@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>DraBornGo v0.0.4 Sürüm Notları</title>
+  <style>
+    :root { color-scheme: dark; --dkd_bg: #06101c; --dkd_panel: #0c1a2b; --dkd_line: rgba(255,255,255,.12); --dkd_text: #f5fbff; --dkd_soft: rgba(245,251,255,.72); --dkd_cyan: #7be6ff; --dkd_green: #58e2ab; }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: var(--dkd_bg); color: var(--dkd_text); }
+    main { width: min(920px, calc(100% - 28px)); margin: 0 auto; padding: 32px 0; }
+    .dkd_card { border: 1px solid var(--dkd_line); border-radius: 24px; background: var(--dkd_panel); padding: 22px; }
+    .dkd_badge { display: inline-flex; border: 1px solid rgba(123,230,255,.28); border-radius: 999px; padding: 8px 12px; color: var(--dkd_cyan); font-weight: 900; font-size: 12px; }
+    h1 { margin: 16px 0 10px; font-size: clamp(28px, 7vw, 54px); line-height: 1; }
+    p, li { color: var(--dkd_soft); font-weight: 700; line-height: 1.7; }
+    a { color: var(--dkd_cyan); font-weight: 900; }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="dkd_card">
+      <span class="dkd_badge">DraBornGo v0.0.4</span>
+      <h1>Sürüm Notları</h1>
+      <p>Bu paket DraBornGo için resmi APK indirme ve kullanıcı onaylı güncelleme merkezini hazırlar.</p>
+      <ul>
+        <li>Uygulama açılışta web manifest dosyasını okuyarak yeni sürüm kontrolü yapar.</li>
+        <li>Hızlı erişim menüsüne Sürüm ve Güncelleme Merkezi eklendi.</li>
+        <li>APK indirme sayfası, manifest, SHA-256 alanı ve sürüm notları hazırlandı.</li>
+        <li>Google Play’e ileride dönüş riskini düşürmek için sessiz kurulum izni eklenmedi.</li>
+      </ul>
+      <p><a href="./">APK indirme sayfasına dön</a></p>
+    </section>
+  </main>
+</body>
+</html>

@@ -1,0 +1,17 @@
+# DKD repo hygiene
+node_modules/
+.expo/
+dist/
+build/
+android/
+ios/
+*.aab
+*.apk
+*.keystore
+*.jks
+.env
+.env.*
+!.env.example
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

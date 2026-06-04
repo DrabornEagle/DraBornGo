@@ -1,0 +1,6 @@
+export const dkd_generated_public_env_value = {
+  EXPO_PUBLIC_SUPABASE_URL: '',
+  EXPO_PUBLIC_SUPABASE_ANON_KEY: '',
+  EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY: '',
+  EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN: '',
+};
