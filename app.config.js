@@ -14,8 +14,27 @@ function dkd_android_permission_value(dkd_permission_suffix_parts_value) {
 const dkd_app_json_value = dkd_read_json_file('app.json');
 const dkd_package_json_value = dkd_read_json_file('package.json');
 
+let dkd_public_env_defaults_value = {};
+
+try {
+  dkd_public_env_defaults_value = dkd_read_json_file(
+    'config/dkd_public_env.defaults.json'
+  );
+} catch (dkd_public_env_defaults_error_value) {
+  void dkd_public_env_defaults_error_value;
+  dkd_public_env_defaults_value = {};
+}
+
 function dkd_public_env_text_value(dkd_env_key_value) {
-  return String(process.env[dkd_env_key_value] || '').trim();
+  const dkd_runtime_env_value = String(
+    process.env[dkd_env_key_value] || ''
+  ).trim();
+
+  const dkd_default_env_value = String(
+    dkd_public_env_defaults_value[dkd_env_key_value] || ''
+  ).trim();
+
+  return dkd_runtime_env_value || dkd_default_env_value;
 }
 
 const dkd_public_env_config_value = {

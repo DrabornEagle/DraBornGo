@@ -13,7 +13,7 @@ function dkd_fail(dkd_message_text) {
 }
 
 if (!dkd_file_system.existsSync(dkd_home_file_path)) {
-  dkd_fail('src/features/map/MapHomeScreen.js bulunamadı. Komutu projects/Lootonia içinde çalıştır.');
+  dkd_fail('src/features/map/MapHomeScreen.js bulunamadı. Komutu projects/DraBornGo içinde çalıştır.');
 }
 
 if (!dkd_file_system.existsSync(dkd_next_support_file_path)) {

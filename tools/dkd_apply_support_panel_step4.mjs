@@ -17,7 +17,7 @@ function dkd_replace_once(dkd_source_text, dkd_search_text, dkd_replace_text, dk
 }
 
 if (!dkd_file_system.existsSync(dkd_admin_menu_path)) {
-  dkd_fail('src/features/admin/AdminMenuModal.js bulunamadı. Komutu projects/Lootonia içinde çalıştır.');
+  dkd_fail('src/features/admin/AdminMenuModal.js bulunamadı. Komutu projects/DraBornGo içinde çalıştır.');
 }
 
 let dkd_admin_menu_text = dkd_file_system.readFileSync(dkd_admin_menu_path, 'utf8');

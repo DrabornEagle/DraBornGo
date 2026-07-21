@@ -18,7 +18,7 @@ if (!dkd_file_system.existsSync(dkd_support_panel_path)) {
 
 let dkd_source_text = dkd_file_system.readFileSync(dkd_support_panel_path, "utf8");
 
-if (!dkd_source_text.includes("dkd_lootonia_support_drafts_v1")) {
+if (!dkd_source_text.includes("dkd_draborngo_support_drafts_v1")) {
   dkd_fail("Step 2 destek paneli baz metni bulunamadı. Eski kopyadan patch üretmiyorum; güncel dosyayı kontrol et.");
 }
 

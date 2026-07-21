@@ -32,12 +32,7 @@
         "android.permission.ACCESS_COARSE_LOCATION",
         "android.permission.ACCESS_FINE_LOCATION",
         "android.permission.CAMERA"
-      ],
-      "navigationBarColor": "#00000000",
-      "statusBar": {
-        "backgroundColor": "#000000",
-        "barStyle": "light-content"
-      }
+      ]
     },
     "plugins": [
       [
