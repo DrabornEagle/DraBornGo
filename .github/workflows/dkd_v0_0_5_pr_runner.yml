@@ -60,7 +60,7 @@ jobs:
       - name: Validate Expo public config
         shell: bash
         run: |
-          npx expo config --type public >/tmp/dkd_expo_public_config.json
+          npx expo config --type public --json >/tmp/dkd_expo_public_config.json
           node -e "const c=require('/tmp/dkd_expo_public_config.json'); if(c.version!=='0.0.5'||Number(c.android?.versionCode)!==5) process.exit(1); console.log('Expo config v0.0.5 / 5 doğrulandı.');"
 
       - name: Bundle Android JavaScript
