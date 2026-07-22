@@ -18,10 +18,6 @@ jobs:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
       ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
       ANDROID_HOME: /usr/local/lib/android/sdk
-      EXPO_PUBLIC_SUPABASE_URL: ${{ secrets.EXPO_PUBLIC_SUPABASE_URL }}
-      EXPO_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.EXPO_PUBLIC_SUPABASE_ANON_KEY }}
-      EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY }}
-      EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN: ${{ secrets.EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN }}
       DKD_ANDROID_KEYSTORE_BASE64: ${{ secrets.DKD_ANDROID_KEYSTORE_BASE64 }}
       DKD_ANDROID_KEYSTORE_PASSWORD: ${{ secrets.DKD_ANDROID_KEYSTORE_PASSWORD }}
       DKD_ANDROID_KEY_ALIAS: ${{ secrets.DKD_ANDROID_KEY_ALIAS }}
@@ -42,7 +38,6 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
-
 
       - name: Dkd fast validate android signing secrets
         shell: bash
@@ -66,6 +61,11 @@ jobs:
       - name: Dkd write embedded public env module
         shell: bash
         run: |
+          node ./scripts/dkd_restore_public_env.mjs
+          set -a
+          . ./.env
+          set +a
+
           dkd_supabase_publishable_key_value="${EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY:-${EXPO_PUBLIC_SUPABASE_ANON_KEY}}"
           export EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY="${dkd_supabase_publishable_key_value}"
 
@@ -164,7 +164,6 @@ jobs:
       - name: Dkd generate android project
         run: npx expo prebuild --platform android --clean --non-interactive
 
-
       - name: Dkd tune gradle release memory
         shell: bash
         run: |
@@ -206,12 +205,12 @@ jobs:
         shell: bash
         run: |
           mkdir -p dkd_signed_apk_output
-          cp android/app/build/outputs/apk/release/*.apk dkd_signed_apk_output/DraBornGo-v0.0.4-code4-release.apk
+          cp android/app/build/outputs/apk/release/*.apk dkd_signed_apk_output/DraBornGo-v0.0.5-code5-release.apk
           ls -lh dkd_signed_apk_output
 
       - name: Dkd upload signed APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: DKD_DraBornGo_v0_0_4_code4_signed_apk
-          path: dkd_signed_apk_output/DraBornGo-v0.0.4-code4-release.apk
+          name: DKD_DraBornGo_v0_0_5_code5_signed_apk
+          path: dkd_signed_apk_output/DraBornGo-v0.0.5-code5-release.apk
           retention-days: 14
