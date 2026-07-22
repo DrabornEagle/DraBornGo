@@ -3,7 +3,6 @@ set -euo pipefail
 
 dkd_project_root="$HOME/Projects"
 dkd_target_path="$dkd_project_root/DraBornGo"
-dkd_legacy_path="$dkd_project_root/Lootonia"
 dkd_download_path="$HOME/storage/downloads"
 dkd_timestamp_value="$(date +%Y%m%d_%H%M%S)"
 dkd_backup_file="$dkd_download_path/DKD_DraBornGo_SourceCode_v0.0.4_${dkd_timestamp_value}.zip"
@@ -19,8 +18,6 @@ if [ -d "$dkd_target_path" ]; then
   rm -f "$dkd_latest_backup_file"
   zip -qr "$dkd_backup_file" . -x '.git/*' 'node_modules/*' '.expo/*' 'dist/*' '.dkd-export-check/*'
   cp -f "$dkd_backup_file" "$dkd_latest_backup_file"
-elif [ -d "$dkd_legacy_path" ]; then
-  mv "$dkd_legacy_path" "$dkd_target_path"
 fi
 
 if [ ! -d "$dkd_target_path/.git" ]; then
