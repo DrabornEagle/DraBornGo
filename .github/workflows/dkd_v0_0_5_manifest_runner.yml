@@ -88,6 +88,11 @@ jobs:
 
           dkd_changed_paths = set(dkd_null_list(dkd_git('diff', '--no-renames', '--name-only', '-z', 'HEAD', dkd_binary=True)))
           dkd_changed_paths.update(dkd_null_list(dkd_git('ls-files', '--others', '--exclude-standard', '-z', dkd_binary=True)))
+          dkd_changed_paths = {
+              dkd_relative_path
+              for dkd_relative_path in dkd_changed_paths
+              if not dkd_relative_path.startswith('.github/workflows/')
+          }
           dkd_entries = []
           for dkd_relative_path in sorted(dkd_changed_paths):
               dkd_path = Path(dkd_relative_path)
