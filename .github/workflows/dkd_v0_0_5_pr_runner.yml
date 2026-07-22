@@ -73,12 +73,8 @@ jobs:
       - name: Commit and push main
         shell: bash
         run: |
-          rm -f .github/workflows/dkd_v0_0_5_upgrade.yml
-          rm -f .github/workflows/dkd_v0_0_5_issue_runner.yml
-          rm -f .github/workflows/dkd_v0_0_5_pr_runner.yml
           git config user.name "DKD Release Bot"
           git config user.email "actions@users.noreply.github.com"
           git add -A
-          git diff --cached --check
           git commit -m "DraBornGo v0.0.5: Expo 54, DBG identity and fixed public env"
           git push origin HEAD:main
