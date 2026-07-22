@@ -14,7 +14,7 @@ const dkd_default_policy_config_value = {
   dkd_account_deletion_form_url_value: dkd_default_account_deletion_form_url_value,
   dkd_package_name_value: 'com.draborneagle.draborngo',
   dkd_version_name_value: 'v0.0.5',
-  dkd_version_code_value: '4',
+  dkd_version_code_value: '5',
 };
 
 const dkd_policy_card_values = [
@@ -286,7 +286,7 @@ function DkdGooglePlayPolicyCenterModal({ dkd_visible_value, dkd_on_close_value,
                     dkd_label_value="Sürüm kodu"
                     dkd_value={String(dkd_policy_config_draft_value.dkd_version_code_value || '')}
                     dkd_on_change_value={(dkd_next_text_value) => dkd_change_policy_config_draft_value('dkd_version_code_value', dkd_next_text_value)}
-                    dkd_placeholder_value="1"
+                    dkd_placeholder_value="5"
                     dkd_keyboard_type_value="number-pad"
                   />
                   <DkdPolicyInput

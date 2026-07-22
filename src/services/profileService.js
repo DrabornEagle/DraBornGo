@@ -12,6 +12,7 @@ export async function checkIsAdmin() {
 
 export async function fetchProfile(userId) {
   const selV27 = 'user_id, dbg_id, social_last_seen_at, nickname, avatar_emoji, avatar_image_url, dkd_puan, shards, boss_tickets, energy, energy_max, energy_updated_at, task_state, boss_state, weekly_task_state, xp, level, rank_key, wallet_tl, courier_status, courier_score, courier_completed_jobs, courier_wallet_tl, merchant_wallet_tl, courier_total_earned_tl, courier_withdrawn_tl, courier_active_days, courier_last_completed_at, courier_fastest_eta_min, courier_city, courier_zone, courier_vehicle_type, courier_profile_meta, dkd_country, dkd_city, dkd_region, dkd_courier_online, dkd_courier_online_country, dkd_courier_online_city, dkd_courier_online_region, dkd_courier_last_online_at, dkd_courier_auto_assigned_job_id';
+  const selV26LegacyDbg = 'user_id, dbg_id:ally_id, social_last_seen_at, nickname, avatar_emoji, avatar_image_url, dkd_puan, shards, boss_tickets, energy, energy_max, energy_updated_at, task_state, boss_state, weekly_task_state, xp, level, rank_key, wallet_tl, courier_status, courier_score, courier_completed_jobs, courier_wallet_tl, courier_total_earned_tl, courier_withdrawn_tl, courier_active_days, courier_last_completed_at, courier_fastest_eta_min, courier_city, courier_zone, courier_vehicle_type, courier_profile_meta';
   const selV26 = 'user_id, dbg_id, social_last_seen_at, nickname, avatar_emoji, avatar_image_url, dkd_puan, shards, boss_tickets, energy, energy_max, energy_updated_at, task_state, boss_state, weekly_task_state, xp, level, rank_key, wallet_tl, courier_status, courier_score, courier_completed_jobs, courier_wallet_tl, courier_total_earned_tl, courier_withdrawn_tl, courier_active_days, courier_last_completed_at, courier_fastest_eta_min, courier_city, courier_zone, courier_vehicle_type, courier_profile_meta';
   const selV25 = 'user_id, dbg_id, social_last_seen_at, nickname, avatar_emoji, dkd_puan, shards, boss_tickets, energy, energy_max, energy_updated_at, task_state, boss_state, weekly_task_state, xp, level, rank_key, wallet_tl, courier_status, courier_score, courier_completed_jobs, courier_wallet_tl, courier_total_earned_tl, courier_withdrawn_tl, courier_active_days, courier_last_completed_at, courier_fastest_eta_min, courier_city, courier_zone, courier_vehicle_type, courier_profile_meta';
   const selV24 = 'user_id, dbg_id, social_last_seen_at, nickname, avatar_emoji, dkd_puan, shards, boss_tickets, energy, energy_max, energy_updated_at, task_state, boss_state, weekly_task_state, xp, level, rank_key, courier_status, courier_score, courier_completed_jobs, courier_wallet_tl, courier_total_earned_tl, courier_withdrawn_tl, courier_active_days, courier_last_completed_at, courier_fastest_eta_min';
@@ -71,7 +72,18 @@ export async function fetchProfile(userId) {
       error = resp.error;
     }
 
-    if (msg.includes('dbg_id') || msg.includes('social_last_seen_at')) {
+    if (msg.includes('dbg_id')) {
+      resp = await supabase
+        .from('dkd_profiles')
+        .select(selV26LegacyDbg)
+        .eq('user_id', userId)
+        .single();
+      data = resp.data;
+      error = resp.error;
+    }
+
+    msg = String(error?.message || error?.details || '');
+    if (msg.includes('social_last_seen_at')) {
       resp = await supabase
         .from('dkd_profiles')
         .select(selV22)
