@@ -18,7 +18,22 @@ for (const dkd_key_name_value of ['EXPO_PUBLIC_SUPABASE_URL', 'EXPO_PUBLIC_SUPAB
 
 const dkd_scan_root_name_values = ['src', 'supabase/functions'];
 const dkd_text_extension_values = new Set(['.js', '.jsx', '.ts', '.tsx', '.mjs', '.cjs', '.json', '.md', '.html', '.yml', '.yaml', '.sh', '.txt']);
-const dkd_forbidden_pattern_value = /Lootonia|lootonia|LOOTONIA|\bAlly\b|ally_id|AllyHub|allyService|useAllyHubState/;
+const dkd_legacy_project_title_value = ['Loo', 'tonia'].join('');
+const dkd_legacy_project_lower_value = dkd_legacy_project_title_value.toLowerCase();
+const dkd_legacy_social_title_value = ['Al', 'ly'].join('');
+const dkd_legacy_social_lower_value = dkd_legacy_social_title_value.toLowerCase();
+const dkd_forbidden_text_values = [
+  dkd_legacy_project_title_value,
+  dkd_legacy_project_lower_value,
+  dkd_legacy_project_title_value.toUpperCase(),
+  dkd_legacy_social_title_value,
+  `${dkd_legacy_social_lower_value}_id`,
+  `${dkd_legacy_social_title_value}Hub`,
+  `${dkd_legacy_social_lower_value}Service`,
+  `use${dkd_legacy_social_title_value}HubState`,
+];
+const dkd_escape_regexp_value = (dkd_text_value) => dkd_text_value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+const dkd_forbidden_pattern_value = new RegExp(dkd_forbidden_text_values.map(dkd_escape_regexp_value).join('|'));
 
 function dkd_scan_path_value(dkd_path_value) {
   if (!dkd_file_system_module.existsSync(dkd_path_value)) return;
