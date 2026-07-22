@@ -1,0 +1,68 @@
+name: DKD v0.0.5 One-Time Runner
+
+on:
+  issues:
+    types: [opened, reopened]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: dkd-v0-0-5-one-time-runner
+  cancel-in-progress: false
+
+jobs:
+  upgrade:
+    if: github.event.issue.title == '[DKD] DraBornGo v0.0.5 yükseltmesini çalıştır'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      CI: "1"
+      EXPO_NO_TELEMETRY: "1"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - name: Apply deterministic upgrade
+        run: python3 scripts/dkd_apply_v0_0_5_upgrade.py
+
+      - name: Install and align Expo SDK 54 packages
+        shell: bash
+        run: |
+          npm install
+          npx expo install --fix
+          npm run env:restore
+
+      - name: Verify version, identity and environment
+        run: npm run dkd:verify-v0.0.5
+
+      - name: Validate Expo public config
+        shell: bash
+        run: |
+          npx expo config --type public >/tmp/dkd_expo_public_config.json
+          node -e "const c=require('/tmp/dkd_expo_public_config.json'); if(c.version!=='0.0.5'||Number(c.android?.versionCode)!==5) process.exit(1); console.log('Expo config v0.0.5 / 5 doğrulandı.');"
+
+      - name: Bundle Android JavaScript
+        shell: bash
+        run: |
+          rm -rf .dkd-export-check
+          npx expo export --platform android --output-dir .dkd-export-check --clear
+          rm -rf .dkd-export-check
+
+      - name: Remove temporary runners and push
+        shell: bash
+        run: |
+          rm -f .github/workflows/dkd_v0_0_5_upgrade.yml
+          rm -f .github/workflows/dkd_v0_0_5_issue_runner.yml
+          git config user.name "DKD Release Bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add -A
+          git diff --cached --check
+          git commit -m "DraBornGo v0.0.5: Expo 54, DBG identity and fixed public env"
+          git push origin HEAD:main
