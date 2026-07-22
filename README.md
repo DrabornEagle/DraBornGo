@@ -1,3 +1,5 @@
+> Aktif sürüm: DraBornGo v0.0.5 • Android versionCode 5 • Termux proje yolu: `~/Projects/DraBornGo`
+
 # DraBornGo
 
 DraBornGo is an Expo + Supabase mobile application focused on courier, package delivery, service-network orders, live route tracking, support, account privacy, and admin operations.

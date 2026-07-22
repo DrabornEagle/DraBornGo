@@ -30,7 +30,7 @@ import DailyRewardModal from '../features/dailyReward/DailyRewardModal';
 import AchievementsModal from '../features/achievements/AchievementsModal';
 import SocialPlayerCardModal from '../features/social/SocialPlayerCardModal';
 import SocialCompareModal from '../features/social/SocialCompareModal';
-import AllyHubModal from '../features/social/AllyHubModal';
+import DBGHubModal from '../features/social/DBGHubModal';
 import DkdWalletPaymentMethodModal from '../features/payment/dkd_wallet_payment_method_modal';
 import DkdGooglePlayPolicyCenterModal from '../features/legal/dkd_google_play_policy_center_modal';
 import DkdAppUpdateCenterModal from '../features/legal/dkd_app_update_center_modal';
@@ -358,7 +358,7 @@ function ModalHost(props) {
             setCourierBoardOpen(true);
           }}
           onProfile={() => setProfileOpen(true)}
-          onAllyHub={() => setActiveTab('ally')}
+          onDBGHub={() => setActiveTab('dbg')}
           onLeaderboard={() => setActiveTab('leader')}
           onDailyReward={openRewardModal}
           onWalletTopup={dkd_open_wallet_topup_from_action_menu_value}
@@ -542,8 +542,8 @@ function ModalHost(props) {
         />
       ) : null}
 
-      {activeTab === 'ally' ? (
-        <AllyHubModal
+      {activeTab === 'dbg' ? (
+        <DBGHubModal
           visible
           onClose={() => setActiveTab('map')}
           sessionUserId={sessionUserId}

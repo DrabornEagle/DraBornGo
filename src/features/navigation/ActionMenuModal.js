@@ -72,7 +72,7 @@ function ActionMenuModal({
   onSocialCard,
   onAchievements,
   onProfile,
-  onAllyHub,
+  onDBGHub,
   onLeaderboard,
   onDailyReward,
   onWalletTopup,
@@ -113,13 +113,13 @@ function ActionMenuModal({
             tone: 'green',
             onPress: () => open(onWalletTopup),
           } : null,
-          onAllyHub ? {
-            key: 'ally',
+          onDBGHub ? {
+            key: 'dbg',
             icon: 'message-badge-outline',
             label: 'Sohbet Merkezi',
             sub: 'Arkadaş ekle, DM akışını yönet ve ekip sohbetini aç',
             tone: 'blue',
-            onPress: () => open(onAllyHub),
+            onPress: () => open(onDBGHub),
           } : null,
           onLeaderboard ? {
             key: 'leaderboard',
@@ -219,7 +219,7 @@ function ActionMenuModal({
     });
 
     return base;
-  }, [handlePlayerCard, isAdmin, onAchievements, onAdmin, onAllyHub, onClose, onDailyReward, onHistory, onLeaderboard, onLogout, onProfile, onTasks, onWalletTopup, onLegalCenter, dkd_on_app_update_center_value]);
+  }, [handlePlayerCard, isAdmin, onAchievements, onAdmin, onDBGHub, onClose, onDailyReward, onHistory, onLeaderboard, onLogout, onProfile, onTasks, onWalletTopup, onLegalCenter, dkd_on_app_update_center_value]);
 
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>

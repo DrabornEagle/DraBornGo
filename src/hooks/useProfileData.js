@@ -21,7 +21,7 @@ function normalizeFallbackProfile(userId, row = {}) {
   return {
     user_id: userId,
     id: userId,
-    ally_id: row?.ally_id == null ? null : Number(row?.ally_id),
+    dbg_id: row?.dbg_id == null ? null : Number(row?.dbg_id),
     social_last_seen_at: row?.social_last_seen_at || null,
     nickname: row?.nickname || 'DrabornEagle',
     avatar_emoji: row?.avatar_emoji || '🦅',
@@ -91,7 +91,7 @@ export function useProfileData({ sessionUserId, setProfile, setDbReadyFlags }) {
 
       const direct = await supabase
         .from('dkd_profiles')
-        .select('user_id, ally_id, social_last_seen_at, nickname, avatar_emoji, avatar_image_url, dkd_puan, shards, boss_tickets, energy, energy_max, energy_updated_at, task_state, boss_state, weekly_task_state, xp, level, rank_key, wallet_tl, courier_status, courier_score, courier_completed_jobs, courier_wallet_tl, courier_total_earned_tl, courier_withdrawn_tl, courier_active_days, courier_last_completed_at, courier_fastest_eta_min, courier_city, courier_zone, courier_vehicle_type, courier_profile_meta')
+        .select('user_id, dbg_id, social_last_seen_at, nickname, avatar_emoji, avatar_image_url, dkd_puan, shards, boss_tickets, energy, energy_max, energy_updated_at, task_state, boss_state, weekly_task_state, xp, level, rank_key, wallet_tl, courier_status, courier_score, courier_completed_jobs, courier_wallet_tl, courier_total_earned_tl, courier_withdrawn_tl, courier_active_days, courier_last_completed_at, courier_fastest_eta_min, courier_city, courier_zone, courier_vehicle_type, courier_profile_meta')
         .eq('user_id', sessionUserId)
         .maybeSingle();
 

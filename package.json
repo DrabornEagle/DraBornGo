@@ -1,7 +1,7 @@
 {
   "name": "draborngo",
   "main": "expo/AppEntry",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "scripts": {
     "start": "node ./node_modules/expo/bin/cli start",
     "reset-project": "node ./scripts/reset-project.js",
@@ -17,11 +17,15 @@
     "release:manifest": "bash ./scripts/release-manifest.sh .",
     "release:archive": "bash ./scripts/release-safe-archive.sh .",
     "play:final-audit": "bash ./scripts/dkd_play_console_final_audit.sh .",
-    "postinstall": "node ./scripts/dkd_clean_android_dependency_manifests.js",
+    "postinstall": "node ./scripts/dkd_restore_public_env.mjs && node ./scripts/dkd_clean_android_dependency_manifests.js",
     "dkd:clean-android-manifests": "node ./scripts/dkd_clean_android_dependency_manifests.js",
     "dkd:play-risk-scan": "node ./scripts/dkd_play_risk_scan.js",
     "env:restore": "node ./scripts/dkd_restore_public_env.mjs",
-    "prestart": "npm run env:restore"
+    "prestart": "npm run env:restore",
+    "preandroid": "npm run env:restore",
+    "prebuild": "npm run env:restore",
+    "preexport": "npm run env:restore",
+    "dkd:verify-v0.0.5": "node ./scripts/dkd_verify_release_identity.mjs"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",

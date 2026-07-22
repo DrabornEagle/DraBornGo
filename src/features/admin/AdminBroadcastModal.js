@@ -21,7 +21,7 @@ const TARGETS = [
   { key: 'market', label: 'Market' },
   { key: 'collection', label: 'Koleksiyon' },
   { key: 'courier', label: 'Kurye' },
-  { key: 'ally', label: 'Sohbet' },
+  { key: 'dbg', label: 'Sohbet' },
   { key: 'admin', label: 'Admin' },
 ];
 

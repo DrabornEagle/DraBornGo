@@ -3,18 +3,18 @@ import { Alert } from 'react-native';
 import {
   dkd_block_social_user_value,
   dkd_report_social_user_value,
-  fetchAllySnapshot,
+  fetchDBGSnapshot,
   fetchThreadMessages,
-  getAllyFriendlyError,
+  getDBGFriendlyError,
   getOrCreateDirectThread,
   markThreadSeen,
   removeFriend,
   respondFriendRequest,
-  searchAllyProfiles,
+  searchDBGProfiles,
   sendFriendRequest,
   sendThreadMessage,
-  touchAllyPresence,
-} from '../services/allyService';
+  touchDBGPresence,
+} from '../services/dbgService';
 
 const EMPTY_SNAPSHOT = Object.freeze({
   myProfile: null,
@@ -27,7 +27,7 @@ function sumUnread(rows = []) {
   return (Array.isArray(rows) ? rows : []).reduce((total, row) => total + Number(row?.unread_count || 0), 0);
 }
 
-export function useAllyHubState({ sessionUserId, visible, profile, refreshProfile }) {
+export function useDBGHubState({ sessionUserId, visible, profile, refreshProfile }) {
   const [loading, setLoading] = useState(false);
   const [dbReady, setDbReady] = useState(true);
   const [dbMessage, setDbMessage] = useState('');
@@ -41,10 +41,10 @@ export function useAllyHubState({ sessionUserId, visible, profile, refreshProfil
   const [sending, setSending] = useState(false);
   const [dkd_moderation_saving_value, dkd_set_moderation_saving_value] = useState(false);
 
-  const myAllyId = useMemo(() => {
-    const raw = profile?.ally_id ?? snapshot?.myProfile?.ally_id ?? null;
+  const myDBGId = useMemo(() => {
+    const raw = profile?.dbg_id ?? snapshot?.myProfile?.dbg_id ?? null;
     return raw == null ? '—' : String(raw).replace(/\D/g, '').padStart(6, '0');
-  }, [profile?.ally_id, snapshot?.myProfile?.ally_id]);
+  }, [profile?.dbg_id, snapshot?.myProfile?.dbg_id]);
 
   const unreadTotal = useMemo(() => sumUnread(snapshot?.friends), [snapshot?.friends]);
 
@@ -57,9 +57,9 @@ export function useAllyHubState({ sessionUserId, visible, profile, refreshProfil
     }
 
     if (!silent) setLoading(true);
-    const { data, error } = await fetchAllySnapshot();
+    const { data, error } = await fetchDBGSnapshot();
     if (error) {
-      const message = getAllyFriendlyError(error);
+      const message = getDBGFriendlyError(error);
       setDbReady(false);
       setDbMessage(message);
       if (!silent) setSnapshot(EMPTY_SNAPSHOT);
@@ -90,8 +90,8 @@ export function useAllyHubState({ sessionUserId, visible, profile, refreshProfil
     if (!silent) setMessagesLoading(true);
     const { data, error } = await fetchThreadMessages(threadId, 120);
     if (error) {
-      const message = getAllyFriendlyError(error);
-      if (!silent) Alert.alert('Ally Sohbet', message);
+      const message = getDBGFriendlyError(error);
+      if (!silent) Alert.alert('DBG Sohbet', message);
       if (!silent) setMessagesLoading(false);
       return [];
     }
@@ -109,7 +109,7 @@ export function useAllyHubState({ sessionUserId, visible, profile, refreshProfil
     if (!threadId) {
       const { data, error } = await getOrCreateDirectThread(friendRow.user_id);
       if (error) {
-        Alert.alert('Ally Sohbet', getAllyFriendlyError(error));
+        Alert.alert('DBG Sohbet', getDBGFriendlyError(error));
         return;
       }
       threadId = data;
@@ -140,11 +140,11 @@ export function useAllyHubState({ sessionUserId, visible, profile, refreshProfil
     }
 
     setSearching(true);
-    const { data, error } = await searchAllyProfiles(query, 12);
+    const { data, error } = await searchDBGProfiles(query, 12);
     setSearching(false);
 
     if (error) {
-      Alert.alert('Ally Arama', getAllyFriendlyError(error));
+      Alert.alert('DBG Arama', getDBGFriendlyError(error));
       return [];
     }
 
@@ -156,11 +156,11 @@ export function useAllyHubState({ sessionUserId, visible, profile, refreshProfil
   const handleSendRequest = useCallback(async (targetUserId) => {
     const { data, error } = await sendFriendRequest(targetUserId);
     if (error) {
-      Alert.alert('Arkadaş Ekle', getAllyFriendlyError(error));
+      Alert.alert('Arkadaş Ekle', getDBGFriendlyError(error));
       return false;
     }
     if (data?.ok === false) {
-      Alert.alert('Arkadaş Ekle', getAllyFriendlyError(data?.reason || 'İstek gönderilemedi.'));
+      Alert.alert('Arkadaş Ekle', getDBGFriendlyError(data?.reason || 'İstek gönderilemedi.'));
       return false;
     }
     Alert.alert('Arkadaş Ekle', data?.reason === 'accepted_existing' ? 'Karşı taraftan bekleyen istek kabul edildi. Artık arkadaşsınız.' : 'İstek gönderildi.');
@@ -171,11 +171,11 @@ export function useAllyHubState({ sessionUserId, visible, profile, refreshProfil
   const handleRespondRequest = useCallback(async (requestId, action) => {
     const { data, error } = await respondFriendRequest(requestId, action);
     if (error) {
-      Alert.alert('Arkadaşlık İsteği', getAllyFriendlyError(error));
+      Alert.alert('Arkadaşlık İsteği', getDBGFriendlyError(error));
       return false;
     }
     if (data?.ok === false) {
-      Alert.alert('Arkadaşlık İsteği', getAllyFriendlyError(data?.reason || 'İşlem tamamlanamadı.'));
+      Alert.alert('Arkadaşlık İsteği', getDBGFriendlyError(data?.reason || 'İşlem tamamlanamadı.'));
       return false;
     }
     await refreshSnapshot({ silent: true });
@@ -185,11 +185,11 @@ export function useAllyHubState({ sessionUserId, visible, profile, refreshProfil
   const handleRemoveFriend = useCallback(async (friendUserId) => {
     const { data, error } = await removeFriend(friendUserId);
     if (error) {
-      Alert.alert('Ally', getAllyFriendlyError(error));
+      Alert.alert('DBG', getDBGFriendlyError(error));
       return false;
     }
     if (data?.ok === false) {
-      Alert.alert('Ally', getAllyFriendlyError(data?.reason || 'Arkadaş kaldırılamadı.'));
+      Alert.alert('DBG', getDBGFriendlyError(data?.reason || 'Arkadaş kaldırılamadı.'));
       return false;
     }
     if (String(activeChat?.user_id || '') === String(friendUserId || '')) {
@@ -206,17 +206,17 @@ export function useAllyHubState({ sessionUserId, visible, profile, refreshProfil
     const { data, error } = await sendThreadMessage(activeChat.thread_id, text);
     setSending(false);
     if (error) {
-      Alert.alert('Mesaj', getAllyFriendlyError(error));
+      Alert.alert('Mesaj', getDBGFriendlyError(error));
       return false;
     }
     if (data?.ok === false) {
-      Alert.alert('Mesaj', getAllyFriendlyError(data?.reason || 'Mesaj gönderilemedi.'));
+      Alert.alert('Mesaj', getDBGFriendlyError(data?.reason || 'Mesaj gönderilemedi.'));
       return false;
     }
     await Promise.all([
       loadMessages(activeChat.thread_id, { silent: true }),
       refreshSnapshot({ silent: true }),
-      touchAllyPresence(),
+      touchDBGPresence(),
     ]);
     return true;
   }, [activeChat?.thread_id, loadMessages, refreshSnapshot]);
@@ -233,12 +233,12 @@ export function useAllyHubState({ sessionUserId, visible, profile, refreshProfil
     dkd_set_moderation_saving_value(false);
 
     if (error) {
-      Alert.alert('Şikayet', getAllyFriendlyError(error));
+      Alert.alert('Şikayet', getDBGFriendlyError(error));
       return false;
     }
 
     if (data?.ok === false) {
-      Alert.alert('Şikayet', getAllyFriendlyError(data?.reason || 'Şikayet gönderilemedi.'));
+      Alert.alert('Şikayet', getDBGFriendlyError(data?.reason || 'Şikayet gönderilemedi.'));
       return false;
     }
 
@@ -286,12 +286,12 @@ export function useAllyHubState({ sessionUserId, visible, profile, refreshProfil
           dkd_set_moderation_saving_value(false);
 
           if (error) {
-            Alert.alert('Engelle', getAllyFriendlyError(error));
+            Alert.alert('Engelle', getDBGFriendlyError(error));
             return;
           }
 
           if (data?.ok === false) {
-            Alert.alert('Engelle', getAllyFriendlyError(data?.reason || 'Kullanıcı engellenemedi.'));
+            Alert.alert('Engelle', getDBGFriendlyError(data?.reason || 'Kullanıcı engellenemedi.'));
             return;
           }
 
@@ -315,7 +315,7 @@ export function useAllyHubState({ sessionUserId, visible, profile, refreshProfil
     let active = true;
 
     (async () => {
-      await touchAllyPresence();
+      await touchDBGPresence();
       const next = await refreshSnapshot();
       if (!active) return;
       if (!activeChat?.user_id && Array.isArray(next?.friends) && next.friends.length === 1 && Number(next.friends[0]?.unread_count || 0) > 0) {
@@ -324,7 +324,7 @@ export function useAllyHubState({ sessionUserId, visible, profile, refreshProfil
     })();
 
     const timer = setInterval(() => {
-      touchAllyPresence();
+      touchDBGPresence();
       refreshSnapshot({ silent: true });
     }, 9000);
 
@@ -350,7 +350,7 @@ export function useAllyHubState({ sessionUserId, visible, profile, refreshProfil
     dbReady,
     dbMessage,
     snapshot,
-    myAllyId,
+    myDBGId,
     unreadTotal,
     refreshSnapshot,
     searchText,
@@ -375,4 +375,4 @@ export function useAllyHubState({ sessionUserId, visible, profile, refreshProfil
   };
 }
 
-export default useAllyHubState;
+export default useDBGHubState;

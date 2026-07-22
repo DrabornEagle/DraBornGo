@@ -174,7 +174,7 @@ export function getHasVisibleModal({
     historyOpen ||
     collectionOpen ||
     activeTab === 'market' ||
-    activeTab === 'ally' ||
+    activeTab === 'dbg' ||
     activeTab === 'tasks' ||
     activeTab === 'leader' ||
     activeTab === 'logistics' ||

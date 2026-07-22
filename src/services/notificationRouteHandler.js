@@ -6,12 +6,12 @@ export function resolveNotificationRoute(payload = {}) {
     .toLowerCase();
 
   const dkd_route_alias_map = {
-    social: 'ally',
-    chat: 'ally',
-    message: 'ally',
-    messages: 'ally',
-    friend: 'ally',
-    friends: 'ally',
+    social: 'dbg',
+    chat: 'dbg',
+    message: 'dbg',
+    messages: 'dbg',
+    friend: 'dbg',
+    friends: 'dbg',
   };
 
   const dkd_route = dkd_route_alias_map[dkd_raw_route] || dkd_raw_route;
@@ -46,8 +46,8 @@ export function applyNotificationRoute({ route, dropId, payload }, api = {}) {
     return true;
   }
 
-  if (route === 'ally') {
-    api.openTab?.('ally', payload);
+  if (route === 'dbg') {
+    api.openTab?.('dbg', payload);
     api.openSocial?.();
     return true;
   }
