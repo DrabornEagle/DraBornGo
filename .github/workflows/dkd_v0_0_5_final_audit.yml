@@ -1,0 +1,124 @@
+name: DKD DraBornGo v0.0.5 Final Audit
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: dkd-draborngo-v0-0-5-final-audit
+  cancel-in-progress: false
+
+jobs:
+  audit:
+    if: github.event.pull_request.title == '[DKD] Audit DraBornGo v0.0.5 final state'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      CI: "1"
+      EXPO_NO_TELEMETRY: "1"
+    steps:
+      - name: Checkout trusted main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - name: Install packages
+        run: npm ci
+
+      - name: Restore pinned public environment
+        run: npm run env:restore
+
+      - name: Verify release identity
+        run: npm run dkd:verify-v0.0.5
+
+      - name: Verify legacy identity is absent from active project files
+        shell: bash
+        run: |
+          dkd_legacy_project_title="$(printf 'Loo%s' 'tonia')"
+          dkd_legacy_social_title="$(printf 'Al%s' 'ly')"
+          dkd_legacy_social_lower="$(printf 'al%s' 'ly')"
+          dkd_pattern="${dkd_legacy_project_title}|${dkd_legacy_project_title,,}|${dkd_legacy_social_title}|${dkd_legacy_social_lower}_id|${dkd_legacy_social_title}Hub|${dkd_legacy_social_lower}Service|use${dkd_legacy_social_title}HubState"
+          if rg -n --hidden \
+            --glob '!node_modules/**' \
+            --glob '!.git/**' \
+            --glob '!supabase/migrations/**' \
+            --glob '!docs/**' \
+            --glob '!store_assets/**' \
+            --glob '!scripts/dkd_verify_release_identity.mjs' \
+            "${dkd_pattern}" \
+            App.js app.json app.config.js package.json src scripts supabase/functions web .github/workflows; then
+            echo "DKD ERROR: Active project files still contain a legacy identity."
+            exit 1
+          fi
+
+      - name: Verify v0.0.5 and code5 remnants
+        shell: bash
+        run: |
+          if rg -n '0\.0\.4|v0_0_4|code4' \
+            app.json app.config.js package.json src web \
+            .github/workflows/dkdev_build_apk.yml \
+            .github/workflows/dkd_build_signed_apk.yml \
+            .github/workflows/dkd_build_signed_aab.yml; then
+            echo "DKD ERROR: Current app/build files still contain v0.0.4 or code4."
+            exit 1
+          fi
+          rg -n '0\.0\.5' app.json package.json
+          rg -n 'versionCode[^0-9]*5|code5|v0_0_5' app.json app.config.js .github/workflows/dkdev_build_apk.yml .github/workflows/dkd_build_signed_apk.yml .github/workflows/dkd_build_signed_aab.yml
+
+      - name: Verify removed silent-install notice
+        shell: bash
+        run: |
+          dkd_notice_text="Uygulama sessiz kurulum yapmaz"
+          if rg -n -F "${dkd_notice_text}" src; then
+            echo "DKD ERROR: Removed silent-install notice is still present."
+            exit 1
+          fi
+
+      - name: Verify DBG files and removed legacy files
+        shell: bash
+        run: |
+          test -f src/features/social/DBGHubModal.js
+          test -f src/hooks/useDBGHubState.js
+          test -f src/services/dbgService.js
+          test ! -e src/features/social/AllyHubModal.js
+          test ! -e src/hooks/useAllyHubState.js
+          test ! -e src/services/allyService.js
+
+      - name: Validate Expo public config
+        shell: bash
+        run: |
+          npx expo config --type public --json >/tmp/dkd_expo_public_config.json
+          node - <<'DKD_NODE'
+          const dkdConfig = require('/tmp/dkd_expo_public_config.json');
+          const dkdRequiredKeys = [
+            'EXPO_PUBLIC_SUPABASE_URL',
+            'EXPO_PUBLIC_SUPABASE_ANON_KEY',
+            'EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY',
+            'EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN',
+          ];
+          if (dkdConfig.name !== 'DraBornGo') throw new Error('DraBornGo app name missing.');
+          if (dkdConfig.version !== '0.0.5') throw new Error('Expo version is not 0.0.5.');
+          if (Number(dkdConfig.android?.versionCode) !== 5) throw new Error('Android versionCode is not 5.');
+          for (const dkdKey of dkdRequiredKeys) {
+            const dkdValue = String(dkdConfig.extra?.dkd_public_env?.[dkdKey] || '').trim();
+            if (!dkdValue) throw new Error(`${dkdKey} is missing from Expo config.`);
+          }
+          console.log('DraBornGo v0.0.5 Expo config and pinned public env verified.');
+          DKD_NODE
+
+      - name: Bundle Android JavaScript
+        shell: bash
+        run: |
+          rm -rf .dkd-final-audit-export
+          npx expo export --platform android --output-dir .dkd-final-audit-export --clear
+          rm -rf .dkd-final-audit-export
