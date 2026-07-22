@@ -22,16 +22,16 @@ function dkd_update_number_value(dkd_source_value, dkd_fallback_value = 0) {
 function dkd_read_current_build_code_value() {
   const dkd_native_build_value = dkd_update_number_value(Constants?.nativeBuildVersion, 0);
   const dkd_expo_build_value = dkd_update_number_value(Constants?.expoConfig?.android?.versionCode, 0);
-  return dkd_native_build_value || dkd_expo_build_value || 4;
+  return dkd_native_build_value || dkd_expo_build_value || 5;
 }
 
 function dkd_read_current_version_name_value() {
-  return dkd_update_text_value(Constants?.nativeAppVersion, dkd_update_text_value(Constants?.expoConfig?.version, '0.0.4'));
+  return dkd_update_text_value(Constants?.nativeAppVersion, dkd_update_text_value(Constants?.expoConfig?.version, '0.0.5'));
 }
 
 function dkd_normalize_manifest_value(dkd_manifest_value = {}) {
   const dkd_latest_version_code_value = dkd_update_number_value(dkd_manifest_value.dkd_latest_version_code, 0);
-  const dkd_latest_version_name_value = dkd_update_text_value(dkd_manifest_value.dkd_latest_version_name, '0.0.4');
+  const dkd_latest_version_name_value = dkd_update_text_value(dkd_manifest_value.dkd_latest_version_name, '0.0.5');
   const dkd_min_supported_version_code_value = dkd_update_number_value(dkd_manifest_value.dkd_min_supported_version_code, 1);
   const dkd_apk_url_value = dkd_update_text_value(dkd_manifest_value.dkd_apk_url, 'https://www.draborneagle.com/DraBornGo/App/dkd_draborngo_latest.apk');
   const dkd_download_page_url_value = dkd_update_text_value(dkd_manifest_value.dkd_download_page_url, dkd_app_update_download_page_url_value);

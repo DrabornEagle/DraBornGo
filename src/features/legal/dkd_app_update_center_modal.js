@@ -136,13 +136,13 @@ function DkdAppUpdateCenterModal({ dkd_visible_value, dkd_on_close_value }) {
               <DkdUpdateInfoCard
                 dkd_icon_value="cellphone-check"
                 dkd_label_value="Cihazdaki sürüm"
-                dkd_value={`v${dkd_status_value?.dkd_current_version_name || '0.0.4'} • Kod ${dkd_status_value?.dkd_current_version_code || 4}`}
+                dkd_value={`v${dkd_status_value?.dkd_current_version_name || '0.0.5'} • Kod ${dkd_status_value?.dkd_current_version_code || 4}`}
                 dkd_tone_value="dkd_current"
               />
               <DkdUpdateInfoCard
                 dkd_icon_value="cloud-download-outline"
                 dkd_label_value="Webdeki son sürüm"
-                dkd_value={`v${dkd_status_value?.dkd_latest_version_name || dkd_manifest_value.dkd_latest_version_name || '0.0.4'} • Kod ${dkd_status_value?.dkd_latest_version_code || dkd_manifest_value.dkd_latest_version_code || 4}`}
+                dkd_value={`v${dkd_status_value?.dkd_latest_version_name || dkd_manifest_value.dkd_latest_version_name || '0.0.5'} • Kod ${dkd_status_value?.dkd_latest_version_code || dkd_manifest_value.dkd_latest_version_code || 4}`}
                 dkd_tone_value={dkd_status_tone_value}
               />
               <DkdUpdateInfoCard

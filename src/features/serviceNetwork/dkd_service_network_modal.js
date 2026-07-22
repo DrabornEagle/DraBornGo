@@ -7,6 +7,8 @@ import DkdUrgentCourierPanel from '../courier/dkd_urgent_courier_panel';
 import DkdCargoLiveMapModal from '../courier/dkd_cargo_live_map_modal';
 import DkdLogisticsModal from '../logistics/dkd_logistics_modal';
 import DkdWalletPaymentMethodModal from '../payment/dkd_wallet_payment_method_modal';
+import DkdRestaurantDemoNoticeModal from './dkd_restaurant_demo_notice_modal';
+import { dkd_payments_enabled_value, dkd_restaurant_orders_enabled_value } from '../../config/dkd_release_flags';
 import { dkd_build_unified_wallet_patch_value, resolveUnifiedWalletTl } from '../../services/walletService';
 import { fetchBusinessMarketCatalog as dkd_fetch_business_market_catalog_value } from '../../services/businessProductService';
 import { dkd_create_restaurant_order_value, dkd_create_service_network_request_value, dkd_delete_completed_service_network_order_value, dkd_fetch_service_network_my_orders_value } from '../../services/dkd_service_network_service';
@@ -1120,6 +1122,7 @@ function DkdServiceNetworkHero({ dkd_on_payment_method_press_value }) {
       </View>
       <Text style={dkd_styles.dkd_hero_eyebrow}>DraBornGo HİZMET AĞI</Text>
       <Text style={dkd_styles.dkd_hero_title}>Şehiriçi & Şehirlerarası ihtiyacınız olan bütün hizmetlerden yararlanın.</Text>
+      {dkd_payments_enabled_value ? (
       <Pressable onPress={dkd_on_payment_method_press_value} style={({ pressed: dkd_pressed_value }) => [dkd_styles.dkd_hero_wallet_button, dkd_pressed_value && dkd_styles.dkd_hero_wallet_button_pressed]}>
         <Animated.View
           pointerEvents="none"
@@ -1143,6 +1146,7 @@ function DkdServiceNetworkHero({ dkd_on_payment_method_press_value }) {
         </View>
         <MaterialCommunityIcons name="chevron-right" size={21} color="#BAE6FD" />
       </Pressable>
+      ) : null}
     </LinearGradient>
   );
 }
@@ -1362,6 +1366,7 @@ function DkdServiceNetworkRestaurantCatalogPanel({
   const [dkd_restaurant_payment_product_value, dkd_set_restaurant_payment_product_value] = useState(null);
   const [dkd_restaurant_payment_preview_value, dkd_set_restaurant_payment_preview_value] = useState(null);
   const [dkd_payment_method_modal_visible_value, dkd_set_payment_method_modal_visible_value] = useState(false);
+  const [dkd_restaurant_demo_notice_visible_value, dkd_set_restaurant_demo_notice_visible_value] = useState(false);
   const dkd_wallet_tl_value = useMemo(() => resolveUnifiedWalletTl(dkd_profile_value || {}), [dkd_profile_value]);
   const dkd_sync_wallet_after_topup_value = useCallback((dkd_wallet_after_value) => {
     const dkd_numeric_wallet_value = Number(dkd_wallet_after_value);
@@ -1502,6 +1507,18 @@ function DkdServiceNetworkRestaurantCatalogPanel({
     ]);
   }, [dkd_submit_restaurant_paid_order_value]);
 
+  const dkd_handle_restaurant_order_press_value = useCallback((dkd_product_value) => {
+    if (!dkd_restaurant_orders_enabled_value || !dkd_payments_enabled_value) {
+      dkd_set_restaurant_demo_notice_visible_value(true);
+      return;
+    }
+    dkd_open_restaurant_payment_value(dkd_product_value);
+  }, [dkd_open_restaurant_payment_value]);
+
+  const dkd_close_restaurant_demo_notice_value = useCallback(() => {
+    dkd_set_restaurant_demo_notice_visible_value(false);
+  }, []);
+
   const dkd_selected_product_image_uri_value = dkd_resolve_restaurant_product_image_uri_value(dkd_selected_restaurant_product_value);
   const dkd_selected_product_price_text_value = dkd_service_network_catalog_price_text_value(dkd_selected_restaurant_product_value);
 
@@ -1518,9 +1535,9 @@ function DkdServiceNetworkRestaurantCatalogPanel({
             <MaterialCommunityIcons name={dkd_selected_category_value?.dkd_icon_value || 'silverware-fork-knife'} size={31} color="#431407" />
           </View>
           <View style={dkd_styles.dkd_restaurant_catalog_hero_copy}>
-            <Text style={dkd_styles.dkd_restaurant_catalog_kicker}>RESTORAN ÜRÜN VİTRİNİ</Text>
+            <Text style={dkd_styles.dkd_restaurant_catalog_kicker}>RESTORAN ÜRÜN VİTRİNİ • DEMO</Text>
             <Text style={dkd_styles.dkd_restaurant_catalog_title}>Restoran siparişi</Text>
-            <Text style={dkd_styles.dkd_restaurant_catalog_text}>Kayıtlı işletmelerin ürünleri minimalist görseller, net fiyat vurgusu ve işletme bazlı modern listeyle görünür. Ürüne dokununca tam görsel ve detay açılır.</Text>
+            <Text style={dkd_styles.dkd_restaurant_catalog_text}>Bu ürünler demo ve test amaçlıdır. Ürünleri inceleyebilirsin; gerçek sipariş ve ödeme çok yakında hizmete açılacaktır.</Text>
           </View>
         </View>
         <View style={dkd_styles.dkd_restaurant_catalog_badge_row}>
@@ -1636,9 +1653,9 @@ function DkdServiceNetworkRestaurantCatalogPanel({
               </View>
             </View>
 
-            <Pressable onPress={() => dkd_open_restaurant_payment_value(dkd_selected_restaurant_product_value)} disabled={Boolean(dkd_restaurant_order_busy_key_value)} style={dkd_styles.dkd_restaurant_detail_order_button}>
+            <Pressable onPress={() => dkd_handle_restaurant_order_press_value(dkd_selected_restaurant_product_value)} disabled={Boolean(dkd_restaurant_order_busy_key_value)} style={dkd_styles.dkd_restaurant_detail_order_button}>
               <LinearGradient colors={["#FDE68A", "#FDBA74", "#FB923C"]} style={dkd_styles.dkd_restaurant_detail_order_gradient}>
-                <Text style={dkd_styles.dkd_restaurant_detail_order_text}>{dkd_restaurant_order_busy_key_value ? 'Kaydediliyor…' : 'Sipariş Oluştur'}</Text>
+                <Text style={dkd_styles.dkd_restaurant_detail_order_text}>{(!dkd_restaurant_orders_enabled_value || !dkd_payments_enabled_value) ? 'Sipariş Ver (Demo)' : (dkd_restaurant_order_busy_key_value ? 'Kaydediliyor…' : 'Sipariş Oluştur')}</Text>
                 <MaterialCommunityIcons name="arrow-right" size={18} color="#431407" />
               </LinearGradient>
             </Pressable>
@@ -1646,7 +1663,14 @@ function DkdServiceNetworkRestaurantCatalogPanel({
         </View>
       </Modal>
 
-      <Modal visible={dkd_restaurant_payment_modal_visible_value} transparent animationType="fade" onRequestClose={dkd_close_restaurant_payment_value}>
+      <DkdRestaurantDemoNoticeModal
+        dkd_visible_value={dkd_restaurant_demo_notice_visible_value}
+        dkd_on_close_value={dkd_close_restaurant_demo_notice_value}
+        dkd_product_title_value={dkd_selected_restaurant_product_value?.title || 'Restoran ürünü'}
+        dkd_business_title_value={dkd_selected_restaurant_product_value?.business_name || 'Restoran'}
+      />
+
+      <Modal visible={dkd_payments_enabled_value && dkd_restaurant_payment_modal_visible_value} transparent animationType="fade" onRequestClose={dkd_close_restaurant_payment_value}>
         <View style={dkd_styles.dkd_restaurant_payment_overlay}>
           <View style={dkd_styles.dkd_restaurant_payment_card}>
             <View style={dkd_styles.dkd_restaurant_payment_header}>
@@ -1704,7 +1728,7 @@ function DkdServiceNetworkRestaurantCatalogPanel({
       </Modal>
 
       <DkdWalletPaymentMethodModal
-        dkd_visible_value={dkd_payment_method_modal_visible_value}
+        dkd_visible_value={dkd_payments_enabled_value && dkd_payment_method_modal_visible_value}
         dkd_on_close_value={() => dkd_set_payment_method_modal_visible_value(false)}
         dkd_order_title_value={`Restoran siparişi • ${dkd_restaurant_payment_product_value?.title || 'Ürün'}`}
         dkd_order_total_tl_value={dkd_restaurant_payment_preview_value?.dkd_customer_charge_tl || 0}

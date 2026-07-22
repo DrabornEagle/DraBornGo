@@ -156,12 +156,12 @@ jobs:
             echo "DKD ERROR: Dev APK output not found."
             exit 1
           fi
-          cp "${dkd_dev_apk_path}" dkd_dev_apk_output/DraBornGo-v0.0.4-code4-dev.apk
+          cp "${dkd_dev_apk_path}" dkd_dev_apk_output/DraBornGo-v0.0.5-code5-dev.apk
           ls -lh dkd_dev_apk_output
 
       - name: Dkd upload development APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: DKD_DraBornGo_v0_0_4_code4_dev_apk
-          path: dkd_dev_apk_output/DraBornGo-v0.0.4-code4-dev.apk
+          name: DKD_DraBornGo_v0_0_5_code5_dev_apk
+          path: dkd_dev_apk_output/DraBornGo-v0.0.5-code5-dev.apk
           retention-days: 7

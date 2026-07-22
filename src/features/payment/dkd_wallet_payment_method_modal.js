@@ -7,6 +7,8 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { dkd_analyze_bank_receipt_image_value } from '../../services/dkd_bank_receipt_ocr_service';
 import { dkd_create_bank_transfer_wallet_topup_value } from '../../services/dkd_wallet_topup_service';
 import { dkd_render_support_panel_modal } from '../support/dkd_support_panel_conversation';
+import { dkd_payments_enabled_value } from '../../config/dkd_release_flags';
+import DkdPaymentsClosedModal from './dkd_payments_closed_modal';
 
 const dkd_wallet_topup_amount_values = [100, 250, 500, 1000];
 const dkd_bank_transfer_iban_value = 'TR53 0011 1000 0000 0151 1527 14';
@@ -797,6 +799,16 @@ export default function DkdWalletPaymentMethodModal({
     }
     await dkd_on_wallet_pay_value?.();
   }, [dkd_on_wallet_pay_value, dkd_wallet_enough_value]);
+
+  if (!dkd_payments_enabled_value) {
+    return (
+      <DkdPaymentsClosedModal
+        dkd_visible_value={dkd_visible_value}
+        dkd_on_close_value={dkd_on_close_value}
+        dkd_context_title_value={dkd_order_title_value}
+      />
+    );
+  }
 
   return (
     <>

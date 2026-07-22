@@ -206,12 +206,12 @@ jobs:
         shell: bash
         run: |
           mkdir -p dkd_signed_apk_output
-          cp android/app/build/outputs/apk/release/*.apk dkd_signed_apk_output/DraBornGo-v0.0.4-code4-release.apk
+          cp android/app/build/outputs/apk/release/*.apk dkd_signed_apk_output/DraBornGo-v0.0.5-code5-release.apk
           ls -lh dkd_signed_apk_output
 
       - name: Dkd upload signed APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: DKD_DraBornGo_v0_0_4_code4_signed_apk
-          path: dkd_signed_apk_output/DraBornGo-v0.0.4-code4-release.apk
+          name: DKD_DraBornGo_v0_0_5_code5_signed_apk
+          path: dkd_signed_apk_output/DraBornGo-v0.0.5-code5-release.apk
           retention-days: 14

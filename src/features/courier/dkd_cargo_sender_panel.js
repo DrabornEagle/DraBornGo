@@ -19,6 +19,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { cityLootTheme } from '../../theme/cityLootTheme';
 import DkdCargoLiveMapModal from './dkd_cargo_live_map_modal';
 import DkdWalletPaymentMethodModal from '../payment/dkd_wallet_payment_method_modal';
+import { dkd_payments_enabled_value } from '../../config/dkd_release_flags';
 import {
   dkd_create_cargo_shipment,
   dkd_emit_cargo_shipment_push_event,
@@ -1039,6 +1040,10 @@ export default function DkdCargoSenderPanel({
   }, [dkd_set_form_field]);
 
   const dkd_open_payment_modal = useCallback(async () => {
+    if (!dkd_payments_enabled_value) {
+      setDkdPaymentMethodModalVisibleValue(true);
+      return;
+    }
     const dkd_missing_alert_message_value = dkd_missing_form_alert_message_value(dkd_form_value);
     if (dkd_missing_alert_message_value) {
       Alert.alert('Paket', dkd_missing_alert_message_value);
@@ -1247,7 +1252,7 @@ export default function DkdCargoSenderPanel({
 
         <Pressable onPress={dkd_open_payment_modal} disabled={dkd_submitting_value || dkd_payment_loading_value} style={[dkd_styles.dkd_primaryAction, (dkd_submitting_value || dkd_payment_loading_value) && dkd_styles.dkd_actionDisabled]}>
           <LinearGradient colors={['#40D8FF', '#2A8DFF', '#0E1840']} style={StyleSheet.absoluteFill} />
-          <Text style={dkd_styles.dkd_primaryActionText}>{dkd_payment_loading_value ? 'Ödeme özeti hazırlanıyor…' : 'Paketimi Teslim AL'}</Text>
+          <Text style={dkd_styles.dkd_primaryActionText}>{dkd_payments_enabled_value ? (dkd_payment_loading_value ? 'Ödeme özeti hazırlanıyor…' : 'Paketimi Teslim AL') : 'Gönderi Hizmeti Çok Yakında'}</Text>
         </Pressable>
       </View>
       ) : null}
@@ -1498,7 +1503,7 @@ export default function DkdCargoSenderPanel({
         dkd_on_refresh_value={dkd_load_shipments}
       />
 
-      <Modal visible={dkd_payment_modal_visible_value} transparent animationType="fade" onRequestClose={() => setDkdPaymentModalVisibleValue(false)}>
+      <Modal visible={dkd_payments_enabled_value && dkd_payment_modal_visible_value} transparent animationType="fade" onRequestClose={() => setDkdPaymentModalVisibleValue(false)}>
         <View style={dkd_styles.dkd_paymentOverlay}>
           <View style={dkd_styles.dkd_paymentCard}>
             <LinearGradient colors={['rgba(97,216,255,0.18)', 'rgba(181,124,255,0.10)', 'rgba(82,242,161,0.08)']} style={StyleSheet.absoluteFill} />

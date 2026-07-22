@@ -206,12 +206,12 @@ jobs:
         shell: bash
         run: |
           mkdir -p dkd_signed_aab_output
-          cp android/app/build/outputs/bundle/release/*.aab dkd_signed_aab_output/DraBornGo-v0.0.4-code4-release.aab
+          cp android/app/build/outputs/bundle/release/*.aab dkd_signed_aab_output/DraBornGo-v0.0.5-code5-release.aab
           ls -lh dkd_signed_aab_output
 
       - name: Dkd upload signed AAB artifact
         uses: actions/upload-artifact@v4
         with:
-          name: DKD_DraBornGo_v0_0_4_code4_signed_aab
-          path: dkd_signed_aab_output/DraBornGo-v0.0.4-code4-release.aab
+          name: DKD_DraBornGo_v0_0_5_code5_signed_aab
+          path: dkd_signed_aab_output/DraBornGo-v0.0.5-code5-release.aab
           retention-days: 14

@@ -32,6 +32,7 @@ import SocialPlayerCardModal from '../features/social/SocialPlayerCardModal';
 import SocialCompareModal from '../features/social/SocialCompareModal';
 import AllyHubModal from '../features/social/AllyHubModal';
 import DkdWalletPaymentMethodModal from '../features/payment/dkd_wallet_payment_method_modal';
+import { dkd_payments_enabled_value } from '../config/dkd_release_flags';
 import DkdGooglePlayPolicyCenterModal from '../features/legal/dkd_google_play_policy_center_modal';
 import DkdAppUpdateCenterModal from '../features/legal/dkd_app_update_center_modal';
 import { dkd_build_unified_wallet_patch_value, resolveUnifiedWalletTl } from '../services/walletService';
@@ -361,7 +362,7 @@ function ModalHost(props) {
           onAllyHub={() => setActiveTab('ally')}
           onLeaderboard={() => setActiveTab('leader')}
           onDailyReward={openRewardModal}
-          onWalletTopup={dkd_open_wallet_topup_from_action_menu_value}
+          onWalletTopup={dkd_payments_enabled_value ? dkd_open_wallet_topup_from_action_menu_value : undefined}
           onLegalCenter={dkd_open_policy_center_from_action_menu_value}
           dkd_on_app_update_center_value={dkd_open_app_update_center_from_action_menu_value}
           onTasks={() => setActiveTab('tasks')}
@@ -375,7 +376,7 @@ function ModalHost(props) {
         />
       ) : null}
 
-      {dkd_wallet_topup_modal_visible_value ? (
+      {dkd_payments_enabled_value && dkd_wallet_topup_modal_visible_value ? (
         <DkdWalletPaymentMethodModal
           dkd_visible_value
           dkd_on_close_value={dkd_close_wallet_topup_modal_value}

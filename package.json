@@ -1,7 +1,7 @@
 {
   "name": "draborngo",
   "main": "expo/AppEntry",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "scripts": {
     "start": "node ./node_modules/expo/bin/cli start",
     "reset-project": "node ./scripts/reset-project.js",

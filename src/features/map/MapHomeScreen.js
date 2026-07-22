@@ -1001,7 +1001,7 @@ function HeaderHUD({
             <View style={styles.dkd_home_version_row}>
               <Text style={styles.headerEyebrow}>DraBornGo</Text>
               <View style={styles.dkd_home_version_badge}>
-                <Text style={styles.dkd_home_version_text}>DKD_DraBornGo_v0.0.4</Text>
+                <Text style={styles.dkd_home_version_text}>DKD_DraBornGo_v0.0.5</Text>
               </View>
             </View>
             <Text
