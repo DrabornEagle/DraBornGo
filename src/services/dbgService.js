@@ -6,7 +6,7 @@ function normalizeRpcError(error) {
 
   if (!raw) return 'İşlem şu anda tamamlanamadı.';
   if (lower.includes('dkd_social_') || lower.includes('function') || lower.includes('does not exist')) {
-    return 'Sohbet ve Ally altyapısı veritabanında hazır görünmüyor. Yeni SQL dosyasını Supabase üzerinde çalıştırman gerekiyor.';
+    return 'Sohbet ve DBG altyapısı veritabanında hazır görünmüyor. Yeni SQL dosyasını Supabase üzerinde çalıştırman gerekiyor.';
   }
   if (lower.includes('friend_exists')) return 'Bu oyuncu zaten arkadaş listende.';
   if (lower.includes('request_exists')) return 'Bu oyuncuya zaten bekleyen istek gönderdin.';
@@ -20,19 +20,19 @@ function normalizeRpcError(error) {
   if (lower.includes('admin_required')) return 'Bu moderasyon alanı için admin yetkisi gerekiyor.';
   if (lower.includes('target_not_found')) return 'Aradığın oyuncu bulunamadı.';
   if (lower.includes('not_request_target')) return 'Bu arkadaşlık isteği üzerinde işlem yetkin yok.';
-  if (lower.includes('ally_id')) return '6 haneli otomatik Ally_ID altyapısı için SQL dosyası uygulanmalı.';
+  if (lower.includes('dbg_id')) return '6 haneli otomatik DBG_ID altyapısı için SQL dosyası uygulanmalı.';
   return raw;
 }
 
-export function getAllyFriendlyError(error) {
+export function getDBGFriendlyError(error) {
   return normalizeRpcError(error);
 }
 
-export async function touchAllyPresence() {
+export async function touchDBGPresence() {
   return supabase.rpc('dkd_social_touch_presence');
 }
 
-export async function fetchAllySnapshot() {
+export async function fetchDBGSnapshot() {
   const res = await supabase.rpc('dkd_social_snapshot');
   if (res?.error) return res;
   return {
@@ -46,7 +46,7 @@ export async function fetchAllySnapshot() {
   };
 }
 
-export async function searchAllyProfiles(query, limit = 12) {
+export async function searchDBGProfiles(query, limit = 12) {
   return supabase.rpc('dkd_social_search_profiles', {
     dkd_param_query: String(query || '').trim(),
     dkd_param_limit: Math.max(1, Math.min(20, Number(limit || 12))),

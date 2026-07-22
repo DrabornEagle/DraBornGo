@@ -136,13 +136,13 @@ function DkdAppUpdateCenterModal({ dkd_visible_value, dkd_on_close_value }) {
               <DkdUpdateInfoCard
                 dkd_icon_value="cellphone-check"
                 dkd_label_value="Cihazdaki sürüm"
-                dkd_value={`v${dkd_status_value?.dkd_current_version_name || '0.0.5'} • Kod ${dkd_status_value?.dkd_current_version_code || 4}`}
+                dkd_value={`v${dkd_status_value?.dkd_current_version_name || '0.0.5'} • Kod ${dkd_status_value?.dkd_current_version_code || 5}`}
                 dkd_tone_value="dkd_current"
               />
               <DkdUpdateInfoCard
                 dkd_icon_value="cloud-download-outline"
                 dkd_label_value="Webdeki son sürüm"
-                dkd_value={`v${dkd_status_value?.dkd_latest_version_name || dkd_manifest_value.dkd_latest_version_name || '0.0.5'} • Kod ${dkd_status_value?.dkd_latest_version_code || dkd_manifest_value.dkd_latest_version_code || 4}`}
+                dkd_value={`v${dkd_status_value?.dkd_latest_version_name || dkd_manifest_value.dkd_latest_version_name || '0.0.5'} • Kod ${dkd_status_value?.dkd_latest_version_code || dkd_manifest_value.dkd_latest_version_code || 5}`}
                 dkd_tone_value={dkd_status_tone_value}
               />
               <DkdUpdateInfoCard
@@ -163,13 +163,7 @@ function DkdAppUpdateCenterModal({ dkd_visible_value, dkd_on_close_value }) {
               <Text style={dkd_styles.dkd_notes_title}>Sürüm notu</Text>
               <Text style={dkd_styles.dkd_notes_text}>{dkd_manifest_value.dkd_release_notes || 'DraBornGo APK indirme ve güncelleme merkezi hazırlandı.'}</Text>
             </View>
-
-            <View style={dkd_styles.dkd_warning_card}>
-              <MaterialCommunityIcons name="information-outline" size={18} color="#F6B54E" />
-              <Text style={dkd_styles.dkd_warning_text}>Uygulama sessiz kurulum yapmaz. Bu, Google Play’e ileride dönüş için REQUEST_INSTALL_PACKAGES riskini düşük tutar.</Text>
-            </View>
-
-            <View style={dkd_styles.dkd_action_row}>
+<View style={dkd_styles.dkd_action_row}>
               <DkdUpdateActionButton
                 dkd_label_value="Tekrar Kontrol Et"
                 dkd_icon_value="refresh"

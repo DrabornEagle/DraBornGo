@@ -30,7 +30,7 @@ import DailyRewardModal from '../features/dailyReward/DailyRewardModal';
 import AchievementsModal from '../features/achievements/AchievementsModal';
 import SocialPlayerCardModal from '../features/social/SocialPlayerCardModal';
 import SocialCompareModal from '../features/social/SocialCompareModal';
-import AllyHubModal from '../features/social/AllyHubModal';
+import DBGHubModal from '../features/social/DBGHubModal';
 import DkdWalletPaymentMethodModal from '../features/payment/dkd_wallet_payment_method_modal';
 import { dkd_payments_enabled_value } from '../config/dkd_release_flags';
 import DkdGooglePlayPolicyCenterModal from '../features/legal/dkd_google_play_policy_center_modal';
@@ -320,6 +320,7 @@ function ModalHost(props) {
   }, [activeTab, setActiveTab]);
 
   const dkd_open_app_update_center_from_action_menu_value = useCallback(() => {
+    if (!isAdmin) return;
     setProfileOpen(false);
     setCollectionOpen(false);
     setHistoryOpen(false);
@@ -327,7 +328,7 @@ function ModalHost(props) {
     dkd_set_app_update_center_visible_value(true);
     setActiveTab('dkd_app_update_center');
     setActionMenuOpen(false);
-  }, [setActionMenuOpen, setActiveTab, setCollectionOpen, setDropListOpen, setHistoryOpen, setProfileOpen]);
+  }, [isAdmin, setActionMenuOpen, setActiveTab, setCollectionOpen, setDropListOpen, setHistoryOpen, setProfileOpen]);
 
   const dkd_close_app_update_center_value = useCallback(() => {
     dkd_set_app_update_center_visible_value(false);
@@ -359,12 +360,12 @@ function ModalHost(props) {
             setCourierBoardOpen(true);
           }}
           onProfile={() => setProfileOpen(true)}
-          onAllyHub={() => setActiveTab('ally')}
+          onDBGHub={() => setActiveTab('dbg')}
           onLeaderboard={() => setActiveTab('leader')}
           onDailyReward={openRewardModal}
           onWalletTopup={dkd_payments_enabled_value ? dkd_open_wallet_topup_from_action_menu_value : undefined}
           onLegalCenter={dkd_open_policy_center_from_action_menu_value}
-          dkd_on_app_update_center_value={dkd_open_app_update_center_from_action_menu_value}
+          dkd_on_app_update_center_value={isAdmin ? dkd_open_app_update_center_from_action_menu_value : undefined}
           onTasks={() => setActiveTab('tasks')}
           onPlayerCard={openSocialPlayerCard || (() => setSocialCardOpen(true))}
           onHistory={() => {
@@ -543,8 +544,8 @@ function ModalHost(props) {
         />
       ) : null}
 
-      {activeTab === 'ally' ? (
-        <AllyHubModal
+      {activeTab === 'dbg' ? (
+        <DBGHubModal
           visible
           onClose={() => setActiveTab('map')}
           sessionUserId={sessionUserId}
@@ -639,7 +640,7 @@ function ModalHost(props) {
         />
       ) : null}
 
-      {(dkd_app_update_center_visible_value || activeTab === 'dkd_app_update_center') ? (
+      {isAdmin && (dkd_app_update_center_visible_value || activeTab === 'dkd_app_update_center') ? (
         <DkdAppUpdateCenterModal
           dkd_visible_value
           dkd_on_close_value={dkd_close_app_update_center_value}

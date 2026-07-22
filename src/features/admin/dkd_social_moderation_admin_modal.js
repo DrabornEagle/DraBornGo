@@ -16,8 +16,8 @@ import { cityLootTheme } from '../../theme/cityLootTheme';
 import {
   dkd_fetch_social_moderation_queue_value,
   dkd_update_social_moderation_report_value,
-  getAllyFriendlyError,
-} from '../../services/allyService';
+  getDBGFriendlyError,
+} from '../../services/dbgService';
 
 const dkd_status_options_value = Object.freeze([
   { dkd_key_value: 'dkd_open', dkd_title_value: 'Yeni', dkd_icon_value: 'bell-alert-outline' },
@@ -47,7 +47,7 @@ function dkd_format_datetime_value(dkd_input_value) {
   }
 }
 
-function dkd_pad_ally_id_value(dkd_input_value) {
+function dkd_pad_dbg_id_value(dkd_input_value) {
   if (dkd_input_value == null || dkd_input_value === '') return '—';
   const dkd_digits_value = String(dkd_input_value).replace(/\D/g, '');
   return dkd_digits_value ? dkd_digits_value.padStart(6, '0') : '—';
@@ -88,8 +88,8 @@ function DkdReportCard(dkd_props_value) {
         <MaterialCommunityIcons name={dkd_selected_value ? 'chevron-up' : 'chevron-right'} size={22} color={cityLootTheme.colors.textMuted} />
       </View>
       <View style={dkd_styles.dkd_people_row}>
-        <Text style={dkd_styles.dkd_people_text}>Bildiren: {dkd_report_value?.dkd_reporter_nickname || 'Oyuncu'} #{dkd_pad_ally_id_value(dkd_report_value?.dkd_reporter_ally_id)}</Text>
-        <Text style={dkd_styles.dkd_people_text}>Şikayet edilen: {dkd_report_value?.dkd_reported_nickname || 'Oyuncu'} #{dkd_pad_ally_id_value(dkd_report_value?.dkd_reported_ally_id)}</Text>
+        <Text style={dkd_styles.dkd_people_text}>Bildiren: {dkd_report_value?.dkd_reporter_nickname || 'Oyuncu'} #{dkd_pad_dbg_id_value(dkd_report_value?.dkd_reporter_dbg_id)}</Text>
+        <Text style={dkd_styles.dkd_people_text}>Şikayet edilen: {dkd_report_value?.dkd_reported_nickname || 'Oyuncu'} #{dkd_pad_dbg_id_value(dkd_report_value?.dkd_reported_dbg_id)}</Text>
       </View>
       {!!dkd_report_value?.dkd_detail_text ? <Text style={dkd_styles.dkd_detail_text} numberOfLines={3}>{dkd_report_value.dkd_detail_text}</Text> : null}
     </Pressable>
@@ -131,7 +131,7 @@ export default function dkd_social_moderation_admin_modal(dkd_props_value) {
     const { data: dkd_queue_rows_value, error: dkd_queue_error_value } = await dkd_fetch_social_moderation_queue_value(dkd_status_key_value, 100);
 
     if (dkd_queue_error_value) {
-      dkd_set_error_text_value(getAllyFriendlyError(dkd_queue_error_value));
+      dkd_set_error_text_value(getDBGFriendlyError(dkd_queue_error_value));
       dkd_set_reports_value([]);
       dkd_set_selected_report_value(null);
     } else {
@@ -171,9 +171,9 @@ export default function dkd_social_moderation_admin_modal(dkd_props_value) {
     );
 
     if (dkd_update_error_value) {
-      dkd_set_error_text_value(getAllyFriendlyError(dkd_update_error_value));
+      dkd_set_error_text_value(getDBGFriendlyError(dkd_update_error_value));
     } else if (dkd_update_result_value?.ok === false) {
-      dkd_set_error_text_value(getAllyFriendlyError(dkd_update_result_value?.reason || 'Durum güncellenemedi.'));
+      dkd_set_error_text_value(getDBGFriendlyError(dkd_update_result_value?.reason || 'Durum güncellenemedi.'));
     } else {
       const dkd_updated_report_value = {
         ...dkd_selected_report_value,
@@ -267,8 +267,8 @@ export default function dkd_social_moderation_admin_modal(dkd_props_value) {
                 <>
                   <Text style={dkd_styles.dkd_panel_title}>Rapor detayı</Text>
                   <Text style={dkd_styles.dkd_detail_title}>{dkd_reason_title_value(dkd_selected_report_value?.dkd_reason_key)}</Text>
-                  <Text style={dkd_styles.dkd_detail_meta}>Bildiren: {dkd_selected_report_value?.dkd_reporter_nickname || 'Oyuncu'} #{dkd_pad_ally_id_value(dkd_selected_report_value?.dkd_reporter_ally_id)}</Text>
-                  <Text style={dkd_styles.dkd_detail_meta}>Şikayet edilen: {dkd_selected_report_value?.dkd_reported_nickname || 'Oyuncu'} #{dkd_pad_ally_id_value(dkd_selected_report_value?.dkd_reported_ally_id)}</Text>
+                  <Text style={dkd_styles.dkd_detail_meta}>Bildiren: {dkd_selected_report_value?.dkd_reporter_nickname || 'Oyuncu'} #{dkd_pad_dbg_id_value(dkd_selected_report_value?.dkd_reporter_dbg_id)}</Text>
+                  <Text style={dkd_styles.dkd_detail_meta}>Şikayet edilen: {dkd_selected_report_value?.dkd_reported_nickname || 'Oyuncu'} #{dkd_pad_dbg_id_value(dkd_selected_report_value?.dkd_reported_dbg_id)}</Text>
                   <Text style={dkd_styles.dkd_detail_meta}>Tarih: {dkd_format_datetime_value(dkd_selected_report_value?.dkd_created_at)}</Text>
                   <Text style={dkd_styles.dkd_detail_body}>{dkd_selected_report_value?.dkd_detail_text || 'Kullanıcı detay mesajı eklemedi.'}</Text>
 

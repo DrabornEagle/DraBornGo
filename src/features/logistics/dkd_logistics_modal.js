@@ -4,7 +4,9 @@ import { LinearGradient } from 'expo-linear-gradient';
 import * as ImagePicker from 'expo-image-picker';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import SafeScreen from '../../components/layout/SafeScreen';
+import DkdComingSoonModal from '../../components/feedback/dkd_coming_soon_modal';
 import { cityLootTheme } from '../../theme/cityLootTheme';
+import { dkd_logistics_orders_enabled_value } from '../../config/dkd_release_flags';
 import {
   dkd_add_logistics_message_value,
   dkd_create_logistics_job_value,
@@ -272,6 +274,7 @@ function DkdSmallStat({ dkd_icon_value, dkd_label_value, dkd_value, dkd_accent_v
 export function DkdApplicationForm({ dkd_profile_value, dkd_application_value, dkd_on_refresh_value }) {
   const [dkd_form_value, dkd_set_form_value] = useState(() => dkd_default_logistics_application_value(dkd_profile_value));
   const [dkd_saving_value, dkd_set_saving_value] = useState(false);
+  const [dkd_coming_soon_visible_value, dkd_set_coming_soon_visible_value] = useState(false);
   const dkd_ready_value = dkd_logistics_application_ready_value(dkd_form_value);
   const dkd_status_value = String(dkd_application_value?.dkd_status || dkd_application_value?.status || dkd_profile_value?.dkd_logistics_status || 'none');
   const dkd_selected_country_value = dkd_form_value.dkd_country_value || 'Türkiye';
@@ -425,6 +428,10 @@ function DkdCreateJobPanel({ dkd_profile_value, dkd_on_refresh_value }) {
   }
 
   async function dkd_create_value() {
+    if (!dkd_logistics_orders_enabled_value) {
+      dkd_set_coming_soon_visible_value(true);
+      return;
+    }
     if (!dkd_logistics_job_ready_value(dkd_form_value)) {
       Alert.alert('Nakliye Oluştur', 'Müşteri adı, telefon, alım adresi, teslimat adresi ve yük tipi zorunlu.');
       return;
@@ -472,9 +479,23 @@ function DkdCreateJobPanel({ dkd_profile_value, dkd_on_refresh_value }) {
       </View>
       <Pressable onPress={dkd_create_value} disabled={dkd_saving_value} style={({ pressed }) => [dkd_styles.dkdPrimaryAction, pressed && dkd_styles.dkdPressed, dkd_saving_value && dkd_styles.dkdDisabled]}>
         <LinearGradient colors={["#58E8FF", "#6AF4B6"]} style={StyleSheet.absoluteFill} />
-        <Text style={dkd_styles.dkdPrimaryText}>{dkd_saving_value ? 'Oluşturuluyor…' : 'Nakliye İşi Oluştur'}</Text>
-        <MaterialCommunityIcons name="plus-circle-outline" size={18} color="#07111F" />
+        <Text style={dkd_styles.dkdPrimaryText}>{dkd_logistics_orders_enabled_value ? (dkd_saving_value ? 'Oluşturuluyor…' : 'Nakliye İşi Oluştur') : 'Nakliye Hizmeti Çok Yakında'}</Text>
+        <MaterialCommunityIcons name={dkd_logistics_orders_enabled_value ? "plus-circle-outline" : "clock-alert-outline"} size={18} color="#07111F" />
       </Pressable>
+
+      <DkdComingSoonModal
+        dkd_visible_value={dkd_coming_soon_visible_value}
+        dkd_on_close_value={() => dkd_set_coming_soon_visible_value(false)}
+        dkd_kicker_value="DRABORNGO NAKLİYE AĞI"
+        dkd_title_value="Nakliye Hizmeti Çok Yakında"
+        dkd_message_value="Nakliye ağı, doğrulanmış taşıyıcılar ve güvenli ödeme altyapısı tamamlandıktan sonra kullanıma açılacaktır."
+        dkd_icon_value="truck-clock-outline"
+        dkd_item_values={[
+          'Bu sürümde gerçek nakliye talebi oluşturulmaz.',
+          'Nakliyeciye teklif veya ödeme gönderilmez.',
+          'Hizmet aktif olduğunda uygulama içinden duyurulacaktır.',
+        ]}
+      />
     </View>
   );
 }

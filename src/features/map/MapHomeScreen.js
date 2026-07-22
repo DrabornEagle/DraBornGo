@@ -1569,9 +1569,9 @@ function MissionBoard({
       onPress: () => onTabChange?.("applications"),
     },
     {
-      key: "ally",
+      key: "dbg",
       title: "Sohbet",
-      sub: "Ally mesaj ve ekip sohbetini aç",
+      sub: "DBG mesaj ve ekip sohbetini aç",
       icon: "message-badge-outline",
       dkd_icon_secondary: "account-group-outline",
       dkd_icon_third: "forum-outline",
@@ -1580,7 +1580,7 @@ function MissionBoard({
       dkd_icon_third_color: "#8CF2FF",
       tone: "rose",
       dkd_title_near_icons_value: true,
-      onPress: () => onTabChange?.("ally"),
+      onPress: () => onTabChange?.("dbg"),
     },
   ];
 

@@ -820,7 +820,7 @@ export default function GameFlow({
       loadCollection();
       return;
     }
-    if (tab === 'ally') {
+    if (tab === 'dbg') {
       setCollectionOpen(false);
       setHistoryOpen(false);
       setActionMenuOpen(false);
@@ -1001,12 +1001,12 @@ export default function GameFlow({
     setProfileOpen(true);
   }, []);
 
-  const openAllyHub = useCallback(() => {
+  const openDBGHub = useCallback(() => {
     setActionMenuOpen(false);
     setProfileOpen(false);
     setCollectionOpen(false);
     setHistoryOpen(false);
-    setActiveTab('ally');
+    setActiveTab('dbg');
   }, []);
 
 
@@ -1112,7 +1112,7 @@ export default function GameFlow({
       return true;
     }
 
-    if (activeTab === 'market' || activeTab === 'ally' || activeTab === 'tasks' || activeTab === 'leader' || activeTab === 'logistics' || activeTab === 'applications' || activeTab === 'serviceNetwork' || activeTab === 'dkd_legal_center' || activeTab === 'dkd_app_update_center') {
+    if (activeTab === 'market' || activeTab === 'dbg' || activeTab === 'tasks' || activeTab === 'leader' || activeTab === 'logistics' || activeTab === 'applications' || activeTab === 'serviceNetwork' || activeTab === 'dkd_legal_center' || activeTab === 'dkd_app_update_center') {
       setActiveTab('map');
       return true;
     }
@@ -1313,7 +1313,7 @@ export default function GameFlow({
     dkd_on_toggle_courier_online_value: dkd_toggle_home_courier_online_value,
     openActionMenu,
     openScanner: openScannerHome,
-    openAllyHub,
+    openDBGHub,
     openCourierBoard,
     openProfile,
     openBossFromTasks,
@@ -1350,7 +1350,7 @@ export default function GameFlow({
     openDropList,
     openActionMenu,
     openScannerHome,
-    openAllyHub,
+    openDBGHub,
     openCourierBoard,
     openProfile,
     openBossFromTasks,
@@ -1399,7 +1399,7 @@ export default function GameFlow({
     setSocialCompareOpen,
     openSocialPlayerCard,
     openSocialCompare,
-    openAllyHub,
+    openDBGHub,
     localSocialCard,
     actionMenuOpen,
     setActionMenuOpen,
@@ -1625,7 +1625,7 @@ export default function GameFlow({
     setSocialCompareOpen,
     openSocialPlayerCard,
     openSocialCompare,
-    openAllyHub,
+    openDBGHub,
     localSocialCard,
     refreshProfile,
     actionMenuOpen,

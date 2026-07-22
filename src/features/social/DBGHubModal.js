@@ -14,7 +14,7 @@ import SafeScreen from '../../components/layout/SafeScreen';
 
 import SecondaryButton from '../../components/ui/SecondaryButton';
 import { minimalLootUi as ui, formatNum } from '../../theme/minimalLootUi';
-import { useAllyHubState } from '../../hooks/useAllyHubState';
+import { useDBGHubState } from '../../hooks/useDBGHubState';
 
 const QUICK_EMOJIS = ['🔥', '👑', '⚡', '😎', '🎯', '💎', '👏', '🫶'];
 
@@ -32,7 +32,7 @@ function dkd_get_quick_emoji_gradient(dkd_index_value) {
   return dkd_gradient_palette[dkd_index_value % dkd_gradient_palette.length];
 }
 
-function padAllyId(value) {
+function padDBGId(value) {
   if (value == null || value === '') return '—';
   const digits = String(value).replace(/\D/g, '');
   return digits ? digits.padStart(6, '0') : '—';
@@ -137,7 +137,7 @@ function IdentityRow({ row, suffix, compact = false }) {
       </LinearGradient>
       <View style={{ flex: 1, minWidth: 0 }}>
         <Text style={[dkd_styles.rowTitle, compact && dkd_styles.rowTitleCompact]} numberOfLines={1}>{row?.nickname || 'Oyuncu'}</Text>
-        <Text style={dkd_styles.rowSub} numberOfLines={1}>#{padAllyId(row?.ally_id)} • Lvl {formatNum(row?.level || 1)} • {String(row?.rank_key || 'rookie').toUpperCase()}</Text>
+        <Text style={dkd_styles.rowSub} numberOfLines={1}>#{padDBGId(row?.dbg_id)} • Lvl {formatNum(row?.level || 1)} • {String(row?.rank_key || 'rookie').toUpperCase()}</Text>
         {!!suffix ? <Text style={dkd_styles.rowMeta} numberOfLines={2}>{suffix}</Text> : null}
       </View>
     </View>
@@ -298,7 +298,7 @@ function MessageBubble({ item, mine }) {
         ]}
       >
         <View style={dkd_styles.messageTopRow}>
-          <Text style={[dkd_styles.messageSender, mine && dkd_styles.messageSenderMine]}>{mine ? 'Sen' : 'Ally'}</Text>
+          <Text style={[dkd_styles.messageSender, mine && dkd_styles.messageSenderMine]}>{mine ? 'Sen' : 'DBG'}</Text>
           <Text style={[dkd_styles.messageMeta, mine && dkd_styles.messageMetaMine]}>{dkd_time_text}</Text>
         </View>
         <Text style={[dkd_styles.messageBody, dkd_emoji_only && dkd_styles.messageBodyEmoji, mine && dkd_styles.messageBodyMine]}>{dkd_text}</Text>
@@ -307,7 +307,7 @@ function MessageBubble({ item, mine }) {
   );
 }
 
-export default function AllyHubModal({ visible, onClose, sessionUserId, profile, refreshProfile }) {
+export default function DBGHubModal({ visible, onClose, sessionUserId, profile, refreshProfile }) {
   const [tab, setTab] = useState('threads');
   const [composer, setComposer] = useState('');
   const feedRef = useRef(null);
@@ -316,7 +316,7 @@ export default function AllyHubModal({ visible, onClose, sessionUserId, profile,
     dbReady,
     dbMessage,
     snapshot,
-    myAllyId,
+    myDBGId,
     unreadTotal,
     refreshSnapshot,
     searchText,
@@ -336,7 +336,7 @@ export default function AllyHubModal({ visible, onClose, sessionUserId, profile,
     sendFriendRequest,
     respondFriendRequest,
     removeFriend,
-  } = useAllyHubState({ sessionUserId, visible, profile, refreshProfile });
+  } = useDBGHubState({ sessionUserId, visible, profile, refreshProfile });
 
   const friends = useMemo(() => (Array.isArray(snapshot?.friends) ? snapshot.friends : []), [snapshot?.friends]);
   const incoming = useMemo(() => (Array.isArray(snapshot?.incoming) ? snapshot.incoming : []), [snapshot?.incoming]);
@@ -389,7 +389,7 @@ export default function AllyHubModal({ visible, onClose, sessionUserId, profile,
         <LinearGradient colors={['#03060F', '#07111D', '#160B20']} style={{ flex: 1 }}>
           <View style={dkd_styles.header}>
             <View style={{ flex: 1, paddingRight: 12 }}>
-              <Text style={dkd_styles.kicker}>ALLY • NEXUS DM</Text>
+              <Text style={dkd_styles.kicker}>DBG • NEXUS DM</Text>
               <Text style={[dkd_styles.title, activeChat && dkd_styles.titleCompact]}>{activeChat ? 'Mesaj Komuta Alanı' : 'Sohbet Merkezi'}</Text>
 
             </View>
@@ -418,7 +418,7 @@ export default function AllyHubModal({ visible, onClose, sessionUserId, profile,
 
                     <View style={{ flex: 1, minWidth: 0 }}>
                       <Text style={dkd_styles.chatHeroTitle}>{activeChat?.nickname || 'Oyuncu'}</Text>
-                      <Text style={dkd_styles.chatHeroSub}>Ally_ID #{padAllyId(activeChat?.ally_id)} • Lvl {formatNum(activeChat?.level || 1)} • {String(activeChat?.rank_key || 'rookie').toUpperCase()}</Text>
+                      <Text style={dkd_styles.chatHeroSub}>DBG_ID #{padDBGId(activeChat?.dbg_id)} • Lvl {formatNum(activeChat?.level || 1)} • {String(activeChat?.rank_key || 'rookie').toUpperCase()}</Text>
                       <View style={dkd_styles.chatHeroMetaRow}>
                         <PresencePill row={activeChat} />
                         <View style={dkd_styles.heroMetaPill}><Text style={dkd_styles.heroMetaPillText}>{messagesLoading ? 'senkron' : dkd_moderation_saving_value ? 'güvenlik' : 'hazır'}</Text></View>
@@ -544,7 +544,7 @@ export default function AllyHubModal({ visible, onClose, sessionUserId, profile,
                   <View style={dkd_styles.heroTop}>
                     <View style={{ flex: 1, minWidth: 0 }}>
                       <Text style={dkd_styles.heroEyebrow}>KİMLİĞİN • PREMIUM HUB</Text>
-                      <Text style={dkd_styles.heroTitle}>Ally_ID #{padAllyId(myAllyId)}</Text>
+                      <Text style={dkd_styles.heroTitle}>DBG_ID #{padDBGId(myDBGId)}</Text>
                       <Text style={dkd_styles.heroSub}>{profile?.nickname || snapshot?.myProfile?.nickname || 'Oyuncu'}</Text>
                     </View>
                     <View style={dkd_styles.heroBadge}>
@@ -616,7 +616,7 @@ export default function AllyHubModal({ visible, onClose, sessionUserId, profile,
                       <View style={dkd_styles.stackGap}>
                         {friends.length
                           ? friends.map((row) => <ThreadRow key={String(row?.user_id)} row={row} onOpen={openThread} onRemove={removeFriend} onReport={dkd_report_user_value} onBlock={dkd_block_user_value} />)
-                          : <EmptyState icon="account-heart-outline" title="Takım kadron boş" sub="Ally_ID veya nickname ile oyuncu ekleyerek ağını büyütebilirsin." />}
+                          : <EmptyState icon="account-heart-outline" title="Takım kadron boş" sub="DBG_ID veya nickname ile oyuncu ekleyerek ağını büyütebilirsin." />}
                       </View>
                     </View>
 
@@ -625,7 +625,7 @@ export default function AllyHubModal({ visible, onClose, sessionUserId, profile,
                       <Text style={dkd_styles.panelSub}>Onay verdiğinde oyuncu anında takım listene eklenir ve mesaj hattı otomatik açılır.</Text>
                       <View style={dkd_styles.stackGap}>
                         {incoming.length
-                          ? incoming.map((row, dkd_incoming_index) => <RequestRow key={`dkd-in-${String(row?.request_id || row?.from_user_id || row?.user_id || row?.ally_id || dkd_incoming_index)}`} row={row} mode="incoming" onAccept={() => handleReply('accept', row)} onReject={() => handleReply('reject', row)} onReport={dkd_report_user_value} onBlock={dkd_block_user_value} />)
+                          ? incoming.map((row, dkd_incoming_index) => <RequestRow key={`dkd-in-${String(row?.request_id || row?.from_user_id || row?.user_id || row?.dbg_id || dkd_incoming_index)}`} row={row} mode="incoming" onAccept={() => handleReply('accept', row)} onReject={() => handleReply('reject', row)} onReport={dkd_report_user_value} onBlock={dkd_block_user_value} />)
                           : <Text style={dkd_styles.inlineHint}>Şu an gelen bekleyen istek yok.</Text>}
                       </View>
                     </View>
@@ -635,7 +635,7 @@ export default function AllyHubModal({ visible, onClose, sessionUserId, profile,
                       <Text style={dkd_styles.panelSub}>Karşı taraf onay verdiğinde bu alan otomatik olarak canlı sohbet akışına dönüşür.</Text>
                       <View style={dkd_styles.stackGap}>
                         {outgoing.length
-                          ? outgoing.map((row, dkd_outgoing_index) => <RequestRow key={`dkd-out-${String(row?.request_id || row?.to_user_id || row?.user_id || row?.ally_id || dkd_outgoing_index)}`} row={row} mode="outgoing" onReport={dkd_report_user_value} onBlock={dkd_block_user_value} />)
+                          ? outgoing.map((row, dkd_outgoing_index) => <RequestRow key={`dkd-out-${String(row?.request_id || row?.to_user_id || row?.user_id || row?.dbg_id || dkd_outgoing_index)}`} row={row} mode="outgoing" onReport={dkd_report_user_value} onBlock={dkd_block_user_value} />)
                           : <Text style={dkd_styles.inlineHint}>Gönderdiğin bekleyen istek yok.</Text>}
                       </View>
                     </View>
@@ -645,7 +645,7 @@ export default function AllyHubModal({ visible, onClose, sessionUserId, profile,
                 {tab === 'search' ? (
                   <View style={dkd_styles.panel}>
                     <Text style={dkd_styles.panelTitle}>Yeni bağlantı tara</Text>
-                    <Text style={dkd_styles.panelSub}>Ally_ID ya da oyuncu adı yaz. Eşleşmeler güçlü kontrastlı modern oyuncu kartları olarak aşağıda görünür.</Text>
+                    <Text style={dkd_styles.panelSub}>DBG_ID ya da oyuncu adı yaz. Eşleşmeler güçlü kontrastlı modern oyuncu kartları olarak aşağıda görünür.</Text>
                     <LinearGradient colors={['rgba(103,227,255,0.12)', 'rgba(162,98,255,0.10)']} style={dkd_styles.searchShell}>
                       <MaterialCommunityIcons name="magnify" size={18} color={ui.colors.soft} />
                       <TextInput
@@ -663,7 +663,7 @@ export default function AllyHubModal({ visible, onClose, sessionUserId, profile,
                       </Pressable>
                     </LinearGradient>
                     <View style={dkd_styles.searchHintRow}>
-                      <Text style={dkd_styles.inlineHint}>Senin Ally_ID: #{padAllyId(myAllyId)}</Text>
+                      <Text style={dkd_styles.inlineHint}>Senin DBG_ID: #{padDBGId(myDBGId)}</Text>
                       <Text style={dkd_styles.inlineHint}>{loading ? 'Güncelleniyor…' : `${searchResults.length} sonuç`}</Text>
                     </View>
                     <View style={dkd_styles.stackGap}>

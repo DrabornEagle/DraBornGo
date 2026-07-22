@@ -9,7 +9,7 @@ import { tapFeedback } from '../../services/feedbackService';
 const ITEMS = [
   { key: 'map', label: 'Harita', icon: 'map-marker-radius-outline' },
   { key: 'chest', label: 'Sandıklar', icon: 'treasure-chest-outline' },
-  { key: 'ally', label: 'Sohbet', icon: 'message-badge-outline' },
+  { key: 'dbg', label: 'Sohbet', icon: 'message-badge-outline' },
   { key: 'courier', label: 'Kurye-Kargo', icon: 'truck-fast-outline' },
   { key: 'leader', label: 'Sıralama', icon: 'podium-gold', gateKey: 'leader' },
 ];
@@ -35,7 +35,7 @@ function getItemTone(key) {
         icon: '#D8C1FF',
         dot: '#AF7CFF',
       };
-    case 'ally':
+    case 'dbg':
       return {
         glow: ['rgba(103,227,255,0.24)', 'rgba(68,122,255,0.08)'],
         tint: 'rgba(103,227,255,0.10)',
@@ -87,8 +87,8 @@ function runItem(item, profile, handlers) {
     case 'chest':
       handlers.onOpenDropList?.();
       break;
-    case 'ally':
-      handlers.onChange?.('ally');
+    case 'dbg':
+      handlers.onChange?.('dbg');
       break;
     case 'courier':
       handlers.onOpenCourier?.();

@@ -21,7 +21,8 @@
     "dkd:clean-android-manifests": "node ./scripts/dkd_clean_android_dependency_manifests.js",
     "dkd:play-risk-scan": "node ./scripts/dkd_play_risk_scan.js",
     "env:restore": "node ./scripts/dkd_restore_public_env.mjs",
-    "prestart": "npm run env:restore"
+    "prestart": "npm run env:restore",
+    "dkd:verify-v005": "node ./scripts/dkd_verify_v0_0_5_runtime.mjs"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",
