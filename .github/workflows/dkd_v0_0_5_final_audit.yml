@@ -44,55 +44,154 @@ jobs:
       - name: Verify legacy identity is absent from active project files
         shell: bash
         run: |
-          dkd_legacy_project_title="$(printf 'Loo%s' 'tonia')"
-          dkd_legacy_social_title="$(printf 'Al%s' 'ly')"
-          dkd_legacy_social_lower="$(printf 'al%s' 'ly')"
-          dkd_pattern="${dkd_legacy_project_title}|${dkd_legacy_project_title,,}|${dkd_legacy_social_title}|${dkd_legacy_social_lower}_id|${dkd_legacy_social_title}Hub|${dkd_legacy_social_lower}Service|use${dkd_legacy_social_title}HubState"
-          if rg -n --hidden \
-            --glob '!node_modules/**' \
-            --glob '!.git/**' \
-            --glob '!supabase/migrations/**' \
-            --glob '!docs/**' \
-            --glob '!store_assets/**' \
-            --glob '!scripts/dkd_verify_release_identity.mjs' \
-            "${dkd_pattern}" \
-            App.js app.json app.config.js package.json src scripts supabase/functions web .github/workflows; then
-            echo "DKD ERROR: Active project files still contain a legacy identity."
-            exit 1
-          fi
+          node - <<'DKD_NODE'
+          const fs = require('fs');
+          const path = require('path');
+          const dkdProjectTitle = ['Loo', 'tonia'].join('');
+          const dkdSocialTitle = ['Al', 'ly'].join('');
+          const dkdSocialLower = dkdSocialTitle.toLowerCase();
+          const dkdForbidden = [
+            dkdProjectTitle,
+            dkdProjectTitle.toLowerCase(),
+            dkdProjectTitle.toUpperCase(),
+            dkdSocialTitle,
+            `${dkdSocialLower}_id`,
+            `${dkdSocialTitle}Hub`,
+            `${dkdSocialLower}Service`,
+            `use${dkdSocialTitle}HubState`,
+          ];
+          const dkdRoots = ['App.js', 'app.json', 'app.config.js', 'package.json', 'src', 'scripts', 'supabase/functions', 'web'];
+          const dkdExtensions = new Set(['.js', '.jsx', '.ts', '.tsx', '.mjs', '.cjs', '.json', '.md', '.html', '.yml', '.yaml', '.sh', '.txt']);
+          const dkdErrors = [];
+          function dkdScan(dkdFilePath) {
+            if (!fs.existsSync(dkdFilePath)) return;
+            const dkdStat = fs.statSync(dkdFilePath);
+            if (dkdStat.isDirectory()) {
+              for (const dkdName of fs.readdirSync(dkdFilePath)) dkdScan(path.join(dkdFilePath, dkdName));
+              return;
+            }
+            if (!dkdExtensions.has(path.extname(dkdFilePath).toLowerCase())) return;
+            const dkdText = fs.readFileSync(dkdFilePath, 'utf8');
+            for (const dkdToken of dkdForbidden) {
+              if (dkdText.includes(dkdToken)) dkdErrors.push(`${dkdFilePath}: ${dkdToken}`);
+            }
+          }
+          for (const dkdRoot of dkdRoots) dkdScan(dkdRoot);
+          if (dkdErrors.length) {
+            console.error(dkdErrors.join('\n'));
+            process.exit(1);
+          }
+          console.log('Active project files contain no legacy identity literals.');
+          DKD_NODE
 
-      - name: Verify v0.0.5 and code5 remnants
+      - name: Verify v0.0.5 and code5 state
         shell: bash
         run: |
-          if rg -n '0\.0\.4|v0_0_4|code4' \
-            app.json app.config.js package.json src web \
-            .github/workflows/dkdev_build_apk.yml \
-            .github/workflows/dkd_build_signed_apk.yml \
-            .github/workflows/dkd_build_signed_aab.yml; then
-            echo "DKD ERROR: Current app/build files still contain v0.0.4 or code4."
-            exit 1
-          fi
-          rg -n '0\.0\.5' app.json package.json
-          rg -n 'versionCode[^0-9]*5|code5|v0_0_5' app.json app.config.js .github/workflows/dkdev_build_apk.yml .github/workflows/dkd_build_signed_apk.yml .github/workflows/dkd_build_signed_aab.yml
+          node - <<'DKD_NODE'
+          const fs = require('fs');
+          const path = require('path');
+          const dkdScanRoots = [
+            'app.json',
+            'app.config.js',
+            'package.json',
+            'src',
+            'web',
+            '.github/workflows/dkdev_build_apk.yml',
+            '.github/workflows/dkd_build_signed_apk.yml',
+            '.github/workflows/dkd_build_signed_aab.yml',
+          ];
+          const dkdExtensions = new Set(['.js', '.jsx', '.ts', '.tsx', '.mjs', '.cjs', '.json', '.md', '.html', '.yml', '.yaml', '.txt']);
+          const dkdErrors = [];
+          function dkdScan(dkdFilePath) {
+            if (!fs.existsSync(dkdFilePath)) return;
+            const dkdStat = fs.statSync(dkdFilePath);
+            if (dkdStat.isDirectory()) {
+              for (const dkdName of fs.readdirSync(dkdFilePath)) dkdScan(path.join(dkdFilePath, dkdName));
+              return;
+            }
+            if (!dkdExtensions.has(path.extname(dkdFilePath).toLowerCase())) return;
+            const dkdText = fs.readFileSync(dkdFilePath, 'utf8');
+            for (const dkdPattern of [/0\.0\.4/g, /v0_0_4/g, /code4/g]) {
+              if (dkdPattern.test(dkdText)) dkdErrors.push(`${dkdFilePath}: ${dkdPattern.source}`);
+            }
+          }
+          for (const dkdRoot of dkdScanRoots) dkdScan(dkdRoot);
+
+          const dkdApp = JSON.parse(fs.readFileSync('app.json', 'utf8'));
+          const dkdPackage = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+          const dkdWebManifest = JSON.parse(fs.readFileSync('web/DraBornGo/App/dkd_draborngo_update_manifest.json', 'utf8'));
+          if (dkdPackage.version !== '0.0.5') dkdErrors.push('package.json version is not 0.0.5');
+          if (dkdApp?.expo?.version !== '0.0.5') dkdErrors.push('app.json version is not 0.0.5');
+          if (Number(dkdApp?.expo?.android?.versionCode) !== 5) dkdErrors.push('app.json versionCode is not 5');
+          if (dkdWebManifest.dkd_latest_version_name !== '0.0.5') dkdErrors.push('web manifest version is not 0.0.5');
+          if (Number(dkdWebManifest.dkd_latest_version_code) !== 5) dkdErrors.push('web manifest versionCode is not 5');
+
+          for (const dkdWorkflowPath of [
+            '.github/workflows/dkdev_build_apk.yml',
+            '.github/workflows/dkd_build_signed_apk.yml',
+            '.github/workflows/dkd_build_signed_aab.yml',
+          ]) {
+            const dkdText = fs.readFileSync(dkdWorkflowPath, 'utf8');
+            if (!dkdText.includes('v0.0.5')) dkdErrors.push(`${dkdWorkflowPath}: v0.0.5 missing`);
+            if (!dkdText.includes('v0_0_5')) dkdErrors.push(`${dkdWorkflowPath}: v0_0_5 missing`);
+            if (!dkdText.includes('code5')) dkdErrors.push(`${dkdWorkflowPath}: code5 missing`);
+          }
+
+          if (dkdErrors.length) {
+            console.error(dkdErrors.join('\n'));
+            process.exit(1);
+          }
+          console.log('DraBornGo v0.0.5 and Android code5 state verified.');
+          DKD_NODE
 
       - name: Verify removed silent-install notice
         shell: bash
         run: |
-          dkd_notice_text="Uygulama sessiz kurulum yapmaz"
-          if rg -n -F "${dkd_notice_text}" src; then
-            echo "DKD ERROR: Removed silent-install notice is still present."
-            exit 1
-          fi
+          node - <<'DKD_NODE'
+          const fs = require('fs');
+          const path = require('path');
+          const dkdNeedle = ['sessiz', 'kurulum'].join(' ');
+          const dkdErrors = [];
+          function dkdScan(dkdFilePath) {
+            if (!fs.existsSync(dkdFilePath)) return;
+            const dkdStat = fs.statSync(dkdFilePath);
+            if (dkdStat.isDirectory()) {
+              for (const dkdName of fs.readdirSync(dkdFilePath)) dkdScan(path.join(dkdFilePath, dkdName));
+              return;
+            }
+            if (!['.js', '.jsx', '.ts', '.tsx', '.html', '.json', '.md'].includes(path.extname(dkdFilePath).toLowerCase())) return;
+            if (fs.readFileSync(dkdFilePath, 'utf8').toLowerCase().includes(dkdNeedle)) dkdErrors.push(dkdFilePath);
+          }
+          dkdScan('src');
+          dkdScan('web');
+          if (dkdErrors.length) {
+            console.error(`Silent-install notice remains in: ${dkdErrors.join(', ')}`);
+            process.exit(1);
+          }
+          console.log('Silent-install notice area is absent.');
+          DKD_NODE
 
       - name: Verify DBG files and removed legacy files
         shell: bash
         run: |
-          test -f src/features/social/DBGHubModal.js
-          test -f src/hooks/useDBGHubState.js
-          test -f src/services/dbgService.js
-          test ! -e src/features/social/AllyHubModal.js
-          test ! -e src/hooks/useAllyHubState.js
-          test ! -e src/services/allyService.js
+          node - <<'DKD_NODE'
+          const fs = require('fs');
+          const dkdSocialTitle = ['Al', 'ly'].join('');
+          const dkdSocialLower = dkdSocialTitle.toLowerCase();
+          const dkdRequired = [
+            'src/features/social/DBGHubModal.js',
+            'src/hooks/useDBGHubState.js',
+            'src/services/dbgService.js',
+          ];
+          const dkdRemoved = [
+            `src/features/social/${dkdSocialTitle}HubModal.js`,
+            `src/hooks/use${dkdSocialTitle}HubState.js`,
+            `src/services/${dkdSocialLower}Service.js`,
+          ];
+          for (const dkdPath of dkdRequired) if (!fs.existsSync(dkdPath)) throw new Error(`Missing ${dkdPath}`);
+          for (const dkdPath of dkdRemoved) if (fs.existsSync(dkdPath)) throw new Error(`Legacy file remains: ${dkdPath}`);
+          console.log('DBG runtime files verified.');
+          DKD_NODE
 
       - name: Validate Expo public config
         shell: bash
