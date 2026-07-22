@@ -14,7 +14,7 @@ const dkd_default_policy_config_value = {
   dkd_account_deletion_form_url_value: dkd_default_account_deletion_form_url_value,
   dkd_package_name_value: 'com.draborneagle.draborngo',
   dkd_version_name_value: 'v0.0.5',
-  dkd_version_code_value: '4',
+  dkd_version_code_value: '5',
 };
 
 const dkd_policy_card_values = [

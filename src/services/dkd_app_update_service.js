@@ -20,13 +20,13 @@ function dkd_update_number_value(dkd_source_value, dkd_fallback_value = 0) {
 }
 
 function dkd_read_current_build_code_value() {
-  const dkd_native_build_value = dkd_update_number_value(Constants?.nativeBuildVersion, 0);
   const dkd_expo_build_value = dkd_update_number_value(Constants?.expoConfig?.android?.versionCode, 0);
-  return dkd_native_build_value || dkd_expo_build_value || 5;
+  const dkd_native_build_value = dkd_update_number_value(Constants?.nativeBuildVersion, 0);
+  return dkd_expo_build_value || dkd_native_build_value || 5;
 }
 
 function dkd_read_current_version_name_value() {
-  return dkd_update_text_value(Constants?.nativeAppVersion, dkd_update_text_value(Constants?.expoConfig?.version, '0.0.5'));
+  return dkd_update_text_value(Constants?.expoConfig?.version, dkd_update_text_value(Constants?.nativeAppVersion, '0.0.5'));
 }
 
 function dkd_normalize_manifest_value(dkd_manifest_value = {}) {
