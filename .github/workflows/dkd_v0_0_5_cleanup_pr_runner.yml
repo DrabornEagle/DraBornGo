@@ -1,0 +1,103 @@
+name: DKD DraBornGo v0.0.5 Cleanup Runner
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: dkd-v0-0-5-cleanup-runner
+  cancel-in-progress: false
+
+jobs:
+  cleanup:
+    if: github.event.pull_request.title == '[DKD] Apply DraBornGo v0.0.5 cleanup'
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    env:
+      CI: '1'
+      EXPO_NO_TELEMETRY: '1'
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
+    steps:
+      - name: Checkout trusted main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - name: Apply cleanup
+        run: python3 scripts/dkd_v0_0_5_cleanup.py
+
+      - name: Install packages
+        run: npm ci
+
+      - name: Restore pinned public environment
+        run: npm run env:restore
+
+      - name: Verify identity and version
+        run: npm run dkd:verify-v0.0.5
+
+      - name: Verify repository cleanup
+        shell: bash
+        run: |
+          dkd_current_migration='supabase/migrations/20260722133353_dkd_draborngo_v0_0_5_remove_draborndeal_and_fix_version.sql'
+          test -f "${dkd_current_migration}"
+          if find supabase/migrations supabase/sql supabase/functions -type f \
+            ! -path "${dkd_current_migration}" \
+            \( -iname '*dkd_deal*' -o -iname '*draborndeal*' -o -iname '*v0_0_6*' \) \
+            -print | grep -q .; then
+            echo 'DKD ERROR: Obsolete DraBornDeal or v0.0.6 Supabase files remain.'
+            exit 1
+          fi
+          if rg -n '0\.0\.4|v0_0_4|code4|Kod 4' \
+            src web/DraBornGo/App app.json app.config.js package.json \
+            .github/workflows/dkdev_build_apk.yml \
+            .github/workflows/dkd_build_signed_apk.yml \
+            .github/workflows/dkd_build_signed_aab.yml; then
+            echo 'DKD ERROR: Active visible/build files still contain v0.0.4 or code4.'
+            exit 1
+          fi
+          rg -n "expoConfig\?\.version|expoConfig\?\.android\?\.versionCode" src/services/dkd_app_update_service.js
+          rg -n "dkd_version_code_value: '5'|dkd_version_code_value.*\|\| 5" \
+            src/features/legal/dkd_google_play_policy_center_modal.js \
+            src/services/dkd_policy_center_service.js
+
+      - name: Validate Expo public config
+        shell: bash
+        run: |
+          npx expo config --type public --json > /tmp/dkd_public_config.json
+          node - <<'DKD_NODE'
+          const fs = require('fs');
+          const dkdConfig = JSON.parse(fs.readFileSync('/tmp/dkd_public_config.json', 'utf8'));
+          if (dkdConfig.name !== 'DraBornGo') throw new Error('App name is not DraBornGo.');
+          if (dkdConfig.version !== '0.0.5') throw new Error('Expo version is not 0.0.5.');
+          if (Number(dkdConfig.android?.versionCode) !== 5) throw new Error('Android versionCode is not 5.');
+          console.log('DraBornGo v0.0.5 / code 5 config verified.');
+          DKD_NODE
+
+      - name: Bundle Android JavaScript
+        run: |
+          rm -rf .dkd-v0-0-5-cleanup-export
+          npx expo export --platform android --output-dir .dkd-v0-0-5-cleanup-export --clear
+          rm -rf .dkd-v0-0-5-cleanup-export
+
+      - name: Publish validated cleanup to main
+        shell: bash
+        run: |
+          git config user.name 'DKD Release Bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add -A
+          if git diff --cached --quiet; then
+            echo 'No repository changes to publish.'
+            exit 0
+          fi
+          git commit -m 'DraBornGo v0.0.5: remove DraBornDeal remnants and fix visible versions'
+          git push origin HEAD:main
