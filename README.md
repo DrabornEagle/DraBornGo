@@ -6,8 +6,8 @@ DraBornGo, kurye ve şehir hizmet operasyonlarını tek mobil merkezde birleşti
 - Expo SDK 57
 - React Native 0.86
 - React 19.2.3
-- Android versionCode 3
-- Test kanalı: Expo Go
+- Android versionCode 6
+- Test kanalı: Expo Go 57.0.2
 - Bu aşamada APK/AAB üretimi yapılmaz.
 
 ## Aktif çekirdek
