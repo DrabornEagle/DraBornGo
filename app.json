@@ -7,7 +7,6 @@
     "icon": "./assets/images/icon.png",
     "scheme": "draborngo",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
     "ios": {
       "supportsTablet": true
     },
@@ -18,7 +17,6 @@
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
-      "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
       "package": "com.draborneagle.draborngo",
       "versionCode": 3,
@@ -73,10 +71,6 @@
       }
     },
     "owner": "draborneagle",
-    "androidNavigationBar": {
-      "backgroundColor": "#000000",
-      "barStyle": "light-content"
-    },
     "androidStatusBar": {
       "backgroundColor": "#000000",
       "barStyle": "light-content",
