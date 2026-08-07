@@ -5,7 +5,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { supabase } from './src/lib/supabase';
 import dkd_auth_screen_value from './src/features/auth/dkd_auth_screen';
 import dkd_pre_login_intro_screen_value from './src/features/onboarding/dkd_pre_login_intro_screen';
-import dkd_courier_flow_value from './src/core/dkd_courier_flow';
+import dkd_courier_flow_value from './src/core/dkd_courier_flow_v2';
 
 const dkd_intro_storage_key_value = 'dkd_draborngo_intro_seen_v006';
 
@@ -49,7 +49,7 @@ export default function App() {
     dkd_content_value = React.createElement(
       View,
       { style: dkd_styles_value.dkd_boot_value },
-      React.createElement(ActivityIndicator, { size: 'large', color: '#5CE7FF' }),
+      React.createElement(ActivityIndicator, { size: 'large', color: '#37D8FF' }),
     );
   } else if (!dkd_intro_seen_value) {
     dkd_content_value = React.createElement(dkd_pre_login_intro_screen_value, {
@@ -72,6 +72,6 @@ const dkd_styles_value = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#030711',
+    backgroundColor: '#02060D',
   },
 });
