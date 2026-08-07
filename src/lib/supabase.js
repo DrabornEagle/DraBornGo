@@ -3,35 +3,33 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createClient } from '@supabase/supabase-js';
 import { dkd_public_env_value } from './dkd_public_env';
 
-const dkd_supabase_url = dkd_public_env_value('EXPO_PUBLIC_SUPABASE_URL');
-const dkd_supabase_key = dkd_public_env_value('EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY')
+const dkd_supabase_url_value = dkd_public_env_value('EXPO_PUBLIC_SUPABASE_URL');
+const dkd_supabase_key_value = dkd_public_env_value('EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY')
   || dkd_public_env_value('EXPO_PUBLIC_SUPABASE_ANON_KEY');
 
-const dkd_placeholder_flag = [dkd_supabase_url, dkd_supabase_key].some((dkd_item_value) =>
-  !dkd_item_value || dkd_item_value.includes('BURAYA_')
+const dkd_config_ready_value = Boolean(
+  dkd_supabase_url_value
+  && dkd_supabase_key_value
+  && !dkd_supabase_url_value.includes('BURAYA_')
+  && !dkd_supabase_key_value.includes('BURAYA_')
 );
 
 export const dkd_supabase_runtime_config = {
-  dkd_url_value: dkd_supabase_url,
-  dkd_key_value: dkd_supabase_key,
-  dkd_is_ready: Boolean(dkd_supabase_url && dkd_supabase_key && !dkd_placeholder_flag),
-  dkd_issue_text: dkd_placeholder_flag
-    ? 'Supabase ayarı eksik. .env dosyasına EXPO_PUBLIC_SUPABASE_URL ve EXPO_PUBLIC_SUPABASE_ANON_KEY yaz.'
-    : '',
+  dkd_url_value: dkd_supabase_url_value,
+  dkd_key_value: dkd_supabase_key_value,
+  dkd_is_ready: dkd_config_ready_value,
+  dkd_issue_text: dkd_config_ready_value ? '' : 'Supabase bağlantı ayarı eksik.',
 };
 
-if (!dkd_supabase_runtime_config.dkd_is_ready) {
-  console.warn(`[DraBornGo] ${dkd_supabase_runtime_config.dkd_issue_text}`);
-}
-
-const dkd_safe_url = dkd_supabase_runtime_config.dkd_is_ready ? dkd_supabase_url : 'https://example.invalid';
-const dkd_safe_key = dkd_supabase_runtime_config.dkd_is_ready ? dkd_supabase_key : 'dkd_invalid_key';
-
-export const supabase = createClient(dkd_safe_url, dkd_safe_key, {
-  auth: {
-    storage: AsyncStorage,
-    autoRefreshToken: true,
-    persistSession: true,
-    detectSessionInUrl: false,
+export const supabase = createClient(
+  dkd_config_ready_value ? dkd_supabase_url_value : 'https://example.invalid',
+  dkd_config_ready_value ? dkd_supabase_key_value : 'dkd_invalid_public_key',
+  {
+    auth: {
+      storage: AsyncStorage,
+      autoRefreshToken: true,
+      persistSession: true,
+      detectSessionInUrl: false,
+    },
   },
-});
+);

@@ -2,7 +2,7 @@
   "expo": {
     "name": "DraBornGo",
     "slug": "draborngo",
-    "version": "0.0.5",
+    "version": "0.0.6",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "draborngo",
@@ -13,7 +13,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
+        "backgroundColor": "#06111C",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
@@ -21,17 +21,24 @@
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
       "package": "com.draborneagle.draborngo",
-      "googleServicesFile": "./google-services.json",
-      "config": {
-        "googleMaps": {
-          "apiKey": "AIzaSyDznPFvHQMVOqdJhPPyJ4jkqQINUUymcpY"
-        }
-      },
-      "versionCode": 5,
+      "versionCode": 3,
       "permissions": [
         "android.permission.ACCESS_COARSE_LOCATION",
-        "android.permission.ACCESS_FINE_LOCATION",
-        "android.permission.CAMERA"
+        "android.permission.ACCESS_FINE_LOCATION"
+      ],
+      "blockedPermissions": [
+        "android.permission.ACCESS_BACKGROUND_LOCATION",
+        "android.permission.FOREGROUND_SERVICE",
+        "android.permission.FOREGROUND_SERVICE_LOCATION",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.READ_MEDIA_IMAGES",
+        "android.permission.READ_MEDIA_VIDEO",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.SYSTEM_ALERT_WINDOW",
+        "android.permission.QUERY_ALL_PACKAGES",
+        "android.permission.REQUEST_INSTALL_PACKAGES",
+        "android.permission.USE_FULL_SCREEN_INTENT"
       ]
     },
     "plugins": [
@@ -48,32 +55,12 @@
         }
       ],
       [
-        "expo-notifications",
-        {
-          "defaultChannel": "draborngo-core",
-          "color": "#0EA5E9"
-        }
-      ],
-      [
-        "@rnmapbox/maps",
-        {
-          "RNMapboxMapsVersion": "11.20.1"
-        }
-      ],
-      [
         "expo-location",
         {
-          "locationWhenInUsePermission": "DraBornGo; kurye, paket, hizmet ağı ve restoran/market siparişlerinde adres eşleştirme, rota çizimi ve canlı teslimat takibi için yalnızca uygulama açıkken konumunu kullanır.",
+          "locationWhenInUsePermission": "DraBornGo, yalnızca sen konum gerektiren kurye işlemini başlattığında ve uygulama açıkken konumunu kullanır.",
           "isAndroidBackgroundLocationEnabled": false,
           "isAndroidForegroundServiceEnabled": false,
           "isIosBackgroundLocationEnabled": false
-        }
-      ],
-      [
-        "expo-image-picker",
-        {
-          "photosPermission": "DraBornGo; yalnızca senin seçtiğin paket, ürün, profil veya dekont görselini eklemek için galerine erişir.",
-          "cameraPermission": "DraBornGo; paket, ürün, profil veya dekont fotoğrafı çekmek için kameranı kullanır."
         }
       ]
     ],
@@ -87,7 +74,7 @@
     },
     "owner": "draborneagle",
     "androidNavigationBar": {
-      "backgroundColor": "#00000000",
+      "backgroundColor": "#000000",
       "barStyle": "light-content"
     },
     "androidStatusBar": {
