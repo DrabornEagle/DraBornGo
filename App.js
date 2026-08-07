@@ -5,7 +5,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { supabase } from './src/lib/supabase';
 import dkd_auth_screen_value from './src/features/auth/dkd_auth_screen';
 import dkd_pre_login_intro_screen_value from './src/features/onboarding/dkd_pre_login_intro_screen';
-import dkd_game_flow_value from './src/core/dkd_game_flow';
+import dkd_courier_flow_value from './src/core/dkd_courier_flow';
 
 const dkd_intro_storage_key_value = 'dkd_draborngo_intro_seen_v006';
 
@@ -49,7 +49,7 @@ export default function App() {
     dkd_content_value = React.createElement(
       View,
       { style: dkd_styles_value.dkd_boot_value },
-      React.createElement(ActivityIndicator, { size: 'large', color: '#79E6FF' }),
+      React.createElement(ActivityIndicator, { size: 'large', color: '#5CE7FF' }),
     );
   } else if (!dkd_intro_seen_value) {
     dkd_content_value = React.createElement(dkd_pre_login_intro_screen_value, {
@@ -58,7 +58,7 @@ export default function App() {
   } else if (!dkd_session_value) {
     dkd_content_value = React.createElement(dkd_auth_screen_value);
   } else {
-    dkd_content_value = React.createElement(dkd_game_flow_value, {
+    dkd_content_value = React.createElement(dkd_courier_flow_value, {
       dkd_session_value,
       dkd_on_signed_out_value: () => dkd_set_session_value(null),
     });
@@ -72,6 +72,6 @@ const dkd_styles_value = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#050B15',
+    backgroundColor: '#030711',
   },
 });
