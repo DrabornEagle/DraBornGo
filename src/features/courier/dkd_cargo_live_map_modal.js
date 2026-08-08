@@ -83,10 +83,10 @@ function dkd_vehicle_label_value(dkd_vehicle_type_value) {
   return dkd_key_value ? dkd_key_value.toUpperCase() : 'Kurye';
 }
 
-function dkd_status_label_value(dkd_status_value, dkd_is_business_task_value = false) {
+function dkd_status_label_value(dkd_status_value, dkd_is_pickup_task_value = false) {
   const dkd_key_value = String(dkd_status_value || 'open').toLowerCase();
-  if (dkd_key_value === 'accepted') return dkd_is_business_task_value ? 'İşletmeye gidiyor' : 'Göndericiye gidiyor';
-  if (dkd_key_value === 'picked_up') return dkd_is_business_task_value ? 'Müşteriye gidiyor' : 'Teslimat noktasına gidiyor';
+  if (dkd_key_value === 'accepted') return dkd_is_pickup_task_value ? 'İşletmeye gidiyor' : 'Göndericiye gidiyor';
+  if (dkd_key_value === 'picked_up') return dkd_is_pickup_task_value ? 'Müşteriye gidiyor' : 'Teslimat noktasına gidiyor';
   if (dkd_key_value === 'completed') return 'Teslim edildi';
   if (dkd_key_value === 'cancelled') return 'Teslimat iptal edildi';
   return 'Kurye bekleniyor';
@@ -154,7 +154,7 @@ function dkd_clean_business_route_address_text_value(dkd_value) {
     .replace(/\s*•\s*/g, ', ')
     .replace(/\s+/g, ' ')
     .trim();
-  if (!dkd_clean_value || /^(adres yok|işletme teslim alma noktası|teslimat adresi)$/i.test(dkd_clean_value)) return '';
+  if (!dkd_clean_value || /^(adres yok|alım noktası|teslimat adresi)$/i.test(dkd_clean_value)) return '';
   return dkd_clean_value;
 }
 
@@ -283,7 +283,7 @@ function dkd_job_phase_status_value(dkd_task_value) {
   const dkd_pickup_status_value = String(dkd_task_value?.pickup_status || '').toLowerCase();
   if (dkd_status_key_value === 'completed' || dkd_pickup_status_value === 'delivered') return 'completed';
   if (dkd_status_key_value === 'picked_up' || dkd_status_key_value === 'to_customer' || dkd_status_key_value === 'delivering' || dkd_pickup_status_value === 'picked_up') return 'picked_up';
-  if (dkd_status_key_value === 'accepted' || dkd_status_key_value === 'assigned' || dkd_status_key_value === 'to_business') return 'accepted';
+  if (dkd_status_key_value === 'accepted' || dkd_status_key_value === 'assigned' || dkd_status_key_value === 'to_pickup') return 'accepted';
   return dkd_status_key_value || 'open';
 }
 
@@ -320,7 +320,7 @@ function dkd_business_task_address_text_value(dkd_task_value, dkd_kind_value) {
         dkd_task_value?.sender_address_text,
         dkd_task_value?.pickup,
         dkd_read_nested_text_value(dkd_meta_value, ['pickup']),
-      ]) || 'İşletme teslim alma noktası',
+      ]) || 'Alım noktası',
     );
   }
   return dkd_compact_address_text_value(
@@ -753,7 +753,7 @@ function DkdCargoLiveMapModal({
   const dkd_effective_location_updated_at_value = dkd_task_value ? (dkd_current_location_value?.updated_at || dkd_current_location_value?.timestamp || new Date().toISOString()) : dkd_shipment_value?.courier_location_updated_at;
 
   const dkd_raw_status_key_value = dkd_effective_status_value;
-  const dkd_is_business_task_value = Boolean(dkd_task_value) && String(dkd_task_value?.job_type || '').toLowerCase() !== 'cargo';
+  const dkd_is_pickup_task_value = Boolean(dkd_task_value) && String(dkd_task_value?.job_type || '').toLowerCase() !== 'cargo';
   const dkd_pickup_address_text_value = dkd_task_value
     ? dkd_business_task_address_text_value(dkd_task_value, 'pickup')
     : dkd_shipment_value?.pickup_address_text;
@@ -764,28 +764,28 @@ function DkdCargoLiveMapModal({
     ? dkd_coordinate_pair_value(dkd_current_location_value?.lat, dkd_current_location_value?.lng)
     : dkd_coordinate_pair_value(dkd_shipment_value?.courier_lat, dkd_shipment_value?.courier_lng), [dkd_task_value, dkd_current_location_value?.lat, dkd_current_location_value?.lng, dkd_shipment_value?.courier_lat, dkd_shipment_value?.courier_lng]);
   const dkd_pickup_raw_point_value = useMemo(() => dkd_task_value
-    ? (dkd_is_business_task_value ? dkd_business_pickup_point_from_task_value(dkd_task_value) : dkd_coordinate_pair_value(dkd_task_value?.pickup_lat, dkd_task_value?.pickup_lng))
-    : dkd_coordinate_pair_value(dkd_shipment_value?.pickup_lat, dkd_shipment_value?.pickup_lng), [dkd_task_value, dkd_is_business_task_value, dkd_shipment_value?.pickup_lat, dkd_shipment_value?.pickup_lng]);
+    ? (dkd_is_pickup_task_value ? dkd_business_pickup_point_from_task_value(dkd_task_value) : dkd_coordinate_pair_value(dkd_task_value?.pickup_lat, dkd_task_value?.pickup_lng))
+    : dkd_coordinate_pair_value(dkd_shipment_value?.pickup_lat, dkd_shipment_value?.pickup_lng), [dkd_task_value, dkd_is_pickup_task_value, dkd_shipment_value?.pickup_lat, dkd_shipment_value?.pickup_lng]);
   const dkd_dropoff_raw_point_value = useMemo(() => dkd_task_value
-    ? (dkd_is_business_task_value ? dkd_business_dropoff_point_from_task_value(dkd_task_value) : dkd_coordinate_pair_value(dkd_task_value?.dropoff_lat, dkd_task_value?.dropoff_lng))
-    : dkd_coordinate_pair_value(dkd_shipment_value?.dropoff_lat, dkd_shipment_value?.dropoff_lng), [dkd_task_value, dkd_is_business_task_value, dkd_shipment_value?.dropoff_lat, dkd_shipment_value?.dropoff_lng]);
+    ? (dkd_is_pickup_task_value ? dkd_business_dropoff_point_from_task_value(dkd_task_value) : dkd_coordinate_pair_value(dkd_task_value?.dropoff_lat, dkd_task_value?.dropoff_lng))
+    : dkd_coordinate_pair_value(dkd_shipment_value?.dropoff_lat, dkd_shipment_value?.dropoff_lng), [dkd_task_value, dkd_is_pickup_task_value, dkd_shipment_value?.dropoff_lat, dkd_shipment_value?.dropoff_lng]);
   const dkd_courier_point_key_value = dkd_point_cache_key_value(dkd_courier_point_value);
   const dkd_pickup_raw_point_key_value = dkd_point_cache_key_value(dkd_pickup_raw_point_value);
   const dkd_dropoff_raw_point_key_value = dkd_point_cache_key_value(dkd_dropoff_raw_point_value);
-  const dkd_pickup_point_value = useMemo(() => (dkd_is_business_task_value
+  const dkd_pickup_point_value = useMemo(() => (dkd_is_pickup_task_value
     ? dkd_prefer_verified_point_value(dkd_pickup_raw_point_value, dkd_business_pickup_geocode_value, true, dkd_pickup_address_text_value)
-    : dkd_pickup_raw_point_value), [dkd_business_pickup_geocode_value, dkd_is_business_task_value, dkd_pickup_address_text_value, dkd_pickup_raw_point_value]);
-  const dkd_dropoff_point_value = useMemo(() => (dkd_is_business_task_value
+    : dkd_pickup_raw_point_value), [dkd_business_pickup_geocode_value, dkd_is_pickup_task_value, dkd_pickup_address_text_value, dkd_pickup_raw_point_value]);
+  const dkd_dropoff_point_value = useMemo(() => (dkd_is_pickup_task_value
     ? dkd_prefer_verified_point_value(dkd_dropoff_raw_point_value, dkd_business_dropoff_geocode_value, true, dkd_delivery_address_text_value)
-    : dkd_dropoff_raw_point_value), [dkd_business_dropoff_geocode_value, dkd_delivery_address_text_value, dkd_dropoff_raw_point_value, dkd_is_business_task_value]);
+    : dkd_dropoff_raw_point_value), [dkd_business_dropoff_geocode_value, dkd_delivery_address_text_value, dkd_dropoff_raw_point_value, dkd_is_pickup_task_value]);
   const dkd_pickup_point_key_value = dkd_point_cache_key_value(dkd_pickup_point_value);
   const dkd_dropoff_point_key_value = dkd_point_cache_key_value(dkd_dropoff_point_value);
-  const dkd_should_preview_open_business_route_value = dkd_is_business_task_value && dkd_raw_status_key_value === 'open' && Boolean(dkd_courier_point_value && dkd_pickup_point_value);
+  const dkd_should_preview_open_business_route_value = dkd_is_pickup_task_value && dkd_raw_status_key_value === 'open' && Boolean(dkd_courier_point_value && dkd_pickup_point_value);
   const dkd_status_key_value = dkd_should_preview_open_business_route_value ? 'accepted' : dkd_raw_status_key_value;
   const dkd_is_waiting_assignment_value = dkd_status_key_value === 'open';
   const dkd_is_pickup_focus_value = dkd_is_pickup_focus_status_value(dkd_status_key_value);
-  const dkd_should_show_business_pickup_marker_value = dkd_is_business_task_value ? dkd_is_pickup_focus_value : true;
-  const dkd_should_show_business_dropoff_marker_value = dkd_is_business_task_value ? !dkd_is_pickup_focus_value : true;
+  const dkd_should_show_business_pickup_marker_value = dkd_is_pickup_task_value ? dkd_is_pickup_focus_value : true;
+  const dkd_should_show_business_dropoff_marker_value = dkd_is_pickup_task_value ? !dkd_is_pickup_focus_value : true;
   const dkd_is_day_map_value = useMemo(() => dkd_is_day_cycle_value(dkd_clock_tick_value), [dkd_clock_tick_value]);
   const dkd_map_style_value = dkd_is_day_map_value ? dkd_day_map_style_value : cityMapStyle;
   const dkd_bottom_map_padding_value = dkd_bottom_panel_collapsed_value ? 118 : 274;
@@ -798,7 +798,7 @@ function DkdCargoLiveMapModal({
 
     const dkd_fit_is_pickup_focus_value = dkd_is_pickup_focus_status_value(dkd_status_key_value);
     const dkd_fit_should_include_overview_value = Array.isArray(dkd_delivery_overview_route_value?.dkd_point_list_value);
-    const dkd_fit_phase_stop_point_value = dkd_is_business_task_value
+    const dkd_fit_phase_stop_point_value = dkd_is_pickup_task_value
       ? (dkd_fit_is_pickup_focus_value ? dkd_pickup_point_value : dkd_dropoff_point_value)
       : null;
     const dkd_fit_point_map_value = new Map();
@@ -807,7 +807,7 @@ function DkdCargoLiveMapModal({
       ...(!dkd_fit_is_pickup_focus_value && Array.isArray(dkd_courier_to_dropoff_route_value?.dkd_point_list_value) ? dkd_courier_to_dropoff_route_value.dkd_point_list_value : []),
       ...(dkd_fit_should_include_overview_value ? dkd_delivery_overview_route_value.dkd_point_list_value : []),
       dkd_courier_point_value,
-      ...(dkd_is_business_task_value ? [dkd_fit_phase_stop_point_value] : [dkd_pickup_point_value, dkd_dropoff_point_value]),
+      ...(dkd_is_pickup_task_value ? [dkd_fit_phase_stop_point_value] : [dkd_pickup_point_value, dkd_dropoff_point_value]),
     ].filter(Boolean).forEach((dkd_point_value) => {
       dkd_fit_point_map_value.set(`${dkd_point_value.latitude}:${dkd_point_value.longitude}`, dkd_point_value);
     });
@@ -839,7 +839,7 @@ function DkdCargoLiveMapModal({
     dkd_courier_to_dropoff_route_value,
     dkd_delivery_overview_route_value,
     dkd_bottom_fit_padding_value,
-    dkd_is_business_task_value,
+    dkd_is_pickup_task_value,
     dkd_status_key_value,
   ]);
 
@@ -892,7 +892,7 @@ function DkdCargoLiveMapModal({
   }, [dkd_visible_value, dkd_shipment_value?.id, dkd_task_value?.id]);
 
   useEffect(() => {
-    if (!dkd_visible_value || !dkd_is_business_task_value) return undefined;
+    if (!dkd_visible_value || !dkd_is_pickup_task_value) return undefined;
     let dkd_cancelled_value = false;
 
     async function dkd_load_business_address_points_value() {
@@ -944,7 +944,7 @@ function DkdCargoLiveMapModal({
     };
   }, [
     dkd_visible_value,
-    dkd_is_business_task_value,
+    dkd_is_pickup_task_value,
     dkd_pickup_address_text_value,
     dkd_delivery_address_text_value,
     dkd_pickup_raw_point_key_value,
@@ -1060,7 +1060,7 @@ function DkdCargoLiveMapModal({
       : (dkd_status_key_value === 'picked_up'
         ? dkd_dropoff_leg_distance_value
         : (dkd_dropoff_leg_distance_value ?? dkd_delivery_overview_distance_value));
-  const dkd_phase_geocode_warning_text_value = dkd_is_business_task_value
+  const dkd_phase_geocode_warning_text_value = dkd_is_pickup_task_value
     ? (dkd_is_pickup_focus_value ? dkd_business_pickup_geocode_value?.dkd_warning_text_value : dkd_business_dropoff_geocode_value?.dkd_warning_text_value)
     : '';
   const dkd_route_warning_text_value = String(
@@ -1079,7 +1079,7 @@ function DkdCargoLiveMapModal({
       : dkd_mapbox_access_token_problem_text_value();
   const dkd_should_show_delivery_overview_line_value = true;
   const dkd_mapbox_camera_points_value = useMemo(() => {
-    const dkd_phase_stop_point_value = dkd_is_business_task_value
+    const dkd_phase_stop_point_value = dkd_is_pickup_task_value
       ? (dkd_is_pickup_focus_value ? dkd_pickup_point_value : dkd_dropoff_point_value)
       : null;
     const dkd_point_map_value = new Map();
@@ -1088,7 +1088,7 @@ function DkdCargoLiveMapModal({
       ...(!dkd_is_pickup_focus_value && Array.isArray(dkd_courier_to_dropoff_route_value?.dkd_point_list_value) ? dkd_courier_to_dropoff_route_value.dkd_point_list_value : []),
       ...(dkd_should_show_delivery_overview_line_value && Array.isArray(dkd_delivery_overview_route_value?.dkd_point_list_value) ? dkd_delivery_overview_route_value.dkd_point_list_value : []),
       dkd_courier_point_value,
-      ...(dkd_is_business_task_value ? [dkd_phase_stop_point_value] : [dkd_pickup_point_value, dkd_dropoff_point_value]),
+      ...(dkd_is_pickup_task_value ? [dkd_phase_stop_point_value] : [dkd_pickup_point_value, dkd_dropoff_point_value]),
     ].filter(Boolean).forEach((dkd_point_value) => {
       dkd_point_map_value.set(`${dkd_point_value.latitude}:${dkd_point_value.longitude}`, dkd_point_value);
     });
@@ -1100,7 +1100,7 @@ function DkdCargoLiveMapModal({
     dkd_courier_to_pickup_route_value,
     dkd_courier_to_dropoff_route_value,
     dkd_delivery_overview_route_value,
-    dkd_is_business_task_value,
+    dkd_is_pickup_task_value,
     dkd_is_pickup_focus_value,
     dkd_should_show_delivery_overview_line_value,
   ]);
@@ -1133,16 +1133,16 @@ function DkdCargoLiveMapModal({
     [dkd_active_route_value],
   );
   const dkd_navigation_point_value = dkd_is_pickup_focus_value ? dkd_pickup_point_value : dkd_dropoff_point_value;
-  const dkd_summary_title_value = dkd_is_business_task_value
+  const dkd_summary_title_value = dkd_is_pickup_task_value
     ? (dkd_is_pickup_focus_value ? 'İşletmeye Rota' : 'Müşteriye Rota')
     : dkd_is_pickup_focus_value ? 'Gönderici Takibi' : 'Teslimat Takibi';
-  const dkd_primary_distance_label_value = dkd_is_business_task_value
+  const dkd_primary_distance_label_value = dkd_is_pickup_task_value
     ? (dkd_is_pickup_focus_value ? 'İşletmeye Kalan' : 'Müşteriye Kalan')
     : dkd_is_pickup_focus_value ? 'Göndericiye Kalan' : 'Teslime Kalan';
-  const dkd_total_route_label_value = dkd_is_business_task_value
+  const dkd_total_route_label_value = dkd_is_pickup_task_value
     ? (dkd_is_pickup_focus_value ? 'İşletme Rotası' : 'Müşteri Rotası')
     : dkd_is_pickup_focus_value ? 'Alım Rotası' : 'Müşteri Rotası';
-  const dkd_route_focus_label_value = dkd_is_business_task_value
+  const dkd_route_focus_label_value = dkd_is_pickup_task_value
     ? (dkd_is_pickup_focus_value ? 'İşletme Konumu' : 'Müşteri Konumu')
     : dkd_is_pickup_focus_value ? 'Gönderici Konumu' : 'Teslim Edilecek';
   const dkd_route_focus_address_text_value = dkd_is_pickup_focus_value ? dkd_pickup_address_text_value : dkd_delivery_address_text_value;
@@ -1192,13 +1192,13 @@ function DkdCargoLiveMapModal({
 
             {dkd_should_show_business_pickup_marker_value && dkd_pickup_point_value ? (
               <dkd_mapbox_gl_value.PointAnnotation id="dkd_cargo_pickup_marker" coordinate={dkd_mapbox_coordinate_from_map_view_point_value(dkd_pickup_point_value)}>
-                <DkdStopMarker dkd_icon_name_value={dkd_is_business_task_value ? 'storefront-plus-outline' : 'storefront-check-outline'} dkd_tone_value="business" dkd_label_value={dkd_is_business_task_value ? 'İŞLETME' : 'ALIM'} />
+                <DkdStopMarker dkd_icon_name_value={dkd_is_pickup_task_value ? 'storefront-plus-outline' : 'storefront-check-outline'} dkd_tone_value="business" dkd_label_value={dkd_is_pickup_task_value ? 'İŞLETME' : 'ALIM'} />
               </dkd_mapbox_gl_value.PointAnnotation>
             ) : null}
 
             {dkd_should_show_business_dropoff_marker_value && dkd_dropoff_point_value ? (
               <dkd_mapbox_gl_value.PointAnnotation id="dkd_cargo_dropoff_marker" coordinate={dkd_mapbox_coordinate_from_map_view_point_value(dkd_dropoff_point_value)}>
-                <DkdStopMarker dkd_icon_name_value={dkd_is_business_task_value ? 'account-check-outline' : 'account-heart-outline'} dkd_tone_value="customer" dkd_label_value={dkd_is_business_task_value ? 'MÜŞTERİ' : 'TESLİM'} />
+                <DkdStopMarker dkd_icon_name_value={dkd_is_pickup_task_value ? 'account-check-outline' : 'account-heart-outline'} dkd_tone_value="customer" dkd_label_value={dkd_is_pickup_task_value ? 'MÜŞTERİ' : 'TESLİM'} />
               </dkd_mapbox_gl_value.PointAnnotation>
             ) : null}
 
@@ -1265,13 +1265,13 @@ function DkdCargoLiveMapModal({
 
             {dkd_should_show_business_pickup_marker_value && dkd_pickup_point_value ? (
               <Marker coordinate={dkd_pickup_point_value} anchor={dkd_make_native_axis_point(0.5, 1)} tracksViewChanges>
-                <DkdStopMarker dkd_icon_name_value={dkd_is_business_task_value ? 'storefront-plus-outline' : 'storefront-check-outline'} dkd_tone_value="business" dkd_label_value={dkd_is_business_task_value ? 'İŞLETME' : 'ALIM'} />
+                <DkdStopMarker dkd_icon_name_value={dkd_is_pickup_task_value ? 'storefront-plus-outline' : 'storefront-check-outline'} dkd_tone_value="business" dkd_label_value={dkd_is_pickup_task_value ? 'İŞLETME' : 'ALIM'} />
               </Marker>
             ) : null}
 
             {dkd_should_show_business_dropoff_marker_value && dkd_dropoff_point_value ? (
               <Marker coordinate={dkd_dropoff_point_value} anchor={dkd_make_native_axis_point(0.5, 1)} tracksViewChanges>
-                <DkdStopMarker dkd_icon_name_value={dkd_is_business_task_value ? 'account-check-outline' : 'account-heart-outline'} dkd_tone_value="customer" dkd_label_value={dkd_is_business_task_value ? 'MÜŞTERİ' : 'TESLİM'} />
+                <DkdStopMarker dkd_icon_name_value={dkd_is_pickup_task_value ? 'account-check-outline' : 'account-heart-outline'} dkd_tone_value="customer" dkd_label_value={dkd_is_pickup_task_value ? 'MÜŞTERİ' : 'TESLİM'} />
               </Marker>
             ) : null}
 
@@ -1291,8 +1291,8 @@ function DkdCargoLiveMapModal({
               </Pressable>
 
               <View style={dkd_styles.dkd_topTitleWrap}>
-                <Text style={dkd_styles.dkd_topEyebrow}>{dkd_is_business_task_value ? 'DKDmap' : 'KURYE TAKİP'}</Text>
-                <Text numberOfLines={2} style={dkd_styles.dkd_topTitle}>{dkd_should_preview_open_business_route_value ? 'İşletmeye rota oluşturuldu' : dkd_status_label_value(dkd_effective_status_value, dkd_is_business_task_value)}</Text>
+                <Text style={dkd_styles.dkd_topEyebrow}>{dkd_is_pickup_task_value ? 'DKDmap' : 'KURYE TAKİP'}</Text>
+                <Text numberOfLines={2} style={dkd_styles.dkd_topTitle}>{dkd_should_preview_open_business_route_value ? 'İşletmeye rota oluşturuldu' : dkd_status_label_value(dkd_effective_status_value, dkd_is_pickup_task_value)}</Text>
               </View>
 
               <Pressable onPress={dkd_on_refresh_value} style={dkd_styles.dkd_roundButton}>
@@ -1422,7 +1422,7 @@ function DkdCargoLiveMapModal({
                   </View>
                   <View style={dkd_styles.dkd_legendCompactItem}>
                     <View style={[dkd_styles.dkd_legendCompactLine, dkd_styles.dkd_legendCompactLineGreen]} />
-                    <Text style={dkd_styles.dkd_legendCompactText}>{dkd_is_business_task_value ? 'Müşteri' : 'Teslim Edilecek'}</Text>
+                    <Text style={dkd_styles.dkd_legendCompactText}>{dkd_is_pickup_task_value ? 'Müşteri' : 'Teslim Edilecek'}</Text>
                   </View>
                   <View style={dkd_styles.dkd_legendCompactItem}>
                     <View style={[dkd_styles.dkd_legendCompactLine, dkd_styles.dkd_legendCompactLineBlue]} />
@@ -1436,7 +1436,7 @@ function DkdCargoLiveMapModal({
                       <MaterialCommunityIcons name="storefront-outline" size={15} color="#08111C" />
                     </View>
                     <View style={dkd_styles.dkd_routeRailCopy}>
-                      <Text style={dkd_styles.dkd_routeRailLabel}>{dkd_is_business_task_value ? 'İşletmeden Alım' : 'Göndericiden Alım'}</Text>
+                      <Text style={dkd_styles.dkd_routeRailLabel}>{dkd_is_pickup_task_value ? 'İşletmeden Alım' : 'Göndericiden Alım'}</Text>
                       <Text numberOfLines={1} style={dkd_styles.dkd_routeRailAddress}>{dkd_compact_address_text_value(dkd_pickup_address_text_value)}</Text>
                     </View>
                   </View>

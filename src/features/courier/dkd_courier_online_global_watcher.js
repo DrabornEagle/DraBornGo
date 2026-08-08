@@ -33,7 +33,7 @@ function dkd_active_status_value(dkd_job_value) {
   const dkd_pickup_status_value = dkd_trim_text_value(dkd_job_value?.pickup_status).toLowerCase();
   if (['completed', 'cancelled', 'canceled'].includes(dkd_status_value)) return false;
   if (['delivered', 'cancelled', 'canceled'].includes(dkd_pickup_status_value)) return false;
-  return ['accepted', 'assigned', 'to_business', 'picked_up', 'to_customer', 'delivering'].includes(dkd_status_value)
+  return ['accepted', 'assigned', 'to_pickup', 'picked_up', 'to_customer', 'delivering'].includes(dkd_status_value)
     || dkd_pickup_status_value === 'picked_up';
 }
 
@@ -97,7 +97,7 @@ function dkd_offer_title_value(dkd_job_value) {
 
 function dkd_pickup_text_value(dkd_job_value) {
   return dkd_trim_text_value(dkd_job_value?.pickup)
-    || dkd_trim_text_value(dkd_job_value?.merchant_name)
+    )
     || 'Gönderici noktası';
 }
 

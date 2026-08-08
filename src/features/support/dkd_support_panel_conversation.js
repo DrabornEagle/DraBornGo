@@ -35,13 +35,6 @@ const dkd_support_topic_list = Object.freeze([
     dkd_tone: ['#32D7FF', '#4874FF'],
   },
   {
-    dkd_key: 'dkd_market_order',
-    dkd_title: 'Market Siparişi',
-    dkd_text: 'İşletme ürünü, sipariş geçmişi, teslimat ve ürün sorunları.',
-    dkd_icon: 'storefront-outline',
-    dkd_tone: ['#FFB84D', '#FF6B7A'],
-  },
-  {
     dkd_key: 'dkd_account_access',
     dkd_title: 'Hesap / Erişim',
     dkd_text: 'Profil, giriş, hesap güvenliği ve erişim sorunlarıyla ilgili destek.',
