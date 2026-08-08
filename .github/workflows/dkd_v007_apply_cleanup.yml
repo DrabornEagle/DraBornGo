@@ -1,0 +1,64 @@
+name: DKD v0.0.7 Apply Cleanup
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/dkd_v007_apply_cleanup.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply cleanup
+        shell: bash
+        run: |
+          set +e
+          python3 scripts/dkd_v007_cleanup.py > /tmp/dkd_cleanup.log 2>&1
+          DKD_CLEANUP_CODE=$?
+          echo "$DKD_CLEANUP_CODE" > /tmp/dkd_cleanup_code
+      - name: Expo Go source validation
+        shell: bash
+        run: |
+          set +e
+          DKD_INSTALL_CODE=99
+          DKD_EXPORT_CODE=99
+          if [ "$(cat /tmp/dkd_cleanup_code)" = "0" ]; then
+            npm install --no-package-lock > /tmp/dkd_npm.log 2>&1
+            DKD_INSTALL_CODE=$?
+            if [ "$DKD_INSTALL_CODE" = "0" ]; then
+              npx expo export --platform android --output-dir /tmp/dkd-v007-export > /tmp/dkd_export.log 2>&1
+              DKD_EXPORT_CODE=$?
+            fi
+          fi
+          {
+            echo "DKD v0.0.7 CLEANUP VALIDATION"
+            echo "cleanup_code=$(cat /tmp/dkd_cleanup_code)"
+            echo "npm_install_code=$DKD_INSTALL_CODE"
+            echo "expo_export_android_code=$DKD_EXPORT_CODE"
+            echo
+            echo "=== CLEANUP LOG ==="
+            cat /tmp/dkd_cleanup.log
+            echo
+            echo "=== EXPO EXPORT LOG TAIL ==="
+            tail -n 120 /tmp/dkd_export.log 2>/dev/null || true
+            echo
+            echo "=== FORBIDDEN SOURCE REFERENCES ==="
+            grep -RInE '(DKD_DraBornGo_v0\.0\.[0-6]|Günlük Giriş Ödülü|Günlük Ödül|daily_reward|DailyReward|\benergy\b|\bEnerji\b|dkd_puan|\bCüzdan\b|wallet_tl|courier_wallet_tl|merchant_wallet_tl|Özel Kart|boss_tickets|Harita=Sandıklar|\bSandıklar\b|\bKoleksiyon\b|CollectionModal|ChestModal|useChestActions|useCollectionActions|useTaskProgress|\bXP\b|\bLVL\b|\bLvl\b|rank_key|Oyuncu Kartı|İLETİ MERKEZİ SMS|dkd_iletimerkezi|sms_otp)' src supabase web 2>/dev/null || true
+            echo
+            echo "=== GIT STATUS ==="
+            git status --short
+          } > dkd_v007_validation.txt
+      - name: Commit cleanup result
+        shell: bash
+        run: |
+          git config user.name 'DraBornGo v0.0.7 Bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add -A
+          git commit -m 'DraBornGo v0.0.7 remove legacy game economy and SMS systems'
+          git push origin HEAD:main
