@@ -78,7 +78,6 @@ function ModalHost(props) {
           dkd_is_admin_value={isAdmin}
           dkd_on_profile_press_value={() => { setActiveTab('map'); setProfileOpen(true); }}
           dkd_on_open_logistics_value={() => { dkd_set_logistics_initial_panel_value?.('create'); setActiveTab('logistics'); }}
-          dkd_on_open_urgent_courier_value={() => { setActiveTab('map'); dkd_set_courier_initial_panel_value?.('urgent'); setCourierBoardOpen(true); }}
         />
       ) : null}
 

@@ -3,13 +3,11 @@ import { Alert, Animated, BackHandler, Easing, Image, Modal, Pressable, ScrollVi
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import DkdCargoSenderPanel, { DkdCargoShipmentDetailReplica } from '../courier/dkd_cargo_sender_panel';
-import DkdUrgentCourierPanel from '../courier/dkd_urgent_courier_panel';
 import DkdCargoLiveMapModal from '../courier/dkd_cargo_live_map_modal';
 import DkdLogisticsModal from '../logistics/dkd_logistics_modal';
 import { fetchBusinessMarketCatalog as dkd_fetch_business_market_catalog_value } from '../../services/businessProductService';
 import { dkd_create_service_network_request_value, dkd_delete_completed_service_network_order_value, dkd_fetch_service_network_my_orders_value } from '../../services/dkd_service_network_service';
 import { dkd_send_customer_order_local_notification_value } from '../../services/notificationService';
-import { dkd_approve_urgent_courier_fee, dkd_approve_urgent_courier_product_total, dkd_reject_urgent_courier_fee, dkd_send_urgent_courier_message } from '../../services/dkd_urgent_courier_service';
 
 export const dkd_service_network_category_groups_value = [
   { dkd_group_id_value: 'dkd_home_life', dkd_title_value: 'Ev & Yaşam', dkd_subtitle_value: 'Evden alınan, randevulu veya konumda verilen günlük hizmetler', dkd_icon_value: 'home-city-outline', dkd_gradient_value: ['#065F46', '#047857', '#164E63'], dkd_categories_value: [
@@ -303,7 +301,7 @@ const dkd_service_network_request_blueprints_value = {
   dkd_private_driver: { dkd_primary_question_value: 'Şoför süresi, rota, araç kimin olacak ve özel beklentiler alınır.', dkd_address_placeholder_value: 'Başlangıç adresi ve buluşma noktası', dkd_delivery_placeholder_value: 'Varış/rota durakları veya dönüş noktası', dkd_detail_placeholder_value: 'Saatlik şoför, şehir dışı, düğün, toplantı, kendi aracım/partner aracı, bekleme notu', dkd_photo_note_value: 'Araç/rota veya buluşma noktası fotoğrafı notu', dkd_option_values: ['Saatlik şoför', 'Kendi aracım', 'Partner aracı', 'Randevulu'], dkd_flow_values: ['Şoför profil ve ücret teklifi verir', 'Rota/süre onaylanır', 'Hizmet sonunda tamamlandı özeti oluşur'] },
   dkd_flower_gift: { dkd_primary_question_value: 'Hediye/çiçek türü, alıcı bilgisi, kart notu ve teslim zamanı alınır.', dkd_address_placeholder_value: 'Alınacak çiçekçi/mağaza veya partner tercihi', dkd_delivery_placeholder_value: 'Alıcı teslim adresi ve telefon/kapı notu', dkd_detail_placeholder_value: 'Çiçek türü, buket, hediye, paketleme, kart mesajı ve gizli teslim notu', dkd_photo_note_value: 'İstenen buket/hediye örneği veya kart notu görseli', dkd_option_values: ['Kart notu', 'Sürpriz teslim', 'Fotoğraf onayı', 'Özel saat'], dkd_flow_values: ['Partner ürün fotoğrafı ve fiyatı gönderir', 'Kurye özel teslim rotasına bağlanır', 'Alıcı teslim onayı ve fotoğraf notu alınır'] },
   dkd_event_support: { dkd_primary_question_value: 'Etkinlik türü, tarih/saat, kişi sayısı ve ekipman ihtiyacı alınır.', dkd_address_placeholder_value: 'Etkinlik adresi, giriş ve yükleme alanı notu', dkd_delivery_placeholder_value: 'Malzeme teslim/toplama noktası varsa yaz', dkd_detail_placeholder_value: 'Doğum günü, nişan, organizasyon, masa-sandalye, süsleme, ses, saha destek ve süre notu', dkd_photo_note_value: 'Mekan fotoğrafı, konsept görseli veya ekipman listesi', dkd_option_values: ['Süsleme', 'Ekipman', 'Saha personeli', 'Toplama hizmeti'], dkd_flow_values: ['Organizasyon partneri paket teklifini verir', 'Kurulum/toplama saatleri planlanır', 'Etkinlik sonrası kapanış ve değerlendirme alınır'] },
-  dkd_document_courier: { dkd_primary_question_value: 'Belge türü, güvenlik seviyesi, alım-teslim adresi ve süre alınır.', dkd_address_placeholder_value: 'Belgenin alınacağı adres ve kişi notu', dkd_delivery_placeholder_value: 'Teslim edilecek adres, kişi ve imza notu', dkd_detail_placeholder_value: 'Evrak, numune, sözleşme, imzalı teslim, gizlilik, kırılabilir veya özel taşıma notu', dkd_photo_note_value: 'Zarf/paket fotoğrafı veya teslim talimatı', dkd_option_values: ['İmzalı teslim', 'Gizli zarf', 'Acil kurye', 'Canlı takip'], dkd_flow_values: ['Kurye güvenli teslim görevine atanır', 'Alımda fotoğraf/imza kaydı açılır', 'Teslimde alıcı onayı alınır'] },
+  dkd_document_courier: { dkd_primary_question_value: 'Belge türü, güvenlik seviyesi, alım-teslim adresi ve süre alınır.', dkd_address_placeholder_value: 'Belgenin alınacağı adres ve kişi notu', dkd_delivery_placeholder_value: 'Teslim edilecek adres, kişi ve imza notu', dkd_detail_placeholder_value: 'Evrak, numune, sözleşme, imzalı teslim, gizlilik, kırılabilir veya özel taşıma notu', dkd_photo_note_value: 'Zarf/paket fotoğrafı veya teslim talimatı', dkd_option_values: ['İmzalı teslim', 'Gizli zarf', 'Kurye', 'Canlı takip'], dkd_flow_values: ['Kurye güvenli teslim görevine atanır', 'Alımda fotoğraf/imza kaydı açılır', 'Teslimde alıcı onayı alınır'] },
   dkd_gift_shopping: { dkd_primary_question_value: 'Hediye fikri, bütçe, mağaza tercihi ve alıcı teslim notu alınır.', dkd_address_placeholder_value: 'Alışveriş yapılacak mağaza/AVM veya bölge', dkd_delivery_placeholder_value: 'Hediyenin teslim edileceği alıcı adresi', dkd_detail_placeholder_value: 'Hediye türü, bütçe, paketleme, kart mesajı, beden/renk ve alternatif ürün notu', dkd_photo_note_value: 'Örnek ürün görseli, beden/renk referansı veya kart mesajı', dkd_option_values: ['Bütçeli alışveriş', 'Paketleme', 'Kart mesajı', 'Sürpriz teslim'], dkd_flow_values: ['Partner/kurye ürün seçeneklerini paylaşır', 'Kullanıcı ürün ve fiyatı onaylar', 'Paketlenip teslim rotasına bağlanır'] },
 };
 
@@ -373,7 +371,6 @@ function dkd_service_network_mapbox_job_type_value(dkd_source_type_value = '') {
   const dkd_source_key_value = String(dkd_source_type_value || '').toLowerCase();
   if (dkd_source_key_value.includes('restaurant')) return 'restaurant';
   if (dkd_source_key_value.includes('cargo')) return 'cargo';
-  if (dkd_source_key_value.includes('urgent')) return 'urgent_courier';
   if (dkd_source_key_value.includes('logistics')) return 'logistics';
   return 'service_network';
 }
@@ -568,174 +565,8 @@ function dkd_service_network_urgent_order_id_value(dkd_order_value = {}, dkd_pay
   ], '');
 }
 
-function DkdServiceNetworkUrgentDetailCard({ dkd_order_value, dkd_on_after_action_value }) {
-  const dkd_payload_value = dkd_service_network_payload_value(dkd_order_value);
-  const dkd_item_values = Array.isArray(dkd_payload_value?.dkd_item_values)
-    ? dkd_payload_value.dkd_item_values
-    : (Array.isArray(dkd_payload_value?.dkd_items) ? dkd_payload_value.dkd_items : []);
-  const dkd_message_values = Array.isArray(dkd_payload_value?.dkd_message_values) ? dkd_payload_value.dkd_message_values : [];
-  const dkd_status_key_value = dkd_service_network_first_text_value([dkd_payload_value?.dkd_status_key, dkd_order_value?.dkd_status], 'dkd_open');
-  const dkd_order_id_value = dkd_service_network_urgent_order_id_value(dkd_order_value, dkd_payload_value);
-  const dkd_status_title_value = dkd_order_value?.dkd_status_title && !String(dkd_order_value.dkd_status_title).startsWith('dkd_')
-    ? dkd_order_value.dkd_status_title
-    : dkd_service_network_urgent_status_text_value(dkd_status_key_value);
-  const dkd_invoice_url_value = String(dkd_payload_value?.dkd_invoice_image_url || '').trim();
-  const dkd_courier_fee_text_value = dkd_service_network_money_detail_text_value(dkd_payload_value?.dkd_courier_fee_tl) || 'Kurye bekleniyor';
-  const dkd_product_total_text_value = dkd_service_network_money_detail_text_value(dkd_payload_value?.dkd_product_total_tl) || 'Bekleniyor';
-  const [dkd_message_draft_value, dkd_set_message_draft_value] = useState('');
-  const [dkd_busy_action_key_value, dkd_set_busy_action_key_value] = useState('');
-  const dkd_trimmed_message_value = dkd_message_draft_value.trim();
-
-  const dkd_run_urgent_detail_action_value = useCallback(async (dkd_action_key_value, dkd_action_callback_value, dkd_success_text_value) => {
-    if (!dkd_order_id_value) {
-      Alert.alert('Acil Kurye', 'Sipariş numarası bulunamadı. Listeyi yenileyip tekrar dene.');
-      return;
-    }
-    dkd_set_busy_action_key_value(dkd_action_key_value);
-    try {
-      const dkd_action_result_value = await dkd_action_callback_value();
-      if (dkd_action_result_value?.error) throw dkd_action_result_value.error;
-      if (dkd_action_key_value === 'dkd_message') dkd_set_message_draft_value('');
-      await dkd_on_after_action_value?.();
-      Alert.alert('Acil Kurye', dkd_success_text_value);
-    } catch (dkd_error_value) {
-      Alert.alert('Acil Kurye', dkd_error_value?.message || 'İşlem tamamlanamadı.');
-    } finally {
-      dkd_set_busy_action_key_value('');
-    }
-  }, [dkd_on_after_action_value, dkd_order_id_value]);
-
-  const dkd_confirm_reject_urgent_fee_value = useCallback(() => {
-    Alert.alert(
-      'Taşıma ücretini reddet',
-      'Bu taşıma teklifini reddetmek istiyor musun?',
-      [
-        { text: 'Vazgeç', style: 'cancel' },
-        {
-          text: 'Reddet',
-          style: 'destructive',
-          onPress: () => dkd_run_urgent_detail_action_value('dkd_reject_fee', () => dkd_reject_urgent_courier_fee(dkd_order_id_value), 'Taşıma ücreti reddedildi.'),
-        },
-      ],
-    );
-  }, [dkd_order_id_value, dkd_run_urgent_detail_action_value]);
-
-  return (
-    <LinearGradient colors={['rgba(8,47,73,0.96)', 'rgba(49,46,129,0.78)', 'rgba(15,23,42,0.98)']} style={dkd_styles.dkd_source_detail_card}>
-      <View style={dkd_styles.dkd_source_detail_header}>
-        <View style={dkd_styles.dkd_source_detail_icon_wrap}><MaterialCommunityIcons name="bike-fast" size={19} color="#07131C" /></View>
-        <View style={dkd_styles.dkd_source_detail_header_copy}>
-          <Text style={dkd_styles.dkd_source_detail_kicker}>ACİL KURYE SİPARİŞLERİM</Text>
-          <Text style={dkd_styles.dkd_source_detail_title}>Acil Kurye sipariş özeti</Text>
-        </View>
-        <Text style={dkd_styles.dkd_source_detail_status_pill}>{dkd_status_title_value}</Text>
-      </View>
-      <DkdServiceNetworkSourceTimeline
-        dkd_status_key_value={dkd_status_key_value}
-        dkd_step_values={[
-          { dkd_key_value: 'dkd_received', dkd_label_value: 'Alındı', dkd_match_values: ['open', 'pending', 'siparis', 'fee'] },
-          { dkd_key_value: 'dkd_courier', dkd_label_value: 'Kurye', dkd_match_values: ['paid', 'shopping', 'assigned', 'kurye'] },
-          { dkd_key_value: 'dkd_delivery', dkd_label_value: 'Teslimat', dkd_match_values: ['way', 'picked', 'aktif', 'deliv'] },
-          { dkd_key_value: 'dkd_done', dkd_label_value: 'Bitti', dkd_match_values: ['completed', 'tamam'] },
-        ]}
-      />
-      <View style={dkd_styles.dkd_source_metric_grid}>
-        <DkdServiceNetworkSourceMetric dkd_icon_value="bike-fast" dkd_label_value="Taşıma" dkd_value_text={dkd_courier_fee_text_value} />
-        <DkdServiceNetworkSourceMetric dkd_icon_value="basket-check-outline" dkd_label_value="Ürün" dkd_value_text={dkd_product_total_text_value} dkd_tone_value="green" />
-      </View>
-      {dkd_status_key_value === 'dkd_fee_offer_waiting' ? (
-        <View style={dkd_styles.dkd_source_action_stack}>
-          <Pressable
-            disabled={Boolean(dkd_busy_action_key_value)}
-            onPress={() => dkd_run_urgent_detail_action_value('dkd_approve_fee', () => dkd_approve_urgent_courier_fee(dkd_order_id_value), 'Taşıma ücreti onaylandı. Kurye alışveriş adımına geçebilir.')}
-            style={[dkd_styles.dkd_source_primary_action_button, dkd_busy_action_key_value === 'dkd_approve_fee' && dkd_styles.dkd_source_action_button_busy]}
-          >
-            <MaterialCommunityIcons name="credit-card-check-outline" size={16} color="#052E16" />
-            <Text style={dkd_styles.dkd_source_primary_action_text}>{dkd_busy_action_key_value === 'dkd_approve_fee' ? 'Onaylanıyor...' : 'Taşıma Ücretini Onayla'}</Text>
-          </Pressable>
-          <Pressable
-            disabled={Boolean(dkd_busy_action_key_value)}
-            onPress={dkd_confirm_reject_urgent_fee_value}
-            style={[dkd_styles.dkd_source_danger_action_button, dkd_busy_action_key_value === 'dkd_reject_fee' && dkd_styles.dkd_source_action_button_busy]}
-          >
-            <MaterialCommunityIcons name="close-circle-outline" size={16} color="#FEE2E2" />
-            <Text style={dkd_styles.dkd_source_danger_action_text}>{dkd_busy_action_key_value === 'dkd_reject_fee' ? 'Reddediliyor...' : 'Taşıma Ücretini Reddet'}</Text>
-          </Pressable>
-        </View>
-      ) : null}
-      {dkd_status_key_value === 'dkd_product_total_waiting' ? (
-        <Pressable
-          disabled={Boolean(dkd_busy_action_key_value)}
-          onPress={() => dkd_run_urgent_detail_action_value('dkd_approve_product_total', () => dkd_approve_urgent_courier_product_total(dkd_order_id_value), 'Ürün toplamı onaylandı.')}
-          style={[dkd_styles.dkd_source_primary_action_button, dkd_busy_action_key_value === 'dkd_approve_product_total' && dkd_styles.dkd_source_action_button_busy]}
-        >
-          <MaterialCommunityIcons name="basket-check-outline" size={16} color="#052E16" />
-          <Text style={dkd_styles.dkd_source_primary_action_text}>{dkd_busy_action_key_value === 'dkd_approve_product_total' ? 'Onaylanıyor...' : 'Ürün Toplamını Onayla'}</Text>
-        </Pressable>
-      ) : null}
-      <View style={dkd_styles.dkd_source_message_input_card}>
-        <View style={dkd_styles.dkd_source_message_input_header}>
-          <MaterialCommunityIcons name="message-reply-text-outline" size={15} color="#BAE6FD" />
-          <Text style={dkd_styles.dkd_source_message_input_title}>Kuryeye mesaj gönder</Text>
-        </View>
-        <TextInput
-          value={dkd_message_draft_value}
-          onChangeText={dkd_set_message_draft_value}
-          placeholder="Kuryeye not yaz..."
-          placeholderTextColor="rgba(226,242,255,0.48)"
-          multiline
-          style={dkd_styles.dkd_source_message_input}
-        />
-        <Pressable
-          disabled={!dkd_trimmed_message_value || Boolean(dkd_busy_action_key_value)}
-          onPress={() => dkd_run_urgent_detail_action_value('dkd_message', () => dkd_send_urgent_courier_message(dkd_order_id_value, dkd_trimmed_message_value), 'Mesaj kuryeye gönderildi.')}
-          style={[dkd_styles.dkd_source_message_send_button, (!dkd_trimmed_message_value || Boolean(dkd_busy_action_key_value)) && dkd_styles.dkd_source_message_send_button_disabled]}
-        >
-          <MaterialCommunityIcons name={dkd_busy_action_key_value === 'dkd_message' ? 'loading' : 'send'} size={15} color="#07131C" />
-          <Text style={dkd_styles.dkd_source_message_send_text}>{dkd_busy_action_key_value === 'dkd_message' ? 'Gönderiliyor...' : 'Kuryeye Mesaj Gönder'}</Text>
-        </Pressable>
-      </View>
-      <View style={dkd_styles.dkd_source_item_list}>
-        {dkd_item_values.length ? dkd_item_values.map((dkd_item_value, dkd_item_index_value) => (
-          <View key={`${dkd_service_network_first_text_value([dkd_item_value?.dkd_store_name, dkd_item_value?.dkd_store_group_title], 'dkd_store')}_${dkd_item_index_value}`} style={dkd_styles.dkd_source_item_chip}>
-            <Text style={dkd_styles.dkd_source_item_title}>{dkd_service_network_first_text_value([dkd_item_value?.dkd_store_name, dkd_item_value?.dkd_store_group_title], 'Mağaza')}</Text>
-            <Text style={dkd_styles.dkd_source_item_text}>{dkd_service_network_first_text_value([dkd_item_value?.dkd_product_text, dkd_item_value?.dkd_title], 'Ürün listesi yazılmadı')}</Text>
-            {dkd_service_network_money_detail_text_value(dkd_item_value?.dkd_product_total_tl) ? <Text style={dkd_styles.dkd_source_item_total_text}>Mağaza toplamı: {dkd_service_network_money_detail_text_value(dkd_item_value?.dkd_product_total_tl)}</Text> : null}
-          </View>
-        )) : <Text style={dkd_styles.dkd_source_empty_text}>Ürün listesi bekleniyor.</Text>}
-      </View>
-      {dkd_invoice_url_value ? <Image source={{ uri: dkd_invoice_url_value }} style={dkd_styles.dkd_source_preview_image} resizeMode="cover" /> : null}
-      {dkd_message_values.length ? (
-        <View style={dkd_styles.dkd_source_message_box}>
-          <View style={dkd_styles.dkd_source_message_header}><MaterialCommunityIcons name="message-processing-outline" size={14} color="#BAE6FD" /><Text style={dkd_styles.dkd_source_message_title}>Canlı mesaj özeti</Text></View>
-          {dkd_message_values.slice(-3).map((dkd_message_value, dkd_message_index_value) => (
-            <View key={`${dkd_message_value?.dkd_created_at || 'dkd_message'}_${dkd_message_index_value}`} style={dkd_styles.dkd_source_message_bubble}>
-              <Text style={dkd_styles.dkd_source_message_sender}>{dkd_message_value?.dkd_sender_display_name || (String(dkd_message_value?.dkd_sender_role_key || '') === 'dkd_courier' ? 'Kurye' : 'Müşteri')}</Text>
-              <Text style={dkd_styles.dkd_source_message_text}>{dkd_message_value?.dkd_message_text || ''}</Text>
-            </View>
-          ))}
-        </View>
-      ) : null}
-    </LinearGradient>
-  );
-}
-
-function DkdServiceNetworkCargoDetailCard({ dkd_order_value, dkd_on_open_cargo_tracking_value }) {
-  const dkd_cargo_shipment_value = dkd_service_network_cargo_shipment_replica_value(dkd_order_value);
-  const dkd_open_cargo_tracking_value = () => {
-    dkd_on_open_cargo_tracking_value?.(dkd_order_value);
-  };
-  return (
-    <DkdCargoShipmentDetailReplica
-      dkd_shipment_value={dkd_cargo_shipment_value}
-      dkd_on_open_live_map_value={dkd_open_cargo_tracking_value}
-    />
-  );
-}
-
 function DkdServiceNetworkSourceDetailCard({ dkd_order_value, dkd_on_after_action_value, dkd_on_open_cargo_tracking_value }) {
   const dkd_source_type_key_value = dkd_service_network_source_type_key_value(dkd_order_value);
-  if (dkd_source_type_key_value.includes('urgent')) return <DkdServiceNetworkUrgentDetailCard dkd_order_value={dkd_order_value} dkd_on_after_action_value={dkd_on_after_action_value} />;
   if (dkd_source_type_key_value.includes('cargo') || dkd_source_type_key_value.includes('kargo')) return <DkdServiceNetworkCargoDetailCard dkd_order_value={dkd_order_value} dkd_on_open_cargo_tracking_value={dkd_on_open_cargo_tracking_value} />;
   return null;
 }
@@ -1080,18 +911,7 @@ function DkdServiceNetworkFeaturedActions({
   dkd_active_operation_value,
   dkd_on_open_operation_value,
 }) {
-  const dkd_urgent_courier_featured_hidden_value = true;
   const dkd_featured_action_values = [
-    ...(dkd_urgent_courier_featured_hidden_value ? [] : [{
-      dkd_key_value: 'dkd_urgent_courier',
-      dkd_title_value: 'Acil Kurye',
-      dkd_eyebrow_value: 'HIZLI TESLİMAT',
-      dkd_desc_value: 'Market, fırın ve günlük ihtiyaçları hızlı kurye akışına bağla.',
-      dkd_icon_value: 'bike-fast',
-      dkd_badge_value: 'Vitrin',
-      dkd_gradient_value: ['rgba(255,221,94,0.30)', 'rgba(255,82,132,0.24)', 'rgba(46,20,58,0.97)'],
-      dkd_icon_gradient_value: ['#FFD85F', '#FF7EA7', '#6CE7FF'],
-    }]),
     {
       dkd_key_value: 'dkd_cargo_choices',
       dkd_title_value: 'Gönderi Paneli',
@@ -1178,9 +998,7 @@ function DkdServiceNetworkFeaturedInlinePanel({
   const dkd_courier_approved_value = String(dkd_profile_value?.courier_status || '').toLowerCase() === 'approved';
   const dkd_active_title_value = dkd_active_operation_value === 'dkd_logistics'
     ? 'Nakliye/Lojistik'
-    : dkd_active_operation_value === 'dkd_urgent_courier'
-      ? 'Acil Kurye'
-      : dkd_active_operation_value === 'dkd_cargo_create'
+    : dkd_active_operation_value === 'dkd_cargo_create'
         ? 'Gönderi Oluştur'
         : dkd_active_operation_value === 'dkd_cargo_shipments'
           ? 'Gönderilerim'
@@ -1243,17 +1061,6 @@ function DkdServiceNetworkFeaturedInlinePanel({
           dkd_profile_value={dkd_profile_value}
           dkd_initial_panel_value="create"
           dkd_inline_value
-        />
-      ) : null}
-
-      {dkd_active_operation_value === 'dkd_urgent_courier' ? (
-        <DkdUrgentCourierPanel
-          dkd_visible_value
-          dkd_profile_value={dkd_profile_value}
-          dkd_courier_approved_value={dkd_courier_approved_value || dkd_is_admin_value}
-          dkd_is_admin_value={dkd_is_admin_value}
-          dkd_default_tab_value="create"
-          dkd_hide_courier_tab_value
         />
       ) : null}
     </View>

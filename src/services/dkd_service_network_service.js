@@ -1,9 +1,8 @@
 import { supabase } from '../lib/supabase';
 import { dkd_fetch_my_cargo_shipments } from './dkd_cargo_service';
 import { dkd_fetch_logistics_jobs_value } from './dkd_logistics_service';
-import { dkd_fetch_urgent_courier_snapshot } from './dkd_urgent_courier_service';
 
-const dkd_service_network_active_status_values = ['pending', 'open', 'dkd_open', 'created', 'new', 'waiting', 'awaiting', 'pending_courier', 'dkd_waiting', 'courier_pool', 'accepted', 'dkd_accepted', 'assigned', 'assigned_courier', 'in_progress', 'on_the_way', 'picked_up', 'preparing', 'paid', 'processing', 'siparis_alindi', 'kurye_atandi', 'aktif_teslimat', 'dkd_fee_offer_waiting', 'dkd_fee_paid_shopping', 'dkd_product_total_waiting', 'dkd_product_total_approved', 'dkd_invoice_uploaded', 'dkd_on_the_way'];
+const dkd_service_network_active_status_values = ['pending', 'open', 'dkd_open', 'created', 'new', 'waiting', 'awaiting', 'pending_courier', 'dkd_waiting', 'courier_pool', 'accepted', 'dkd_accepted', 'assigned', 'assigned_courier', 'in_progress', 'on_the_way', 'picked_up', 'preparing', 'paid', 'processing', 'siparis_alindi', 'kurye_atandi', 'aktif_teslimat', 'on_the_way'];
 const dkd_service_network_completed_status_values = ['completed', 'dkd_completed', 'complete', 'delivered', 'done', 'finished', 'closed', 'tamamlandi'];
 const dkd_service_network_cancelled_status_values = ['cancelled', 'dkd_cancelled', 'canceled', 'cancel', 'rejected', 'iptal', 'iptal_edildi'];
 const dkd_service_network_hidden_status_values = ['deleted', 'dkd_deleted', 'admin_deleted', 'dkd_admin_deleted', 'removed', 'silindi', 'admin_sildi'];
@@ -212,7 +211,7 @@ function dkd_service_network_status_title_value(dkd_status_value) {
   if (['dkd_product_total_waiting'].includes(dkd_status_key_value)) return 'Ürün tutarı onayı bekliyor';
   if (['dkd_product_total_approved'].includes(dkd_status_key_value)) return 'Ürün alımı onaylandı';
   if (['dkd_invoice_uploaded'].includes(dkd_status_key_value)) return 'Fatura yüklendi';
-  if (['dkd_on_the_way'].includes(dkd_status_key_value)) return 'Kurye yolda';
+  if (['on_the_way'].includes(dkd_status_key_value)) return 'Kurye yolda';
   if (['pending', 'open', 'dkd_open', 'created', 'new', 'waiting', 'awaiting', 'pending_courier', 'dkd_waiting', 'paid', 'processing', 'siparis_alindi'].includes(dkd_status_key_value)) return 'Sipariş alındı';
   if (['courier_pool'].includes(dkd_status_key_value)) return 'Kurye havuzunda';
   if (['accepted', 'dkd_accepted', 'assigned', 'assigned_courier', 'kurye_atandi'].includes(dkd_status_key_value)) return 'Kurye atandı';
@@ -336,62 +335,6 @@ function dkd_normalized_restaurant_order_value(dkd_row_value = {}, dkd_job_value
   };
 }
 
-
-function dkd_normalized_urgent_courier_order_value(dkd_row_value = {}) {
-  const dkd_source_id_value = dkd_string_value(dkd_row_value?.dkd_order_id || dkd_row_value?.id || dkd_row_value?.order_id, 'dkd_urgent_order');
-  const dkd_status_value = dkd_first_existing_text_value([dkd_row_value?.dkd_status_key, dkd_row_value?.dkd_status, dkd_row_value?.status], 'dkd_open');
-  const dkd_item_values = Array.isArray(dkd_row_value?.dkd_item_values)
-    ? dkd_row_value.dkd_item_values
-    : (Array.isArray(dkd_row_value?.dkd_items) ? dkd_row_value.dkd_items : []);
-  const dkd_store_label_value = dkd_first_existing_text_value([
-    dkd_row_value?.dkd_store_name,
-    dkd_row_value?.dkd_market_name,
-    dkd_item_values.map((dkd_item_value) => dkd_string_value(dkd_item_value?.dkd_store_name || dkd_item_value?.dkd_store_group_title || dkd_item_value?.dkd_product_text)).filter(Boolean).slice(0, 2).join(', '),
-  ], 'Acil alış noktası');
-  const dkd_budget_text_value = dkd_compact_price_range_text_value(dkd_row_value?.dkd_courier_fee_tl, dkd_row_value?.dkd_product_total_tl)
-    || dkd_compact_money_text_value(dkd_row_value?.dkd_total_tl);
-  return {
-    dkd_order_key: `dkd_urgent_courier_${dkd_source_id_value}`,
-    dkd_source_type: 'dkd_urgent_courier_order',
-    dkd_source_id: dkd_source_id_value,
-    dkd_title: 'Acil Kurye Siparişi',
-    dkd_subtitle: 'Acil Kurye',
-    dkd_category_key: 'dkd_urgent_courier',
-    dkd_status: dkd_status_value,
-    dkd_status_title: dkd_service_network_status_title_value(dkd_status_value),
-    dkd_status_group_key: dkd_service_network_status_group_value(dkd_status_value),
-    dkd_address_text: dkd_first_existing_text_value([dkd_row_value?.dkd_pickup_address_text, dkd_store_label_value], 'Acil alış noktası'),
-    dkd_delivery_text: dkd_first_existing_text_value([dkd_row_value?.dkd_customer_address_text, dkd_row_value?.customer_address_text], 'Teslimat adresi'),
-    dkd_note_text: dkd_string_value(dkd_row_value?.dkd_customer_note_text || dkd_row_value?.customer_note_text),
-    dkd_schedule_text: 'Acil teslimat',
-    dkd_budget_text: dkd_budget_text_value,
-    dkd_contact_text: dkd_string_value(dkd_row_value?.dkd_customer_phone_text || dkd_row_value?.customer_phone_text),
-    dkd_urgency_text: 'Acil Kurye',
-    dkd_created_at: dkd_order_timestamp_value(dkd_row_value),
-    dkd_courier_job_id: dkd_source_id_value,
-    dkd_pickup_lat: dkd_number_or_null_value(dkd_row_value?.dkd_pickup_lat ?? dkd_row_value?.pickup_lat),
-    dkd_pickup_lng: dkd_number_or_null_value(dkd_row_value?.dkd_pickup_lng ?? dkd_row_value?.pickup_lng),
-    dkd_dropoff_lat: dkd_number_or_null_value(dkd_row_value?.dkd_customer_lat ?? dkd_row_value?.customer_lat ?? dkd_row_value?.dropoff_lat),
-    dkd_dropoff_lng: dkd_number_or_null_value(dkd_row_value?.dkd_customer_lng ?? dkd_row_value?.customer_lng ?? dkd_row_value?.dropoff_lng),
-    dkd_source_payload_value: dkd_json_value(dkd_row_value),
-    dkd_courier_live_location: dkd_order_live_location_value({
-      assigned_user_id: dkd_row_value?.dkd_courier_user_id || dkd_row_value?.courier_user_id,
-      courier_lat: dkd_row_value?.dkd_courier_lat ?? dkd_row_value?.courier_lat ?? dkd_row_value?.live_lat,
-      courier_lng: dkd_row_value?.dkd_courier_lng ?? dkd_row_value?.courier_lng ?? dkd_row_value?.live_lng,
-      courier_heading_deg: dkd_row_value?.dkd_heading_deg ?? dkd_row_value?.heading_deg,
-      eta_min: dkd_row_value?.dkd_courier_eta_min ?? dkd_row_value?.eta_min,
-      updated_at: dkd_row_value?.dkd_courier_location_updated_at ?? dkd_row_value?.location_updated_at ?? dkd_row_value?.updated_at,
-      courier_vehicle_type: 'moto',
-    }, null),
-  };
-}
-
-function dkd_service_network_cargo_order_title_value(dkd_content_value) {
-  const dkd_clean_value = dkd_string_value(dkd_content_value, 'Paket');
-  const dkd_lower_value = dkd_clean_value.toLocaleLowerCase('tr-TR');
-  if (dkd_lower_value.includes('sipariş')) return dkd_clean_value;
-  return `${dkd_clean_value} Siparişi`;
-}
 
 function dkd_normalized_cargo_shipment_order_value(dkd_row_value = {}) {
   const dkd_source_id_value = dkd_string_value(dkd_row_value?.id || dkd_row_value?.dkd_id || dkd_row_value?.order_id, 'dkd_cargo_shipment');
@@ -607,16 +550,6 @@ async function dkd_enriched_service_network_order_values(dkd_order_values = [], 
 
 async function dkd_fetch_service_network_supplemental_order_values(dkd_user_key_value = '', dkd_limit_value = 40) {
   const dkd_supplemental_order_values = [];
-
-  try {
-    const dkd_urgent_result_value = await dkd_fetch_urgent_courier_snapshot();
-    const dkd_urgent_customer_values = Array.isArray(dkd_urgent_result_value?.data?.dkd_customer_orders) ? dkd_urgent_result_value.data.dkd_customer_orders : [];
-    dkd_supplemental_order_values.push(...dkd_urgent_customer_values.map(dkd_normalized_urgent_courier_order_value));
-  } catch (dkd_error_value) {
-    if (dkd_error_value?.message) {
-      // Acil Kurye Siparişlerim köprüsü sessiz yedek akıştır.
-    }
-  }
 
   try {
     const dkd_cargo_result_value = await dkd_fetch_my_cargo_shipments();

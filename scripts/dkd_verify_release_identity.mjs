@@ -12,9 +12,9 @@ const dkd_expected_permission_values = [
   'android.permission.CAMERA',
 ];
 
-if (dkd_package_value.version !== '0.0.9') dkd_error_text_values.push('package.json version 0.0.9 değil.');
-if (dkd_app_value?.expo?.version !== '0.0.9') dkd_error_text_values.push('app.json expo.version 0.0.9 değil.');
-if (Number(dkd_app_value?.expo?.android?.versionCode) !== 9) dkd_error_text_values.push('Android versionCode 9 değil.');
+if (dkd_package_value.version !== '0.0.10') dkd_error_text_values.push('package.json version 0.0.10 değil.');
+if (dkd_app_value?.expo?.version !== '0.0.10') dkd_error_text_values.push('app.json expo.version 0.0.10 değil.');
+if (Number(dkd_app_value?.expo?.android?.versionCode) !== 10) dkd_error_text_values.push('Android versionCode 10 değil.');
 if (dkd_app_value?.expo?.name !== 'DraBornGo') dkd_error_text_values.push('Uygulama adı DraBornGo değil.');
 if (!String(dkd_package_value?.dependencies?.expo || '').includes('57.0')) dkd_error_text_values.push('Expo SDK 57 bağımlılığı tanımlı değil.');
 if (String(dkd_package_value?.dependencies?.react || '') !== '19.2.3') dkd_error_text_values.push('React 19.2.3 değil.');
@@ -25,7 +25,7 @@ const dkd_android_permission_values = Array.isArray(dkd_app_value?.expo?.android
   : [];
 const dkd_expected_permission_sorted_values = [...dkd_expected_permission_values].sort();
 if (JSON.stringify(dkd_android_permission_values) !== JSON.stringify(dkd_expected_permission_sorted_values)) {
-  dkd_error_text_values.push('Android izin listesi v0.0.9 güvenli izin setiyle eşleşmiyor.');
+  dkd_error_text_values.push('Android izin listesi v0.0.10 güvenli izin setiyle eşleşmiyor.');
 }
 
 for (const dkd_key_name_value of ['EXPO_PUBLIC_SUPABASE_URL', 'EXPO_PUBLIC_SUPABASE_ANON_KEY', 'EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY', 'EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN']) {
@@ -69,4 +69,4 @@ if (dkd_error_text_values.length) {
   console.error(dkd_error_text_values.join('\n'));
   process.exit(1);
 }
-console.log('DKD v0.0.9 kimlik, Expo SDK 57 ve Google Play izin doğrulaması başarılı.');
+console.log('DKD v0.0.10 kimlik, Expo SDK 57 ve Google Play izin doğrulaması başarılı.');

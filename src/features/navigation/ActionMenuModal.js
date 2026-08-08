@@ -106,7 +106,7 @@ function ActionMenuModal({ visible, onClose, isAdmin, canCourier, onCourier, onP
                 <MaterialCommunityIcons name="routes" size={28} color="#07111C" />
               </View>
               <View style={styles.dkd_header_copy}>
-                <Text style={styles.dkd_header_kicker}>DraBornGo v0.0.9</Text>
+                <Text style={styles.dkd_header_kicker}>DraBornGo v0.0.10</Text>
                 <Text style={styles.dkd_header_title}>Merkez Menü</Text>
                 <Text style={styles.dkd_header_sub}>Kurye ağı ve hesap araçlarına hızlı geçiş.</Text>
               </View>

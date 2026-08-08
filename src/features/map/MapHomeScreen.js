@@ -12,7 +12,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Image } from 'expo-image';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-const dkd_version_text_value = 'v0.0.9';
+const dkd_version_text_value = 'v0.0.10';
 
 function DkdAnimatedPressable({ dkd_children_value, dkd_on_press_value, dkd_style_value, dkd_disabled_value = false }) {
   const dkd_scale_value = useRef(new Animated.Value(1)).current;
@@ -211,7 +211,7 @@ function MapHomeScreen({
             <View style={styles.dkd_control_topline}>
               <View style={styles.dkd_control_brand_pill}>
                 <MaterialCommunityIcons name="shield-check-outline" size={14} color="#A9EEFF" />
-                <Text style={styles.dkd_control_brand_pill_text}>PREMIUM COURIER CORE</Text>
+                <Text style={styles.dkd_control_brand_pill_text}>DRABORNGATE MOTO CORE</Text>
               </View>
               <View style={[styles.dkd_network_pill, { borderColor: `${dkd_status_value.dkd_accent_value}66` }]}> 
                 <View style={[styles.dkd_network_dot, { backgroundColor: dkd_status_value.dkd_accent_value }]} />
@@ -223,9 +223,9 @@ function MapHomeScreen({
               <View style={styles.dkd_gate_icon_stage}>
                 <Animated.View style={[styles.dkd_gate_icon_halo, { opacity: dkd_pulse_opacity_value, transform: [{ scale: dkd_pulse_scale_value }], borderColor: dkd_status_value.dkd_accent_value }]} />
                 <LinearGradient colors={[dkd_status_value.dkd_accent_value, dkd_status_value.dkd_secondary_value]} style={styles.dkd_gate_icon_shell}>
-                  <MaterialCommunityIcons name="speedometer" size={39} color="#031019" />
+                  <MaterialCommunityIcons name="speedometer" size={46} color="#031019" />
                 </LinearGradient>
-                <View style={styles.dkd_gate_icon_label}><Text style={styles.dkd_gate_icon_label_text}>GATE</Text></View>
+                <View style={styles.dkd_gate_icon_label}><Text style={styles.dkd_gate_icon_label_text}>MOTO</Text></View>
               </View>
               <View style={styles.dkd_control_copy}>
                 <Text style={styles.dkd_control_kicker}>KURYE KONTROL MERKEZİ</Text>
@@ -278,7 +278,7 @@ function MapHomeScreen({
             dkd_icon_value="speedometer"
             dkd_kicker_value="CANLI KURYE AĞI"
             dkd_title_value="Kurye Operasyon Merkezi"
-            dkd_subtitle_value="Sipariş havuzu, aktif teslimatlar, kargo, acil kurye ve performans akışını tek merkezden yönet."
+            dkd_subtitle_value="Sipariş havuzu, aktif teslimatlar, kargo ve performans akışını tek merkezden yönet."
             dkd_badge_value="CANLI"
             dkd_colors_value={['#064E58', '#174A92', '#5A2D91']}
             dkd_on_press_value={() => onOpenCourierBoard?.('default')}

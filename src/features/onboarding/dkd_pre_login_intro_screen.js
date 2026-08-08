@@ -31,7 +31,7 @@ const dkd_intro_step_list_value = [
   {
     dkd_badge_text: 'HIZLI TESLİMAT MOTORU',
     dkd_title_text: 'Sipariş gelir, rota parlar, görev netleşir',
-    dkd_body_text: 'Acil kurye, restoran siparişi, kargo paneli ve partner hizmetleri daha renkli kartlar ve canlı operasyon mantığıyla görünür olur.',
+    dkd_body_text: 'Kurye, restoran siparişi, kargo paneli ve partner hizmetleri daha renkli kartlar ve canlı operasyon mantığıyla görünür olur.',
     dkd_art_mode_value: 'delivery',
     dkd_art_image_source_value: require('../../../assets/dkd_onboarding/dkd_intro_delivery_route.png'),
     dkd_primary_icon_name: 'bike-fast',
@@ -67,7 +67,7 @@ const dkd_role_option_list_value = [
 ];
 
 const dkd_delivery_card_list_value = [
-  { dkd_title_text: 'Acil Kurye', dkd_body_text: 'Dakikalar içinde görev', dkd_icon_name: 'flash', dkd_color_value: '#22C55E' },
+  { dkd_title_text: 'Kurye Ağı', dkd_body_text: 'Dakikalar içinde görev', dkd_icon_name: 'flash', dkd_color_value: '#22C55E' },
   { dkd_title_text: 'Restoran', dkd_body_text: 'Sıcak sipariş takibi', dkd_icon_name: 'silverware-fork-knife', dkd_color_value: '#F97316' },
   { dkd_title_text: 'Gönderi Paneli', dkd_body_text: 'Paket ve rota akışı', dkd_icon_name: 'package-variant-closed', dkd_color_value: '#0EA5E9' },
   { dkd_title_text: 'Hizmet Ağı', dkd_body_text: 'Partner hizmetleri', dkd_icon_name: 'tools', dkd_color_value: '#A855F7' },
@@ -319,7 +319,7 @@ export default function DkdPreLoginIntroScreen({ dkd_on_complete_value }) {
                 </View>
                 <View style={dkd_styles_value.dkd_control_line}>
                   <MaterialCommunityIcons name="check-circle" size={18} color="#16A34A" />
-                  <Text style={dkd_styles_value.dkd_control_line_text}>Kargo, restoran ve acil kurye için canlı durum</Text>
+                  <Text style={dkd_styles_value.dkd_control_line_text}>Kargo, restoran ve kurye için canlı durum</Text>
                 </View>
                 <View style={dkd_styles_value.dkd_control_line}>
                   <MaterialCommunityIcons name="check-circle" size={18} color="#16A34A" />

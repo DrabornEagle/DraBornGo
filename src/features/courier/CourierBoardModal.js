@@ -16,7 +16,6 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import SafeScreen from '../../components/layout/SafeScreen';
-import DkdUrgentCourierPanel from './dkd_urgent_courier_panel';
 import {
   acceptCourierJob,
   completeCourierJob,
@@ -191,7 +190,7 @@ function CourierBoardModal({
 
   useEffect(() => {
     if (!visible) return;
-    dkd_set_tab_value(dkd_initial_panel_value === 'urgent' ? 'urgent' : 'overview');
+    dkd_set_tab_value('overview');
     dkd_entry_value.setValue(0);
     Animated.timing(dkd_entry_value, { toValue: 1, duration: 420, easing: Easing.out(Easing.cubic), useNativeDriver: true }).start();
     const dkd_pulse_animation_value = Animated.loop(Animated.sequence([
@@ -320,20 +319,6 @@ function CourierBoardModal({
               <Text style={styles.dkd_license_gate_text}>Kurye başvurunu Ana Sayfa → Başvurular bölümünden tamamla. Onaylandıktan sonra bu merkez otomatik olarak açılır.</Text>
               <Pressable onPress={onClose} style={styles.dkd_license_gate_button}><Text style={styles.dkd_license_gate_button_text}>Ana Sayfaya Dön</Text><MaterialCommunityIcons name="arrow-right" size={19} color="#031019" /></Pressable>
             </View>
-          ) : dkd_tab_value === 'urgent' ? (
-            <View style={styles.dkd_urgent_wrap}>
-              <View style={styles.dkd_back_row}>
-                <Pressable onPress={() => dkd_set_tab_value('overview')} style={styles.dkd_back_button}><MaterialCommunityIcons name="arrow-left" size={19} color="#FFFFFF" /><Text style={styles.dkd_back_button_text}>Operasyon Merkezi</Text></Pressable>
-              </View>
-              <DkdUrgentCourierPanel
-                dkd_visible_value
-                dkd_profile_value={profile}
-                dkd_courier_approved_value={dkd_courier_approved_value || isAdmin}
-                dkd_is_admin_value={isAdmin}
-                dkd_default_tab_value="courier"
-                dkd_queue_only_value
-              />
-            </View>
           ) : (
             <ScrollView
               showsVerticalScrollIndicator={false}
@@ -380,16 +365,6 @@ function CourierBoardModal({
                     dkd_badge_value={`${dkd_open_count_value + dkd_active_count_value} GÖREV`}
                     dkd_colors_value={['#075A67', '#184FA1', '#62308B']}
                     dkd_on_press_value={() => dkd_set_tab_value('jobs')}
-                  />
-
-                  <DkdCenterCard
-                    dkd_icon_value="lightning-bolt-outline"
-                    dkd_kicker_value="HIZLI TESLİMAT"
-                    dkd_title_value="Acil Kurye"
-                    dkd_subtitle_value="Acil kurye kuyruğunu aç, sana atanan hızlı görevleri ve teslimat durumunu yönet."
-                    dkd_badge_value="ACİL"
-                    dkd_colors_value={['#762A3C', '#B43B60', '#543184']}
-                    dkd_on_press_value={() => dkd_set_tab_value('urgent')}
                   />
 
                   <DkdCenterCard
@@ -537,8 +512,6 @@ const styles = StyleSheet.create({
   dkd_license_gate_text: { color: 'rgba(235,245,255,0.65)', fontSize: 12, lineHeight: 19, fontWeight: '700', textAlign: 'center', marginTop: 8 },
   dkd_license_gate_button: { minHeight: 55, borderRadius: 18, backgroundColor: '#75E6FF', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingHorizontal: 20, marginTop: 20 },
   dkd_license_gate_button_text: { color: '#031019', fontSize: 13, fontWeight: '900' },
-
-  dkd_urgent_wrap: { flex: 1 },
   dkd_back_row: { paddingHorizontal: 18, paddingTop: 10, paddingBottom: 6 },
   dkd_back_button: { alignSelf: 'flex-start', minHeight: 42, paddingHorizontal: 13, borderRadius: 15, borderWidth: 1, borderColor: 'rgba(255,255,255,0.11)', backgroundColor: 'rgba(255,255,255,0.06)', flexDirection: 'row', alignItems: 'center', gap: 7 },
   dkd_back_button_text: { color: '#FFFFFF', fontSize: 11, fontWeight: '900' },

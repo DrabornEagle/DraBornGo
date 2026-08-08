@@ -53,15 +53,6 @@ function dkd_cargo_meta_object_value(dkd_value) {
 }
 
 
-function dkd_job_is_urgent_auto_assign_blocked_value(dkd_job_value) {
-  const dkd_meta_value = dkd_cargo_meta_object_value(dkd_job_value?.cargo_meta);
-  const dkd_job_type_value = dkd_trim_text_value(dkd_job_value?.job_type || dkd_meta_value?.dkd_job_type || dkd_meta_value?.job_type).toLowerCase();
-  const dkd_title_value = dkd_trim_text_value(dkd_job_value?.title || '').toLowerCase();
-  return ['urgent', 'urgent_courier', 'acil', 'acil_kurye', 'dkd_urgent_courier'].includes(dkd_job_type_value)
-    || Boolean(dkd_meta_value?.dkd_urgent_order_id || dkd_meta_value?.urgent_order_id)
-    || dkd_title_value.includes('acil kurye');
-}
-
 function dkd_positive_number_value(dkd_value) {
   const dkd_number_value = Number(dkd_value);
   return Number.isFinite(dkd_number_value) && dkd_number_value > 0 ? dkd_number_value : 0;
@@ -118,7 +109,7 @@ function dkd_dropoff_text_value(dkd_job_value) {
 function dkd_find_offer_job_value(dkd_rows_value, dkd_profile_value, dkd_assigned_job_id_value) {
   const dkd_user_id_value = dkd_trim_text_value(dkd_profile_value?.user_id);
   const dkd_requested_id_value = dkd_trim_text_value(dkd_assigned_job_id_value || dkd_profile_value?.dkd_courier_auto_assigned_job_id);
-  const dkd_safe_rows_value = (Array.isArray(dkd_rows_value) ? dkd_rows_value : []).filter((dkd_row_value) => !dkd_job_is_urgent_auto_assign_blocked_value(dkd_row_value));
+  const dkd_safe_rows_value = Array.isArray(dkd_rows_value) ? dkd_rows_value : [];
   if (dkd_requested_id_value) {
     const dkd_direct_job_value = dkd_safe_rows_value.find((dkd_row_value) => dkd_trim_text_value(dkd_row_value?.id) === dkd_requested_id_value && dkd_offer_status_value(dkd_row_value));
     if (dkd_direct_job_value) return dkd_direct_job_value;

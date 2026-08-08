@@ -30,7 +30,7 @@ const dkd_support_topic_list = Object.freeze([
   {
     dkd_key: 'dkd_courier_cargo',
     dkd_title: 'Kurye / Kargo',
-    dkd_text: 'Kurye takibi, kargo gönderisi, acil kurye ve teslimat sorunları.',
+    dkd_text: 'Kurye takibi, kargo gönderisi, kurye ve teslimat sorunları.',
     dkd_icon: 'truck-fast-outline',
     dkd_tone: ['#32D7FF', '#4874FF'],
   },
