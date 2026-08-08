@@ -1,8 +1,18 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Alert, Animated, Easing, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Alert, Animated, Easing, Modal, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { requireNativeModule } from 'expo-modules-core';
 import { dkd_make_native_axis_point } from '../../utils/dkdNativeAxis';
+
+let dkd_android_navigation_bar_module_value = null;
+if (Platform.OS === 'android') {
+  try {
+    dkd_android_navigation_bar_module_value = requireNativeModule('ExpoNavigationBar');
+  } catch {
+    dkd_android_navigation_bar_module_value = null;
+  }
+}
 
 function dkd_alert_buttons_value(dkd_buttons_value) {
   const dkd_safe_buttons_value = Array.isArray(dkd_buttons_value) && dkd_buttons_value.length
@@ -79,6 +89,17 @@ export default function Dkd_modern_alert_provider(dkd_props_value) {
       dkd_options_value: dkd_options_value && typeof dkd_options_value === 'object' ? dkd_options_value : {},
     };
     setDkdAlertQueueValue((dkd_previous_queue_value) => [...dkd_previous_queue_value, dkd_next_alert_value]);
+  }, []);
+
+  useEffect(() => {
+    if (Platform.OS !== 'android' || !dkd_android_navigation_bar_module_value) return undefined;
+    try {
+      dkd_android_navigation_bar_module_value.setHidden?.(false);
+      dkd_android_navigation_bar_module_value.setStyle?.('dark');
+    } catch (dkd_navigation_bar_error_value) {
+      console.log('[DraBornGo][navigation-bar]', dkd_navigation_bar_error_value?.message || String(dkd_navigation_bar_error_value));
+    }
+    return undefined;
   }, []);
 
   useEffect(() => {
