@@ -13,6 +13,7 @@ function dkd_android_permission_value(dkd_permission_suffix_parts_value) {
 
 const dkd_app_json_value = dkd_read_json_file('app.json');
 const dkd_package_json_value = dkd_read_json_file('package.json');
+const dkd_android_target_sdk_value = 36;
 
 let dkd_public_env_defaults_value = {};
 
@@ -82,7 +83,7 @@ function dkd_clean_android_config_value(dkd_source_android_config_value = {}) {
 
   return {
     ...dkd_clean_config_value,
-    versionCode: dkd_source_android_config_value.versionCode || 5,
+    versionCode: dkd_source_android_config_value.versionCode || 6,
     permissions: dkd_safe_android_permissions_value.filter(
       (dkd_permission_name_value) => !dkd_blocked_android_permission_set_value.has(dkd_permission_name_value)
     )
@@ -117,7 +118,7 @@ module.exports = function dkd_resolve_expo_app_config(dkd_config_params_value) {
     android: {
       ...dkd_base_android_config_value,
       ...dkd_project_android_config_value,
-      versionCode: dkd_android_config_value.versionCode || 5,
+      versionCode: dkd_android_config_value.versionCode || 6,
       permissions: dkd_safe_android_permissions_value
     },
     plugins: [
@@ -127,6 +128,7 @@ module.exports = function dkd_resolve_expo_app_config(dkd_config_params_value) {
     extra: {
       ...(dkd_base_config_value.extra || {}),
       ...(dkd_expo_config_value.extra || {}),
+      dkd_android_target_sdk: dkd_android_target_sdk_value,
       dkd_public_env: dkd_public_env_config_value,
       EXPO_PUBLIC_SUPABASE_URL: dkd_public_env_config_value.EXPO_PUBLIC_SUPABASE_URL,
       EXPO_PUBLIC_SUPABASE_ANON_KEY: dkd_public_env_config_value.EXPO_PUBLIC_SUPABASE_ANON_KEY,
