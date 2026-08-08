@@ -1,8 +1,0 @@
-DraBornGo v0.0.10 guarded transform: PASS
-Android versionCode: 10
-DraBornGate motorcycle activity icon: speedometer
-Acil Kurye active source: REMOVED
-Android source export: PASS
-Web source export: PASS
-APK/AAB produced: NO
-Source commit: 8b7e6ee340ad377abd56a59f44b76743504c4a06
