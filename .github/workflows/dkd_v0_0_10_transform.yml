@@ -80,7 +80,7 @@ jobs:
           fi
 
           if [ "$DKD_CODE" -eq 0 ]; then
-            npm install --package-lock-only --ignore-scripts >> "$DKD_LOG_FILE" 2>&1 || DKD_CODE=$?
+            npm install mapbox-gl --save --package-lock-only --ignore-scripts >> "$DKD_LOG_FILE" 2>&1 || DKD_CODE=$?
           fi
           if [ "$DKD_CODE" -eq 0 ]; then
             npm ci >> "$DKD_LOG_FILE" 2>&1 || DKD_CODE=$?
@@ -111,7 +111,7 @@ jobs:
               echo "Exit code: $DKD_CODE"
               echo "Commit: $GITHUB_SHA"
               echo
-              tail -n 240 "$DKD_LOG_FILE"
+              tail -n 260 "$DKD_LOG_FILE"
             } > audit/dkd_v0_0_10_transform_status.txt
             git add audit/dkd_v0_0_10_transform_status.txt
             git commit -m "audit: record v0.0.10 transform failure" || true
@@ -124,6 +124,8 @@ jobs:
             echo "Android versionCode: 10"
             echo "DraBornGate motorcycle activity icon: speedometer"
             echo "Acil Kurye active source: REMOVED"
+            echo "Android source export: PASS"
+            echo "Web source export: PASS"
             echo "APK/AAB produced: NO"
             echo "Source commit: $GITHUB_SHA"
           } > audit/dkd_v0_0_10_transform_status.txt
