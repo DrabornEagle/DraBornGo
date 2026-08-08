@@ -565,7 +565,6 @@ export async function emitTrafficFromChestResult({
     dkd_param_code_value: codeText || null,
     dkd_param_boss_reward: String(sourceType || '') === 'boss',
     dkd_param_meta: {
-      reward_puan: Number(result?.dkd_puan || 0),
       reward_card_def_id: result?.card_def_id || null,
       drop_type: result?.drop_type || drop?.type || null,
     },
@@ -586,7 +585,6 @@ export async function emitTrafficFromChestResult({
     codeValue: codeText || null,
     bossReward: String(sourceType || '') === 'boss',
     meta: {
-      reward_puan: Number(result?.dkd_puan || 0),
       reward_card_def_id: result?.card_def_id || null,
       drop_type: result?.drop_type || drop?.type || null,
     },

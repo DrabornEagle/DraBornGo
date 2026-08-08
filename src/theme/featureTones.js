@@ -124,7 +124,6 @@ const ALIASES = {
   tasks: 'blue',
   rewards: 'red',
   dailyReward: 'red',
-  daily_reward: 'red',
   courier: 'green',
   profile: 'cyan',
   leaderboard: 'purple',

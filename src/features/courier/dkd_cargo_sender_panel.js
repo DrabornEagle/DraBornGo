@@ -18,7 +18,6 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { cityLootTheme } from '../../theme/cityLootTheme';
 import DkdCargoLiveMapModal from './dkd_cargo_live_map_modal';
-import DkdWalletPaymentMethodModal from '../payment/dkd_wallet_payment_method_modal';
 import {
   dkd_create_cargo_shipment,
   dkd_emit_cargo_shipment_push_event,
@@ -65,21 +64,10 @@ function dkd_safe_number(dkd_value) {
   return Number.isFinite(dkd_numeric_value) ? dkd_numeric_value : null;
 }
 
-function dkd_cargo_payment_error_message_value(dkd_error_value) {
-  const dkd_error_text_value = String(dkd_error_value?.message || dkd_error_value?.details || dkd_error_value?.hint || '').toLowerCase();
-  if (dkd_error_text_value.includes('wallet_insufficient')) {
-    return 'Cüzdanında yeterli TL yok. Önce ana cüzdana bakiye eklemelisin.';
-  }
-  if (dkd_error_text_value.includes('dkd_cargo_package_storage_rls')) {
-    return 'Paket görseli yükleme izni Supabase Storage tarafında güncel değil. dkd_fix_cargo_package_storage_rls_v0_0_2.sql dosyasını Supabase SQL Editor içinde çalıştırmalısın.';
-  }
-  if (dkd_error_text_value.includes('row-level security') || dkd_error_text_value.includes('rls') || dkd_error_text_value.includes('policy')) {
-    return 'Gönderi cüzdan ödeme izni Supabase tarafında güncel değil. dkd_fix_cargo_wallet_rls_v0_0_2.sql dosyasını Supabase SQL Editor içinde çalıştırmalısın.';
-  }
-  if (dkd_error_text_value.includes('dkd_cargo_shipment_create') || dkd_error_text_value.includes('could not find the function') || dkd_error_text_value.includes('schema cache')) {
-    return 'Gönderi ödeme RPC fonksiyonu Supabase tarafında güncel değil. dkd_fix_cargo_wallet_rls_v0_0_2.sql dosyasını Supabase SQL Editor içinde çalıştırmalısın.';
-  }
-  return String(dkd_error_value?.message || '') || 'Gönderi siparişi oluşturulamadı.';
+function dkd_cargo_request_error_message_value(dkd_error_value) {
+  const dkd_error_text_value=String(dkd_error_value?.message||dkd_error_value?.details||dkd_error_value?.hint||'').toLowerCase();
+  if(dkd_error_text_value.includes('dkd_cargo_package_storage_rls')) return 'Paket görseli yükleme izni güncel değil.';
+  return String(dkd_error_value?.message||'')||'Gönderi siparişi oluşturulamadı.';
 }
 
 function dkd_package_content_label_value(dkd_form_value = {}) {
@@ -172,14 +160,6 @@ function dkd_mask_national_id_text(dkd_value) {
   return `${dkd_digits_value.slice(0, 3)}••••${dkd_digits_value.slice(-4)}`;
 }
 
-function dkd_payment_status_label(dkd_status_value) {
-  const dkd_key_value = String(dkd_status_value || '').toLowerCase();
-  if (dkd_key_value === 'paid') return 'Ödendi';
-  if (dkd_key_value === 'refunded') return 'İade edildi';
-  if (dkd_key_value === 'pending') return 'Ödeme bekliyor';
-  return dkd_key_value ? dkd_key_value : 'Belirsiz';
-}
-
 function dkd_shipment_metric_theme_value(dkd_kind_value, dkd_payload_value) {
   const dkd_metric_kind_value = String(dkd_kind_value || '').toLowerCase();
   const dkd_status_key_value = String(dkd_payload_value?.dkd_status_key_value || '').toLowerCase();
@@ -193,40 +173,6 @@ function dkd_shipment_metric_theme_value(dkd_kind_value, dkd_payload_value) {
       dkd_glow_colors: ['rgba(118, 231, 199, 0.10)', 'rgba(15, 28, 34, 0.02)'],
       dkd_icon_surface_colors: ['rgba(255,255,255,0.13)', 'rgba(255,255,255,0.03)'],
       dkd_shadow_color: '#39B89A',
-    };
-  }
-
-  if (dkd_metric_kind_value === 'payment') {
-    if (dkd_status_key_value === 'paid') {
-      return {
-        dkd_icon_name: 'credit-card-check-outline',
-        dkd_icon_color: '#F5F9FF',
-        dkd_border_color: 'rgba(136, 176, 255, 0.26)',
-        dkd_surface_colors: ['rgba(72, 118, 224, 0.95)', 'rgba(34, 57, 114, 0.98)'],
-        dkd_glow_colors: ['rgba(136, 176, 255, 0.10)', 'rgba(19, 31, 58, 0.02)'],
-        dkd_icon_surface_colors: ['rgba(255,255,255,0.13)', 'rgba(255,255,255,0.03)'],
-        dkd_shadow_color: '#4F79D8',
-      };
-    }
-    if (dkd_status_key_value === 'refunded') {
-      return {
-        dkd_icon_name: 'credit-card-refund-outline',
-        dkd_icon_color: '#FFF8F1',
-        dkd_border_color: 'rgba(255, 171, 107, 0.42)',
-        dkd_surface_colors: ['rgba(255, 162, 89, 0.96)', 'rgba(129, 63, 22, 0.98)'],
-        dkd_glow_colors: ['rgba(255, 171, 107, 0.32)', 'rgba(74, 31, 11, 0.04)'],
-        dkd_icon_surface_colors: ['rgba(255,255,255,0.18)', 'rgba(255,255,255,0.05)'],
-        dkd_shadow_color: '#FF9E5C',
-      };
-    }
-    return {
-      dkd_icon_name: 'credit-card-clock-outline',
-      dkd_icon_color: '#FFF9E4',
-      dkd_border_color: 'rgba(255, 211, 120, 0.42)',
-      dkd_surface_colors: ['rgba(255, 205, 87, 0.96)', 'rgba(120, 83, 16, 0.98)'],
-      dkd_glow_colors: ['rgba(255, 211, 120, 0.32)', 'rgba(80, 53, 8, 0.04)'],
-      dkd_icon_surface_colors: ['rgba(255,255,255,0.22)', 'rgba(255,255,255,0.06)'],
-      dkd_shadow_color: '#FFCB54',
     };
   }
 
@@ -464,13 +410,6 @@ export function DkdCargoShipmentDetailReplica({ dkd_shipment_value, dkd_on_open_
             dkd_value_text: dkd_format_money_value(dkd_shipment_value?.customer_charge_tl || 0),
             dkd_theme_value: dkd_shipment_metric_theme_value('charge', {}),
           },
-          {
-            dkd_metric_key_value: 'payment',
-            dkd_label_value: 'Ödeme',
-            dkd_hide_label_value: true,
-            dkd_value_text: dkd_payment_status_label(dkd_shipment_value?.payment_status),
-            dkd_theme_value: dkd_shipment_metric_theme_value('payment', { dkd_status_key_value: dkd_shipment_value?.payment_status }),
-          },
 
         ].map((dkd_metric_value) => {
           const dkd_is_pressable_metric_value = !!dkd_metric_value.dkd_is_pressable_value;
@@ -577,14 +516,11 @@ export function DkdCargoShipmentDetailReplica({ dkd_shipment_value, dkd_on_open_
 
       <View style={dkd_styles.dkd_shipmentChipRow}>
         <View style={dkd_styles.dkd_shipmentInfoChip}><MaterialCommunityIcons name="weight-kilogram" size={14} color="#7EF1B6" /><Text style={dkd_styles.dkd_shipmentInfoChipText}>{dkd_format_weight(dkd_shipment_value?.package_weight_kg)}</Text></View>
-        <View style={dkd_styles.dkd_shipmentPaymentTrackingRow}>
-          <View style={[dkd_styles.dkd_shipmentInfoChip, dkd_styles.dkd_shipmentPaymentInfoChip]}><MaterialCommunityIcons name="wallet-outline" size={14} color={dkd_colors.cyanSoft} /><Text style={dkd_styles.dkd_shipmentInfoChipText}>{dkd_payment_status_label(dkd_shipment_value?.payment_status)}</Text></View>
-          <DkdTrackingActionChip
+        <DkdTrackingActionChip
             dkd_is_active_value={!!dkd_show_live_value && !!dkd_shipment_value?.id}
             dkd_disabled_value={!dkd_show_live_value || !dkd_shipment_value?.id}
             dkd_on_press_value={dkd_open_live_map_handler_value}
           />
-        </View>
       </View>
 
       <View style={dkd_styles.dkd_routeStack}>
@@ -789,7 +725,7 @@ function dkd_cargo_total_fee_from_distance_km(dkd_pickup_distance_km_value, dkd_
   );
 }
 
-async function dkd_build_payment_preview(dkd_form_value, dkd_current_location_value) {
+async function dkd_build_route_quote_value(dkd_form_value, dkd_current_location_value) {
   const dkd_pickup_address_text_value = String(dkd_form_value?.dkd_pickup_address_text || '').trim();
   const dkd_delivery_address_text_value = String(dkd_form_value?.dkd_delivery_address_text || '').trim();
   const dkd_pickup_geo_value = await dkd_geocode_text_address(dkd_pickup_address_text_value).catch(() => null);
@@ -888,8 +824,6 @@ export default function DkdCargoSenderPanel({
   dkd_visible_value,
   dkd_panel_mode_value = 'full',
   dkd_current_location_value,
-  dkd_wallet_tl_value = 0,
-  dkd_on_wallet_after_payment_value,
   dkd_on_created_value,
   dkd_on_home_return_value,
 }) {
@@ -899,10 +833,6 @@ export default function DkdCargoSenderPanel({
   const [dkd_location_syncing_value, setDkdLocationSyncingValue] = useState(false);
   const [dkd_shipments_value, setDkdShipmentsValue] = useState([]);
   const [dkd_shipment_filter_value, setDkdShipmentFilterValue] = useState('waiting');
-  const [dkd_payment_modal_visible_value, setDkdPaymentModalVisibleValue] = useState(false);
-  const [dkd_payment_method_modal_visible_value, setDkdPaymentMethodModalVisibleValue] = useState(false);
-  const [dkd_payment_loading_value, setDkdPaymentLoadingValue] = useState(false);
-  const [dkd_payment_preview_value, setDkdPaymentPreviewValue] = useState(null);
   const [dkd_live_map_visible_value, setDkdLiveMapVisibleValue] = useState(false);
   const [dkd_live_map_shipment_id_value, setDkdLiveMapShipmentIdValue] = useState(null);
   const dkd_initial_filter_pending_ref_value = useRef(true);
@@ -1038,109 +968,38 @@ export default function DkdCargoSenderPanel({
     }
   }, [dkd_set_form_field]);
 
-  const dkd_open_payment_modal = useCallback(async () => {
+  const dkd_submit_cargo_request = useCallback(async () => {
     const dkd_missing_alert_message_value = dkd_missing_form_alert_message_value(dkd_form_value);
-    if (dkd_missing_alert_message_value) {
-      Alert.alert('Paket', dkd_missing_alert_message_value);
-      return;
-    }
-
-    setDkdPaymentLoadingValue(true);
-    try {
-      const dkd_preview_value = await dkd_build_payment_preview(dkd_form_value, dkd_current_location_value);
-      setDkdPaymentPreviewValue(dkd_preview_value);
-      setDkdPaymentModalVisibleValue(true);
-    } catch (dkd_error_value) {
-      Alert.alert('Paket', dkd_error_value?.message || 'Ödeme özeti hazırlanamadı.');
-    } finally {
-      setDkdPaymentLoadingValue(false);
-    }
-  }, [dkd_current_location_value, dkd_form_value]);
-
-  const dkd_submit_cargo_request = useCallback(async (dkd_payment_context_value = {}) => {
-    const dkd_missing_alert_message_value = dkd_missing_form_alert_message_value(dkd_form_value);
-    if (dkd_missing_alert_message_value) {
-      Alert.alert('Paket', dkd_missing_alert_message_value);
-      return;
-    }
-    const dkd_preview_value = dkd_payment_preview_value || await dkd_build_payment_preview(dkd_form_value, dkd_current_location_value);
-    const dkd_wallet_before_value = dkd_round_money_value(dkd_payment_context_value?.dkd_wallet_override_tl_value ?? dkd_wallet_tl_value);
-
-    if (dkd_wallet_before_value < dkd_preview_value.dkd_customer_charge_tl) {
-      Alert.alert('Paket', 'Cüzdanında yeterli TL yok. Önce ana cüzdana bakiye eklemelisin.');
-      return;
-    }
-
+    if (dkd_missing_alert_message_value) { Alert.alert('Paket', dkd_missing_alert_message_value); return; }
     setDkdSubmittingValue(true);
     try {
+      const dkd_quote_value = await dkd_build_route_quote_value(dkd_form_value, dkd_current_location_value);
       const dkd_package_content_text_value = dkd_package_content_label_value(dkd_form_value);
       let dkd_package_image_url_value = '';
       if (String(dkd_form_value?.dkd_package_image_uri || '').trim()) {
-        const { data: dkd_upload_data_value } = await dkd_upload_cargo_package_art({
-          dkd_image_uri: dkd_form_value.dkd_package_image_uri,
-          dkd_sender_slug: `${dkd_form_value.dkd_customer_first_name}-${dkd_form_value.dkd_customer_last_name}`,
-          dkd_content_label: dkd_package_content_text_value,
-        });
+        const { data: dkd_upload_data_value } = await dkd_upload_cargo_package_art({ dkd_image_uri: dkd_form_value.dkd_package_image_uri, dkd_sender_slug: `${dkd_form_value.dkd_customer_first_name}-${dkd_form_value.dkd_customer_last_name}`, dkd_content_label: dkd_package_content_text_value });
         dkd_package_image_url_value = dkd_upload_data_value?.publicUrl || '';
       }
-
       const dkd_payload_value = {
-        dkd_customer_first_name: dkd_form_value.dkd_customer_first_name,
-        dkd_customer_last_name: dkd_form_value.dkd_customer_last_name,
-        dkd_customer_national_id: dkd_form_value.dkd_customer_national_id,
-        dkd_customer_phone_text: dkd_form_value.dkd_customer_phone_text,
-        dkd_pickup_address_text: dkd_form_value.dkd_pickup_address_text,
-        dkd_delivery_address_text: dkd_form_value.dkd_delivery_address_text,
+        dkd_customer_first_name: dkd_form_value.dkd_customer_first_name, dkd_customer_last_name: dkd_form_value.dkd_customer_last_name,
+        dkd_customer_national_id: dkd_form_value.dkd_customer_national_id, dkd_customer_phone_text: dkd_form_value.dkd_customer_phone_text,
+        dkd_pickup_address_text: dkd_form_value.dkd_pickup_address_text, dkd_delivery_address_text: dkd_form_value.dkd_delivery_address_text,
         dkd_delivery_note_text: String(dkd_form_value.dkd_delivery_note_text || '').trim() || dkd_cargo_default_delivery_note_value,
-        dkd_package_content_text: dkd_package_content_text_value,
-        dkd_package_image_url: dkd_package_image_url_value,
-        dkd_package_weight_kg: dkd_form_value.dkd_package_weight_kg,
-        dkd_pickup_lat: dkd_preview_value.dkd_pickup_lat,
-        dkd_pickup_lng: dkd_preview_value.dkd_pickup_lng,
-        dkd_dropoff_lat: dkd_preview_value.dkd_dropoff_lat,
-        dkd_dropoff_lng: dkd_preview_value.dkd_dropoff_lng,
-        dkd_pickup_distance_km: dkd_preview_value.dkd_pickup_distance_km,
-        dkd_delivery_distance_km: dkd_preview_value.dkd_delivery_distance_km,
-        dkd_courier_fee_tl: dkd_preview_value.dkd_courier_fee_tl,
-        dkd_customer_charge_tl: dkd_preview_value.dkd_customer_charge_tl,
+        dkd_package_content_text: dkd_package_content_text_value, dkd_package_image_url: dkd_package_image_url_value, dkd_package_weight_kg: dkd_form_value.dkd_package_weight_kg,
+        dkd_pickup_lat: dkd_quote_value.dkd_pickup_lat, dkd_pickup_lng: dkd_quote_value.dkd_pickup_lng, dkd_dropoff_lat: dkd_quote_value.dkd_dropoff_lat, dkd_dropoff_lng: dkd_quote_value.dkd_dropoff_lng,
+        dkd_pickup_distance_km: dkd_quote_value.dkd_pickup_distance_km, dkd_delivery_distance_km: dkd_quote_value.dkd_delivery_distance_km,
+        dkd_courier_fee_tl: dkd_quote_value.dkd_courier_fee_tl, dkd_customer_charge_tl: dkd_quote_value.dkd_customer_charge_tl,
       };
-
       const { data: dkd_create_data_value, error: dkd_error_value } = await dkd_create_cargo_shipment(dkd_payload_value);
       if (dkd_error_value) throw dkd_error_value;
-
-      dkd_emit_cargo_shipment_push_event(dkd_create_data_value, dkd_payload_value).catch((dkd_push_error_value) => {
-        console.log('dkd_cargo_push_event_failed', dkd_push_error_value?.message || String(dkd_push_error_value));
-      });
-      dkd_send_customer_order_local_notification_value({
-        dkd_order_title_value: 'Gönderi Siparişiniz Oluşturuldu',
-        dkd_order_message_value: `${dkd_package_content_text_value} siparişiniz alındı ve kurye havuzuna aktarıldı.`,
-        dkd_order_id_value: dkd_create_data_value?.dkd_cargo_shipment_id || dkd_create_data_value?.cargo_shipment_id || dkd_create_data_value?.id || '',
-        dkd_source_value: 'dkd_cargo_sender_panel_payment',
-      }).catch(() => null);
-
-      const dkd_wallet_after_value = Number(dkd_create_data_value?.wallet_tl ?? (dkd_wallet_before_value - dkd_preview_value.dkd_customer_charge_tl));
-      dkd_on_wallet_after_payment_value?.(dkd_wallet_after_value);
-      setDkdPaymentModalVisibleValue(false);
-      setDkdPaymentMethodModalVisibleValue(false);
-      setDkdPaymentPreviewValue(null);
+      dkd_emit_cargo_shipment_push_event(dkd_create_data_value, dkd_payload_value).catch(()=>null);
+      dkd_send_customer_order_local_notification_value({ dkd_order_title_value:'Gönderi Siparişiniz Oluşturuldu', dkd_order_message_value:`${dkd_package_content_text_value} siparişiniz alındı ve kurye havuzuna aktarıldı.`, dkd_order_id_value:dkd_create_data_value?.dkd_cargo_shipment_id||dkd_create_data_value?.cargo_shipment_id||dkd_create_data_value?.id||'', dkd_source_value:'dkd_cargo_sender_panel' }).catch(()=>null);
       setDkdFormValue(dkd_default_form_state());
-      await dkd_load_shipments();
-      dkd_on_created_value?.();
-      Alert.alert('Sipariş Oluşturuldu', `Ödeme alındı ve sipariş kurye havuzuna düştü. Alım tutarı ${dkd_format_money_value(dkd_preview_value.dkd_courier_fee_tl)} • toplam ${dkd_format_money_value(dkd_preview_value.dkd_customer_charge_tl)}.`);
-    } catch (dkd_error_value) {
-      Alert.alert('Paket', dkd_cargo_payment_error_message_value(dkd_error_value));
-    } finally {
-      setDkdSubmittingValue(false);
-    }
-  }, [dkd_current_location_value, dkd_form_value, dkd_load_shipments, dkd_on_created_value, dkd_on_wallet_after_payment_value, dkd_payment_preview_value, dkd_wallet_tl_value]);
-
-  const dkd_handle_payment_choice_value = useCallback(() => {
-    Alert.alert('Ödeme Yöntemi Seç', 'Gönderi siparişini nasıl tamamlamak istiyorsun?', [
-      { text: 'Cüzdanımdan Öde', onPress: () => dkd_submit_cargo_request() },
-      { text: 'Ödeme Seçenekleri', onPress: () => setDkdPaymentMethodModalVisibleValue(true) },
-      { text: 'Vazgeç', style: 'cancel' },
-    ]);
-  }, [dkd_submit_cargo_request]);
+      await dkd_load_shipments(); dkd_on_created_value?.();
+      Alert.alert('Sipariş Oluşturuldu', `Gönderi kurye havuzuna aktarıldı. Tahmini kurye ücreti ${dkd_format_money_value(dkd_quote_value.dkd_courier_fee_tl)}.`);
+    } catch (dkd_error_value) { Alert.alert('Paket', dkd_cargo_request_error_message_value(dkd_error_value)); }
+    finally { setDkdSubmittingValue(false); }
+  }, [dkd_current_location_value, dkd_form_value, dkd_load_shipments, dkd_on_created_value]);
 
   return (
     <View>
@@ -1245,7 +1104,7 @@ export default function DkdCargoSenderPanel({
           </View>
         </View>
 
-        <Pressable onPress={dkd_open_payment_modal} disabled={dkd_submitting_value || dkd_payment_loading_value} style={[dkd_styles.dkd_primaryAction, (dkd_submitting_value || dkd_payment_loading_value) && dkd_styles.dkd_actionDisabled]}>
+        <Pressable onPress={dkd_submit_cargo_request} disabled={dkd_submitting_value || dkd_payment_loading_value} style={[dkd_styles.dkd_primaryAction, (dkd_submitting_value || dkd_payment_loading_value) && dkd_styles.dkd_actionDisabled]}>
           <LinearGradient colors={['#40D8FF', '#2A8DFF', '#0E1840']} style={StyleSheet.absoluteFill} />
           <Text style={dkd_styles.dkd_primaryActionText}>{dkd_payment_loading_value ? 'Ödeme özeti hazırlanıyor…' : 'Paketimi Teslim AL'}</Text>
         </Pressable>
@@ -1315,13 +1174,6 @@ export default function DkdCargoSenderPanel({
                         dkd_hide_label_value: true,
                         dkd_value_text: dkd_format_money_value(dkd_shipment_value?.customer_charge_tl || 0),
                         dkd_theme_value: dkd_shipment_metric_theme_value('charge', {}),
-                      },
-                      {
-                        dkd_metric_key_value: 'payment',
-                        dkd_label_value: 'Ödeme',
-                        dkd_hide_label_value: true,
-                        dkd_value_text: dkd_payment_status_label(dkd_shipment_value?.payment_status),
-                        dkd_theme_value: dkd_shipment_metric_theme_value('payment', { dkd_status_key_value: dkd_shipment_value?.payment_status }),
                       },
 
                     ].map((dkd_metric_value) => {
@@ -1429,14 +1281,11 @@ export default function DkdCargoSenderPanel({
 
                   <View style={dkd_styles.dkd_shipmentChipRow}>
                     <View style={dkd_styles.dkd_shipmentInfoChip}><MaterialCommunityIcons name="weight-kilogram" size={14} color="#7EF1B6" /><Text style={dkd_styles.dkd_shipmentInfoChipText}>{dkd_format_weight(dkd_shipment_value?.package_weight_kg)}</Text></View>
-                    <View style={dkd_styles.dkd_shipmentPaymentTrackingRow}>
-                      <View style={[dkd_styles.dkd_shipmentInfoChip, dkd_styles.dkd_shipmentPaymentInfoChip]}><MaterialCommunityIcons name="wallet-outline" size={14} color={dkd_colors.cyanSoft} /><Text style={dkd_styles.dkd_shipmentInfoChipText}>{dkd_payment_status_label(dkd_shipment_value?.payment_status)}</Text></View>
-                      <DkdTrackingActionChip
+                    <DkdTrackingActionChip
                         dkd_is_active_value={!!dkd_show_live_value && !!dkd_shipment_value?.id}
                         dkd_disabled_value={!dkd_show_live_value || !dkd_shipment_value?.id}
                         dkd_on_press_value={() => dkd_open_live_map_value(dkd_shipment_value?.id)}
                       />
-                    </View>
                   </View>
 
                   <View style={dkd_styles.dkd_routeStack}>
@@ -1496,80 +1345,6 @@ export default function DkdCargoSenderPanel({
         dkd_refreshing_value={dkd_loading_value}
         dkd_on_close_value={dkd_close_live_map_value}
         dkd_on_refresh_value={dkd_load_shipments}
-      />
-
-      <Modal visible={dkd_payment_modal_visible_value} transparent animationType="fade" onRequestClose={() => setDkdPaymentModalVisibleValue(false)}>
-        <View style={dkd_styles.dkd_paymentOverlay}>
-          <View style={dkd_styles.dkd_paymentCard}>
-            <LinearGradient colors={['rgba(97,216,255,0.18)', 'rgba(181,124,255,0.10)', 'rgba(82,242,161,0.08)']} style={StyleSheet.absoluteFill} />
-            <View style={dkd_styles.dkd_paymentHeader}>
-              <View style={dkd_styles.dkd_paymentHeaderIconWrap}>
-                <MaterialCommunityIcons name="wallet-outline" size={22} color={dkd_colors.cyanSoft} />
-              </View>
-              <View style={dkd_styles.dkd_paymentHeaderCopy}>
-                <Text style={dkd_styles.dkd_paymentTitle}>Ödeme Onayı</Text>
-                <Text style={dkd_styles.dkd_paymentSub}>Sipariş kurye havuzuna düşmeden önce ödeme yöntemi seçilir; gerekiyorsa cüzdana TL yüklenir.</Text>
-              </View>
-            </View>
-
-            <View style={dkd_styles.dkd_paymentRouteCard}>
-              <Text style={dkd_styles.dkd_paymentRouteLine}>Gönderici • {String(dkd_form_value?.dkd_pickup_address_text || '-').trim() || '-'}</Text>
-              <Text style={dkd_styles.dkd_paymentRouteLine}>Teslimat • {String(dkd_form_value?.dkd_delivery_address_text || '-').trim() || '-'}</Text>
-              <Text style={dkd_styles.dkd_paymentRouteMeta}>Kurye → gönderici • {dkd_format_km_value(dkd_payment_preview_value?.dkd_pickup_distance_km)}</Text>
-              <Text style={dkd_styles.dkd_paymentRouteMeta}>Gönderici → teslimat • {dkd_format_km_value(dkd_payment_preview_value?.dkd_delivery_distance_km)}</Text>
-            </View>
-
-            <View style={dkd_styles.dkd_paymentStatCard}>
-              <View style={dkd_styles.dkd_paymentStatRow}>
-                <Text style={dkd_styles.dkd_paymentStatLabel}>Alım Tutarı</Text>
-                <Text style={dkd_styles.dkd_paymentStatValue}>{dkd_format_money_value(dkd_payment_preview_value?.dkd_courier_fee_tl || 0)}</Text>
-              </View>
-              <View style={dkd_styles.dkd_paymentStatRow}>
-                <Text style={dkd_styles.dkd_paymentStatLabel}>Teslimat Tutarı</Text>
-                <Text style={dkd_styles.dkd_paymentStatValue}>{dkd_format_money_value(dkd_payment_preview_value?.dkd_service_fee_tl || 0)}</Text>
-              </View>
-              <View style={[dkd_styles.dkd_paymentStatRow, dkd_styles.dkd_paymentStatRowTotal]}>
-                <Text style={dkd_styles.dkd_paymentStatLabelTotal}>Toplam Tutar</Text>
-                <Text style={dkd_styles.dkd_paymentStatValueTotal}>{dkd_format_money_value(dkd_payment_preview_value?.dkd_customer_charge_tl || 0)}</Text>
-              </View>
-            </View>
-
-            <View style={dkd_styles.dkd_paymentWalletCard}>
-              <View style={dkd_styles.dkd_paymentWalletRow}>
-                <Text style={dkd_styles.dkd_paymentWalletLabel}>Cüzdan bakiyesi</Text>
-                <Text style={dkd_styles.dkd_paymentWalletValue}>{dkd_format_money_value(dkd_wallet_tl_value || 0)}</Text>
-              </View>
-              <View style={dkd_styles.dkd_paymentWalletRow}>
-                <Text style={dkd_styles.dkd_paymentWalletLabel}>Ödeme sonrası</Text>
-                <Text style={dkd_styles.dkd_paymentWalletValue}>{dkd_format_money_value(dkd_round_money_value(Number(dkd_wallet_tl_value || 0) - Number(dkd_payment_preview_value?.dkd_customer_charge_tl || 0)))}</Text>
-              </View>
-            </View>
-
-            <View style={dkd_styles.dkd_paymentActionRow}>
-              <Pressable onPress={() => setDkdPaymentModalVisibleValue(false)} style={dkd_styles.dkd_paymentGhostButton}>
-                <Text style={dkd_styles.dkd_paymentGhostButtonText}>Vazgeç</Text>
-              </Pressable>
-              <Pressable onPress={dkd_handle_payment_choice_value} disabled={dkd_submitting_value} style={[dkd_styles.dkd_paymentPrimaryButton, dkd_submitting_value && dkd_styles.dkd_actionDisabled]}>
-                <LinearGradient colors={['#58E2AB', '#2AB7A1', '#0C2431']} style={StyleSheet.absoluteFill} />
-                <Text style={dkd_styles.dkd_paymentPrimaryButtonText}>{dkd_submitting_value ? 'Ödeme alınıyor…' : 'Ödeme Yöntemi Seç'}</Text>
-              </Pressable>
-            </View>
-          </View>
-        </View>
-      </Modal>
-
-      <DkdWalletPaymentMethodModal
-        dkd_visible_value={dkd_payment_method_modal_visible_value}
-        dkd_on_close_value={() => setDkdPaymentMethodModalVisibleValue(false)}
-        dkd_order_title_value={dkd_package_content_order_title_value(dkd_form_value?.dkd_package_content_text || 'Paket')}
-        dkd_order_total_tl_value={dkd_payment_preview_value?.dkd_customer_charge_tl || 0}
-        dkd_wallet_tl_value={dkd_wallet_tl_value || 0}
-        dkd_wallet_pay_busy_value={dkd_submitting_value}
-        dkd_on_wallet_pay_value={dkd_submit_cargo_request}
-        dkd_on_wallet_after_topup_value={dkd_on_wallet_after_payment_value}
-        dkd_on_bank_transfer_success_value={() => { setDkdPaymentMethodModalVisibleValue(false); setDkdPaymentModalVisibleValue(false); }}
-        dkd_on_home_return_value={dkd_on_home_return_value}
-        dkd_context_note_value="Gönderi siparişi için ödeme yöntemi seç; TL cüzdan yalnızca fiziksel gönderi ve teslimat ödemelerinde kullanılır."
       />
     </View>
   );
@@ -2164,18 +1939,6 @@ const dkd_styles = StyleSheet.create({
     gap: 8,
     marginBottom: 12,
   },
-  dkd_shipmentPaymentTrackingRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 7,
-    flexShrink: 1,
-    flexGrow: 1,
-    minWidth: 0,
-  },
-  dkd_shipmentPaymentInfoChip: {
-    borderColor: 'rgba(103,216,255,0.18)',
-    backgroundColor: 'rgba(103,216,255,0.08)',
-  },
   dkd_shipmentInfoChip: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -2320,168 +2083,5 @@ const dkd_styles = StyleSheet.create({
   },
   dkd_shipmentActionChipTextActive: {
     color: '#F8FDFF',
-  },
-  dkd_paymentOverlay: {
-    flex: 1,
-    padding: 18,
-    backgroundColor: 'rgba(2,7,14,0.72)',
-    justifyContent: 'center',
-  },
-  dkd_paymentCard: {
-    borderRadius: 26,
-    padding: 18,
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.10)',
-    backgroundColor: 'rgba(6,14,25,0.96)',
-  },
-  dkd_paymentHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  dkd_paymentHeaderIconWrap: {
-    width: 52,
-    height: 52,
-    borderRadius: 18,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'rgba(103,227,255,0.10)',
-    borderWidth: 1,
-    borderColor: 'rgba(103,227,255,0.20)',
-  },
-  dkd_paymentHeaderCopy: {
-    flex: 1,
-  },
-  dkd_paymentTitle: {
-    color: '#FFFFFF',
-    fontSize: 20,
-    fontWeight: '900',
-  },
-  dkd_paymentSub: {
-    marginTop: 4,
-    color: 'rgba(231,241,255,0.72)',
-    fontSize: 12,
-    lineHeight: 18,
-  },
-  dkd_paymentRouteCard: {
-    marginTop: 18,
-    borderRadius: 18,
-    padding: 14,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)',
-    backgroundColor: 'rgba(255,255,255,0.04)',
-    gap: 6,
-  },
-  dkd_paymentRouteLine: {
-    color: '#F6FBFF',
-    fontSize: 12,
-    lineHeight: 18,
-    fontWeight: '700',
-  },
-  dkd_paymentRouteMeta: {
-    marginTop: 4,
-    color: 'rgba(126,233,255,0.76)',
-    fontSize: 12,
-    fontWeight: '800',
-  },
-  dkd_paymentStatCard: {
-    marginTop: 14,
-    borderRadius: 18,
-    padding: 14,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)',
-    backgroundColor: 'rgba(255,255,255,0.04)',
-    gap: 12,
-  },
-  dkd_paymentStatRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    gap: 10,
-  },
-  dkd_paymentStatRowTotal: {
-    marginTop: 2,
-    paddingTop: 12,
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(255,255,255,0.08)',
-  },
-  dkd_paymentStatLabel: {
-    color: 'rgba(231,241,255,0.72)',
-    fontSize: 13,
-    fontWeight: '700',
-  },
-  dkd_paymentStatValue: {
-    color: '#F4FBFF',
-    fontSize: 14,
-    fontWeight: '900',
-  },
-  dkd_paymentStatLabelTotal: {
-    color: '#FFFFFF',
-    fontSize: 15,
-    fontWeight: '900',
-  },
-  dkd_paymentStatValueTotal: {
-    color: '#63F1B1',
-    fontSize: 18,
-    fontWeight: '900',
-  },
-  dkd_paymentWalletCard: {
-    marginTop: 14,
-    borderRadius: 18,
-    padding: 14,
-    borderWidth: 1,
-    borderColor: 'rgba(88,226,171,0.18)',
-    backgroundColor: 'rgba(88,226,171,0.08)',
-    gap: 8,
-  },
-  dkd_paymentWalletRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    gap: 10,
-  },
-  dkd_paymentWalletLabel: {
-    color: 'rgba(231,241,255,0.76)',
-    fontSize: 13,
-    fontWeight: '700',
-  },
-  dkd_paymentWalletValue: {
-    color: '#E9FFF6',
-    fontSize: 14,
-    fontWeight: '900',
-  },
-  dkd_paymentActionRow: {
-    marginTop: 18,
-    flexDirection: 'row',
-    gap: 12,
-  },
-  dkd_paymentGhostButton: {
-    flex: 1,
-    minHeight: 50,
-    borderRadius: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.10)',
-    backgroundColor: 'rgba(255,255,255,0.04)',
-  },
-  dkd_paymentGhostButtonText: {
-    color: '#EAF5FF',
-    fontSize: 14,
-    fontWeight: '900',
-  },
-  dkd_paymentPrimaryButton: {
-    flex: 1.25,
-    minHeight: 50,
-    borderRadius: 16,
-    overflow: 'hidden',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  dkd_paymentPrimaryButtonText: {
-    color: '#FFFFFF',
-    fontSize: 14,
-    fontWeight: '900',
   },
 });

@@ -25,7 +25,6 @@ export const ylColors = {
 export const ylGradients = {
   surface: ['rgba(7, 15, 28, 0.98)', 'rgba(10, 20, 36, 0.92)'],
   header: ['rgba(8, 17, 31, 0.98)', 'rgba(14, 23, 41, 0.88)'],
-  energy: ['rgba(7, 36, 26, 0.96)', 'rgba(10, 28, 39, 0.90)'],
   tokens: ['rgba(33, 24, 9, 0.96)', 'rgba(14, 22, 39, 0.90)'],
   activeTab: ['rgba(242, 196, 109, 0.24)', 'rgba(104, 216, 255, 0.16)'],
   activeGlow: ['rgba(242, 196, 109, 0.18)', 'rgba(104, 216, 255, 0.10)'],

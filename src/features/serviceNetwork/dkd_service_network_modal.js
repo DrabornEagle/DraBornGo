@@ -6,7 +6,6 @@ import DkdCargoSenderPanel, { DkdCargoShipmentDetailReplica } from '../courier/d
 import DkdUrgentCourierPanel from '../courier/dkd_urgent_courier_panel';
 import DkdCargoLiveMapModal from '../courier/dkd_cargo_live_map_modal';
 import DkdLogisticsModal from '../logistics/dkd_logistics_modal';
-import DkdWalletPaymentMethodModal from '../payment/dkd_wallet_payment_method_modal';
 import { fetchBusinessMarketCatalog as dkd_fetch_business_market_catalog_value } from '../../services/businessProductService';
 import { dkd_create_restaurant_order_value, dkd_create_service_network_request_value, dkd_delete_completed_service_network_order_value, dkd_fetch_service_network_my_orders_value } from '../../services/dkd_service_network_service';
 import { dkd_send_customer_order_local_notification_value } from '../../services/notificationService';
@@ -1246,15 +1245,6 @@ function DkdServiceNetworkFeaturedInlinePanel({
   dkd_on_close_value,
   dkd_on_home_return_value,
 }) {
-  const dkd_wallet_tl_value = useMemo(() => resolveUnifiedWalletTl(dkd_profile_value || {}), [dkd_profile_value]);
-  const dkd_sync_wallet_after_topup_value = useCallback((dkd_wallet_after_value) => {
-    const dkd_numeric_wallet_value = Number(dkd_wallet_after_value);
-    if (!Number.isFinite(dkd_numeric_wallet_value)) return;
-    dkd_set_profile_value?.((dkd_previous_profile_value) => (dkd_previous_profile_value ? {
-      ...dkd_previous_profile_value,
-      ...dkd_build_unified_wallet_patch_value(dkd_numeric_wallet_value),
-    } : dkd_previous_profile_value));
-  }, [dkd_set_profile_value]);
   const dkd_courier_approved_value = String(dkd_profile_value?.courier_status || '').toLowerCase() === 'approved';
   const dkd_active_title_value = dkd_active_operation_value === 'dkd_logistics'
     ? 'Nakliye/Lojistik'
@@ -1311,8 +1301,6 @@ function DkdServiceNetworkFeaturedInlinePanel({
           dkd_visible_value
           dkd_panel_mode_value={dkd_active_operation_value === 'dkd_cargo_shipments' ? 'shipments_only' : 'create_only'}
           dkd_current_location_value={dkd_current_location_value}
-          dkd_wallet_tl_value={dkd_wallet_tl_value}
-          dkd_on_wallet_after_payment_value={dkd_sync_wallet_after_topup_value}
           dkd_on_created_value={() => dkd_set_cargo_panel_mode_value('shipments')}
           dkd_on_home_return_value={dkd_on_home_return_value}
         />
@@ -1338,383 +1326,6 @@ function DkdServiceNetworkFeaturedInlinePanel({
           dkd_hide_courier_tab_value
         />
       ) : null}
-    </View>
-  );
-}
-
-function DkdServiceNetworkRestaurantCatalogPanel({
-  dkd_selected_category_value,
-  dkd_current_location_text_value,
-  dkd_restaurant_catalog_product_values,
-  dkd_restaurant_catalog_loading_value,
-  dkd_restaurant_catalog_error_value,
-  dkd_on_back_value,
-  dkd_profile_value,
-  dkd_set_profile_value,
-  dkd_current_location_value,
-  dkd_on_home_return_value,
-  dkd_visible_value = false,
-}) {
-  const [dkd_selected_restaurant_product_value, dkd_set_selected_restaurant_product_value] = useState(null);
-  const [dkd_restaurant_order_busy_key_value, dkd_set_restaurant_order_busy_key_value] = useState('');
-  const [dkd_restaurant_payment_modal_visible_value, dkd_set_restaurant_payment_modal_visible_value] = useState(false);
-  const [dkd_restaurant_payment_product_value, dkd_set_restaurant_payment_product_value] = useState(null);
-  const [dkd_restaurant_payment_preview_value, dkd_set_restaurant_payment_preview_value] = useState(null);
-  const [dkd_payment_method_modal_visible_value, dkd_set_payment_method_modal_visible_value] = useState(false);
-  const dkd_wallet_tl_value = useMemo(() => resolveUnifiedWalletTl(dkd_profile_value || {}), [dkd_profile_value]);
-  const dkd_sync_wallet_after_topup_value = useCallback((dkd_wallet_after_value) => {
-    const dkd_numeric_wallet_value = Number(dkd_wallet_after_value);
-    if (!Number.isFinite(dkd_numeric_wallet_value)) return;
-    dkd_set_profile_value?.((dkd_previous_profile_value) => (dkd_previous_profile_value ? {
-      ...dkd_previous_profile_value,
-      ...dkd_build_unified_wallet_patch_value(dkd_numeric_wallet_value),
-    } : dkd_previous_profile_value));
-  }, [dkd_set_profile_value]);
-  const dkd_price_pulse_value = useRef(new Animated.Value(0)).current;
-
-  useEffect(() => {
-    if (!dkd_visible_value) {
-      dkd_price_pulse_value.stopAnimation();
-      dkd_price_pulse_value.setValue(0);
-      return undefined;
-    }
-    const dkd_price_animation_value = Animated.loop(
-      Animated.sequence([
-        Animated.timing(dkd_price_pulse_value, { toValue: 1, duration: 760, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
-        Animated.timing(dkd_price_pulse_value, { toValue: 0, duration: 760, easing: Easing.in(Easing.cubic), useNativeDriver: true }),
-      ])
-    );
-    dkd_price_animation_value.start();
-    return () => dkd_price_animation_value.stop();
-  }, [dkd_price_pulse_value, dkd_visible_value]);
-
-  const dkd_price_badge_scale_value = dkd_price_pulse_value.interpolate({
-    inputRange: [0, 1],
-    outputRange: [1, 1.055],
-  });
-
-  const dkd_restaurant_catalog_visible_values = useMemo(() => {
-    const dkd_source_product_values = Array.isArray(dkd_restaurant_catalog_product_values) ? dkd_restaurant_catalog_product_values : [];
-    const dkd_matching_product_values = dkd_source_product_values.filter((dkd_product_value) => dkd_is_restaurant_catalog_product_value(dkd_product_value));
-    return dkd_matching_product_values.length ? dkd_matching_product_values : dkd_source_product_values;
-  }, [dkd_restaurant_catalog_product_values]);
-  const dkd_restaurant_catalog_section_values = useMemo(() => dkd_build_restaurant_catalog_sections_value(dkd_restaurant_catalog_visible_values), [dkd_restaurant_catalog_visible_values]);
-  const dkd_product_count_value = dkd_restaurant_catalog_visible_values.length;
-  const dkd_business_count_value = dkd_restaurant_catalog_section_values.length;
-
-  const dkd_handle_product_press_value = useCallback((dkd_product_value) => {
-    dkd_set_selected_restaurant_product_value(dkd_product_value || null);
-  }, []);
-
-  const dkd_close_restaurant_payment_value = useCallback(() => {
-    if (dkd_restaurant_order_busy_key_value) return;
-    dkd_set_restaurant_payment_modal_visible_value(false);
-    dkd_set_restaurant_payment_product_value(null);
-    dkd_set_restaurant_payment_preview_value(null);
-    dkd_set_payment_method_modal_visible_value(false);
-  }, [dkd_restaurant_order_busy_key_value]);
-
-  const dkd_close_product_detail_value = useCallback(() => {
-    dkd_set_selected_restaurant_product_value(null);
-  }, []);
-
-  const dkd_open_restaurant_payment_value = useCallback((dkd_product_value) => {
-    if (!dkd_product_value || dkd_restaurant_order_busy_key_value) return;
-    const dkd_payment_preview_value = dkd_build_restaurant_payment_preview_value(dkd_product_value);
-    if (!dkd_payment_preview_value.dkd_customer_charge_tl) {
-      Alert.alert('Restoran siparişi', 'Bu ürün için TL fiyatı bulunamadı. İşletme ürün fiyatını ekledikten sonra ödeme alınabilir.');
-      return;
-    }
-    dkd_set_restaurant_payment_product_value(dkd_product_value);
-    dkd_set_restaurant_payment_preview_value(dkd_payment_preview_value);
-    dkd_set_restaurant_payment_modal_visible_value(true);
-  }, [dkd_restaurant_order_busy_key_value]);
-
-  const dkd_submit_restaurant_paid_order_value = useCallback(async (dkd_payment_context_value = {}) => {
-    const dkd_product_value = dkd_restaurant_payment_product_value || dkd_selected_restaurant_product_value;
-    const dkd_payment_preview_value = dkd_restaurant_payment_preview_value || dkd_build_restaurant_payment_preview_value(dkd_product_value || {});
-    if (!dkd_product_value || dkd_restaurant_order_busy_key_value) return;
-
-    const dkd_product_title_value = String(dkd_product_value?.title || 'Ürün');
-    const dkd_business_title_value = String(dkd_product_value?.business_name || 'İşletme');
-    const dkd_product_key_value = String(dkd_product_value?.id || dkd_product_title_value);
-    const dkd_wallet_before_value = dkd_restaurant_round_money_value(dkd_payment_context_value?.dkd_wallet_override_tl_value ?? dkd_wallet_tl_value ?? 0);
-    if (dkd_wallet_before_value < dkd_payment_preview_value.dkd_customer_charge_tl) {
-      Alert.alert('Restoran siparişi', 'Cüzdanında yeterli TL yok. Önce ana cüzdana bakiye eklemelisin.');
-      return;
-    }
-
-    dkd_set_restaurant_order_busy_key_value(dkd_product_key_value);
-    try {
-      const dkd_order_result_value = await dkd_create_restaurant_order_value({
-        dkd_profile_value,
-        dkd_current_location_value,
-        dkd_product_value,
-        dkd_selected_category_value,
-        dkd_service_category_title_value: dkd_selected_category_value?.dkd_title_value || 'Restoran siparişi',
-        dkd_delivery_address_text_value: dkd_current_location_text_value,
-        dkd_delivery_note_value: '',
-        dkd_use_wallet_payment_value: true,
-        dkd_payment_preview_value,
-        dkd_customer_charge_tl_value: dkd_payment_preview_value.dkd_customer_charge_tl,
-        dkd_product_price_tl_value: dkd_payment_preview_value.dkd_product_price_tl,
-        dkd_delivery_fee_tl_value: dkd_payment_preview_value.dkd_delivery_fee_tl,
-      });
-      if (dkd_order_result_value?.error) throw dkd_order_result_value.error;
-      const dkd_wallet_after_order_value = Number(
-        dkd_order_result_value?.data?.dkd_wallet_after_tl
-          ?? dkd_order_result_value?.data?.wallet_tl
-          ?? (Number(dkd_wallet_before_value || 0) - Number(dkd_payment_preview_value.dkd_customer_charge_tl || 0))
-      );
-      if (Number.isFinite(dkd_wallet_after_order_value)) {
-        dkd_sync_wallet_after_topup_value(dkd_wallet_after_order_value);
-      }
-      dkd_send_customer_order_local_notification_value({
-        dkd_order_title_value: 'Siparişiniz Oluşturuldu',
-        dkd_order_message_value: `${dkd_business_title_value} • ${dkd_product_title_value} siparişiniz alındı ve kurye havuzuna aktarıldı.`,
-        dkd_order_id_value: dkd_order_result_value?.data?.dkd_order_id_value || dkd_order_result_value?.data?.id || '',
-        dkd_source_value: 'dkd_restaurant_wallet_payment',
-      }).catch(() => null);
-      Alert.alert('Sipariş Oluşturuldu', `${dkd_business_title_value} • ${dkd_product_title_value} için ödeme alındı ve sipariş kurye havuzuna gönderildi.`);
-      dkd_set_restaurant_payment_modal_visible_value(false);
-      dkd_set_restaurant_payment_product_value(null);
-      dkd_set_restaurant_payment_preview_value(null);
-      dkd_set_payment_method_modal_visible_value(false);
-      dkd_close_product_detail_value();
-    } catch (dkd_order_error_value) {
-      const dkd_error_message_value = String(dkd_order_error_value?.message || dkd_order_error_value || '');
-      if (dkd_error_message_value.includes('wallet_insufficient')) {
-        Alert.alert('Restoran siparişi', 'Cüzdanında yeterli TL yok. Önce ana cüzdana bakiye eklemelisin.');
-      } else {
-        Alert.alert('Restoran siparişi', dkd_order_error_value?.message || 'Ödeme veya sipariş kaydı tamamlanamadı. SQL dosyasını çalıştırdığından emin ol.');
-      }
-    } finally {
-      dkd_set_restaurant_order_busy_key_value('');
-    }
-  }, [dkd_close_product_detail_value, dkd_current_location_text_value, dkd_current_location_value, dkd_profile_value, dkd_restaurant_order_busy_key_value, dkd_restaurant_payment_preview_value, dkd_restaurant_payment_product_value, dkd_selected_category_value, dkd_selected_restaurant_product_value, dkd_sync_wallet_after_topup_value, dkd_wallet_tl_value]);
-
-  const dkd_handle_restaurant_payment_choice_value = useCallback(() => {
-    Alert.alert('Ödeme Yöntemi Seç', 'Siparişi nasıl tamamlamak istiyorsun?', [
-      { text: 'Cüzdanımdan Öde', onPress: () => dkd_submit_restaurant_paid_order_value() },
-      { text: 'Ödeme Seçenekleri', onPress: () => dkd_set_payment_method_modal_visible_value(true) },
-      { text: 'Vazgeç', style: 'cancel' },
-    ]);
-  }, [dkd_submit_restaurant_paid_order_value]);
-
-  const dkd_selected_product_image_uri_value = dkd_resolve_restaurant_product_image_uri_value(dkd_selected_restaurant_product_value);
-  const dkd_selected_product_price_text_value = dkd_service_network_catalog_price_text_value(dkd_selected_restaurant_product_value);
-
-  return (
-    <View style={dkd_styles.dkd_restaurant_catalog_wrap}>
-      <Pressable onPress={dkd_on_back_value} style={dkd_styles.dkd_back_button}>
-        <MaterialCommunityIcons name="arrow-left-circle" size={20} color="#BAE6FD" />
-        <Text style={dkd_styles.dkd_back_button_text}>Ürün listesini kapat</Text>
-      </Pressable>
-
-      <LinearGradient colors={["#24101A", "#7C2D12", "#EA580C"]} style={dkd_styles.dkd_restaurant_catalog_hero}>
-        <View style={dkd_styles.dkd_restaurant_catalog_hero_top}>
-          <View style={dkd_styles.dkd_restaurant_catalog_icon_shell}>
-            <MaterialCommunityIcons name={dkd_selected_category_value?.dkd_icon_value || 'silverware-fork-knife'} size={31} color="#431407" />
-          </View>
-          <View style={dkd_styles.dkd_restaurant_catalog_hero_copy}>
-            <Text style={dkd_styles.dkd_restaurant_catalog_kicker}>RESTORAN ÜRÜN VİTRİNİ</Text>
-            <Text style={dkd_styles.dkd_restaurant_catalog_title}>Restoran siparişi</Text>
-            <Text style={dkd_styles.dkd_restaurant_catalog_text}>Kayıtlı işletmelerin ürünleri minimalist görseller, net fiyat vurgusu ve işletme bazlı modern listeyle görünür. Ürüne dokununca tam görsel ve detay açılır.</Text>
-          </View>
-        </View>
-        <View style={dkd_styles.dkd_restaurant_catalog_badge_row}>
-          <View style={dkd_styles.dkd_restaurant_catalog_badge}><MaterialCommunityIcons name="storefront-outline" size={14} color="#FED7AA" /><Text style={dkd_styles.dkd_restaurant_catalog_badge_text}>{dkd_business_count_value} işletme</Text></View>
-          <View style={dkd_styles.dkd_restaurant_catalog_badge}><MaterialCommunityIcons name="food-takeout-box-outline" size={14} color="#FDE68A" /><Text style={dkd_styles.dkd_restaurant_catalog_badge_text}>{dkd_product_count_value} ürün</Text></View>
-          <View style={dkd_styles.dkd_restaurant_catalog_badge}><MaterialCommunityIcons name="cash-fast" size={14} color="#A7F3D0" /><Text style={dkd_styles.dkd_restaurant_catalog_badge_text}>Fiyat odaklı</Text></View>
-        </View>
-      </LinearGradient>
-
-      {dkd_restaurant_catalog_error_value ? (
-        <View style={dkd_styles.dkd_restaurant_catalog_empty_card}>
-          <MaterialCommunityIcons name="alert-circle-outline" size={24} color="#FCA5A5" />
-          <View style={dkd_styles.dkd_restaurant_catalog_empty_copy}>
-            <Text style={dkd_styles.dkd_restaurant_catalog_empty_title}>Ürünler okunamadı</Text>
-            <Text style={dkd_styles.dkd_restaurant_catalog_empty_text}>{dkd_restaurant_catalog_error_value}</Text>
-          </View>
-        </View>
-      ) : null}
-
-      {!dkd_restaurant_catalog_loading_value && !dkd_restaurant_catalog_section_values.length ? (
-        <View style={dkd_styles.dkd_restaurant_catalog_empty_card}>
-          <MaterialCommunityIcons name="store-search-outline" size={24} color="#FED7AA" />
-          <View style={dkd_styles.dkd_restaurant_catalog_empty_copy}>
-            <Text style={dkd_styles.dkd_restaurant_catalog_empty_title}>Kayıtlı restoran ürünü yok</Text>
-            <Text style={dkd_styles.dkd_restaurant_catalog_empty_text}>İşletme ürünleri eklendiğinde bu alan otomatik ürün vitrini gibi dolacak.</Text>
-          </View>
-        </View>
-      ) : null}
-
-      {dkd_restaurant_catalog_section_values.map((dkd_section_value) => (
-        <View key={dkd_section_value.dkd_key_value} style={dkd_styles.dkd_restaurant_business_section}>
-          <View style={dkd_styles.dkd_restaurant_business_header}>
-            <View style={dkd_styles.dkd_restaurant_business_icon}>
-              <MaterialCommunityIcons name="storefront-outline" size={20} color="#431407" />
-            </View>
-            <View style={dkd_styles.dkd_restaurant_business_copy}>
-              <Text style={dkd_styles.dkd_restaurant_business_title}>{dkd_section_value.dkd_business_name_value}</Text>
-              <Text style={dkd_styles.dkd_restaurant_business_meta}>{dkd_section_value.dkd_business_category_value} • {dkd_section_value.dkd_item_values.length} ürün</Text>
-              <Text style={dkd_styles.dkd_restaurant_business_address} numberOfLines={2}>{dkd_section_value.dkd_business_address_value}</Text>
-            </View>
-          </View>
-          <View style={dkd_styles.dkd_restaurant_product_grid}>
-            {dkd_section_value.dkd_item_values.map((dkd_product_value) => {
-              const dkd_product_image_uri_value = dkd_resolve_restaurant_product_image_uri_value(dkd_product_value);
-              const dkd_product_price_text_value = dkd_service_network_catalog_price_text_value(dkd_product_value);
-              return (
-                <Pressable key={`${dkd_section_value.dkd_key_value}:${String(dkd_product_value?.id || dkd_product_value?.title)}`} onPress={() => dkd_handle_product_press_value(dkd_product_value)} style={dkd_styles.dkd_restaurant_product_card}>
-                  <View style={dkd_styles.dkd_restaurant_product_image_shell}>
-                    {dkd_product_image_uri_value ? (
-                      <Image source={{ uri: dkd_product_image_uri_value }} style={dkd_styles.dkd_restaurant_product_image} resizeMode="cover" />
-                    ) : (
-                      <LinearGradient colors={["rgba(251,146,60,0.26)", "rgba(124,45,18,0.84)"]} style={dkd_styles.dkd_restaurant_product_image_fallback}>
-                        <MaterialCommunityIcons name="food-takeout-box-outline" size={26} color="#FED7AA" />
-                      </LinearGradient>
-                    )}
-                  </View>
-                  <Text style={dkd_styles.dkd_restaurant_product_title} numberOfLines={2}>{dkd_product_value?.title || 'İşletme ürünü'}</Text>
-                  <Text style={dkd_styles.dkd_restaurant_product_desc} numberOfLines={3}>{dkd_product_value?.description || dkd_product_value?.category || 'Ürün açıklaması işletme panelinden gelir.'}</Text>
-                  <Animated.View style={[dkd_styles.dkd_restaurant_product_price_highlight, { transform: [{ scale: dkd_price_badge_scale_value }] }]}>
-                    <MaterialCommunityIcons name="cash-fast" size={14} color="#431407" />
-                    <Text style={dkd_styles.dkd_restaurant_product_price_highlight_text}>{dkd_product_price_text_value}</Text>
-                  </Animated.View>
-                  <View style={dkd_styles.dkd_restaurant_product_cta}>
-                    <Text style={dkd_styles.dkd_restaurant_product_cta_text}>Detayları Aç</Text>
-                    <MaterialCommunityIcons name="arrow-expand" size={15} color="#07131C" />
-                  </View>
-                </Pressable>
-              );
-            })}
-          </View>
-        </View>
-      ))}
-
-      <Modal visible={Boolean(dkd_selected_restaurant_product_value)} transparent animationType="fade" onRequestClose={dkd_close_product_detail_value}>
-        <View style={dkd_styles.dkd_restaurant_detail_overlay}>
-          <View style={dkd_styles.dkd_restaurant_detail_shell}>
-            <View style={dkd_styles.dkd_restaurant_detail_header}>
-              <View style={dkd_styles.dkd_restaurant_detail_header_copy}>
-                <Text style={dkd_styles.dkd_restaurant_detail_kicker}>ÜRÜN DETAYI</Text>
-                <Text style={dkd_styles.dkd_restaurant_detail_title} numberOfLines={2}>{dkd_selected_restaurant_product_value?.title || 'İşletme ürünü'}</Text>
-              </View>
-              <Pressable onPress={dkd_close_product_detail_value} style={dkd_styles.dkd_restaurant_detail_close_button}>
-                <MaterialCommunityIcons name="close" size={21} color="#F8FAFC" />
-              </Pressable>
-            </View>
-
-            <View style={dkd_styles.dkd_restaurant_detail_image_shell}>
-              {dkd_selected_product_image_uri_value ? (
-                <Image source={{ uri: dkd_selected_product_image_uri_value }} style={dkd_styles.dkd_restaurant_detail_image} resizeMode="contain" />
-              ) : (
-                <LinearGradient colors={["rgba(251,146,60,0.34)", "rgba(67,20,7,0.96)"]} style={dkd_styles.dkd_restaurant_detail_image_fallback}>
-                  <MaterialCommunityIcons name="food-takeout-box-outline" size={58} color="#FED7AA" />
-                  <Text style={dkd_styles.dkd_restaurant_detail_image_fallback_text}>Ürün görseli işletme panelinden eklenince burada tam boy gösterilir.</Text>
-                </LinearGradient>
-              )}
-              <Animated.View style={[dkd_styles.dkd_restaurant_detail_price_badge, { transform: [{ scale: dkd_price_badge_scale_value }] }]}>
-                <MaterialCommunityIcons name="cash-fast" size={17} color="#431407" />
-                <Text style={dkd_styles.dkd_restaurant_detail_price_text}>{dkd_selected_product_price_text_value}</Text>
-              </Animated.View>
-            </View>
-
-            <View style={dkd_styles.dkd_restaurant_detail_info_card}>
-              <Text style={dkd_styles.dkd_restaurant_detail_business}>{dkd_selected_restaurant_product_value?.business_name || 'İşletme'}</Text>
-              <Text style={dkd_styles.dkd_restaurant_detail_meta}>{dkd_selected_restaurant_product_value?.business_category || dkd_selected_restaurant_product_value?.category || 'Restoran ürünü'}</Text>
-              <Text style={dkd_styles.dkd_restaurant_detail_desc}>{dkd_selected_restaurant_product_value?.description || 'Ürün açıklaması işletme panelinden gelir.'}</Text>
-              <View style={dkd_styles.dkd_restaurant_detail_line_row}>
-                <MaterialCommunityIcons name="map-marker-outline" size={16} color="#FDBA74" />
-                <Text style={dkd_styles.dkd_restaurant_detail_line_text}>{dkd_selected_restaurant_product_value?.business_address_text || dkd_current_location_text_value || 'Adres bilgisi ürün detayında netleşir'}</Text>
-              </View>
-              <View style={dkd_styles.dkd_restaurant_detail_line_row}>
-                <MaterialCommunityIcons name="tag-multiple-outline" size={16} color="#FDE68A" />
-                <Text style={dkd_styles.dkd_restaurant_detail_line_text}>{dkd_selected_restaurant_product_value?.category || 'Kategori bilgisi işletme ürününde görünür'}</Text>
-              </View>
-            </View>
-
-            <Pressable onPress={() => dkd_open_restaurant_payment_value(dkd_selected_restaurant_product_value)} disabled={Boolean(dkd_restaurant_order_busy_key_value)} style={dkd_styles.dkd_restaurant_detail_order_button}>
-              <LinearGradient colors={["#FDE68A", "#FDBA74", "#FB923C"]} style={dkd_styles.dkd_restaurant_detail_order_gradient}>
-                <Text style={dkd_styles.dkd_restaurant_detail_order_text}>{dkd_restaurant_order_busy_key_value ? 'Kaydediliyor…' : 'Sipariş Oluştur'}</Text>
-                <MaterialCommunityIcons name="arrow-right" size={18} color="#431407" />
-              </LinearGradient>
-            </Pressable>
-          </View>
-        </View>
-      </Modal>
-
-      <Modal visible={dkd_restaurant_payment_modal_visible_value} transparent animationType="fade" onRequestClose={dkd_close_restaurant_payment_value}>
-        <View style={dkd_styles.dkd_restaurant_payment_overlay}>
-          <View style={dkd_styles.dkd_restaurant_payment_card}>
-            <View style={dkd_styles.dkd_restaurant_payment_header}>
-              <View style={dkd_styles.dkd_restaurant_payment_icon_wrap}>
-                <MaterialCommunityIcons name="wallet-outline" size={23} color="#FED7AA" />
-              </View>
-              <View style={dkd_styles.dkd_restaurant_payment_header_copy}>
-                <Text style={dkd_styles.dkd_restaurant_payment_title}>Ödeme Onayı</Text>
-                <Text style={dkd_styles.dkd_restaurant_payment_sub}>Sipariş kurye havuzuna düşmeden önce ödeme yöntemi seçilir; gerekiyorsa cüzdana TL yüklenir.</Text>
-              </View>
-            </View>
-
-            <View style={dkd_styles.dkd_restaurant_payment_route_card}>
-              <Text style={dkd_styles.dkd_restaurant_payment_route_line}>İşletme • {dkd_restaurant_payment_product_value?.business_name || 'Restoran'}</Text>
-              <Text style={dkd_styles.dkd_restaurant_payment_route_line}>Ürün • {dkd_restaurant_payment_product_value?.title || 'Ürün'}</Text>
-              <Text style={dkd_styles.dkd_restaurant_payment_route_meta}>Teslimat • {dkd_current_location_text_value || 'Adres bilgisi kullanıcı konumundan alınır'}</Text>
-            </View>
-
-            <View style={dkd_styles.dkd_restaurant_payment_stat_card}>
-              <View style={dkd_styles.dkd_restaurant_payment_stat_row}>
-                <Text style={dkd_styles.dkd_restaurant_payment_stat_label}>Ürün Tutarı</Text>
-                <Text style={dkd_styles.dkd_restaurant_payment_stat_value}>{dkd_restaurant_format_money_value(dkd_restaurant_payment_preview_value?.dkd_product_price_tl || 0)}</Text>
-              </View>
-              <View style={dkd_styles.dkd_restaurant_payment_stat_row}>
-                <Text style={dkd_styles.dkd_restaurant_payment_stat_label}>İşletme Kurye Ücreti</Text>
-                <Text style={dkd_styles.dkd_restaurant_payment_stat_value}>{dkd_restaurant_format_money_value(dkd_restaurant_payment_preview_value?.dkd_delivery_fee_tl || 0)}</Text>
-              </View>
-              <View style={[dkd_styles.dkd_restaurant_payment_stat_row, dkd_styles.dkd_restaurant_payment_stat_total_row]}>
-                <Text style={dkd_styles.dkd_restaurant_payment_stat_total_label}>Toplam Tutar</Text>
-                <Text style={dkd_styles.dkd_restaurant_payment_stat_total_value}>{dkd_restaurant_format_money_value(dkd_restaurant_payment_preview_value?.dkd_customer_charge_tl || 0)}</Text>
-              </View>
-            </View>
-
-            <View style={dkd_styles.dkd_restaurant_payment_wallet_card}>
-              <View style={dkd_styles.dkd_restaurant_payment_wallet_row}>
-                <Text style={dkd_styles.dkd_restaurant_payment_wallet_label}>Cüzdan bakiyesi</Text>
-                <Text style={dkd_styles.dkd_restaurant_payment_wallet_value}>{dkd_restaurant_format_money_value(dkd_wallet_tl_value || 0)}</Text>
-              </View>
-              <View style={dkd_styles.dkd_restaurant_payment_wallet_row}>
-                <Text style={dkd_styles.dkd_restaurant_payment_wallet_label}>Ödeme sonrası</Text>
-                <Text style={dkd_styles.dkd_restaurant_payment_wallet_value}>{dkd_restaurant_format_money_value(dkd_restaurant_round_money_value(Number(dkd_wallet_tl_value || 0) - Number(dkd_restaurant_payment_preview_value?.dkd_customer_charge_tl || 0)))}</Text>
-              </View>
-            </View>
-
-            <View style={dkd_styles.dkd_restaurant_payment_action_row}>
-              <Pressable onPress={dkd_close_restaurant_payment_value} disabled={Boolean(dkd_restaurant_order_busy_key_value)} style={dkd_styles.dkd_restaurant_payment_ghost_button}>
-                <Text style={dkd_styles.dkd_restaurant_payment_ghost_button_text}>Vazgeç</Text>
-              </Pressable>
-              <Pressable onPress={dkd_handle_restaurant_payment_choice_value} disabled={Boolean(dkd_restaurant_order_busy_key_value)} style={[dkd_styles.dkd_restaurant_payment_primary_button, dkd_restaurant_order_busy_key_value ? dkd_styles.dkd_restaurant_payment_button_disabled : null]}>
-                <Text style={dkd_styles.dkd_restaurant_payment_primary_button_text}>{dkd_restaurant_order_busy_key_value ? 'Ödeme alınıyor…' : 'Ödeme Yöntemi Seç'}</Text>
-              </Pressable>
-            </View>
-          </View>
-        </View>
-      </Modal>
-
-      <DkdWalletPaymentMethodModal
-        dkd_visible_value={dkd_payment_method_modal_visible_value}
-        dkd_on_close_value={() => dkd_set_payment_method_modal_visible_value(false)}
-        dkd_order_title_value={`Restoran siparişi • ${dkd_restaurant_payment_product_value?.title || 'Ürün'}`}
-        dkd_order_total_tl_value={dkd_restaurant_payment_preview_value?.dkd_customer_charge_tl || 0}
-        dkd_wallet_tl_value={dkd_wallet_tl_value || 0}
-        dkd_wallet_pay_busy_value={Boolean(dkd_restaurant_order_busy_key_value)}
-        dkd_on_wallet_pay_value={dkd_submit_restaurant_paid_order_value}
-        dkd_on_wallet_after_topup_value={dkd_sync_wallet_after_topup_value}
-        dkd_on_bank_transfer_success_value={dkd_close_restaurant_payment_value}
-        dkd_on_home_return_value={dkd_on_home_return_value}
-        dkd_context_note_value="Restoran siparişi için ödeme yöntemi seç; gerekiyorsa önce cüzdana TL yükle, bakiye yeterliyse siparişi cüzdanla tamamla."
-      />
     </View>
   );
 }
@@ -1933,6 +1544,7 @@ function DkdServiceNetworkRequestPage({
   );
 }
 
+function DkdServiceNetworkModal({ dkd_visible_value, dkd_on_close_value, dkd_profile_value, dkd_set_profile_value, dkd_current_location_value, dkd_on_profile_press_value, dkd_is_admin_value = false }) {
   const dkd_scroll_view_ref_value = useRef(null);
   const dkd_scroll_position_y_ref_value = useRef(0);
   const dkd_category_section_y_ref_value = useRef(0);
@@ -1960,32 +1572,6 @@ function DkdServiceNetworkRequestPage({
   const dkd_selected_group_categories_value = dkd_selected_group_value?.dkd_categories_value || [];
   const dkd_category_row_count_value = Math.ceil((dkd_selected_group_categories_value.length || 1) / 2);
   const dkd_current_location_text_value = dkd_current_location_value?.lat && dkd_current_location_value?.lng ? 'Canlı konum hazır' : 'Konum alınca en yakın partner sıralanır';
-  const [dkd_service_wallet_modal_visible_value, dkd_set_service_wallet_modal_visible_value] = useState(false);
-  const dkd_service_wallet_tl_value = useMemo(() => resolveUnifiedWalletTl(dkd_profile_value || {}), [dkd_profile_value]);
-  const dkd_open_service_wallet_modal_value = useCallback(() => {
-    dkd_set_service_wallet_modal_visible_value(true);
-  }, []);
-  const dkd_close_service_wallet_modal_value = useCallback(() => {
-    dkd_set_service_wallet_modal_visible_value(false);
-  }, []);
-  const dkd_sync_service_wallet_after_topup_value = useCallback((dkd_wallet_after_value) => {
-    const dkd_numeric_wallet_value = Number(dkd_wallet_after_value);
-    if (!Number.isFinite(dkd_numeric_wallet_value)) return;
-    dkd_set_profile_value?.((dkd_previous_profile_value) => (dkd_previous_profile_value ? {
-      ...dkd_previous_profile_value,
-      ...dkd_build_unified_wallet_patch_value(dkd_numeric_wallet_value),
-    } : dkd_previous_profile_value));
-  }, [dkd_set_profile_value]);
-  const dkd_handle_service_wallet_pay_notice_value = useCallback(() => {
-    Alert.alert('Cüzdan TL', 'Bu buton cüzdana bakiye yüklemek için açıldı. Yükleme tutarını seçip Banka Havalesi / EFT / FAST akışını kullanabilirsin.');
-  }, []);
-  const dkd_last_wallet_topup_request_key_ref_value = useRef(0);
-  useEffect(() => {
-    if (!dkd_visible_value || !dkd_next_wallet_request_key_value) return;
-    if (dkd_last_wallet_topup_request_key_ref_value.current === dkd_next_wallet_request_key_value) return;
-    dkd_last_wallet_topup_request_key_ref_value.current = dkd_next_wallet_request_key_value;
-    dkd_set_service_wallet_modal_visible_value(true);
-
 
   const dkd_load_restaurant_catalog_value = useCallback(async () => {
     dkd_set_restaurant_catalog_loading_value(true);
@@ -2223,22 +1809,7 @@ function DkdServiceNetworkRequestPage({
 
             {dkd_request_page_open_value ? (
               <View onLayout={(dkd_layout_event_value) => { dkd_request_section_y_ref_value.current = dkd_layout_event_value.nativeEvent.layout.y; }}>
-                {dkd_selected_category_value?.dkd_id_value === 'dkd_restaurant_order' ? (
-                  <DkdServiceNetworkRestaurantCatalogPanel
-                    dkd_selected_category_value={dkd_selected_category_value}
-                    dkd_current_location_text_value={dkd_current_location_text_value}
-                    dkd_restaurant_catalog_product_values={dkd_restaurant_catalog_product_values}
-                    dkd_restaurant_catalog_loading_value={dkd_restaurant_catalog_loading_value}
-                    dkd_restaurant_catalog_error_value={dkd_restaurant_catalog_error_value}
-                    dkd_on_back_value={dkd_close_request_panel_value}
-                    dkd_profile_value={dkd_profile_value}
-                    dkd_set_profile_value={dkd_set_profile_value}
-                    dkd_current_location_value={dkd_current_location_value}
-                    dkd_on_home_return_value={dkd_on_close_value}
-                    dkd_visible_value={dkd_visible_value}
-                  />
-                ) : (
-                  <DkdServiceNetworkRequestPage
+                <DkdServiceNetworkRequestPage
                     dkd_selected_category_value={dkd_selected_category_value}
                     dkd_selected_group_value={dkd_selected_group_value}
                     dkd_current_location_text_value={dkd_current_location_text_value}
@@ -2264,23 +1835,9 @@ function DkdServiceNetworkRequestPage({
                     dkd_profile_value={dkd_profile_value}
                     dkd_current_location_value={dkd_current_location_value}
                   />
-                )}
               </View>
             ) : null}
           </ScrollView>
-          <DkdWalletPaymentMethodModal
-            dkd_visible_value={dkd_service_wallet_modal_visible_value}
-            dkd_on_close_value={dkd_close_service_wallet_modal_value}
-            dkd_order_title_value="Cüzdanına Bakiye Yükle"
-            dkd_order_total_tl_value={0}
-            dkd_wallet_tl_value={dkd_service_wallet_tl_value || 0}
-            dkd_wallet_pay_busy_value={false}
-            dkd_on_wallet_pay_value={dkd_handle_service_wallet_pay_notice_value}
-            dkd_on_wallet_after_topup_value={dkd_sync_service_wallet_after_topup_value}
-            dkd_on_bank_transfer_success_value={dkd_close_service_wallet_modal_value}
-            dkd_on_home_return_value={dkd_on_close_value}
-              dkd_context_note_value="Cüzdanına TL yüklemek için yöntem seç; bakiye yalnızca fiziksel Hizmet Ağı, restoran, market ve gönderi siparişlerinde kullanılır."
-          />
         </View>
       </View>
     </Modal>
@@ -2300,14 +1857,6 @@ const dkd_styles = StyleSheet.create({
   dkd_hero_eyebrow: { color: '#BAE6FD', fontSize: 11, fontWeight: '900', letterSpacing: 1.2 },
   dkd_hero_title: { color: '#FFFFFF', fontSize: 17.8, lineHeight: 22, fontWeight: '900', marginTop: 5 },
   dkd_hero_text: { color: 'rgba(241,245,249,0.82)', fontSize: 13, lineHeight: 19, marginTop: 9, fontWeight: '700' },
-  dkd_hero_wallet_button: { position: 'relative', overflow: 'visible', marginTop: 13, minHeight: 56, borderRadius: 19, paddingHorizontal: 12, paddingVertical: 9, flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: 'rgba(2,6,23,0.34)', borderWidth: 1, borderColor: 'rgba(186,230,253,0.30)' },
-  dkd_hero_wallet_button_pressed: { opacity: 0.86, transform: [{ scale: 0.99 }] },
-  dkd_hero_wallet_icon_wrap: { width: 38, height: 38, borderRadius: 15, alignItems: 'center', justifyContent: 'center', backgroundColor: '#BAE6FD', borderWidth: 1, borderColor: 'rgba(255,255,255,0.30)' },
-  dkd_hero_wallet_corner_cue: { position: 'absolute', top: -9, right: -7, width: 29, height: 29, borderRadius: 999, alignItems: 'center', justifyContent: 'center', backgroundColor: '#FDE68A', borderWidth: 1.4, borderColor: 'rgba(255,255,255,0.92)', shadowColor: '#FDE68A', shadowOpacity: 0.44, shadowRadius: 9, shadowOffset: { width: 0, height: 0 }, elevation: 8, zIndex: 3 },
-  dkd_hero_wallet_corner_cue_ring: { position: 'absolute', width: 37, height: 37, borderRadius: 999, borderWidth: 1, borderColor: 'rgba(253,230,138,0.44)', backgroundColor: 'rgba(253,230,138,0.08)' },
-  dkd_hero_wallet_copy: { flex: 1, minWidth: 0 },
-  dkd_hero_wallet_title: { color: '#F8FAFC', fontSize: 14.5, lineHeight: 18, fontWeight: '950' },
-  dkd_hero_wallet_text: { color: 'rgba(226,242,255,0.70)', fontSize: 10.8, lineHeight: 14, fontWeight: '800', marginTop: 1 },
   dkd_hero_pill_row: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 14 },
   dkd_hero_pill: { paddingHorizontal: 10, paddingVertical: 7, borderRadius: 999, backgroundColor: 'rgba(255,255,255,0.12)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.16)' },
   dkd_hero_pill_text: { color: '#F8FAFC', fontSize: 11, fontWeight: '900' },
@@ -2649,33 +2198,6 @@ const dkd_styles = StyleSheet.create({
   dkd_restaurant_detail_order_gradient: { minHeight: 49, borderRadius: 19, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 },
   dkd_restaurant_detail_order_text: { color: '#431407', fontSize: 13, fontWeight: '900' },
 
-  dkd_restaurant_payment_overlay: { flex: 1, backgroundColor: 'rgba(2,6,23,0.88)', justifyContent: 'center', padding: 14 },
-  dkd_restaurant_payment_card: { borderRadius: 30, padding: 15, backgroundColor: '#07111F', borderWidth: 1, borderColor: 'rgba(253,186,116,0.28)', shadowColor: '#FB923C', shadowOpacity: 0.20, shadowRadius: 24, elevation: 10 },
-  dkd_restaurant_payment_header: { flexDirection: 'row', alignItems: 'flex-start', gap: 12, marginBottom: 12 },
-  dkd_restaurant_payment_icon_wrap: { width: 46, height: 46, borderRadius: 18, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(251,146,60,0.16)', borderWidth: 1, borderColor: 'rgba(253,186,116,0.28)' },
-  dkd_restaurant_payment_header_copy: { flex: 1 },
-  dkd_restaurant_payment_title: { color: '#FFFFFF', fontSize: 20, lineHeight: 24, fontWeight: '900' },
-  dkd_restaurant_payment_sub: { color: 'rgba(255,247,237,0.74)', fontSize: 12, lineHeight: 17, fontWeight: '750', marginTop: 4 },
-  dkd_restaurant_payment_route_card: { borderRadius: 22, padding: 13, backgroundColor: 'rgba(124,45,18,0.28)', borderWidth: 1, borderColor: 'rgba(253,186,116,0.20)', gap: 6 },
-  dkd_restaurant_payment_route_line: { color: '#FFF7ED', fontSize: 12.5, lineHeight: 17, fontWeight: '900' },
-  dkd_restaurant_payment_route_meta: { color: 'rgba(254,215,170,0.76)', fontSize: 11.5, lineHeight: 16, fontWeight: '750' },
-  dkd_restaurant_payment_stat_card: { marginTop: 12, borderRadius: 22, padding: 13, backgroundColor: 'rgba(15,23,42,0.94)', borderWidth: 1, borderColor: 'rgba(251,146,60,0.20)' },
-  dkd_restaurant_payment_stat_row: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 10, paddingVertical: 7 },
-  dkd_restaurant_payment_stat_total_row: { marginTop: 4, paddingTop: 11, borderTopWidth: 1, borderTopColor: 'rgba(253,186,116,0.18)' },
-  dkd_restaurant_payment_stat_label: { color: 'rgba(226,242,255,0.70)', fontSize: 12, fontWeight: '800' },
-  dkd_restaurant_payment_stat_value: { color: '#FFFFFF', fontSize: 13, fontWeight: '900' },
-  dkd_restaurant_payment_stat_total_label: { color: '#FDE68A', fontSize: 13, fontWeight: '900' },
-  dkd_restaurant_payment_stat_total_value: { color: '#FDE68A', fontSize: 18, fontWeight: '950' },
-  dkd_restaurant_payment_wallet_card: { marginTop: 12, borderRadius: 21, padding: 13, backgroundColor: 'rgba(6,78,59,0.24)', borderWidth: 1, borderColor: 'rgba(167,243,208,0.22)' },
-  dkd_restaurant_payment_wallet_row: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 10, paddingVertical: 5 },
-  dkd_restaurant_payment_wallet_label: { color: 'rgba(209,250,229,0.72)', fontSize: 12, fontWeight: '850' },
-  dkd_restaurant_payment_wallet_value: { color: '#D1FAE5', fontSize: 13, fontWeight: '950' },
-  dkd_restaurant_payment_action_row: { flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 13 },
-  dkd_restaurant_payment_ghost_button: { flex: 1, minHeight: 48, borderRadius: 17, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(255,255,255,0.08)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.14)' },
-  dkd_restaurant_payment_ghost_button_text: { color: '#E2E8F0', fontSize: 12.5, fontWeight: '900' },
-  dkd_restaurant_payment_primary_button: { flex: 1.35, minHeight: 48, borderRadius: 17, alignItems: 'center', justifyContent: 'center', backgroundColor: '#FDE68A', borderWidth: 1, borderColor: '#FDBA74' },
-  dkd_restaurant_payment_primary_button_text: { color: '#431407', fontSize: 12.5, fontWeight: '950' },
-  dkd_restaurant_payment_button_disabled: { opacity: 0.54 },
 
   dkd_admin_note_card: { flexDirection: 'row', gap: 9, alignItems: 'flex-start', marginTop: 6, padding: 13, borderRadius: 18, backgroundColor: 'rgba(20,83,45,0.20)', borderWidth: 1, borderColor: 'rgba(167,243,208,0.20)' },
   dkd_admin_note_text: { flex: 1, color: '#D1FAE5', fontSize: 12, lineHeight: 17, fontWeight: '800' },

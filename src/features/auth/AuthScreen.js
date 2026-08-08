@@ -23,9 +23,9 @@ import { dkd_make_native_axis_point } from '../../utils/dkdNativeAxis';
 const dkd_login_secure_mockup_image_value = require('../../../assets/dkd_login/dkd_login_secure_gate.png');
 const dkd_terms_public_url_value = 'https://www.draborneagle.com/draborngo/terms/';
 const dkd_privacy_public_url_value = 'https://www.draborneagle.com/draborngo/privacy/';
-const dkd_terms_version_value = '2026-05-19-v0.0.3';
-const dkd_privacy_version_value = '2026-05-19-v0.0.3';
-const dkd_community_policy_version_value = '2026-05-19-v0.0.3';
+const dkd_terms_version_value = '2026-08-08-v0.0.7';
+const dkd_privacy_version_value = '2026-08-08-v0.0.7';
+const dkd_community_policy_version_value = '2026-08-08-v0.0.7';
 
 const dkd_region_presets_value = {
   Türkiye: {
@@ -644,20 +644,6 @@ const dkd_styles = StyleSheet.create({
   dkd_primary_button: { marginTop: 16, minHeight: 56, borderRadius: 20, overflow: 'hidden', alignItems: 'center', justifyContent: 'center', flexDirection: 'row', gap: 9, shadowColor: '#67E8F9', shadowOpacity: 0.32, shadowRadius: 18, shadowOffset: { width: 0, height: 10 }, elevation: 9 },
   dkd_primary_button_text: { color: '#FFFFFF', fontSize: 15, fontWeight: '900', letterSpacing: 0.2 },
   dkd_disabled_button: { opacity: 0.58 },
-  dkd_sms_otp_card: { marginTop: 14, borderRadius: 24, overflow: 'hidden', padding: 13, borderWidth: 1, borderColor: 'rgba(140,242,255,0.22)', backgroundColor: 'rgba(15,23,42,0.58)' },
-  dkd_sms_otp_header_row: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  dkd_sms_otp_icon_shell: { width: 38, height: 38, borderRadius: 14, alignItems: 'center', justifyContent: 'center', backgroundColor: '#9AF8FF' },
-  dkd_sms_otp_copy: { flex: 1 },
-  dkd_sms_otp_kicker: { color: '#72FFBF', fontSize: 10, fontWeight: '900', letterSpacing: 1.1 },
-  dkd_sms_otp_title: { color: '#FFFFFF', fontSize: 15, fontWeight: '900', marginTop: 1 },
-  dkd_sms_otp_note: { color: 'rgba(231,241,255,0.72)', fontSize: 11.5, lineHeight: 16, fontWeight: '700', marginTop: 9 },
-  dkd_sms_otp_input_row: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 10 },
-  dkd_sms_otp_input_shell: { flex: 1, minHeight: 50, marginTop: 0 },
-  dkd_sms_otp_code_shell: { flex: 1, minHeight: 50, marginTop: 0 },
-  dkd_sms_otp_small_button: { minHeight: 50, borderRadius: 17, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 12, backgroundColor: 'rgba(140,242,255,0.18)', borderWidth: 1, borderColor: 'rgba(140,242,255,0.26)' },
-  dkd_sms_otp_small_button_text: { color: '#BAF6FF', fontSize: 11, fontWeight: '900' },
-  dkd_sms_otp_verify_button: { minHeight: 50, borderRadius: 17, alignItems: 'center', justifyContent: 'center', flexDirection: 'row', gap: 6, paddingHorizontal: 13, backgroundColor: '#72FFBF' },
-  dkd_sms_otp_verify_button_text: { color: '#061427', fontSize: 12, fontWeight: '900' },
   dkd_auth_action_row: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 10, marginTop: 14 },
   dkd_link_button: { paddingVertical: 10, paddingHorizontal: 4 },
   dkd_link_text: { color: '#BAF6FF', fontSize: 13, fontWeight: '900' },

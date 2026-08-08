@@ -137,7 +137,7 @@ function IdentityRow({ row, suffix, compact = false }) {
       </LinearGradient>
       <View style={{ flex: 1, minWidth: 0 }}>
         <Text style={[dkd_styles.rowTitle, compact && dkd_styles.rowTitleCompact]} numberOfLines={1}>{row?.nickname || 'Oyuncu'}</Text>
-        <Text style={dkd_styles.rowSub} numberOfLines={1}>#{padDBGId(row?.dbg_id)} • Lvl {formatNum(row?.level || 1)} • {String(row?.rank_key || 'rookie').toUpperCase()}</Text>
+        <Text style={dkd_styles.rowSub} numberOfLines={1}>#{padDBGId(row?.dbg_id)}</Text>
         {!!suffix ? <Text style={dkd_styles.rowMeta} numberOfLines={2}>{suffix}</Text> : null}
       </View>
     </View>
@@ -418,7 +418,7 @@ export default function DBGHubModal({ visible, onClose, sessionUserId, profile, 
 
                     <View style={{ flex: 1, minWidth: 0 }}>
                       <Text style={dkd_styles.chatHeroTitle}>{activeChat?.nickname || 'Oyuncu'}</Text>
-                      <Text style={dkd_styles.chatHeroSub}>DBG_ID #{padDBGId(activeChat?.dbg_id)} • Lvl {formatNum(activeChat?.level || 1)} • {String(activeChat?.rank_key || 'rookie').toUpperCase()}</Text>
+                      <Text style={dkd_styles.chatHeroSub}>DBG_ID #{padDBGId(activeChat?.dbg_id)}</Text>
                       <View style={dkd_styles.chatHeroMetaRow}>
                         <PresencePill row={activeChat} />
                         <View style={dkd_styles.heroMetaPill}><Text style={dkd_styles.heroMetaPillText}>{messagesLoading ? 'senkron' : dkd_moderation_saving_value ? 'güvenlik' : 'hazır'}</Text></View>

@@ -116,8 +116,6 @@ function dkd_normalize_shipment_rows(dkd_rows_value) {
     dropoff_lng: dkd_to_number_or_null(dkd_row_value?.dropoff_lng),
     courier_fee_tl: dkd_to_number_or_null(dkd_row_value?.courier_fee_tl) ?? dkd_to_number_or_null(dkd_row_value?.fee_tl) ?? 0,
     customer_charge_tl: dkd_to_number_or_null(dkd_row_value?.customer_charge_tl) ?? 0,
-    payment_status: dkd_row_value?.payment_status || '',
-    paid_at: dkd_row_value?.paid_at || null,
     package_content_text: dkd_row_value?.package_content_text || '',
     package_image_url: dkd_row_value?.package_image_url || '',
     pickup_proof_image_url: dkd_row_value?.pickup_proof_image_url || '',

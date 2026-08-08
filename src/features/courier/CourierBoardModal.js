@@ -19,7 +19,6 @@ import {
   dkd_unlock_courier_delivery_state_value,
   markCourierJobPickedUp
 } from '../../services/courierService';
-import { awardProfileXp } from '../../services/profileService';
 import { submitCourierApplication } from '../../services/courierApplicationService';
 import { deleteAdminCourierJob } from '../../services/adminService';
 import { supabase } from '../../lib/supabase';

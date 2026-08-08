@@ -730,7 +730,7 @@ export async function completeCourierJob(dkd_job_id_value) {
   if (!dkd_has_successful_complete_payload_value(dkd_complete_result_value?.data)) {
     return {
       data: dkd_complete_result_value?.data ?? null,
-      error: new Error('Teslimat Supabase tarafından tamamlanmadı. Güncel kurye kazancı-Cüzdan TL SQL dosyasını çalıştırıp tekrar dene.'),
+      error: new Error('Teslimat Supabase tarafından tamamlanmadı. Kurye teslimat RPC yapılandırmasını kontrol edip tekrar dene.'),
     };
   }
 
