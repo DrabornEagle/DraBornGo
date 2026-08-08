@@ -1,0 +1,26 @@
+name: DKD v0.0.7 Cleanup Inventory
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/dkd_v007_cleanup_inventory.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  inventory:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Legacy feature file inventory
+        shell: bash
+        run: |
+          echo '=== MATCHING PATHS ==='
+          find src supabase web scripts -type f 2>/dev/null | sort | grep -Ei '(daily.?reward|reward|energy|wallet|payment|balance|bakiye|puan|point|collection|chest|sandik|sandık|task|mission|leaderboard|progression|achievement|boss|shard|craft|player.?card|iletimerkezi|sms|payout)' || true
+          echo '=== MATCHING SOURCE REFERENCES ==='
+          grep -RIlE '(daily.?reward|Günlük Ödül|Günlük Giriş|energy|Enerji|wallet|Cüzdan|Bakiye|dkd_puan|Özel Kart|boss_tickets|collection|Koleksiyon|chest|sandık|Sandık|Görev|task_state|weekly_task|\bXP\b|\bLVL\b|\bLvl\b|rank_key|Oyuncu Kartı|iletimerkezi|İLETİ MERKEZİ|SMS Doğrulama)' src supabase web scripts 2>/dev/null | sort || true
+          echo '=== DIRECT IMPORT REFERENCES ==='
+          grep -RInE '(useEnergyState|useDailyRewardState|useTaskProgress|useCollectionActions|useChestActions|walletService|dkd_wallet_topup|DailyRewardModal|CollectionModal|ChestModal|TasksModal|SocialPlayerCardModal|SocialCompareModal|normalizeProgression|dkd_iletimerkezi_otp)' src 2>/dev/null || true
