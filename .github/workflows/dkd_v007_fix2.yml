@@ -1,0 +1,45 @@
+name: DKD v0.0.7 Cleanup Pass Two
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/dkd_v007_fix2.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply pass two
+        run: python3 scripts/dkd_v007_fix2.py
+      - name: Install
+        run: npm install --no-package-lock
+      - name: Expo Android export validation
+        shell: bash
+        run: |
+          set +e
+          npx expo export --platform android --output-dir /tmp/dkd-v007-export > /tmp/dkd_export2.log 2>&1
+          DKD_EXPORT_CODE=$?
+          {
+            echo "DKD v0.0.7 PASS TWO VALIDATION"
+            echo "expo_export_android_code=$DKD_EXPORT_CODE"
+            echo
+            echo "=== EXPO EXPORT LOG TAIL ==="
+            tail -n 180 /tmp/dkd_export2.log
+            echo
+            echo "=== LEGACY SOURCE REFERENCES ==="
+            grep -RInE '(DKD_DraBornGo_v0\.0\.[0-6]|DailyReward|daily_reward|Günlük Giriş Ödülü|Günlük Ödül|\bEnerji\b|energy_max|dkd_puan|\bCüzdan\b|wallet_tl|courier_wallet_tl|merchant_wallet_tl|boss_tickets|Özel Kart|Harita=Sandıklar|\bSandıklar\b|\bKoleksiyon\b|CollectionModal|ChestModal|useChestActions|useCollectionActions|useTaskProgress|\bXP\b|\bLVL\b|\bLvl\b|rank_key|Oyuncu Kartı|İLETİ MERKEZİ SMS|dkd_iletimerkezi|sms_otp|DkdWalletPaymentMethodModal|payment_status|Ödeme Onayı|Ödeme Yöntemi)' src web supabase --exclude='20260808_dkd_v0_0_7_remove_legacy_game_economy_sms.sql' 2>/dev/null || true
+            echo
+            echo "=== REMOVED IMPORT TARGETS ==="
+            grep -RInE '(features/(dailyReward|chest|collection|tasks|payment)|useDailyRewardState|useEnergyState|awardProfileXp|utils/(geo|text)|constants/game)' src 2>/dev/null || true
+          } > dkd_v007_validation2.txt
+          exit 0
+      - name: Commit result
+        shell: bash
+        run: |
+          git config user.name 'DraBornGo v0.0.7 Bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add -A
+          git commit -m 'DraBornGo v0.0.7 finish legacy feature cleanup pass two'
+          git push origin HEAD:main
