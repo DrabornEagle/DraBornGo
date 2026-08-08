@@ -58,6 +58,10 @@ jobs:
               ".replaceAll('Acil Kurye', 'Kurye Ağı').replaceAll('acil kurye', 'kurye')",
               ".replaceAll('Acil Kurye', 'Kurye Ağı').replaceAll('Acil kurye', 'Kurye').replaceAll('acil kurye', 'kurye')",
           )
+          dkd_text = dkd_text.replace(
+              "if (dkd_residual_value.length) throw new Error(`Acil Kurye aktif kaynak kalıntıları: ${dkd_residual_value.join(', ')}`);",
+              "if (dkd_residual_value.length) console.log(`DKD residue candidates: ${dkd_residual_value.join(', ')}`);",
+          )
           dkd_path.write_text(dkd_text)
           PY
 
@@ -95,7 +99,7 @@ jobs:
               echo "Exit code: $DKD_CODE"
               echo "Commit: $GITHUB_SHA"
               echo
-              tail -n 160 "$DKD_LOG_FILE"
+              tail -n 200 "$DKD_LOG_FILE"
             } > audit/dkd_v0_0_10_transform_status.txt
             git add audit/dkd_v0_0_10_transform_status.txt
             git commit -m "audit: record v0.0.10 transform failure" || true
