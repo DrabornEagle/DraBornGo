@@ -2,7 +2,7 @@
   "expo": {
     "name": "DraBornGo",
     "slug": "draborngo",
-    "version": "0.0.7",
+    "version": "0.0.8",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "draborngo",
@@ -25,7 +25,7 @@
           "apiKey": "AIzaSyDznPFvHQMVOqdJhPPyJ4jkqQINUUymcpY"
         }
       },
-      "versionCode": 7,
+      "versionCode": 8,
       "permissions": [
         "android.permission.ACCESS_COARSE_LOCATION",
         "android.permission.ACCESS_FINE_LOCATION",
@@ -86,7 +86,7 @@
     },
     "owner": "draborneagle",
     "androidStatusBar": {
-      "backgroundColor": "#000000",
+      "backgroundColor": "#02050B",
       "barStyle": "light-content",
       "translucent": false
     }
