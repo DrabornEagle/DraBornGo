@@ -3,15 +3,259 @@ import { Alert, Modal, Pressable, ScrollView, Text, TextInput, View } from 'reac
 import { supabase } from '../lib/supabase';
 import dkd_styles_value from './dkd_courier_styles';
 import { dkd_palette_value } from './dkd_courier_theme';
-import { dkd_badge_value, dkd_modal_head_value, dkd_panel_title_value } from './dkd_courier_ui';
+import {
+  dkd_badge_value,
+  dkd_modal_head_value,
+  dkd_panel_title_value,
+} from './dkd_courier_ui';
+
 const dkd_e_value = React.createElement;
 
-function dkd_applications_modal_value({ dkd_visible_value, dkd_session_value, dkd_profile_value, dkd_on_close_value }) {
+function dkd_applications_modal_value({
+  dkd_visible_value,
+  dkd_session_value,
+  dkd_profile_value,
+  dkd_on_close_value,
+}) {
   const dkd_user_id_value = String(dkd_session_value?.user?.id || '');
-  const [dkd_rows_value, dkd_set_rows_value] = useState([]); const [dkd_logistics_rows_value, dkd_set_logistics_rows_value] = useState([]); const [dkd_city_value, dkd_set_city_value] = useState(''); const [dkd_zone_value, dkd_set_zone_value] = useState(''); const [dkd_vehicle_value, dkd_set_vehicle_value] = useState('moto'); const [dkd_busy_value, dkd_set_busy_value] = useState(false);
-  const dkd_load_value = useCallback(async () => { if (!dkd_user_id_value) return; const [dkd_courier_value, dkd_logistics_value] = await Promise.all([supabase.from('dkd_courier_license_applications').select('id,city,zone,vehicle_type,status,created_at').eq('user_id', dkd_user_id_value).order('created_at', { ascending: false }).limit(10), supabase.from('dkd_logistics_applications').select('id,dkd_application_type,dkd_status,dkd_city,dkd_district,dkd_created_at').eq('user_id', dkd_user_id_value).order('dkd_created_at', { ascending: false }).limit(10)]); if (!dkd_courier_value?.error) dkd_set_rows_value(Array.isArray(dkd_courier_value.data) ? dkd_courier_value.data : []); if (!dkd_logistics_value?.error) dkd_set_logistics_rows_value(Array.isArray(dkd_logistics_value.data) ? dkd_logistics_value.data : []); }, [dkd_user_id_value]);
-  useEffect(() => { if (!dkd_visible_value) return; dkd_set_city_value(String(dkd_profile_value?.dkd_city || dkd_profile_value?.courier_city || 'Antalya')); dkd_set_zone_value(String(dkd_profile_value?.dkd_region || dkd_profile_value?.courier_zone || '')); dkd_load_value(); }, [dkd_load_value, dkd_profile_value, dkd_visible_value]);
-  const dkd_submit_value = async () => { if (!dkd_user_id_value) return; dkd_set_busy_value(true); const dkd_response_value = await supabase.from('dkd_courier_license_applications').insert({ user_id: dkd_user_id_value, dkd_country: String(dkd_profile_value?.dkd_country || 'Türkiye'), city: String(dkd_city_value || '').trim(), zone: String(dkd_zone_value || '').trim(), vehicle_type: String(dkd_vehicle_value || 'moto').trim(), status: 'pending', email: String(dkd_session_value?.user?.email || '') }); dkd_set_busy_value(false); if (dkd_response_value?.error) return Alert.alert('Başvuru', String(dkd_response_value.error.message || dkd_response_value.error)); Alert.alert('Başvuru', 'Kurye başvurun kaydedildi.'); dkd_load_value(); };
-  return dkd_e_value(Modal, { visible: Boolean(dkd_visible_value), animationType: 'slide', onRequestClose: dkd_on_close_value }, dkd_e_value(View, { style: dkd_styles_value.dkd_modal_root_value }, dkd_modal_head_value('Başvuru Merkezi', 'Kurye ve lojistik durumları', dkd_on_close_value, dkd_palette_value.dkd_orange_value, 'document-text-outline'), dkd_e_value(ScrollView, { contentContainerStyle: dkd_styles_value.dkd_modal_content_value, keyboardShouldPersistTaps: 'handled' }, dkd_e_value(View, { style: dkd_styles_value.dkd_form_card_value }, dkd_panel_title_value('bicycle-outline', 'Kurye Başvurusu', dkd_palette_value.dkd_orange_value), dkd_e_value(Text, { style: dkd_styles_value.dkd_form_label_value }, 'ŞEHİR'), dkd_e_value(TextInput, { value: dkd_city_value, onChangeText: dkd_set_city_value, style: dkd_styles_value.dkd_input_value, placeholder: 'Şehir', placeholderTextColor: '#667A91' }), dkd_e_value(Text, { style: dkd_styles_value.dkd_form_label_value }, 'İLÇE / BÖLGE'), dkd_e_value(TextInput, { value: dkd_zone_value, onChangeText: dkd_set_zone_value, style: dkd_styles_value.dkd_input_value, placeholder: 'Bölge', placeholderTextColor: '#667A91' }), dkd_e_value(Text, { style: dkd_styles_value.dkd_form_label_value }, 'ARAÇ TİPİ'), dkd_e_value(TextInput, { value: dkd_vehicle_value, onChangeText: dkd_set_vehicle_value, style: dkd_styles_value.dkd_input_value, placeholder: 'moto', placeholderTextColor: '#667A91' }), dkd_e_value(Pressable, { disabled: dkd_busy_value, onPress: dkd_submit_value, style: [dkd_styles_value.dkd_primary_value, { backgroundColor: dkd_palette_value.dkd_orange_value }] }, dkd_e_value(Text, { style: dkd_styles_value.dkd_primary_text_value }, dkd_busy_value ? 'KAYDEDİLİYOR…' : 'BAŞVURUYU GÖNDER'))), dkd_e_value(Text, { style: dkd_styles_value.dkd_section_label_value }, 'KURYE BAŞVURU GEÇMİŞİ'), dkd_rows_value.length ? dkd_rows_value.map((dkd_row_value) => dkd_e_value(View, { key: 'courier-' + String(dkd_row_value.id), style: dkd_styles_value.dkd_simple_card_value }, dkd_panel_title_value('bicycle-outline', String(dkd_row_value.vehicle_type || 'Kurye'), dkd_palette_value.dkd_orange_value), dkd_e_value(Text, { style: dkd_styles_value.dkd_panel_body_value }, [dkd_row_value.city, dkd_row_value.zone].filter(Boolean).join(' • ')), dkd_badge_value(String(dkd_row_value.status || 'pending').toUpperCase(), dkd_palette_value.dkd_orange_value))) : dkd_e_value(Text, { style: dkd_styles_value.dkd_empty_text_value }, 'Kayıt yok.'), dkd_e_value(Text, { style: dkd_styles_value.dkd_section_label_value }, 'LOJİSTİK BAŞVURULARI'), dkd_logistics_rows_value.length ? dkd_logistics_rows_value.map((dkd_row_value) => dkd_e_value(View, { key: 'logistics-' + String(dkd_row_value.id), style: dkd_styles_value.dkd_simple_card_value }, dkd_panel_title_value('car-outline', String(dkd_row_value.dkd_application_type || 'Lojistik'), dkd_palette_value.dkd_blue_value), dkd_e_value(Text, { style: dkd_styles_value.dkd_panel_body_value }, [dkd_row_value.dkd_city, dkd_row_value.dkd_district].filter(Boolean).join(' • ')), dkd_badge_value(String(dkd_row_value.dkd_status || 'pending').toUpperCase(), dkd_palette_value.dkd_blue_value))) : dkd_e_value(Text, { style: dkd_styles_value.dkd_empty_text_value }, 'Lojistik başvurusu yok.')))));
+
+  const [dkd_rows_value, dkd_set_rows_value] = useState([]);
+  const [dkd_logistics_rows_value, dkd_set_logistics_rows_value] = useState([]);
+  const [dkd_city_value, dkd_set_city_value] = useState('');
+  const [dkd_zone_value, dkd_set_zone_value] = useState('');
+  const [dkd_vehicle_value, dkd_set_vehicle_value] = useState('moto');
+  const [dkd_busy_value, dkd_set_busy_value] = useState(false);
+
+  const dkd_load_value = useCallback(async () => {
+    if (!dkd_user_id_value) return;
+
+    const [dkd_courier_value, dkd_logistics_value] = await Promise.all([
+      supabase
+        .from('dkd_courier_license_applications')
+        .select('id,city,zone,vehicle_type,status,created_at')
+        .eq('user_id', dkd_user_id_value)
+        .order('created_at', { ascending: false })
+        .limit(10),
+      supabase
+        .from('dkd_logistics_applications')
+        .select('id,dkd_application_type,dkd_status,dkd_city,dkd_district,dkd_created_at')
+        .eq('user_id', dkd_user_id_value)
+        .order('dkd_created_at', { ascending: false })
+        .limit(10),
+    ]);
+
+    if (!dkd_courier_value?.error) {
+      dkd_set_rows_value(
+        Array.isArray(dkd_courier_value.data) ? dkd_courier_value.data : [],
+      );
+    }
+
+    if (!dkd_logistics_value?.error) {
+      dkd_set_logistics_rows_value(
+        Array.isArray(dkd_logistics_value.data) ? dkd_logistics_value.data : [],
+      );
+    }
+  }, [dkd_user_id_value]);
+
+  useEffect(() => {
+    if (!dkd_visible_value) return;
+
+    dkd_set_city_value(
+      String(dkd_profile_value?.dkd_city || dkd_profile_value?.courier_city || 'Antalya'),
+    );
+    dkd_set_zone_value(
+      String(dkd_profile_value?.dkd_region || dkd_profile_value?.courier_zone || ''),
+    );
+    dkd_load_value();
+  }, [dkd_load_value, dkd_profile_value, dkd_visible_value]);
+
+  const dkd_submit_value = async () => {
+    if (!dkd_user_id_value) return;
+
+    dkd_set_busy_value(true);
+    const dkd_response_value = await supabase
+      .from('dkd_courier_license_applications')
+      .insert({
+        user_id: dkd_user_id_value,
+        dkd_country: String(dkd_profile_value?.dkd_country || 'Türkiye'),
+        city: String(dkd_city_value || '').trim(),
+        zone: String(dkd_zone_value || '').trim(),
+        vehicle_type: String(dkd_vehicle_value || 'moto').trim(),
+        status: 'pending',
+        email: String(dkd_session_value?.user?.email || ''),
+      });
+    dkd_set_busy_value(false);
+
+    if (dkd_response_value?.error) {
+      return Alert.alert(
+        'Başvuru',
+        String(dkd_response_value.error.message || dkd_response_value.error),
+      );
+    }
+
+    Alert.alert('Başvuru', 'Kurye başvurun kaydedildi.');
+    dkd_load_value();
+  };
+
+  const dkd_form_value = dkd_e_value(
+    View,
+    { style: dkd_styles_value.dkd_form_card_value },
+    dkd_panel_title_value(
+      'bicycle-outline',
+      'Kurye Başvurusu',
+      dkd_palette_value.dkd_orange_value,
+    ),
+    dkd_e_value(Text, { style: dkd_styles_value.dkd_form_label_value }, 'ŞEHİR'),
+    dkd_e_value(TextInput, {
+      value: dkd_city_value,
+      onChangeText: dkd_set_city_value,
+      style: dkd_styles_value.dkd_input_value,
+      placeholder: 'Şehir',
+      placeholderTextColor: '#667A91',
+    }),
+    dkd_e_value(Text, { style: dkd_styles_value.dkd_form_label_value }, 'İLÇE / BÖLGE'),
+    dkd_e_value(TextInput, {
+      value: dkd_zone_value,
+      onChangeText: dkd_set_zone_value,
+      style: dkd_styles_value.dkd_input_value,
+      placeholder: 'Bölge',
+      placeholderTextColor: '#667A91',
+    }),
+    dkd_e_value(Text, { style: dkd_styles_value.dkd_form_label_value }, 'ARAÇ TİPİ'),
+    dkd_e_value(TextInput, {
+      value: dkd_vehicle_value,
+      onChangeText: dkd_set_vehicle_value,
+      style: dkd_styles_value.dkd_input_value,
+      placeholder: 'moto',
+      placeholderTextColor: '#667A91',
+    }),
+    dkd_e_value(
+      Pressable,
+      {
+        disabled: dkd_busy_value,
+        onPress: dkd_submit_value,
+        style: [
+          dkd_styles_value.dkd_primary_value,
+          { backgroundColor: dkd_palette_value.dkd_orange_value },
+        ],
+      },
+      dkd_e_value(
+        Text,
+        { style: dkd_styles_value.dkd_primary_text_value },
+        dkd_busy_value ? 'KAYDEDİLİYOR…' : 'BAŞVURUYU GÖNDER',
+      ),
+    ),
+  );
+
+  const dkd_courier_cards_value = dkd_rows_value.map((dkd_row_value) =>
+    dkd_e_value(
+      View,
+      {
+        key: 'courier-' + String(dkd_row_value.id),
+        style: dkd_styles_value.dkd_simple_card_value,
+      },
+      dkd_panel_title_value(
+        'bicycle-outline',
+        String(dkd_row_value.vehicle_type || 'Kurye'),
+        dkd_palette_value.dkd_orange_value,
+      ),
+      dkd_e_value(
+        Text,
+        { style: dkd_styles_value.dkd_panel_body_value },
+        [dkd_row_value.city, dkd_row_value.zone].filter(Boolean).join(' • '),
+      ),
+      dkd_badge_value(
+        String(dkd_row_value.status || 'pending').toUpperCase(),
+        dkd_palette_value.dkd_orange_value,
+      ),
+    ),
+  );
+
+  const dkd_logistics_cards_value = dkd_logistics_rows_value.map((dkd_row_value) =>
+    dkd_e_value(
+      View,
+      {
+        key: 'logistics-' + String(dkd_row_value.id),
+        style: dkd_styles_value.dkd_simple_card_value,
+      },
+      dkd_panel_title_value(
+        'car-outline',
+        String(dkd_row_value.dkd_application_type || 'Lojistik'),
+        dkd_palette_value.dkd_blue_value,
+      ),
+      dkd_e_value(
+        Text,
+        { style: dkd_styles_value.dkd_panel_body_value },
+        [dkd_row_value.dkd_city, dkd_row_value.dkd_district]
+          .filter(Boolean)
+          .join(' • '),
+      ),
+      dkd_badge_value(
+        String(dkd_row_value.dkd_status || 'pending').toUpperCase(),
+        dkd_palette_value.dkd_blue_value,
+      ),
+    ),
+  );
+
+  const dkd_courier_content_value = dkd_rows_value.length
+    ? dkd_courier_cards_value
+    : [
+        dkd_e_value(
+          Text,
+          { key: 'courier-empty', style: dkd_styles_value.dkd_empty_text_value },
+          'Kayıt yok.',
+        ),
+      ];
+
+  const dkd_logistics_content_value = dkd_logistics_rows_value.length
+    ? dkd_logistics_cards_value
+    : [
+        dkd_e_value(
+          Text,
+          { key: 'logistics-empty', style: dkd_styles_value.dkd_empty_text_value },
+          'Lojistik başvurusu yok.',
+        ),
+      ];
+
+  return dkd_e_value(
+    Modal,
+    {
+      visible: Boolean(dkd_visible_value),
+      animationType: 'slide',
+      onRequestClose: dkd_on_close_value,
+    },
+    dkd_e_value(
+      View,
+      { style: dkd_styles_value.dkd_modal_root_value },
+      dkd_modal_head_value(
+        'Başvuru Merkezi',
+        'Kurye ve lojistik durumları',
+        dkd_on_close_value,
+        dkd_palette_value.dkd_orange_value,
+        'document-text-outline',
+      ),
+      dkd_e_value(
+        ScrollView,
+        {
+          contentContainerStyle: dkd_styles_value.dkd_modal_content_value,
+          keyboardShouldPersistTaps: 'handled',
+        },
+        dkd_form_value,
+        dkd_e_value(
+          Text,
+          { style: dkd_styles_value.dkd_section_label_value },
+          'KURYE BAŞVURU GEÇMİŞİ',
+        ),
+        ...dkd_courier_content_value,
+        dkd_e_value(
+          Text,
+          { style: dkd_styles_value.dkd_section_label_value },
+          'LOJİSTİK BAŞVURULARI',
+        ),
+        ...dkd_logistics_content_value,
+      ),
+    ),
+  );
 }
+
 export { dkd_applications_modal_value };
