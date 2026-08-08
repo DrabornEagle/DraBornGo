@@ -1,16 +1,24 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, Alert, Animated, Easing, Pressable, ScrollView, Text, View } from 'react-native';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  ActivityIndicator,
+  Alert,
+  Modal,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Ionicons } from '@expo/vector-icons';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import dkd_safe_screen_value from '../components/layout/dkd_safe_screen';
 import dkd_racing_motorcycle_value from '../components/dkd_racing_motorcycle';
 import { supabase } from '../lib/supabase';
 import dkd_dbg_hub_modal_value from '../features/social/dkd_dbg_hub_modal';
-import dkd_styles_value from './dkd_courier_styles';
-import { dkd_color_alpha_value, dkd_local_avatar_key_prefix_value, dkd_palette_value } from './dkd_courier_theme';
-import { dkd_badge_value, dkd_haptic_value, dkd_metric_value, dkd_motion_pressable_value, dkd_profile_avatar_value, dkd_pulse_value, dkd_scan_line_value } from './dkd_courier_ui';
-import { dkd_change_courier_online_value, dkd_quick_tile_value } from './dkd_courier_actions';
+import { dkd_local_avatar_key_prefix_value } from './dkd_courier_theme';
+import { dkd_haptic_value, dkd_profile_avatar_value } from './dkd_courier_ui';
+import { dkd_change_courier_online_value } from './dkd_courier_actions';
 import { dkd_profile_modal_value } from './dkd_profile_modal';
 import { dkd_courier_modal_value } from './dkd_courier_modal';
 import { dkd_service_modal_value } from './dkd_service_modal';
@@ -18,7 +26,97 @@ import { dkd_applications_modal_value } from './dkd_applications_modal';
 import { dkd_policy_modal_value, dkd_help_modal_value } from './dkd_policy_help_modals';
 import { dkd_admin_modal_value } from './dkd_admin_modal';
 
-const dkd_e_value = React.createElement;
+function dkd_icon_value(dkd_name_value, dkd_size_value, dkd_color_value) {
+  return React.createElement(MaterialCommunityIcons, {
+    name: dkd_name_value,
+    size: dkd_size_value,
+    color: dkd_color_value,
+  });
+}
+
+function dkd_status_dot_value({ dkd_active_value }) {
+  return (
+    <View
+      style={[
+        dkd_styles_value.dkd_status_dot_value,
+        { backgroundColor: dkd_active_value ? '#56F2B0' : '#FFD166' },
+      ]}
+    />
+  );
+}
+
+function dkd_operation_card_value({
+  dkd_kind_value,
+  dkd_title_value,
+  dkd_body_value,
+  dkd_on_press_value,
+  dkd_active_value = false,
+}) {
+  const dkd_courier_value = dkd_kind_value === 'courier';
+  const dkd_accent_value = dkd_courier_value ? '#6DE9FF' : '#57F2AC';
+  const dkd_gradient_value = dkd_courier_value
+    ? ['#0D3151', '#17275B', '#351846']
+    : ['#12372A', '#0A5362', '#4826C5'];
+
+  return (
+    <Pressable onPress={dkd_on_press_value} style={dkd_styles_value.dkd_operation_press_value}>
+      <LinearGradient colors={dkd_gradient_value} style={dkd_styles_value.dkd_operation_value}>
+        <View style={dkd_styles_value.dkd_operation_top_value}>
+          <View style={dkd_styles_value.dkd_operation_icons_value}>
+            {dkd_courier_value ? (
+              React.createElement(dkd_racing_motorcycle_value, {
+                dkd_color_value: '#6DE9FF',
+                dkd_size_value: 86,
+              })
+            ) : (
+              <View style={dkd_styles_value.dkd_service_icon_cluster_value}>
+                {dkd_icon_value('storefront-outline', 25, '#8CF3C7')}
+                {dkd_icon_value('silverware-fork-knife', 23, '#FFD66E')}
+                {dkd_icon_value('truck-delivery-outline', 23, '#FF8E91')}
+                {dkd_icon_value('wrench-outline', 23, '#7FCBFF')}
+              </View>
+            )}
+          </View>
+          <View style={[dkd_styles_value.dkd_operation_tag_value, { borderColor: dkd_accent_value + '66' }]}>
+            {dkd_icon_value(dkd_courier_value ? 'timer-outline' : 'access-point', 14, dkd_accent_value)}
+            <Text style={[dkd_styles_value.dkd_operation_tag_text_value, { color: dkd_accent_value }]}>
+              {dkd_courier_value ? (dkd_active_value ? 'AKTİF' : 'KURYE') : 'HİZMET'}
+            </Text>
+          </View>
+        </View>
+        <Text style={dkd_styles_value.dkd_operation_title_value}>{dkd_title_value}</Text>
+        <Text style={dkd_styles_value.dkd_operation_body_value}>{dkd_body_value}</Text>
+        <View style={dkd_styles_value.dkd_operation_footer_value}>
+          <Text style={[dkd_styles_value.dkd_operation_open_value, { color: dkd_accent_value }]}>MERKEZİ AÇ</Text>
+          {dkd_icon_value('arrow-right', 25, dkd_accent_value)}
+        </View>
+      </LinearGradient>
+    </Pressable>
+  );
+}
+
+function dkd_quick_tile_value({
+  dkd_title_value,
+  dkd_subtitle_value,
+  dkd_icon_value: dkd_icon_name_value,
+  dkd_accent_value,
+  dkd_on_press_value,
+}) {
+  return (
+    <Pressable onPress={dkd_on_press_value} style={dkd_styles_value.dkd_quick_tile_value}>
+      <View style={[dkd_styles_value.dkd_quick_top_line_value, { backgroundColor: dkd_accent_value }]} />
+      <View style={[dkd_styles_value.dkd_quick_icon_shell_value, { backgroundColor: dkd_accent_value + '16' }]}>
+        {dkd_icon_value(dkd_icon_name_value, 31, dkd_accent_value)}
+      </View>
+      <Text style={dkd_styles_value.dkd_quick_title_value}>{dkd_title_value}</Text>
+      <Text style={dkd_styles_value.dkd_quick_subtitle_value}>{dkd_subtitle_value}</Text>
+      <View style={dkd_styles_value.dkd_quick_footer_value}>
+        <Text style={[dkd_styles_value.dkd_quick_open_value, { color: dkd_accent_value }]}>AÇ</Text>
+        {dkd_icon_value('arrow-right', 24, dkd_accent_value)}
+      </View>
+    </Pressable>
+  );
+}
 
 export default function dkd_courier_flow_v2_value({ dkd_session_value, dkd_on_signed_out_value }) {
   const dkd_user_id_value = String(dkd_session_value?.user?.id || '');
@@ -26,10 +124,9 @@ export default function dkd_courier_flow_v2_value({ dkd_session_value, dkd_on_si
   const [dkd_loading_value, dkd_set_loading_value] = useState(true);
   const [dkd_is_admin_value, dkd_set_is_admin_value] = useState(false);
   const [dkd_modal_value, dkd_set_modal_value] = useState('');
+  const [dkd_menu_visible_value, dkd_set_menu_visible_value] = useState(false);
   const [dkd_local_avatar_uri_value, dkd_set_local_avatar_uri_value] = useState('');
   const [dkd_home_toggle_busy_value, dkd_set_home_toggle_busy_value] = useState(false);
-  const dkd_float_value = useRef(new Animated.Value(0)).current;
-  const dkd_ambient_value = useRef(new Animated.Value(0)).current;
 
   const dkd_load_value = useCallback(async () => {
     if (!dkd_user_id_value) return;
@@ -38,20 +135,25 @@ export default function dkd_courier_flow_v2_value({ dkd_session_value, dkd_on_si
       supabase.from('dkd_profiles').select('*').eq('user_id', dkd_user_id_value).maybeSingle(),
       supabase.from('dkd_admin_users').select('user_id,role_key').eq('user_id', dkd_user_id_value).maybeSingle(),
     ]);
+
     if (dkd_profile_response_value?.error) {
       Alert.alert('DraBornGo', String(dkd_profile_response_value.error.message || dkd_profile_response_value.error));
     } else {
       let dkd_next_profile_value = dkd_profile_response_value.data || null;
       if (!dkd_next_profile_value) {
         const dkd_metadata_value = dkd_session_value?.user?.user_metadata || {};
-        const dkd_insert_response_value = await supabase.from('dkd_profiles').insert({
-          user_id: dkd_user_id_value,
-          nickname: String(dkd_metadata_value.dkd_username || dkd_metadata_value.dkd_full_name || 'DraBornGo').slice(0, 40),
-          avatar_emoji: '🦅',
-          dkd_country: String(dkd_metadata_value.dkd_country || 'Türkiye'),
-          dkd_city: String(dkd_metadata_value.dkd_city || 'Antalya'),
-          dkd_region: String(dkd_metadata_value.dkd_region || ''),
-        }).select('*').single();
+        const dkd_insert_response_value = await supabase
+          .from('dkd_profiles')
+          .insert({
+            user_id: dkd_user_id_value,
+            nickname: String(dkd_metadata_value.dkd_username || dkd_metadata_value.dkd_full_name || 'DraBornGo').slice(0, 40),
+            avatar_emoji: '🦅',
+            dkd_country: String(dkd_metadata_value.dkd_country || 'Türkiye'),
+            dkd_city: String(dkd_metadata_value.dkd_city || 'Antalya'),
+            dkd_region: String(dkd_metadata_value.dkd_region || ''),
+          })
+          .select('*')
+          .single();
         if (dkd_insert_response_value?.error) {
           Alert.alert('DraBornGo', String(dkd_insert_response_value.error.message || dkd_insert_response_value.error));
         } else {
@@ -60,11 +162,15 @@ export default function dkd_courier_flow_v2_value({ dkd_session_value, dkd_on_si
       }
       dkd_set_profile_value(dkd_next_profile_value);
     }
+
     dkd_set_is_admin_value(Boolean(dkd_admin_response_value?.data?.user_id));
     dkd_set_loading_value(false);
   }, [dkd_session_value, dkd_user_id_value]);
 
-  useEffect(() => { dkd_load_value(); }, [dkd_load_value]);
+  useEffect(() => {
+    dkd_load_value();
+  }, [dkd_load_value]);
+
   useEffect(() => {
     let dkd_active_value = true;
     AsyncStorage.getItem(dkd_local_avatar_key_prefix_value + (dkd_user_id_value || 'guest'))
@@ -72,193 +178,302 @@ export default function dkd_courier_flow_v2_value({ dkd_session_value, dkd_on_si
         if (dkd_active_value) dkd_set_local_avatar_uri_value(String(dkd_uri_value || '').trim());
       })
       .catch(() => {});
-    return () => { dkd_active_value = false; };
+    return () => {
+      dkd_active_value = false;
+    };
   }, [dkd_user_id_value]);
-  useEffect(() => {
-    const dkd_float_loop_value = Animated.loop(Animated.sequence([
-      Animated.timing(dkd_float_value, { toValue: 1, duration: 2200, easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
-      Animated.timing(dkd_float_value, { toValue: 0, duration: 2200, easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
-    ]));
-    const dkd_ambient_loop_value = Animated.loop(Animated.sequence([
-      Animated.timing(dkd_ambient_value, { toValue: 1, duration: 4200, easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
-      Animated.timing(dkd_ambient_value, { toValue: 0, duration: 4200, easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
-    ]));
-    dkd_float_loop_value.start();
-    dkd_ambient_loop_value.start();
-    return () => { dkd_float_loop_value.stop(); dkd_ambient_loop_value.stop(); };
-  }, [dkd_ambient_value, dkd_float_value]);
 
-  const dkd_sign_out_value = async () => {
+  async function dkd_sign_out_value() {
     const dkd_response_value = await supabase.auth.signOut();
-    if (dkd_response_value?.error) return Alert.alert('Çıkış', String(dkd_response_value.error.message || dkd_response_value.error));
+    if (dkd_response_value?.error) {
+      Alert.alert('Çıkış', String(dkd_response_value.error.message || dkd_response_value.error));
+      return;
+    }
     dkd_on_signed_out_value?.();
-  };
+  }
 
-  const dkd_toggle_home_online_value = async () => {
+  async function dkd_toggle_online_value() {
     const dkd_approved_value = String(dkd_profile_value?.courier_status || '') === 'approved';
-    if (!dkd_approved_value) return dkd_set_modal_value('applications');
+    if (!dkd_approved_value) {
+      dkd_set_modal_value('applications');
+      return;
+    }
     dkd_set_home_toggle_busy_value(true);
-    const dkd_result_value = await dkd_change_courier_online_value({ dkd_user_id_value, dkd_profile_value });
+    const dkd_result_value = await dkd_change_courier_online_value({
+      dkd_user_id_value,
+      dkd_profile_value,
+    });
     dkd_set_home_toggle_busy_value(false);
-    if (dkd_result_value?.dkd_permission_denied_value) return Alert.alert('Konum izni', 'Çevrimiçi olmak için uygulama açıkken konum izni gerekir.');
-    if (dkd_result_value?.dkd_error_value) return Alert.alert('Kurye', String(dkd_result_value.dkd_error_value.message || dkd_result_value.dkd_error_value));
+
+    if (dkd_result_value?.dkd_permission_denied_value) {
+      Alert.alert('Konum izni', 'Çevrimiçi olmak için yalnızca uygulama açıkken konum izni gerekir.');
+      return;
+    }
+    if (dkd_result_value?.dkd_error_value) {
+      Alert.alert('Kurye', String(dkd_result_value.dkd_error_value.message || dkd_result_value.dkd_error_value));
+      return;
+    }
     if (dkd_result_value?.dkd_data_value) {
       dkd_haptic_value('medium');
       dkd_set_profile_value(dkd_result_value.dkd_data_value);
     }
-  };
+  }
 
   const dkd_nickname_value = String(dkd_profile_value?.nickname || dkd_session_value?.user?.email || 'DraBornGo');
   const dkd_online_value = Boolean(dkd_profile_value?.dkd_courier_online);
   const dkd_approved_value = String(dkd_profile_value?.courier_status || '') === 'approved';
-  const dkd_avatar_uri_value = String(dkd_profile_value?.avatar_image_url || dkd_profile_value?.avatar_url || dkd_local_avatar_uri_value || '').trim();
-  const dkd_city_label_value = [dkd_profile_value?.dkd_city || dkd_profile_value?.courier_city, dkd_profile_value?.dkd_region || dkd_profile_value?.courier_zone].filter(Boolean).join(' / ') || 'Bölge seçilmedi';
-  const dkd_completed_jobs_value = Number(dkd_profile_value?.courier_completed_jobs || dkd_profile_value?.completed_jobs || 0);
-  const dkd_state_label_value = dkd_online_value ? 'ÇEVRİMİÇİ' : (dkd_approved_value ? 'HAZIR' : 'BAŞVURU GEREKİYOR');
-  const dkd_quick_tiles_value = useMemo(() => [
-    ['document-text-outline', 'Başvurular', 'Kurye ve lojistik', dkd_palette_value.dkd_orange_value, 'applications'],
-    ['chatbubbles-outline', 'Sohbet', 'Ekip ve arkadaşlar', dkd_palette_value.dkd_pink_value, 'chat'],
-    ['headset-outline', 'Destek', 'Hızlı yardım', dkd_palette_value.dkd_blue_value, 'help'],
-    ['shield-checkmark-outline', 'Gizlilik', 'İzinler ve hesap', dkd_palette_value.dkd_purple_value, 'policy'],
-  ], []);
+  const dkd_avatar_uri_value = String(
+    dkd_profile_value?.avatar_image_url || dkd_profile_value?.avatar_url || dkd_local_avatar_uri_value || '',
+  ).trim();
+  const dkd_city_label_value = [
+    dkd_profile_value?.dkd_city || dkd_profile_value?.courier_city,
+    dkd_profile_value?.dkd_region || dkd_profile_value?.courier_zone,
+  ].filter(Boolean).join(' / ') || 'Bölge seçilmedi';
 
-  const dkd_identity_card_value = dkd_e_value(dkd_motion_pressable_value, {
-    dkd_container_style_value: { width: '100%' },
-    dkd_pressable_style_value: dkd_styles_value.dkd_identity_pressable_value,
-    dkd_on_press_value: () => dkd_set_modal_value('profile'),
-    dkd_label_value: 'Profil',
-    dkd_children_value: dkd_e_value(LinearGradient, { colors: ['#0C2031', '#081522', '#06101A'], style: dkd_styles_value.dkd_identity_card_value },
-      dkd_e_value(View, { style: dkd_styles_value.dkd_identity_accent_value }),
-      dkd_e_value(dkd_profile_avatar_value, { dkd_uri_value: dkd_avatar_uri_value, dkd_emoji_value: dkd_profile_value?.avatar_emoji || '🦅', dkd_online_value, dkd_size_value: 72, dkd_on_error_value: () => dkd_set_local_avatar_uri_value('') }),
-      dkd_e_value(View, { style: dkd_styles_value.dkd_identity_copy_value },
-        dkd_e_value(View, { style: dkd_styles_value.dkd_brand_row_value }, dkd_e_value(Text, { style: dkd_styles_value.dkd_brand_value }, 'DraBornGo'), dkd_badge_value('v0.0.6', dkd_palette_value.dkd_gold_value)),
-        dkd_e_value(Text, { style: dkd_styles_value.dkd_name_value, numberOfLines: 1 }, dkd_nickname_value),
-        dkd_e_value(View, { style: dkd_styles_value.dkd_identity_status_row_value },
-          dkd_e_value(dkd_pulse_value, { dkd_color_value: dkd_online_value ? dkd_palette_value.dkd_green_value : dkd_palette_value.dkd_cyan_value, dkd_size_value: 6 }),
-          dkd_e_value(Text, { style: dkd_styles_value.dkd_identity_meta_value, numberOfLines: 1 }, dkd_state_label_value + ' • ' + dkd_city_label_value))),
-      dkd_e_value(View, { style: dkd_styles_value.dkd_profile_icon_button_value },
-        dkd_e_value(Ionicons, { name: 'person-outline', size: 22, color: dkd_palette_value.dkd_cyan_value }),
-        dkd_e_value(Text, { style: dkd_styles_value.dkd_profile_icon_text_value }, 'PROFİL'))),
-  });
+  const dkd_menu_rows_value = useMemo(() => {
+    const dkd_rows_value = [
+      ['account-circle-outline', 'Profil', 'profile'],
+      ['shield-check-outline', 'Gizlilik ve Güvenlik', 'policy'],
+      ['headset', 'Destek', 'help'],
+    ];
+    if (dkd_is_admin_value) dkd_rows_value.push(['cog-outline', 'Yönetim', 'admin']);
+    return dkd_rows_value;
+  }, [dkd_is_admin_value]);
 
-  const dkd_command_card_value = dkd_e_value(Animated.View, {
-    style: [dkd_styles_value.dkd_command_shell_value, { transform: [{ translateY: dkd_float_value.interpolate({ inputRange: [0, 1], outputRange: [0, -3] }) }] }],
-  }, dkd_e_value(LinearGradient, {
-    colors: dkd_online_value ? ['#0C3B31', '#0A2230', '#07111D'] : ['#0E3150', '#142049', '#081422'],
-    style: dkd_styles_value.dkd_command_center_value,
-  },
-  dkd_e_value(dkd_scan_line_value, { dkd_color_value: dkd_online_value ? dkd_palette_value.dkd_green_value : dkd_palette_value.dkd_cyan_value }),
-  dkd_e_value(View, { style: dkd_styles_value.dkd_command_top_value },
-    dkd_e_value(View, { style: dkd_styles_value.dkd_command_live_row_value }, dkd_e_value(dkd_pulse_value, { dkd_color_value: dkd_online_value ? dkd_palette_value.dkd_green_value : dkd_palette_value.dkd_gold_value }), dkd_e_value(Text, { style: dkd_styles_value.dkd_command_eyebrow_value }, 'KURYE KOMUTA')),
-    dkd_badge_value(dkd_state_label_value, dkd_online_value ? dkd_palette_value.dkd_green_value : dkd_palette_value.dkd_gold_value)),
-  dkd_e_value(View, { style: dkd_styles_value.dkd_command_content_value },
-    dkd_e_value(View, { style: dkd_styles_value.dkd_command_copy_value },
-      dkd_e_value(Text, { style: dkd_styles_value.dkd_command_title_value }, dkd_online_value ? 'Şehir senin rotanda.' : 'Motor hazır. Rota seni bekliyor.'),
-      dkd_e_value(Text, { style: dkd_styles_value.dkd_command_body_value }, dkd_online_value ? 'Kayıtlı bölgede operasyon akışın açık.' : 'Tek dokunuşla çevrimiçi ol ve kayıtlı bölgede teslimat akışını başlat.')),
-    dkd_e_value(View, { style: dkd_styles_value.dkd_motor_stage_value },
-      dkd_e_value(View, { style: [dkd_styles_value.dkd_motor_aura_value, { backgroundColor: dkd_color_alpha_value(dkd_online_value ? dkd_palette_value.dkd_green_value : dkd_palette_value.dkd_cyan_value, '18') }] }),
-      dkd_e_value(dkd_racing_motorcycle_value, { dkd_color_value: dkd_online_value ? dkd_palette_value.dkd_green_value : dkd_palette_value.dkd_cyan_value, dkd_size_value: 118 }))),
-  dkd_e_value(View, { style: dkd_styles_value.dkd_route_strip_value },
-    [0, 1, 2, 3].map((dkd_index_value) => dkd_e_value(View, { key: 'route-' + dkd_index_value, style: [dkd_styles_value.dkd_route_node_value, dkd_index_value === 0 ? { backgroundColor: dkd_online_value ? dkd_palette_value.dkd_green_value : dkd_palette_value.dkd_cyan_value } : null] })),
-    dkd_e_value(View, { style: dkd_styles_value.dkd_route_line_value })),
-  dkd_e_value(dkd_motion_pressable_value, {
-    dkd_container_style_value: { width: '100%', marginTop: 14 },
-    dkd_pressable_style_value: dkd_styles_value.dkd_online_button_value,
-    dkd_on_press_value: dkd_toggle_home_online_value,
-    dkd_disabled_value: dkd_home_toggle_busy_value,
-    dkd_haptic_kind_value: 'medium',
-    dkd_label_value: dkd_online_value ? 'Çevrimdışı ol' : 'Çevrimiçi ol',
-    dkd_children_value: dkd_e_value(LinearGradient, {
-      colors: dkd_online_value ? [dkd_palette_value.dkd_red_value, '#FF8A7B'] : (dkd_approved_value ? [dkd_palette_value.dkd_green_value, dkd_palette_value.dkd_cyan_value] : [dkd_palette_value.dkd_orange_value, dkd_palette_value.dkd_gold_value]),
-      style: dkd_styles_value.dkd_online_button_fill_value,
-    },
-    dkd_e_value(Ionicons, { name: dkd_online_value ? 'pause' : (dkd_approved_value ? 'navigate' : 'document-text'), size: 21, color: '#041019' }),
-    dkd_e_value(Text, { style: dkd_styles_value.dkd_online_button_text_value }, dkd_home_toggle_busy_value ? 'İŞLENİYOR…' : (dkd_online_value ? 'ÇEVRİMDIŞI OL' : (dkd_approved_value ? 'ÇEVRİMİÇİ OL' : 'KURYE BAŞVURUSUNU AÇ'))),
-    dkd_e_value(Ionicons, { name: 'arrow-forward-circle', size: 23, color: '#041019' })),
-  })));
+  return (
+    <React.Fragment>
+      <dkd_safe_screen_value style={dkd_styles_value.dkd_safe_value}>
+        <ScrollView style={dkd_styles_value.dkd_home_value} contentContainerStyle={dkd_styles_value.dkd_home_content_value} showsVerticalScrollIndicator={false}>
+          <LinearGradient colors={['#091425', '#07111D', '#06101A']} style={dkd_styles_value.dkd_identity_value}>
+            <View style={dkd_styles_value.dkd_identity_row_value}>
+              {React.createElement(dkd_profile_avatar_value, {
+                dkd_uri_value: dkd_avatar_uri_value,
+                dkd_emoji_value: dkd_profile_value?.avatar_emoji || '🦅',
+                dkd_online_value,
+                dkd_size_value: 82,
+                dkd_on_error_value: () => dkd_set_local_avatar_uri_value(''),
+              })}
+              <View style={dkd_styles_value.dkd_identity_copy_value}>
+                <View style={dkd_styles_value.dkd_brand_row_value}>
+                  <Text style={dkd_styles_value.dkd_brand_value}>DraBornGo</Text>
+                  <View style={dkd_styles_value.dkd_version_badge_value}>
+                    <Text style={dkd_styles_value.dkd_version_text_value}>DKD_DraBornGo_v0.0.6</Text>
+                  </View>
+                </View>
+                <Text style={dkd_styles_value.dkd_name_value} numberOfLines={1}>{dkd_nickname_value}</Text>
+                <Text style={dkd_styles_value.dkd_role_value}>MASTER</Text>
+              </View>
+              <Pressable onPress={() => dkd_set_menu_visible_value(true)} style={dkd_styles_value.dkd_menu_button_value}>
+                {dkd_icon_value('menu', 30, '#FFFFFF')}
+              </Pressable>
+            </View>
+          </LinearGradient>
 
-  const dkd_metrics_value = dkd_e_value(View, { style: dkd_styles_value.dkd_metrics_row_value },
-    dkd_metric_value('location-outline', 'Bölge', dkd_city_label_value, dkd_palette_value.dkd_cyan_value),
-    dkd_metric_value('cube-outline', 'Teslimat', String(dkd_completed_jobs_value), dkd_palette_value.dkd_green_value),
-    dkd_metric_value('shield-checkmark-outline', 'Kurye', dkd_approved_value ? 'Onaylı' : 'Bekliyor', dkd_approved_value ? dkd_palette_value.dkd_lime_value : dkd_palette_value.dkd_orange_value));
+          <LinearGradient colors={['#321248', '#651B63', '#0C5368']} style={dkd_styles_value.dkd_online_shell_value}>
+            <Pressable disabled={dkd_home_toggle_busy_value} onPress={dkd_toggle_online_value} style={dkd_styles_value.dkd_online_button_value}>
+              <LinearGradient colors={dkd_online_value ? ['#FF5D75', '#FF8A72'] : ['#28C9FF', '#52F2B3', '#FFE36D']} style={StyleSheet.absoluteFill} />
+              <View style={dkd_styles_value.dkd_online_button_icon_value}>
+                {dkd_icon_value(dkd_online_value ? 'pause-circle-outline' : 'rocket-launch-outline', 31, '#FFFFFF')}
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={dkd_styles_value.dkd_online_button_title_value}>
+                  {dkd_home_toggle_busy_value ? 'İŞLENİYOR…' : dkd_online_value ? 'ÇEVRİMDIŞI OL' : dkd_approved_value ? 'ÇEVRİMİÇİ OL' : 'BAŞVURU YAP'}
+                </Text>
+                <Text style={dkd_styles_value.dkd_online_button_body_value}>
+                  {dkd_online_value ? 'Canlı kurye akışını kapat' : dkd_approved_value ? 'Çevrimiçi modu ana sayfadan başlat' : 'Kurye başvurusunu tamamla'}
+                </Text>
+              </View>
+              <View style={dkd_styles_value.dkd_online_arrow_value}>{dkd_icon_value('chevron-double-right', 31, '#07111C')}</View>
+            </Pressable>
 
-  const dkd_operation_header_value = dkd_e_value(View, { style: dkd_styles_value.dkd_section_header_value },
-    dkd_e_value(View, null, dkd_e_value(Text, { style: dkd_styles_value.dkd_section_kicker_value }, 'DraBornGo // CANLI OPERASYON'), dkd_e_value(Text, { style: dkd_styles_value.dkd_section_title_value }, 'Operasyon Merkezi')),
-    dkd_e_value(View, { style: dkd_styles_value.dkd_section_icon_shell_value }, dkd_e_value(Ionicons, { name: 'flash', size: 23, color: dkd_palette_value.dkd_gold_value })));
+            <View style={dkd_styles_value.dkd_search_value}>
+              <View style={dkd_styles_value.dkd_search_icon_value}>{dkd_icon_value(dkd_online_value ? 'radar' : 'timer-sand', 25, '#07111C')}</View>
+              <View style={{ flex: 1 }}>
+                <Text style={dkd_styles_value.dkd_search_title_value}>{dkd_online_value ? 'Sipariş Aranıyor' : 'Arama Beklemede'}</Text>
+                <Text style={dkd_styles_value.dkd_search_body_value}>{dkd_online_value ? 'Kayıtlı bölgede uygun teslimat bekleniyor.' : 'Çevrimiçi olunca kayıtlı bölgede arama başlar.'}</Text>
+              </View>
+            </View>
+          </LinearGradient>
 
-  const dkd_courier_card_value = dkd_e_value(dkd_motion_pressable_value, {
-    dkd_container_style_value: { width: '100%' },
-    dkd_pressable_style_value: dkd_styles_value.dkd_operation_card_pressable_value,
-    dkd_on_press_value: () => dkd_set_modal_value('courier'),
-    dkd_children_value: dkd_e_value(LinearGradient, { colors: ['#0C2C42', '#0D1D35', '#07131F'], style: dkd_styles_value.dkd_operation_card_value },
-      dkd_e_value(View, { style: dkd_styles_value.dkd_operation_card_top_value }, dkd_e_value(View, { style: dkd_styles_value.dkd_operation_motor_value }, dkd_e_value(dkd_racing_motorcycle_value, { dkd_color_value: dkd_palette_value.dkd_cyan_value, dkd_size_value: 88 })), dkd_badge_value(dkd_online_value ? 'AKTİF' : 'KURYE', dkd_online_value ? dkd_palette_value.dkd_green_value : dkd_palette_value.dkd_cyan_value)),
-      dkd_e_value(Text, { style: dkd_styles_value.dkd_operation_title_value }, 'Kurye Operasyon Merkezi'),
-      dkd_e_value(Text, { style: dkd_styles_value.dkd_operation_body_value }, 'Durumunu değiştir, atanmış teslimatları gör ve operasyon akışını yönet.'),
-      dkd_e_value(View, { style: dkd_styles_value.dkd_operation_footer_value }, dkd_e_value(Text, { style: dkd_styles_value.dkd_operation_open_value }, 'MERKEZİ AÇ'), dkd_e_value(Ionicons, { name: 'arrow-forward', size: 21, color: dkd_palette_value.dkd_cyan_value })),
-      dkd_e_value(View, { style: [dkd_styles_value.dkd_operation_edge_value, { backgroundColor: dkd_palette_value.dkd_cyan_value }] })),
-  });
+          <Pressable onPress={() => dkd_set_modal_value('help')} style={dkd_styles_value.dkd_support_button_value}>
+            <LinearGradient colors={['#3820C9', '#D81785']} style={StyleSheet.absoluteFill} />
+            {dkd_icon_value('headset', 27, '#FFFFFF')}
+            <Text style={dkd_styles_value.dkd_support_text_value}>Destek Paneli</Text>
+          </Pressable>
 
-  const dkd_service_card_value = dkd_e_value(dkd_motion_pressable_value, {
-    dkd_container_style_value: { width: '100%', marginTop: 11 },
-    dkd_pressable_style_value: dkd_styles_value.dkd_operation_card_pressable_value,
-    dkd_on_press_value: () => dkd_set_modal_value('service'),
-    dkd_children_value: dkd_e_value(LinearGradient, { colors: ['#0E322A', '#0B2022', '#07131B'], style: dkd_styles_value.dkd_service_operation_value },
-      dkd_e_value(View, { style: dkd_styles_value.dkd_service_operation_icon_value }, dkd_e_value(Ionicons, { name: 'storefront', size: 29, color: dkd_palette_value.dkd_green_value })),
-      dkd_e_value(View, { style: { flex: 1 } }, dkd_e_value(Text, { style: dkd_styles_value.dkd_service_operation_kicker_value }, 'HİZMET AĞI'), dkd_e_value(Text, { style: dkd_styles_value.dkd_service_operation_title_value }, 'Şehrin hizmetlerini tek merkezden aç'), dkd_e_value(Text, { style: dkd_styles_value.dkd_service_operation_body_value }, 'Aktif işletmeler, hizmet katalogları ve bölgeler.')),
-      dkd_e_value(Ionicons, { name: 'chevron-forward', size: 27, color: dkd_palette_value.dkd_green_value })),
-  });
+          <Text style={dkd_styles_value.dkd_section_label_value}>OPERASYON MERKEZİ</Text>
+          {dkd_loading_value ? <ActivityIndicator color="#6DE9FF" style={{ marginVertical: 16 }} /> : null}
 
-  const dkd_quick_header_value = dkd_e_value(View, { style: dkd_styles_value.dkd_section_header_value },
-    dkd_e_value(View, null, dkd_e_value(Text, { style: dkd_styles_value.dkd_section_kicker_value }, 'HIZLI ERİŞİM'), dkd_e_value(Text, { style: dkd_styles_value.dkd_section_title_small_value }, 'Kontrol Araçları')),
-    dkd_e_value(Ionicons, { name: 'grid-outline', size: 23, color: dkd_palette_value.dkd_purple_value }));
-  const dkd_quick_grid_value = dkd_e_value(View, { style: dkd_styles_value.dkd_quick_grid_value }, dkd_quick_tiles_value.map((dkd_row_value, dkd_index_value) => dkd_e_value(dkd_quick_tile_value, {
-    key: dkd_row_value[1],
-    dkd_icon_value: dkd_row_value[0],
-    dkd_title_value: dkd_row_value[1],
-    dkd_subtitle_value: dkd_row_value[2],
-    dkd_color_value: dkd_row_value[3],
-    dkd_delay_value: 150 + dkd_index_value * 65,
-    dkd_on_press_value: () => dkd_set_modal_value(dkd_row_value[4]),
-  })));
+          {React.createElement(dkd_operation_card_value, {
+            dkd_kind_value: 'courier',
+            dkd_title_value: 'Kurye Operasyon Merkezi',
+            dkd_body_value: 'Kurye Durumunu, Gönderi Paneli ve İşletme Siparişleri akışını tek Merkezden yönet.',
+            dkd_on_press_value: () => dkd_set_modal_value('courier'),
+            dkd_active_value: dkd_online_value,
+          })}
 
-  const dkd_admin_card_value = dkd_is_admin_value ? dkd_e_value(dkd_motion_pressable_value, {
-    dkd_container_style_value: { width: '100%', marginTop: 12 },
-    dkd_pressable_style_value: dkd_styles_value.dkd_admin_card_pressable_value,
-    dkd_on_press_value: () => dkd_set_modal_value('admin'),
-    dkd_children_value: dkd_e_value(LinearGradient, { colors: ['#3A2B0B', '#1C1A12', '#09121B'], style: dkd_styles_value.dkd_admin_card_value },
-      dkd_e_value(View, { style: dkd_styles_value.dkd_admin_icon_value }, dkd_e_value(Ionicons, { name: 'settings', size: 25, color: dkd_palette_value.dkd_gold_value })),
-      dkd_e_value(View, { style: { flex: 1 } }, dkd_e_value(Text, { style: dkd_styles_value.dkd_admin_kicker_value }, 'ADMIN'), dkd_e_value(Text, { style: dkd_styles_value.dkd_admin_title_value }, 'Yönetim Operasyonları'), dkd_e_value(Text, { style: dkd_styles_value.dkd_admin_body_value }, 'Kullanıcı, teslimat, başvuru ve hesap talepleri.')),
-      dkd_e_value(Ionicons, { name: 'arrow-forward-circle', size: 27, color: dkd_palette_value.dkd_gold_value })),
-  }) : null;
+          {React.createElement(dkd_operation_card_value, {
+            dkd_kind_value: 'service',
+            dkd_title_value: 'Hizmet Ağı Merkezi',
+            dkd_body_value: 'Şehiriçi & şehirlerarası hizmet, yemek, market, ulaşım ve işletme ağını tek merkezde aç.',
+            dkd_on_press_value: () => dkd_set_modal_value('service'),
+          })}
 
-  const dkd_footer_value = dkd_e_value(View, { style: dkd_styles_value.dkd_footer_value },
-    dkd_e_value(View, { style: dkd_styles_value.dkd_footer_brand_value },
-      dkd_e_value(dkd_racing_motorcycle_value, { dkd_color_value: dkd_palette_value.dkd_cyan_value, dkd_size_value: 48 }),
-      dkd_e_value(View, null, dkd_e_value(Text, { style: dkd_styles_value.dkd_footer_title_value }, 'DraBornGo v0.0.6'), dkd_e_value(Text, { style: dkd_styles_value.dkd_footer_meta_value }, 'Expo Go 57.0.2 • Android versionCode 6'))),
-    dkd_e_value(Pressable, { onPress: dkd_sign_out_value, style: dkd_styles_value.dkd_logout_value }, dkd_e_value(Ionicons, { name: 'log-out-outline', size: 18, color: '#FF9AAF' }), dkd_e_value(Text, { style: dkd_styles_value.dkd_logout_text_value }, 'ÇIKIŞ')));
+          <View style={dkd_styles_value.dkd_quick_grid_value}>
+            {React.createElement(dkd_quick_tile_value, {
+              dkd_title_value: 'Başvurular',
+              dkd_subtitle_value: 'Kurye, nakliye ve işletme başvurularını yönet',
+              dkd_icon_value: 'bike-fast',
+              dkd_accent_value: '#58D7F0',
+              dkd_on_press_value: () => dkd_set_modal_value('applications'),
+            })}
+            {React.createElement(dkd_quick_tile_value, {
+              dkd_title_value: 'Sohbet',
+              dkd_subtitle_value: 'DBG mesaj ve ekip sohbetini aç',
+              dkd_icon_value: 'message-text-outline',
+              dkd_accent_value: '#F05AA7',
+              dkd_on_press_value: () => dkd_set_modal_value('chat'),
+            })}
+          </View>
 
-  return dkd_e_value(React.Fragment, null,
-    dkd_e_value(dkd_safe_screen_value, { style: { backgroundColor: dkd_palette_value.dkd_bg_value } },
-      dkd_e_value(ScrollView, { style: dkd_styles_value.dkd_home_value, contentContainerStyle: dkd_styles_value.dkd_home_content_value, showsVerticalScrollIndicator: false },
-        dkd_e_value(Animated.View, { pointerEvents: 'none', style: [dkd_styles_value.dkd_ambient_orb_one_value, { opacity: dkd_ambient_value.interpolate({ inputRange: [0, 1], outputRange: [0.18, 0.42] }), transform: [{ scale: dkd_ambient_value.interpolate({ inputRange: [0, 1], outputRange: [0.9, 1.08] }) }] }] }),
-        dkd_e_value(Animated.View, { pointerEvents: 'none', style: [dkd_styles_value.dkd_ambient_orb_two_value, { opacity: dkd_ambient_value.interpolate({ inputRange: [0, 1], outputRange: [0.12, 0.3] }) }] }),
-        dkd_identity_card_value,
-        dkd_command_card_value,
-        dkd_metrics_value,
-        dkd_operation_header_value,
-        dkd_loading_value ? dkd_e_value(ActivityIndicator, { color: dkd_palette_value.dkd_cyan_value, style: { marginVertical: 16 } }) : null,
-        dkd_courier_card_value,
-        dkd_service_card_value,
-        dkd_quick_header_value,
-        dkd_quick_grid_value,
-        dkd_admin_card_value,
-        dkd_footer_value)),
-    dkd_e_value(dkd_profile_modal_value, { dkd_visible_value: dkd_modal_value === 'profile', dkd_session_value, dkd_profile_value, dkd_avatar_uri_value, dkd_on_avatar_error_value: () => dkd_set_local_avatar_uri_value(''), dkd_on_close_value: () => dkd_set_modal_value(''), dkd_on_changed_value: dkd_set_profile_value }),
-    dkd_e_value(dkd_courier_modal_value, { dkd_visible_value: dkd_modal_value === 'courier', dkd_session_value, dkd_profile_value, dkd_on_close_value: () => dkd_set_modal_value(''), dkd_on_changed_value: dkd_set_profile_value }),
-    dkd_e_value(dkd_service_modal_value, { dkd_visible_value: dkd_modal_value === 'service', dkd_on_close_value: () => dkd_set_modal_value('') }),
-    dkd_e_value(dkd_applications_modal_value, { dkd_visible_value: dkd_modal_value === 'applications', dkd_session_value, dkd_profile_value, dkd_on_close_value: () => dkd_set_modal_value('') }),
-    dkd_e_value(dkd_policy_modal_value, { dkd_visible_value: dkd_modal_value === 'policy', dkd_on_close_value: () => dkd_set_modal_value('') }),
-    dkd_e_value(dkd_help_modal_value, { dkd_visible_value: dkd_modal_value === 'help', dkd_on_close_value: () => dkd_set_modal_value(''), dkd_on_open_chat_value: () => dkd_set_modal_value('chat') }),
-    dkd_e_value(dkd_admin_modal_value, { dkd_visible_value: dkd_modal_value === 'admin' && dkd_is_admin_value, dkd_on_close_value: () => dkd_set_modal_value('') }),
-    dkd_e_value(dkd_dbg_hub_modal_value, { dkd_visible_value: dkd_modal_value === 'chat', dkd_on_close_value: () => dkd_set_modal_value('') }));
+          <Text style={dkd_styles_value.dkd_region_note_value}>Aktif bölge: {dkd_city_label_value}</Text>
+        </ScrollView>
+      </dkd_safe_screen_value>
+
+      <Modal visible={dkd_menu_visible_value} transparent animationType="fade" onRequestClose={() => dkd_set_menu_visible_value(false)}>
+        <Pressable style={dkd_styles_value.dkd_menu_backdrop_value} onPress={() => dkd_set_menu_visible_value(false)}>
+          <Pressable style={dkd_styles_value.dkd_menu_sheet_value} onPress={() => {}}>
+            <View style={dkd_styles_value.dkd_menu_head_value}>
+              <Text style={dkd_styles_value.dkd_menu_title_value}>DraBornGo</Text>
+              <Pressable onPress={() => dkd_set_menu_visible_value(false)}>{dkd_icon_value('close', 24, '#FFFFFF')}</Pressable>
+            </View>
+            {dkd_menu_rows_value.map((dkd_row_value) => (
+              <Pressable
+                key={dkd_row_value[1]}
+                onPress={() => {
+                  dkd_set_menu_visible_value(false);
+                  dkd_set_modal_value(dkd_row_value[2]);
+                }}
+                style={dkd_styles_value.dkd_menu_row_value}
+              >
+                {dkd_icon_value(dkd_row_value[0], 22, '#7BE6FF')}
+                <Text style={dkd_styles_value.dkd_menu_row_text_value}>{dkd_row_value[1]}</Text>
+                {dkd_icon_value('chevron-right', 21, '#7890A7')}
+              </Pressable>
+            ))}
+            <Pressable
+              onPress={() => {
+                dkd_set_menu_visible_value(false);
+                dkd_sign_out_value();
+              }}
+              style={[dkd_styles_value.dkd_menu_row_value, { borderBottomWidth: 0 }]}
+            >
+              {dkd_icon_value('logout', 22, '#FF8FA5')}
+              <Text style={[dkd_styles_value.dkd_menu_row_text_value, { color: '#FFB0BF' }]}>Çıkış Yap</Text>
+            </Pressable>
+          </Pressable>
+        </Pressable>
+      </Modal>
+
+      {React.createElement(dkd_profile_modal_value, {
+        dkd_visible_value: dkd_modal_value === 'profile',
+        dkd_session_value,
+        dkd_profile_value,
+        dkd_avatar_uri_value,
+        dkd_on_avatar_error_value: () => dkd_set_local_avatar_uri_value(''),
+        dkd_on_close_value: () => dkd_set_modal_value(''),
+        dkd_on_changed_value: dkd_set_profile_value,
+      })}
+      {React.createElement(dkd_courier_modal_value, {
+        dkd_visible_value: dkd_modal_value === 'courier',
+        dkd_session_value,
+        dkd_profile_value,
+        dkd_on_close_value: () => dkd_set_modal_value(''),
+        dkd_on_changed_value: dkd_set_profile_value,
+      })}
+      {React.createElement(dkd_service_modal_value, {
+        dkd_visible_value: dkd_modal_value === 'service',
+        dkd_on_close_value: () => dkd_set_modal_value(''),
+      })}
+      {React.createElement(dkd_applications_modal_value, {
+        dkd_visible_value: dkd_modal_value === 'applications',
+        dkd_session_value,
+        dkd_profile_value,
+        dkd_on_close_value: () => dkd_set_modal_value(''),
+      })}
+      {React.createElement(dkd_policy_modal_value, {
+        dkd_visible_value: dkd_modal_value === 'policy',
+        dkd_on_close_value: () => dkd_set_modal_value(''),
+      })}
+      {React.createElement(dkd_help_modal_value, {
+        dkd_visible_value: dkd_modal_value === 'help',
+        dkd_on_close_value: () => dkd_set_modal_value(''),
+        dkd_on_open_chat_value: () => dkd_set_modal_value('chat'),
+      })}
+      {React.createElement(dkd_admin_modal_value, {
+        dkd_visible_value: dkd_modal_value === 'admin' && dkd_is_admin_value,
+        dkd_on_close_value: () => dkd_set_modal_value(''),
+      })}
+      {React.createElement(dkd_dbg_hub_modal_value, {
+        dkd_visible_value: dkd_modal_value === 'chat',
+        dkd_on_close_value: () => dkd_set_modal_value(''),
+      })}
+    </React.Fragment>
+  );
 }
+
+const dkd_styles_value = StyleSheet.create({
+  dkd_safe_value: { backgroundColor: '#050A12' },
+  dkd_home_value: { flex: 1, backgroundColor: '#050A12' },
+  dkd_home_content_value: { paddingHorizontal: 18, paddingTop: 15, paddingBottom: 44 },
+  dkd_identity_value: { borderRadius: 28, padding: 16, borderWidth: 1, borderColor: '#22354C', overflow: 'hidden' },
+  dkd_identity_row_value: { flexDirection: 'row', alignItems: 'center', gap: 14 },
+  dkd_identity_copy_value: { flex: 1, minWidth: 0 },
+  dkd_brand_row_value: { flexDirection: 'row', alignItems: 'center', gap: 8, flexWrap: 'wrap' },
+  dkd_brand_value: { color: '#6DE9FF', fontSize: 12, fontWeight: '900', letterSpacing: 1.1 },
+  dkd_version_badge_value: { borderRadius: 14, paddingHorizontal: 9, paddingVertical: 5, borderWidth: 1, borderColor: '#8A7740', backgroundColor: '#242317' },
+  dkd_version_text_value: { color: '#FFE39A', fontSize: 9, fontWeight: '900' },
+  dkd_name_value: { color: '#FFFFFF', fontSize: 25, fontWeight: '900', marginTop: 5 },
+  dkd_role_value: { color: '#AAB6C8', fontSize: 12, fontWeight: '900', marginTop: 3 },
+  dkd_menu_button_value: { width: 56, height: 56, borderRadius: 20, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: '#2A3A4C', backgroundColor: '#111927' },
+  dkd_online_shell_value: { borderRadius: 30, padding: 17, marginTop: 14, borderWidth: 1, borderColor: '#315067', overflow: 'hidden' },
+  dkd_online_button_value: { minHeight: 104, borderRadius: 26, overflow: 'hidden', paddingHorizontal: 18, flexDirection: 'row', alignItems: 'center', gap: 14 },
+  dkd_online_button_icon_value: { width: 54, height: 54, borderRadius: 18, backgroundColor: 'rgba(5,25,40,0.25)', alignItems: 'center', justifyContent: 'center' },
+  dkd_online_button_title_value: { color: '#FFFFFF', fontSize: 23, fontWeight: '700' },
+  dkd_online_button_body_value: { color: 'rgba(255,255,255,0.82)', fontSize: 12, marginTop: 4 },
+  dkd_online_arrow_value: { width: 52, height: 52, borderRadius: 26, backgroundColor: 'rgba(255,255,255,0.80)', alignItems: 'center', justifyContent: 'center' },
+  dkd_search_value: { minHeight: 88, borderRadius: 25, backgroundColor: '#071625', borderWidth: 1, borderColor: '#244055', marginTop: 13, paddingHorizontal: 18, flexDirection: 'row', alignItems: 'center', gap: 14 },
+  dkd_search_icon_value: { width: 48, height: 48, borderRadius: 24, backgroundColor: '#FFD166', alignItems: 'center', justifyContent: 'center' },
+  dkd_search_title_value: { color: '#FFFFFF', fontSize: 17, fontWeight: '800' },
+  dkd_search_body_value: { color: '#AAB6C8', fontSize: 12, lineHeight: 17, marginTop: 3 },
+  dkd_support_button_value: { height: 64, borderRadius: 22, overflow: 'hidden', marginTop: 14, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 9, borderWidth: 1, borderColor: '#42577D' },
+  dkd_support_text_value: { color: '#FFFFFF', fontSize: 17, fontWeight: '900' },
+  dkd_section_label_value: { color: '#FFFFFF', fontSize: 25, fontWeight: '900', marginTop: 26, marginBottom: 12 },
+  dkd_operation_press_value: { marginBottom: 13 },
+  dkd_operation_value: { borderRadius: 27, padding: 18, minHeight: 235, borderWidth: 1, borderColor: '#31566D', overflow: 'hidden' },
+  dkd_operation_top_value: { flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between' },
+  dkd_operation_icons_value: { minHeight: 82, justifyContent: 'center' },
+  dkd_operation_tag_value: { height: 36, borderRadius: 18, borderWidth: 1, paddingHorizontal: 12, flexDirection: 'row', alignItems: 'center', gap: 5, backgroundColor: 'rgba(4,16,27,0.45)' },
+  dkd_operation_tag_text_value: { fontSize: 11, fontWeight: '900' },
+  dkd_service_icon_cluster_value: { flexDirection: 'row', gap: 9, borderRadius: 15, padding: 10, backgroundColor: 'rgba(74,206,197,0.15)' },
+  dkd_operation_title_value: { color: '#FFFFFF', fontSize: 27, fontWeight: '900', marginTop: 13 },
+  dkd_operation_body_value: { color: '#C3CCDB', fontSize: 13, lineHeight: 20, marginTop: 8, maxWidth: '92%' },
+  dkd_operation_footer_value: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 'auto', paddingTop: 18 },
+  dkd_operation_open_value: { fontSize: 12, fontWeight: '900', letterSpacing: 1.2 },
+  dkd_quick_grid_value: { flexDirection: 'row', gap: 12, marginTop: 2 },
+  dkd_quick_tile_value: { flex: 1, minHeight: 200, borderRadius: 25, borderWidth: 1, borderColor: '#2B4059', backgroundColor: '#0B1726', padding: 15, overflow: 'hidden' },
+  dkd_quick_top_line_value: { position: 'absolute', left: 20, right: 20, top: 0, height: 4, borderBottomLeftRadius: 4, borderBottomRightRadius: 4 },
+  dkd_quick_icon_shell_value: { width: 52, height: 52, borderRadius: 17, alignItems: 'center', justifyContent: 'center', marginTop: 6 },
+  dkd_quick_title_value: { color: '#FFFFFF', fontSize: 22, fontWeight: '900', marginTop: 17 },
+  dkd_quick_subtitle_value: { color: '#9DAABD', fontSize: 12, lineHeight: 18, marginTop: 7 },
+  dkd_quick_footer_value: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 'auto' },
+  dkd_quick_open_value: { fontSize: 11, fontWeight: '900' },
+  dkd_region_note_value: { color: '#657990', fontSize: 11, textAlign: 'center', marginTop: 22, fontWeight: '700' },
+  dkd_menu_backdrop_value: { flex: 1, backgroundColor: 'rgba(0,0,0,0.62)', justifyContent: 'flex-start', alignItems: 'flex-end', paddingTop: 76, paddingRight: 18 },
+  dkd_menu_sheet_value: { width: 294, borderRadius: 25, borderWidth: 1, borderColor: '#2A4058', backgroundColor: '#0B1624', padding: 14 },
+  dkd_menu_head_value: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 8, paddingBottom: 10 },
+  dkd_menu_title_value: { color: '#FFFFFF', fontSize: 20, fontWeight: '900' },
+  dkd_menu_row_value: { minHeight: 54, borderBottomWidth: 1, borderBottomColor: '#1B2A3A', flexDirection: 'row', alignItems: 'center', gap: 11, paddingHorizontal: 8 },
+  dkd_menu_row_text_value: { flex: 1, color: '#E7EFF9', fontSize: 14, fontWeight: '800' },
+  dkd_status_dot_value: { width: 8, height: 8, borderRadius: 4 },
+});
