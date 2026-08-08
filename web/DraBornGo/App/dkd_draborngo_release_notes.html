@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>DraBornGo v0.0.5 Sürüm Notları</title>
+  <title>DraBornGo v0.0.6 Sürüm Notları</title>
   <style>
     :root { color-scheme: dark; --dkd_bg: #06101c; --dkd_panel: #0c1a2b; --dkd_line: rgba(255,255,255,.12); --dkd_text: #f5fbff; --dkd_soft: rgba(245,251,255,.72); --dkd_cyan: #7be6ff; --dkd_green: #58e2ab; }
     * { box-sizing: border-box; }
@@ -19,15 +19,18 @@
 <body>
   <main>
     <section class="dkd_card">
-      <span class="dkd_badge">DraBornGo v0.0.5</span>
+      <span class="dkd_badge">DraBornGo v0.0.6 • Android code 6</span>
       <h1>Sürüm Notları</h1>
-      <p>Bu paket DraBornGo için resmi APK indirme ve kullanıcı onaylı güncelleme merkezini hazırlar.</p>
+      <p>8 Ağustos 2026 itibarıyla DraBornGo v0.0.6 geliştirme/test sürümü Expo SDK 57 ve Expo Go akışına geçirildi. Bu aşamada APK veya AAB üretilmez.</p>
       <ul>
-        <li>Uygulama açılışta web manifest dosyasını okuyarak yeni sürüm kontrolü yapar.</li>
-        <li>Hızlı erişim menüsüne Sürüm ve Güncelleme Merkezi eklendi.</li>
-        <li>APK indirme sayfası, manifest, SHA-256 alanı ve sürüm notları hazırlandı.</li>
+        <li>Expo SDK 57, React 19.2.3 ve React Native 0.86 uyumlu bağımlılık ailesine geçildi.</li>
+        <li>Login, Ana Sayfa ve genel uygulama tasarımı korunarak sürüm, politika ve altyapı katmanları güncellendi.</li>
+        <li>Android medya ve konum izinleri Google Play gereksinimlerine göre daraltıldı.</li>
+        <li>Web üzerinden APK ile self-update yolu kapatıldı; Google Play dağıtımında güncellemeler yalnız Google Play üzerinden yapılacaktır.</li>
+        <li>Gizlilik ve hesap/veri silme sayfaları güncel public DraBornGo alanına bağlandı.</li>
+        <li>Supabase yönetici RPC erişimleri sıkılaştırıldı ve v0.0.6 politika metadatası canlı veritabanına işlendi.</li>
       </ul>
-      <p><a href="./">APK indirme sayfasına dön</a></p>
+      <p><a href="./">v0.0.6 sürüm durumuna dön</a></p>
     </section>
   </main>
 </body>
