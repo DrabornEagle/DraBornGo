@@ -52,7 +52,7 @@ function ActionMenuModal({ visible, onClose, isAdmin, canCourier, onCourier, onP
       dkd_on_press_value: () => { onClose?.(); onProfile?.(); },
     },
     canCourier ? {
-      dkd_icon_value: 'motorbike',
+      dkd_icon_value: 'speedometer',
       dkd_label_value: 'Kurye Operasyon Merkezi',
       dkd_sub_value: 'Teslimat, çevrimiçi durum ve aktif kurye araçları.',
       dkd_tone_value: '#087C71',
@@ -106,7 +106,7 @@ function ActionMenuModal({ visible, onClose, isAdmin, canCourier, onCourier, onP
                 <MaterialCommunityIcons name="routes" size={28} color="#07111C" />
               </View>
               <View style={styles.dkd_header_copy}>
-                <Text style={styles.dkd_header_kicker}>DraBornGo v0.0.8</Text>
+                <Text style={styles.dkd_header_kicker}>DraBornGo v0.0.9</Text>
                 <Text style={styles.dkd_header_title}>Merkez Menü</Text>
                 <Text style={styles.dkd_header_sub}>Kurye ağı ve hesap araçlarına hızlı geçiş.</Text>
               </View>
