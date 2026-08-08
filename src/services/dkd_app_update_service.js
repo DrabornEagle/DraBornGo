@@ -3,9 +3,9 @@ import { Linking } from 'react-native';
 import Constants from 'expo-constants';
 
 export const dkd_app_update_manifest_url_value = 'https://www.draborneagle.com/DraBornGo/App/dkd_draborngo_update_manifest.json';
-export const dkd_app_update_download_page_url_value = 'https://www.draborneagle.com/DraBornGo/App/';
+export const dkd_app_update_download_page_url_value = 'https://play.google.com/store/apps/details?id=com.draborneagle.draborngo';
 
-const dkd_app_update_reminder_storage_key_value = 'dkd_draborngo_app_update_reminder_v001';
+const dkd_app_update_reminder_storage_key_value = 'dkd_draborngo_app_update_reminder_v002';
 const dkd_optional_update_reminder_delay_ms_value = 12 * 60 * 60 * 1000;
 
 function dkd_update_text_value(dkd_source_value, dkd_fallback_value = '') {
@@ -22,19 +22,17 @@ function dkd_update_number_value(dkd_source_value, dkd_fallback_value = 0) {
 function dkd_read_current_build_code_value() {
   const dkd_expo_build_value = dkd_update_number_value(Constants?.expoConfig?.android?.versionCode, 0);
   const dkd_native_build_value = dkd_update_number_value(Constants?.nativeBuildVersion, 0);
-  return dkd_expo_build_value || dkd_native_build_value || 5;
+  return dkd_expo_build_value || dkd_native_build_value || 6;
 }
 
 function dkd_read_current_version_name_value() {
-  return dkd_update_text_value(Constants?.expoConfig?.version, dkd_update_text_value(Constants?.nativeAppVersion, '0.0.5'));
+  return dkd_update_text_value(Constants?.expoConfig?.version, dkd_update_text_value(Constants?.nativeAppVersion, '0.0.6'));
 }
 
 function dkd_normalize_manifest_value(dkd_manifest_value = {}) {
   const dkd_latest_version_code_value = dkd_update_number_value(dkd_manifest_value.dkd_latest_version_code, 0);
-  const dkd_latest_version_name_value = dkd_update_text_value(dkd_manifest_value.dkd_latest_version_name, '0.0.5');
+  const dkd_latest_version_name_value = dkd_update_text_value(dkd_manifest_value.dkd_latest_version_name, '0.0.6');
   const dkd_min_supported_version_code_value = dkd_update_number_value(dkd_manifest_value.dkd_min_supported_version_code, 1);
-  const dkd_apk_url_value = dkd_update_text_value(dkd_manifest_value.dkd_apk_url, 'https://www.draborneagle.com/DraBornGo/App/dkd_draborngo_latest.apk');
-  const dkd_download_page_url_value = dkd_update_text_value(dkd_manifest_value.dkd_download_page_url, dkd_app_update_download_page_url_value);
 
   return {
     ...dkd_manifest_value,
@@ -42,10 +40,10 @@ function dkd_normalize_manifest_value(dkd_manifest_value = {}) {
     dkd_latest_version_name: dkd_latest_version_name_value,
     dkd_min_supported_version_code: dkd_min_supported_version_code_value,
     dkd_update_required: dkd_manifest_value.dkd_update_required === true,
-    dkd_apk_url: dkd_apk_url_value,
-    dkd_download_page_url: dkd_download_page_url_value,
-    dkd_sha256: dkd_update_text_value(dkd_manifest_value.dkd_sha256, ''),
-    dkd_release_notes: dkd_update_text_value(dkd_manifest_value.dkd_release_notes, 'DraBornGo güncellemesi hazır.'),
+    dkd_apk_url: '',
+    dkd_download_page_url: dkd_app_update_download_page_url_value,
+    dkd_sha256: '',
+    dkd_release_notes: dkd_update_text_value(dkd_manifest_value.dkd_release_notes, 'DraBornGo güncellemesi Google Play üzerinden sunulacaktır.'),
   };
 }
 
@@ -134,12 +132,8 @@ export async function dkd_mark_app_update_reminded_value(dkd_latest_version_code
   } catch {}
 }
 
-export async function dkd_open_app_update_download_value(dkd_manifest_value = {}) {
-  const dkd_download_url_value = dkd_update_text_value(
-    dkd_manifest_value.dkd_download_page_url,
-    dkd_update_text_value(dkd_manifest_value.dkd_apk_url, dkd_app_update_download_page_url_value)
-  );
-  const dkd_can_open_flag = await Linking.canOpenURL(dkd_download_url_value);
-  if (!dkd_can_open_flag) throw new Error('DraBornGo güncelleme sayfası açılamadı.');
-  await Linking.openURL(dkd_download_url_value);
+export async function dkd_open_app_update_download_value() {
+  const dkd_can_open_flag = await Linking.canOpenURL(dkd_app_update_download_page_url_value);
+  if (!dkd_can_open_flag) throw new Error('DraBornGo Google Play sayfası açılamadı.');
+  await Linking.openURL(dkd_app_update_download_page_url_value);
 }
