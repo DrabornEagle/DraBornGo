@@ -1,0 +1,65 @@
+name: DKD v0.0.12 Runtime Sanitize
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/dkd_v0_0_12_runtime_sanitize.yml
+
+permissions:
+  contents: write
+
+jobs:
+  sanitize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Remove exact retired runtime residue
+        shell: bash
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const targets = [
+            'src/features/support/dkd_support_panel_conversation.js',
+            'src/features/admin/AdminBroadcastModal.js',
+            'src/features/courier/dkd_courier_online_global_watcher.js',
+            'src/features/courier/dkd_cargo_live_map_modal.js'
+          ];
+          for (const path of targets) {
+            if (!fs.existsSync(path)) continue;
+            let text = fs.readFileSync(path, 'utf8');
+            if (path.endsWith('dkd_support_panel_conversation.js')) {
+              text = text.replace(/\n\s*\{\s*dkd_key:\s*['"]dkd_market_order['"][\s\S]*?\n\s*\},/g, '');
+            }
+            text = text
+              .replace(/\|\|\s*[^\n;,)]+\.merchant_name/g, '')
+              .replace(/\?\?\s*[^\n;,)]+\.merchant_name/g, '')
+              .replace(/to_business/g, 'to_pickup')
+              .replace(/dkd_is_business_job_value/g, 'dkd_is_pickup_job_value')
+              .replace(/dkd_is_business_task_value/g, 'dkd_is_pickup_task_value')
+              .replace(/dkd_business_route_value/g, 'dkd_pickup_route_value')
+              .replace(/dkd_business_overview_map_url_value/g, 'dkd_pickup_overview_map_url_value')
+              .replace(/İşletme teslim alma noktası/g, 'Alım noktası')
+              .replace(/işletme teslim alma noktası/g, 'alım noktası')
+              .replace(/Önce işletme adresine git/g, 'Önce alım adresine git')
+              .replace(/İşletme \/ market siparişim görünmüyor/g, 'Gönderim görünmüyor')
+              .replace(/İşletme \/ market siparişin görünmüyorsa/g, 'Gönderin görünmüyorsa');
+            fs.writeFileSync(path, text);
+          }
+          NODE
+          rm -f .github/workflows/dkd_v0_0_12_runtime_sanitize.yml
+      - name: Commit sanitized runtime
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "cleanup: sanitize remaining v0.0.12 runtime residue" || exit 0
+          git pull --rebase origin main
+          git push origin HEAD:main
