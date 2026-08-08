@@ -7,10 +7,13 @@ const dkd_app_value = JSON.parse(dkd_file_system_module.readFileSync(dkd_path_mo
 const dkd_env_value = JSON.parse(dkd_file_system_module.readFileSync(dkd_path_module.join(dkd_root_path_value, 'config', 'dkd_public_env.defaults.json'), 'utf8'));
 const dkd_error_text_values = [];
 
-if (dkd_package_value.version !== '0.0.5') dkd_error_text_values.push('package.json version 0.0.5 değil.');
-if (dkd_app_value?.expo?.version !== '0.0.5') dkd_error_text_values.push('app.json expo.version 0.0.5 değil.');
-if (Number(dkd_app_value?.expo?.android?.versionCode) !== 5) dkd_error_text_values.push('Android versionCode 5 değil.');
+if (dkd_package_value.version !== '0.0.6') dkd_error_text_values.push('package.json version 0.0.6 değil.');
+if (dkd_app_value?.expo?.version !== '0.0.6') dkd_error_text_values.push('app.json expo.version 0.0.6 değil.');
+if (Number(dkd_app_value?.expo?.android?.versionCode) !== 6) dkd_error_text_values.push('Android versionCode 6 değil.');
 if (dkd_app_value?.expo?.name !== 'DraBornGo') dkd_error_text_values.push('Uygulama adı DraBornGo değil.');
+if (!String(dkd_package_value?.dependencies?.expo || '').includes('57.0')) dkd_error_text_values.push('Expo SDK 57 bağımlılığı tanımlı değil.');
+if (String(dkd_package_value?.dependencies?.react || '') !== '19.2.3') dkd_error_text_values.push('React 19.2.3 değil.');
+if (!String(dkd_package_value?.dependencies?.['react-native'] || '').startsWith('0.86.')) dkd_error_text_values.push('React Native 0.86.x değil.');
 
 for (const dkd_key_name_value of ['EXPO_PUBLIC_SUPABASE_URL', 'EXPO_PUBLIC_SUPABASE_ANON_KEY', 'EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY', 'EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN']) {
   if (!String(dkd_env_value?.[dkd_key_name_value] || '').trim()) dkd_error_text_values.push(`${dkd_key_name_value} boş.`);
@@ -53,4 +56,4 @@ if (dkd_error_text_values.length) {
   console.error(dkd_error_text_values.join('\n'));
   process.exit(1);
 }
-console.log('DKD v0.0.5 kimlik, sürüm ve public env doğrulaması başarılı.');
+console.log('DKD v0.0.6 kimlik, Expo SDK 57 ve public env doğrulaması başarılı.');
