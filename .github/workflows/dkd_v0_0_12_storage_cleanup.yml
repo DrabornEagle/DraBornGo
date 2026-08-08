@@ -1,0 +1,167 @@
+name: DKD v0.0.12 Retired Business Storage Cleanup
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/dkd_v0_0_12_storage_cleanup.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  dkd_storage_cleanup:
+    runs-on: ubuntu-latest
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      DKD_SUPABASE_PROJECT_REF: ${{ secrets.DKD_SUPABASE_PROJECT_REF }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Resolve server-side Supabase key securely
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$SUPABASE_ACCESS_TOKEN"
+          test -n "$DKD_SUPABASE_PROJECT_REF"
+          curl --fail --silent --show-error \
+            "https://api.supabase.com/v1/projects/${DKD_SUPABASE_PROJECT_REF}/api-keys?reveal=true" \
+            -H "Authorization: Bearer ${SUPABASE_ACCESS_TOKEN}" \
+            -o /tmp/dkd_supabase_keys.json
+
+          node <<'NODE' > /tmp/dkd_server_key.txt
+          const fs = require('fs');
+          const payload = JSON.parse(fs.readFileSync('/tmp/dkd_supabase_keys.json', 'utf8'));
+          const strings = [];
+          function walk(value) {
+            if (typeof value === 'string') strings.push(value);
+            else if (Array.isArray(value)) value.forEach(walk);
+            else if (value && typeof value === 'object') Object.values(value).forEach(walk);
+          }
+          walk(payload);
+          let key = strings.find((value) => value.startsWith('sb_secret_')) || '';
+          if (!key) {
+            key = strings.find((value) => {
+              if (!value.startsWith('eyJ')) return false;
+              try {
+                const parts = value.split('.');
+                if (parts.length < 2) return false;
+                const normalized = parts[1].replace(/-/g, '+').replace(/_/g, '/');
+                const padded = normalized + '='.repeat((4 - normalized.length % 4) % 4);
+                const claims = JSON.parse(Buffer.from(padded, 'base64').toString('utf8'));
+                return claims?.role === 'service_role';
+              } catch {
+                return false;
+              }
+            }) || '';
+          }
+          if (!key) process.exit(2);
+          process.stdout.write(key);
+          NODE
+
+          DKD_SERVER_KEY="$(cat /tmp/dkd_server_key.txt)"
+          test -n "$DKD_SERVER_KEY"
+          echo "::add-mask::$DKD_SERVER_KEY"
+          echo "DKD_SUPABASE_SERVER_KEY=$DKD_SERVER_KEY" >> "$GITHUB_ENV"
+          rm -f /tmp/dkd_supabase_keys.json /tmp/dkd_server_key.txt
+
+      - name: Delete 19 retired business objects and four retired buckets
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const { createClient } = require('@supabase/supabase-js');
+
+          const projectRef = process.env.DKD_SUPABASE_PROJECT_REF;
+          const serverKey = process.env.DKD_SUPABASE_SERVER_KEY;
+          if (!projectRef || !serverKey) throw new Error('Supabase server credentials unavailable.');
+
+          const supabase = createClient(`https://${projectRef}.supabase.co`, serverKey, {
+            auth: { persistSession: false, autoRefreshToken: false },
+          });
+
+          const businessBucket = 'lootonia-business-product-art';
+          const retiredBuckets = [
+            'lootonia-business-product-art',
+            'dkd_draborngo_business_product_art',
+            'dkd_draborngo-business-product-art',
+            'yesloot-business-product-art',
+          ];
+          const objects = [
+            'business-products/ankara/1776924875674-tavuk-burger-menu.jpg',
+            'business-products/ankara/1776980923419-pizzalazza.jpg',
+            'business-products/ankara/1776980970947-lahmacun-time.jpg',
+            'business-products/ankara/1776980973647-lahmacun-time.jpg',
+            'business-products/eryaman-cafe/1775586307332-tavuk-burger-menu.jpg',
+            'business-products/eryaman-cafe/1775586391499-tavuk-burger-menu.jpg',
+            'business-products/eryaman-cafe/1775586393766-tavuk-burger-menu.jpg',
+            'business-products/eryaman-cafe/1775593316869-tavuk-burger-menu.jpg',
+            'business-products/eryaman-cafe/1775603811586-teysts.jpg',
+            'business-products/eryaman-cafe/1775665034850-starbucks-latte.jpg',
+            'business-products/eryaman-cafe/1775670848148-patates.jpg',
+            'business-products/eryaman-cafe/1776978640333-hamburger-menu.jpg',
+            'business-products/eryaman-cafe/1776978886465-kar-s-k-pizza.jpg',
+            'business-products/eryaman-cafe/1776978968556-kar-s-k-pizza.jpg',
+            'business-products/eryaman-cafe/1776979105821-super-lahmacun-menu.jpg',
+            'business-products/eryaman-cafe/1776981069767-corba-menu.jpg',
+            'business-products/eryaman-cafe/1776981071614-corba-menu.jpg',
+            'business-products/eryaman-cafe/1777035125186-lahmacun-time.jpg',
+            'business-products/eryaman-cafe/1777035181847-pizzalazza.jpg',
+          ];
+
+          async function main() {
+            const { data: buckets, error: listError } = await supabase.storage.listBuckets();
+            if (listError) throw listError;
+            const existing = new Set((buckets || []).map((bucket) => bucket.id || bucket.name));
+
+            if (existing.has(businessBucket)) {
+              const { error: removeError } = await supabase.storage.from(businessBucket).remove(objects);
+              if (removeError) throw removeError;
+            }
+
+            for (const bucket of retiredBuckets) {
+              if (!existing.has(bucket)) continue;
+              const { error } = await supabase.storage.deleteBucket(bucket);
+              if (error) throw new Error(`${bucket}: ${error.message}`);
+            }
+
+            const { data: afterBuckets, error: afterError } = await supabase.storage.listBuckets();
+            if (afterError) throw afterError;
+            const remaining = (afterBuckets || [])
+              .map((bucket) => bucket.id || bucket.name)
+              .filter((bucket) => retiredBuckets.includes(bucket));
+            if (remaining.length) throw new Error(`Retired business buckets remain: ${remaining.join(', ')}`);
+
+            console.log('Retired business Storage cleanup: PASS');
+          }
+
+          main().catch((error) => {
+            console.error(error?.message || error);
+            process.exit(1);
+          });
+          NODE
+
+      - name: Remove temporary cleanup Edge Function
+        shell: bash
+        run: |
+          set -euo pipefail
+          dkd_status="$(curl --silent --output /tmp/dkd_delete_function_response.txt --write-out '%{http_code}' \
+            -X DELETE \
+            "https://api.supabase.com/v1/projects/${DKD_SUPABASE_PROJECT_REF}/functions/dkd-v0-0-12-storage-cleanup-once" \
+            -H "Authorization: Bearer ${SUPABASE_ACCESS_TOKEN}")"
+          if [ "$dkd_status" != "200" ] && [ "$dkd_status" != "404" ]; then
+            cat /tmp/dkd_delete_function_response.txt
+            exit 1
+          fi
+          rm -f /tmp/dkd_delete_function_response.txt
