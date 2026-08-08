@@ -1,0 +1,85 @@
+DKD v0.0.7 PASS FOUR VALIDATION
+fix_code=0
+npm_install_code=0
+expo_export_android_code=0
+
+=== FIX SCRIPT LOG ===
+
+=== NPM LOG TAIL ===
+npm warn deprecated uuid@7.0.3: uuid@10 and below is no longer supported.  For ESM codebases, update to uuid@latest.  For CommonJS codebases, use uuid@11 (but be aware this version will likely be deprecated in 2028).
+
+> draborngo@0.0.7 postinstall
+> node ./scripts/dkd_restore_public_env.mjs && node ./scripts/dkd_clean_android_dependency_manifests.js
+
+DKD public env ayarları .env dosyalarına ve uygulama içine geri yüklendi.
+DKD manifest cleaner: 43 AndroidManifest.xml tarandı.
+DKD manifest cleaner: 4 dosya temizlendi.
+DKD manifest cleaner changed: node_modules/expo-location/android/src/main/AndroidManifest.xml
+DKD manifest cleaner changed: node_modules/expo-image-picker/android/src/main/AndroidManifest.xml
+DKD manifest cleaner changed: node_modules/expo-image/android/src/main/AndroidManifest.xml
+DKD manifest cleaner changed: node_modules/expo-file-system/android/src/main/AndroidManifest.xml
+
+added 800 packages, and audited 801 packages in 39s
+
+179 packages are looking for funding
+  run `npm fund` for details
+
+24 vulnerabilities (8 moderate, 16 high)
+
+To address issues that do not require attention, run:
+  npm audit fix
+
+To address all issues (including breaking changes), run:
+  npm audit fix --force
+
+Run `npm audit` for details.
+
+=== EXPO EXPORT LOG TAIL ===
+env: load .env.local .env.production .env
+env: export EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN EXPO_PUBLIC_SUPABASE_ANON_KEY EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY EXPO_PUBLIC_SUPABASE_URL
+React Compiler enabled
+Starting Metro Bundler
+
+Android Bundled 29258ms node_modules/expo/AppEntry.js (1107 modules)
+
+› Assets (28):
+assets/dkd_login/dkd_city_network_opening.png (1.6MB)
+assets/dkd_login/dkd_login_secure_gate.png (1.4MB)
+assets/dkd_onboarding/dkd_intro_city_ecosystem.png (1.5MB)
+assets/dkd_onboarding/dkd_intro_delivery_route.png (1.5MB)
+assets/dkd_onboarding/dkd_intro_live_tracking.png (1.5MB)
+assets/dkd_onboarding/dkd_intro_role_hub.png (1.5MB)
+node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/AntDesign.ttf (130KB)
+node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/Entypo.ttf (66KB)
+node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/EvilIcons.ttf (13KB)
+node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/Feather.ttf (56KB)
+node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/FontAwesome.ttf (166KB)
+node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/FontAwesome5_Brands.ttf (134KB)
+node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/FontAwesome5_Regular.ttf (34KB)
+node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/FontAwesome5_Solid.ttf (203KB)
+node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/FontAwesome6_Brands.ttf (209KB)
+node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/FontAwesome6_Regular.ttf (68KB)
+node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/FontAwesome6_Solid.ttf (424KB)
+node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/Fontisto.ttf (314KB)
+node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/Foundation.ttf (57KB)
+node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/Ionicons.ttf (390KB)
+node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/MaterialCommunityIcons.ttf (1.3MB)
+node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/MaterialIcons.ttf (357KB)
+node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/Octicons.ttf (69KB)
+node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/SimpleLineIcons.ttf (54KB)
+node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/Zocial.ttf (26KB)
+node_modules/@rnmapbox/maps/lib/module/assets/heading.png (3 variations | 450B)
+
+› android bundles (1):
+_expo/static/js/android/AppEntry-fb2394575ded2f37c63970bef96c285a.hbc (4.8MB)
+
+› Files (1):
+metadata.json (1.9KB)
+
+Exported: /tmp/dkd-v007-export
+
+=== LEGACY SOURCE REFERENCES ===
+
+=== REMOVED IMPORT TARGETS ===
+src/core/AdminModalStack.js:3:import AdminDropsModal from '../features/admin/AdminDropsModal';
+src/core/AdminModalStack.js:144:        <AdminDropsModal

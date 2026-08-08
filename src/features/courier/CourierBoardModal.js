@@ -3302,11 +3302,6 @@ export default function CourierBoardModal({ visible, onClose, profile, setProfil
             </Animated.View>
           </Pressable>
         </View>
-
-        <View style={styles.dkdCourierProfileXpPanel}>
-          <Text style={styles.heroXpMeta}>{courierProgress.progressXp}/{courierProgress.levelGoal} XP • %{courierProgress.progressPct}</Text>
-          <Text style={styles.heroXpRewardLine}>Sonraki seviye: +{nextCourierReward.dkd_puan} Puan • +{nextCourierReward.xp} XP</Text>
-        </View>
         {dkd_order_pool_button_node_value}
       </LinearGradient>
     </View>
