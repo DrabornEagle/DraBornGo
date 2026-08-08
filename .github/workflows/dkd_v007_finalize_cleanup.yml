@@ -1,0 +1,67 @@
+name: DKD v0.0.7 Finalize Clean Source
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/dkd_v007_finalize_cleanup.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  finalize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Remove temporary cleanup artifacts
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f dkd_v007_*.txt
+          rm -f scripts/dkd_v007_*.py
+          rm -f .github/workflows/dkd_v007_apply_cleanup.yml
+          rm -f .github/workflows/dkd_v007_fix2.yml
+          rm -f .github/workflows/dkd_v007_cleanup_inventory.yml
+          rm -f .github/workflows/dkd_v007_delete_legacy_edge_functions.yml
+          rm -f supabase/migrations/20260808_dkd_v0_0_7_remove_legacy_game_economy_sms.sql
+          rm -f supabase/migrations/20260808_dkd_v0_0_7_remove_legacy_business_token_compat.sql
+          rm -f .github/workflows/dkd_v007_finalize_cleanup.yml
+      - name: Final Expo Go validation
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci
+          npx expo export --platform android --output-dir /tmp/dkd-v007-final-export
+          npx expo-doctor@latest
+          node -e "const a=require('./app.json').expo,p=require('./package.json'); if(a.version!=='0.0.7'||a.android.versionCode!==7||p.version!=='0.0.7') process.exit(1); console.log('DraBornGo v0.0.7 / Android versionCode 7 OK');"
+      - name: Enforce retired-system cleanup
+        shell: bash
+        run: |
+          set -euo pipefail
+          DKD_PATTERN='DKD_DraBornGo_v0\.0\.[0-6]|DailyReward|daily_reward|Günlük Giriş Ödülü|Günlük Ödül|\bEnerji\b|energy_max|energy_updated_at|wallet|\bCüzdan\b|\bBakiye\b|dkd_puan|price_puan|reward_puan|\bPuan\b|puanlama|Özel Kart|player.?card|Oyuncu Kartı|chest|\bSandık\b|\bSandıklar\b|collection|\bKoleksiyon\b|payment_status|payment_method|DkdWalletPaymentMethodModal|\bÖdeme\b|task_state|weekly_task_state|TasksModal|task_key|\bGörevler\b|\bXP\b|\bLVL\b|\bLvl\b|rank_key|dkd_iletimerkezi|sms_otp|Telefon doğrulama|dkd_business_drop_links|dkd_business_task_attribution|buy_with_token|point_order|business_product_legacy_keys'
+          if git grep -I -nEi "$DKD_PATTERN" -- . ':!package-lock.json'; then
+            echo 'Retired-system source reference remains.'
+            exit 1
+          fi
+          if git ls-files | grep -Ei '(^|/)(daily.?reward|energy|wallet|payment|chest|collection|boss|leaderboard|tasks?|sms|iletimerkezi|player.?card|progression|drop)(/|\.|_)'; then
+            echo 'Retired-system filename remains.'
+            exit 1
+          fi
+          echo 'Retired-system source scan: CLEAN'
+      - name: Commit final source
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'DraBornGo v0.0.7 Bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add -A
+          git commit -m 'DraBornGo v0.0.7 clean source baseline'
+          git push origin HEAD:main
+      - name: Remove obsolete v0.0.6 backup branch
+        shell: bash
+        run: |
+          git push origin --delete backup/v0.0.6-before-v0.0.7-cleanup-20260808-1342 || true
