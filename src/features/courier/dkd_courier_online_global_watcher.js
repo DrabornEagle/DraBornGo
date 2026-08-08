@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { Image } from 'expo-image';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import {
   acceptCourierJob,
@@ -12,6 +13,7 @@ import {
 import { dkd_make_native_axis_point } from '../../utils/dkdNativeAxis';
 
 const dkd_watcher_poll_ms_value = 8500;
+const dkd_racing_motorcycle_asset_value = require('../../../assets/icons/dkd_racing_motorcycle.svg');
 
 function dkd_trim_text_value(dkd_value) {
   return String(dkd_value || '').trim();
@@ -51,7 +53,6 @@ function dkd_cargo_meta_object_value(dkd_value) {
     return {};
   }
 }
-
 
 function dkd_positive_number_value(dkd_value) {
   const dkd_number_value = Number(dkd_value);
@@ -129,7 +130,6 @@ function dkd_find_active_job_value(dkd_rows_value, dkd_profile_value) {
   )) || null;
 }
 
-
 function DkdCourierAssignedOfferModal({ dkd_offer_job_value, dkd_action_busy_value, dkd_on_accept_value, dkd_on_reject_value, dkd_on_open_courier_board_value }) {
   const dkd_fee_text_value = dkd_offer_fee_text_value(dkd_offer_job_value);
   const dkd_distance_text_value = dkd_offer_distance_text_value(dkd_offer_job_value);
@@ -151,8 +151,8 @@ function DkdCourierAssignedOfferModal({ dkd_offer_job_value, dkd_action_busy_val
               <Text style={dkd_styles.dkd_offer_alert_strip_text}>KURYEYE YENİ GÖREV</Text>
             </View>
             <View style={dkd_styles.dkd_offer_top_row}>
-              <LinearGradient colors={['#FFB84D', '#52F2A1', '#31D7FF']} start={dkd_make_native_axis_point(0, 0)} end={dkd_make_native_axis_point(1, 1)} style={dkd_styles.dkd_offer_icon_shell}>
-                <MaterialCommunityIcons name="bike-fast" size={30} color="#FFFFFF" />
+              <LinearGradient colors={['#07131F', '#0A2537', '#0B172B']} start={dkd_make_native_axis_point(0, 0)} end={dkd_make_native_axis_point(1, 1)} style={dkd_styles.dkd_offer_icon_shell}>
+                <Image source={dkd_racing_motorcycle_asset_value} style={dkd_styles.dkd_offer_racing_motorcycle} contentFit="contain" transition={0} />
               </LinearGradient>
               <View style={dkd_styles.dkd_offer_top_copy}>
                 <Text style={dkd_styles.dkd_offer_eyebrow}>OTOMATİK ATAMA BULUNDU</Text>
@@ -252,7 +252,6 @@ export default function DkdCourierOnlineGlobalWatcher({
     const dkd_zone_value = dkd_trim_text_value(dkd_profile_value?.dkd_region || dkd_profile_value?.courier_zone || dkd_profile_value?.dkd_courier_online_region || '');
     return { dkd_country_value, dkd_city_value, dkd_zone_value };
   }, [dkd_profile_value?.courier_city, dkd_profile_value?.courier_zone, dkd_profile_value?.dkd_city, dkd_profile_value?.dkd_country, dkd_profile_value?.dkd_courier_online_city, dkd_profile_value?.dkd_courier_online_country, dkd_profile_value?.dkd_courier_online_region, dkd_profile_value?.dkd_region]);
-
 
   useEffect(() => {
     dkd_online_ref_value.current = dkd_is_online_value;
@@ -441,7 +440,8 @@ const dkd_styles = StyleSheet.create({
   dkd_offer_alert_strip: { alignSelf: 'flex-start', flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 11, paddingVertical: 7, borderRadius: 999, backgroundColor: '#FFD166', marginBottom: 13 },
   dkd_offer_alert_strip_text: { color: '#06111A', fontSize: 10.5, fontWeight: '950', letterSpacing: 0.8 },
   dkd_offer_top_row: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  dkd_offer_icon_shell: { width: 62, height: 62, borderRadius: 24, alignItems: 'center', justifyContent: 'center' },
+  dkd_offer_icon_shell: { width: 72, height: 64, borderRadius: 24, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'rgba(126,235,255,0.30)', overflow: 'visible' },
+  dkd_offer_racing_motorcycle: { width: 68, height: 42 },
   dkd_offer_top_copy: { flex: 1, minWidth: 0 },
   dkd_offer_eyebrow: { color: '#7EEBFF', fontSize: 10.5, fontWeight: '950', letterSpacing: 0.8 },
   dkd_offer_title: { color: '#F7FBFF', fontSize: 25, fontWeight: '950', marginTop: 2 },
