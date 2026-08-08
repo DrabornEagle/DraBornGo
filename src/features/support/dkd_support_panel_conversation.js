@@ -42,9 +42,9 @@ const dkd_support_topic_list = Object.freeze([
     dkd_tone: ['#FFB84D', '#FF6B7A'],
   },
   {
-    dkd_key: 'dkd_account_wallet',
-    dkd_title: 'Hesap / Bakiye',
-    dkd_text: 'Profil, giriş, bakiye, ödeme ve hesap erişimiyle ilgili destek.',
+    dkd_key: 'dkd_account_access',
+    dkd_title: 'Hesap / Erişim',
+    dkd_text: 'Profil, giriş, hesap güvenliği ve erişim sorunlarıyla ilgili destek.',
     dkd_icon: 'account-heart-outline',
     dkd_tone: ['#A782FF', '#FF72D2'],
   },
@@ -948,6 +948,11 @@ function dkd_support_panel_conversation_component({ dkd_visible, dkd_on_close })
                   placeholderTextColor="rgba(255,255,255,0.38)"
                   style={dkd_styles.dkd_contact_input}
                 />
+              </View>
+
+              <View style={dkd_styles.dkd_ai_issue_box}>
+                <MaterialCommunityIcons name="robot-outline" size={17} color="#FDE68A" />
+                <Text style={dkd_styles.dkd_ai_issue_text}>Destek mesajın, otomatik yanıt oluşturmak amacıyla Google Gemini ile işlenebilir. Talebi göndererek bu destek işleme akışını kabul edersin; gerekirse görüşme insan destek ekibine aktarılır.</Text>
               </View>
 
               <Pressable

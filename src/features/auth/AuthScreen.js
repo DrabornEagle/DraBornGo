@@ -571,6 +571,10 @@ export default function AuthScreen({ mode = 'login', setMode = () => {} }) {
                     <MaterialCommunityIcons name="shield-lock-outline" size={14} color="#72FFBF" />
                     <Text style={dkd_styles.dkd_terms_link_text}>Gizlilik Politikası</Text>
                   </Pressable>
+                  <Pressable onPress={() => dkd_open_policy_url(dkd_community_public_url_value)} style={dkd_styles.dkd_terms_link_pill}>
+                    <MaterialCommunityIcons name="account-group-outline" size={14} color="#FFE074" />
+                    <Text style={dkd_styles.dkd_terms_link_text}>Topluluk Kuralları</Text>
+                  </Pressable>
                 </View>
               </View>
 

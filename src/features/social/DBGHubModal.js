@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
+  Linking,
   Modal,
   Pressable,
   ScrollView,
@@ -10,6 +11,7 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import SafeScreen from '../../components/layout/SafeScreen';
 
 import SecondaryButton from '../../components/ui/SecondaryButton';
@@ -310,6 +312,8 @@ function MessageBubble({ item, mine }) {
 export default function DBGHubModal({ visible, onClose, sessionUserId, profile, refreshProfile }) {
   const [tab, setTab] = useState('threads');
   const [composer, setComposer] = useState('');
+  const [dkd_social_terms_accepted_flag, dkd_set_social_terms_accepted_flag] = useState(false);
+  const [dkd_social_terms_checked_flag, dkd_set_social_terms_checked_flag] = useState(false);
   const feedRef = useRef(null);
   const {
     loading,
@@ -348,6 +352,28 @@ export default function DBGHubModal({ visible, onClose, sessionUserId, profile, 
   const dkd_spotlight_rows = useMemo(() => threadRows.slice(0, 3), [threadRows]);
   const dkd_presence_score = useMemo(() => unreadTotal + incoming.length + friends.length, [friends.length, incoming.length, unreadTotal]);
 
+  const dkd_social_terms_storage_key_value = useMemo(() => `dkd_social_terms_2026_08_08_v007_${String(sessionUserId || 'anonymous')}`, [sessionUserId]);
+
+  useEffect(() => {
+    if (!visible) return undefined;
+    let dkd_cancelled_value = false;
+    dkd_set_social_terms_checked_flag(false);
+    AsyncStorage.getItem(dkd_social_terms_storage_key_value)
+      .then((dkd_value) => {
+        if (dkd_cancelled_value) return;
+        dkd_set_social_terms_accepted_flag(dkd_value === 'accepted');
+      })
+      .catch(() => { if (!dkd_cancelled_value) dkd_set_social_terms_accepted_flag(false); })
+      .finally(() => { if (!dkd_cancelled_value) dkd_set_social_terms_checked_flag(true); });
+    return () => { dkd_cancelled_value = true; };
+  }, [dkd_social_terms_storage_key_value, visible]);
+
+  async function dkd_accept_social_terms_value() {
+    await AsyncStorage.setItem(dkd_social_terms_storage_key_value, 'accepted');
+    dkd_set_social_terms_accepted_flag(true);
+    dkd_set_social_terms_checked_flag(true);
+  }
+
   useEffect(() => {
     if (!visible || !activeChat || !feedRef.current) return;
     const dkd_timer = setTimeout(() => feedRef.current?.scrollToEnd?.({ animated: true }), 120);
@@ -381,6 +407,28 @@ export default function DBGHubModal({ visible, onClose, sessionUserId, profile, 
       return;
     }
     setComposer((prev) => `${prev}${prev.endsWith(' ') || !prev ? '' : ' '}${emoji}`);
+  }
+
+  if (visible && dkd_social_terms_checked_flag && !dkd_social_terms_accepted_flag) {
+    return (
+      <Modal visible animationType="slide" onRequestClose={onClose}>
+        <SafeScreen style={{ flex: 1, backgroundColor: '#03060F' }}>
+          <LinearGradient colors={['#03060F', '#07111D', '#160B20']} style={{ flex: 1, padding: 22, justifyContent: 'center' }}>
+            <View style={{ borderRadius: 28, borderWidth: 1, borderColor: 'rgba(132,228,255,0.20)', backgroundColor: 'rgba(8,14,24,0.96)', padding: 22 }}>
+              <MaterialCommunityIcons name="shield-account-outline" size={34} color="#94EEFF" />
+              <Text style={{ color: '#FFFFFF', fontSize: 27, fontWeight: '900', marginTop: 14 }}>Sohbet Güvenlik Kuralları</Text>
+              <Text style={{ color: 'rgba(223,238,255,0.76)', fontSize: 14, lineHeight: 21, marginTop: 10 }}>Mesaj göndermeden önce Kullanım Şartları ve Topluluk Kuralları'nı kabul et. Taciz, tehdit, nefret, dolandırıcılık, spam, yasa dışı içerik ve kişisel veri ifşası yasaktır. Uygunsuz kullanıcıları şikayet edebilir veya engelleyebilirsin.</Text>
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginTop: 18 }}>
+                <Pressable onPress={() => Linking.openURL('https://www.draborneagle.com/draborngo/terms/')} style={{ paddingHorizontal: 14, paddingVertical: 11, borderRadius: 16, backgroundColor: 'rgba(103,227,255,0.12)' }}><Text style={{ color: '#9AF8FF', fontWeight: '900' }}>Kullanım Şartları</Text></Pressable>
+                <Pressable onPress={() => Linking.openURL('https://www.draborneagle.com/draborngo/community/')} style={{ paddingHorizontal: 14, paddingVertical: 11, borderRadius: 16, backgroundColor: 'rgba(255,224,116,0.12)' }}><Text style={{ color: '#FFE074', fontWeight: '900' }}>Topluluk Kuralları</Text></Pressable>
+              </View>
+              <Pressable onPress={dkd_accept_social_terms_value} style={{ minHeight: 58, borderRadius: 20, backgroundColor: '#8CEEFF', alignItems: 'center', justifyContent: 'center', marginTop: 20 }}><Text style={{ color: '#07111C', fontSize: 16, fontWeight: '900' }}>Kabul Et ve Sohbeti Aç</Text></Pressable>
+              <Pressable onPress={onClose} style={{ minHeight: 50, alignItems: 'center', justifyContent: 'center', marginTop: 8 }}><Text style={{ color: 'rgba(239,244,255,0.72)', fontWeight: '800' }}>Vazgeç</Text></Pressable>
+            </View>
+          </LinearGradient>
+        </SafeScreen>
+      </Modal>
+    );
   }
 
   return (
