@@ -1,0 +1,10 @@
+{
+  "dkd_latest_version_name": "0.0.5",
+  "dkd_latest_version_code": 5,
+  "dkd_min_supported_version_code": 3,
+  "dkd_update_required": false,
+  "dkd_apk_url": "https://www.draborneagle.com/DraBornGo/App/dkd_draborngo_latest.apk",
+  "dkd_download_page_url": "https://www.draborneagle.com/DraBornGo/App/",
+  "dkd_sha256": "APK_BUILD_SONRASI_SHA256_BURAYA_YAZILACAK",
+  "dkd_release_notes": "DraBornGo resmi APK indirme sayfası, uygulama içi sürüm kontrolü ve kullanıcı onaylı güncelleme merkezi eklendi."
+}

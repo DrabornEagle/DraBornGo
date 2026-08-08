@@ -1,128 +1,81 @@
+> Aktif sürüm: DraBornGo v0.0.5 • Android versionCode 5 • Termux proje yolu: `~/Projects/DraBornGo`
+
 # DraBornGo
 
-DraBornGo, kurye ve şehir hizmet operasyonlarını tek mobil merkezde birleştiren Expo + Supabase uygulamasıdır.
+DraBornGo is an Expo + Supabase mobile application focused on courier, package delivery, service-network orders, live route tracking, support, account privacy, and admin operations.
 
-## v0.0.6 test kimliği
-- Uygulama sürümü: `0.0.6`
-- Android `versionCode`: `6`
-- Paket: `com.draborneagle.draborngo`
-- Expo SDK: `57` (`expo ~57.0.8`)
-- React Native: `0.86.2`
-- React: `19.2.3`
-- Node.js: `>=22.13.0`
-- Test kanalı: Expo Go `57.0.2`
-- Bu aşamada APK/AAB veya Google Play dağıtım paketi üretilmez.
+## Active source rule
 
-Expo SDK 57 Android API 36 hedef hattındadır. Store paketi üretmeye geçildiğinde Google Play güncel hedef API ve Data Safety beyanı ayrıca son kez doğrulanmalıdır.
+Only this local source is active for mobile development:
 
-## Aktif çekirdek
-- E-posta/şifre ile hesap ve profil
-- Kurye çevrimiçi durumu ve atanmış teslimatlar
-- Hizmet ağı işletme/katalog görüntüleme
-- Başvuru takibi
-- DBG sohbet
-- Gizlilik, hesap/veri silme ve yönetim operasyonları
+- `projects/DraBornGo`
 
-## İzin yaklaşımı
-Konum izni yalnızca kullanıcı konum gerektiren işlemi başlattığında ve uygulama görünürken istenir. Arka plan konumu, mikrofon, geniş medya erişimi, paket kurma, tüm paketleri sorgulama ve full-screen intent gibi mevcut v0.0.6 için gereksiz hassas Android izinleri engellenmiştir.
+The production app name and store-facing brand is **DraBornGo**.
 
-## Termux: ilk kurulum + GitHub → `~/projects/DraBornGo`
+## Store safety scope
+
+DraBornGo is prepared for physical service and delivery workflows.
+
+- The TL wallet is for physical service/order flows.
+- Points, collection cards, and gamification elements do not represent cash, crypto, investment value, or withdrawable financial value.
+- Digital item sales language must not be used in store-facing screens.
+- Location is used for address matching, route drawing, courier visibility, and active delivery tracking.
+- Camera is used for QR scanning, package/service photos, profile photos, and receipt/dekont photo upload.
+- Account deletion and privacy pages are hosted publicly at draborneagle.com.
+
+## Main modules
+
+- Authentication and profile
+- Courier and package operations
+- Service network orders
+- Live route and map tracking
+- Support and moderation
+- Admin panels
+- Push notification foundation
+- Privacy and account deletion flows
+
+## Termux quick start
+
 ```bash
-pkg update -y
-pkg install -y git nodejs-lts
-
-node -e "const v=process.versions.node.split('.').map(Number); if(v[0]<22 || (v[0]===22 && v[1]<13)){console.error('Node.js 22.13.0 veya üstü gerekli. Mevcut: '+process.versions.node); process.exit(1)}"
-
+termux-setup-storage
+pkg update -y && pkg upgrade -y
+pkg install -y nodejs-lts git unzip ripgrep
 mkdir -p ~/projects
-cd ~/projects
-
-if [ ! -d DraBornGo/.git ]; then
-  git clone -b main https://github.com/DrabornEagle/DraBornGo.git DraBornGo
-fi
-
 cd ~/projects/DraBornGo
-git fetch origin --prune
-git checkout main
-git reset --hard origin/main
-git clean -fd
-rm -rf node_modules .expo
-npm install --legacy-peer-deps --package-lock=false
-npm run quality:local
-npm run dkd:start:go
+npm install --legacy-peer-deps
+npx expo install --fix
+npx expo start -c --go --lan
 ```
 
-## Sonraki güncellemelerde GitHub → lokal birebir eşitleme
-Normal eşitlemede `npm run dkd:deps:fix` kullanılmaz. `--fix` bağımlılık manifestini değiştirebildiği için yalnızca bilinçli sürüm bakımında çalıştırılır ve oluşan değişiklik GitHub'a commit edilir.
+## Required environment variables
 
-```bash
-cd ~/projects/DraBornGo
-git fetch origin --prune
-git checkout main
-git reset --hard origin/main
-git clean -fd
-rm -rf node_modules .expo
-npm install --legacy-peer-deps --package-lock=false
-npm run quality:local
-npm run dkd:start:go
+```env
+EXPO_PUBLIC_SUPABASE_URL=https://YOUR-PROJECT.supabase.co
+EXPO_PUBLIC_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
 ```
 
-Kaynak eşitliği kontrolü:
-```bash
-cd ~/projects/DraBornGo
-git fetch origin
-git status --short
-git rev-parse HEAD
-git rev-parse origin/main
-```
-`git status --short` boş ve iki SHA aynıysa takip edilen proje dosyaları GitHub `main` ile eşittir.
+## Repo hygiene rules
 
-## Her sürüm yükseltmesinden ÖNCE GitHub yedeği
-Önce mevcut çalışan `main` sürümü uzak GitHub yedeğine alınır; sonra yeni sürüm değişikliklerine geçilir.
+- Keep only one current source base.
+- Do not commit `node_modules/`, APK/AAB files, build outputs, secrets, or local environment files.
+- Preserve `.github/workflows`.
+- Keep SQL files under `supabase/`.
+- Use `dkd_` / `dkd.` naming for new project-owned identifiers.
 
-```bash
-cd ~/projects/DraBornGo
-git fetch origin --prune
-git checkout main
-git reset --hard origin/main
-DKD_PREVIOUS_VERSION="$(node -p "require('./package.json').version")"
-DKD_BACKUP="backup/v${DKD_PREVIOUS_VERSION}-final-$(date +%Y%m%d-%H%M)"
-git push origin "HEAD:refs/heads/${DKD_BACKUP}"
-echo "GitHub yedeği: ${DKD_BACKUP}"
-```
 
-v0.0.6 öncesi kanonik geri dönüş yedeği:
-```text
-backup/v0.0.5-final-20260808
-```
+## DKD mağaza güvenliği güncel notu
 
-## v0.0.5'e yerel geri dönüş
-```bash
-cd ~/projects/DraBornGo
-git fetch origin --prune
-git checkout main
-git reset --hard origin/backup/v0.0.5-final-20260808
-rm -rf node_modules .expo
-npm install --legacy-peer-deps --package-lock=false
-npm run quality:local
-```
+Kart satış/ilan akışı mağaza sürümünde kapalıdır. Kazanılmış puan dili yalnızca fiziksel hizmet, teslimat ve güvenli vitrin bağlamında kullanılır. Eski marka storage anahtarları dkd_draborngo_* standardına taşınmıştır.
 
-## v0.0.5'i GitHub `main` olarak tamamen geri yükleme
-Bu komut yalnızca gerçekten kalıcı rollback istendiğinde kullanılır:
-```bash
-cd ~/projects/DraBornGo
-git fetch origin --prune
-git checkout main
-git reset --hard origin/backup/v0.0.5-final-20260808
-git push --force-with-lease origin HEAD:main
-```
+## Web yayın ayrımı
 
-## Sürüm yükseltme kuralı
-Her yeni sürümde sıralama sabittir:
-1. Mevcut `main` GitHub backup dalına alınır.
-2. `package.json` sürümü güncellenir.
-3. `app.json` sürümü ve Android `versionCode` birlikte yükseltilir.
-4. Expo uyumluluk kontrolü ve `expo-doctor` çalıştırılır.
-5. Google Play izin/veri politikası ve web gizlilik + hesap silme sayfaları yeniden gözden geçirilir.
-6. Değişiklikler GitHub `main` ve gerekli Supabase migration/Edge Function yapılarına uygulanır.
-7. Termux'ta `origin/main` → `~/projects/DraBornGo` hard-sync yapılır.
-8. `git status` ve SHA karşılaştırmasıyla GitHub/lokal eşitliği doğrulanır.
+DrabornEagle şirket web sitesi ayrı public repo üzerinden yayınlanır:
+
+- Repo: `DrabornEagle/DrabornEagle_Web`
+- Ana site: `https://www.draborneagle.com/`
+- DraBornGo ürün alanı: `https://www.draborneagle.com/draborngo/`
+- Gizlilik: `https://www.draborneagle.com/draborngo/privacy/`
+- Hesap silme: `https://www.draborneagle.com/draborngo/account-deletion/`
+- Kullanım şartları: `https://www.draborneagle.com/draborngo/terms/`
+
+Bu DraBornGo mobil repo private kalır ve web yayını buradan yapılmaz.

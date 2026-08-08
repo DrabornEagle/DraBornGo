@@ -1,0 +1,38 @@
+name: DKD Urgent Courier Alert Deploy
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'supabase/functions/send-urgent-courier-alert/**'
+      - 'supabase/config.toml'
+      - '.github/workflows/dkd_urgent_courier_alert_deploy.yml'
+
+jobs:
+  dkd_deploy_send_urgent_courier_alert:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      DKD_SUPABASE_PROJECT_REF: ${{ secrets.DKD_SUPABASE_PROJECT_REF }}
+    steps:
+      - name: Dkd checkout
+        uses: actions/checkout@v4
+
+      - name: Dkd setup supabase cli
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Dkd verify urgent function path
+        run: |
+          test -f supabase/functions/send-urgent-courier-alert/index.ts
+
+      - name: Dkd deploy urgent function
+        run: |
+          supabase functions deploy send-urgent-courier-alert \
+            --project-ref "$DKD_SUPABASE_PROJECT_REF" \
+            --use-api
