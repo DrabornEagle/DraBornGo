@@ -8,7 +8,7 @@ const dkd_profile_select_value = [
   'dkd_country', 'dkd_city', 'dkd_region', 'dkd_courier_online',
   'dkd_courier_online_country', 'dkd_courier_online_city', 'dkd_courier_online_region',
   'dkd_courier_online_lat', 'dkd_courier_online_lng', 'dkd_courier_last_online_at',
-  'dkd_courier_auto_assigned_job_id', 'dkd_logistics_status', 'dkd_logistics_profile_meta'
+  'dkd_courier_auto_assigned_job_id'
 ].join(', ');
 
 export async function ensureProfile(dkd_user_id_value) {
@@ -20,11 +20,7 @@ export async function checkIsAdmin() {
 }
 
 export async function fetchProfile(dkd_user_id_value) {
-  const dkd_result_value = await supabase
-    .from('dkd_profiles')
-    .select(dkd_profile_select_value)
-    .eq('user_id', dkd_user_id_value)
-    .maybeSingle();
+  const dkd_result_value = await supabase.from('dkd_profiles').select(dkd_profile_select_value).eq('user_id', dkd_user_id_value).maybeSingle();
   if (dkd_result_value?.error) throw dkd_result_value.error;
   const dkd_row_value = dkd_result_value?.data || {};
   return {
@@ -42,7 +38,6 @@ export async function fetchProfile(dkd_user_id_value) {
       courier_active_days: Number(dkd_row_value?.courier_active_days || 0),
       courier_fastest_eta_min: dkd_row_value?.courier_fastest_eta_min == null ? null : Number(dkd_row_value.courier_fastest_eta_min),
       courier_profile_meta: dkd_row_value?.courier_profile_meta && typeof dkd_row_value.courier_profile_meta === 'object' ? dkd_row_value.courier_profile_meta : {},
-      dkd_logistics_profile_meta: dkd_row_value?.dkd_logistics_profile_meta && typeof dkd_row_value.dkd_logistics_profile_meta === 'object' ? dkd_row_value.dkd_logistics_profile_meta : {},
       dkd_courier_online: dkd_row_value?.dkd_courier_online === true,
     },
     tasksDbReady: false,
@@ -51,9 +46,7 @@ export async function fetchProfile(dkd_user_id_value) {
 }
 
 export async function setProfileNickname(dkd_nickname_value, dkd_avatar_value, dkd_avatar_image_url_value = undefined) {
-  const dkd_clean_image_value = dkd_avatar_image_url_value === undefined
-    ? undefined
-    : (String(dkd_avatar_image_url_value || '').trim() || null);
+  const dkd_clean_image_value = dkd_avatar_image_url_value === undefined ? undefined : (String(dkd_avatar_image_url_value || '').trim() || null);
   if (dkd_clean_image_value !== undefined) {
     const dkd_identity_result_value = await supabase.rpc('dkd_set_profile_identity', {
       dkd_param_nickname: dkd_nickname_value,
