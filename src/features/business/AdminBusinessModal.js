@@ -256,7 +256,7 @@ export default function AdminBusinessModal({ visible, onClose }) {
     startNewBusiness,
     isCreatingBusiness,
     selectedBusiness,
-    adminDrops,
+
     dashboard,
     businessDraft,
     setBusinessDraft,
@@ -269,23 +269,17 @@ export default function AdminBusinessModal({ visible, onClose }) {
     couponRedeemDraft,
     setCouponRedeemDraft,
     redeemCoupon,
-    attachDrop,
-    removeLinkedDrop,
+
     refreshAll,
     accessDraft,
     setAccessDraft,
     createAccessCode,
     lastAccessCode,
   } = useBusinessAdminData(visible);
-
-  const linkedDrops = useMemo(() => (Array.isArray(dashboard?.linkedDrops) ? dashboard.linkedDrops : []), [dashboard?.linkedDrops]);
   const campaigns = useMemo(() => (Array.isArray(dashboard?.campaigns) ? dashboard.campaigns : []), [dashboard?.campaigns]);
   const hourly = useMemo(() => (Array.isArray(dashboard?.hourly) ? dashboard.hourly.filter((dkd_numeric_value) => Number(dkd_numeric_value?.scan_count || 0) > 0) : []), [dashboard?.hourly]);
   const tasks = useMemo(() => (Array.isArray(dashboard?.tasks) ? dashboard.tasks.filter((dkd_numeric_value) => Number(dkd_numeric_value?.scan_count || 0) > 0) : []), [dashboard?.tasks]);
   const today = useMemo(() => (dashboard?.today || {}), [dashboard?.today]);
-
-  const availableDrops = useMemo(() => {
-    const taken = new Set(linkedDrops.map((row) => String(row?.drop_id)));
     return (adminDrops || []).filter((row) => !taken.has(String(row?.id)));
   }, [adminDrops, linkedDrops]);
 

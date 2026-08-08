@@ -1056,40 +1056,7 @@ function DkdServiceNetworkMyOrdersCard({ dkd_visible_value, dkd_profile_value })
   );
 }
 
-function DkdServiceNetworkHero({ dkd_on_payment_method_press_value }) {
-  const dkd_wallet_corner_cue_anim_value = useRef(new Animated.Value(0)).current;
-
-  useEffect(() => {
-    const dkd_wallet_corner_cue_loop_value = Animated.loop(
-      Animated.sequence([
-        Animated.timing(dkd_wallet_corner_cue_anim_value, {
-          toValue: 1,
-          duration: 720,
-          easing: Easing.inOut(Easing.ease),
-          useNativeDriver: true,
-        }),
-        Animated.timing(dkd_wallet_corner_cue_anim_value, {
-          toValue: 0,
-          duration: 720,
-          easing: Easing.inOut(Easing.ease),
-          useNativeDriver: true,
-        }),
-      ])
-    );
-
-    dkd_wallet_corner_cue_loop_value.start();
-    return () => dkd_wallet_corner_cue_loop_value.stop();
-  }, [dkd_wallet_corner_cue_anim_value]);
-
-  const dkd_wallet_corner_cue_scale_value = dkd_wallet_corner_cue_anim_value.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0.88, 1.14],
-  });
-  const dkd_wallet_corner_cue_opacity_value = dkd_wallet_corner_cue_anim_value.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0.70, 1],
-  });
-
+function DkdServiceNetworkHero() {
   return (
     <LinearGradient colors={['#0D2C45', '#23306E', '#7C2D58']} style={dkd_styles.dkd_hero_shell}>
       <View style={dkd_styles.dkd_hero_icon_cloud}>
@@ -1105,33 +1072,9 @@ function DkdServiceNetworkHero({ dkd_on_payment_method_press_value }) {
       </View>
       <Text style={dkd_styles.dkd_hero_eyebrow}>DraBornGo HİZMET AĞI</Text>
       <Text style={dkd_styles.dkd_hero_title}>Şehiriçi & Şehirlerarası ihtiyacınız olan bütün hizmetlerden yararlanın.</Text>
-      <Pressable onPress={dkd_on_payment_method_press_value} style={({ pressed: dkd_pressed_value }) => [dkd_styles.dkd_hero_wallet_button, dkd_pressed_value && dkd_styles.dkd_hero_wallet_button_pressed]}>
-        <Animated.View
-          pointerEvents="none"
-          style={[
-            dkd_styles.dkd_hero_wallet_corner_cue,
-            {
-              opacity: dkd_wallet_corner_cue_opacity_value,
-              transform: [{ scale: dkd_wallet_corner_cue_scale_value }],
-            },
-          ]}
-        >
-          <View style={dkd_styles.dkd_hero_wallet_corner_cue_ring} />
-          <MaterialCommunityIcons name="cursor-default-click-outline" size={15} color="#082032" />
-        </Animated.View>
-        <View style={dkd_styles.dkd_hero_wallet_icon_wrap}>
-          <MaterialCommunityIcons name="wallet-plus-outline" size={20} color="#07131C" />
-        </View>
-        <View style={dkd_styles.dkd_hero_wallet_copy}>
-          <Text numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.84} style={dkd_styles.dkd_hero_wallet_title}>Cüzdanına Para Yükle</Text>
-          <Text numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.78} style={dkd_styles.dkd_hero_wallet_text}>TL bakiyeni hızlıca ekle</Text>
-        </View>
-        <MaterialCommunityIcons name="chevron-right" size={21} color="#BAE6FD" />
-      </Pressable>
     </LinearGradient>
   );
 }
-
 
 function DkdServiceNetworkFeaturedActions({
   dkd_active_operation_value,
@@ -1726,7 +1669,7 @@ function DkdServiceNetworkModal({ dkd_visible_value, dkd_on_close_value, dkd_pro
             onScroll={(dkd_scroll_event_value) => { dkd_scroll_position_y_ref_value.current = dkd_scroll_event_value.nativeEvent.contentOffset.y; }}
             contentContainerStyle={dkd_styles.dkd_scroll_content}
           >
-            <DkdServiceNetworkHero dkd_on_payment_method_press_value={dkd_open_service_wallet_modal_value} />
+            <DkdServiceNetworkHero />
             <DkdServiceNetworkMyOrdersCard
               dkd_visible_value={dkd_visible_value}
               dkd_profile_value={dkd_profile_value}

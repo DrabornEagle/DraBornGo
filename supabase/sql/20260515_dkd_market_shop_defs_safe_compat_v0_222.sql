@@ -1,4 +1,0 @@
--- DKD DraBornGo v0.222 optional compatibility note
--- This file is intentionally non-destructive.
--- The app no longer requires dkd_market_shop_defs.price_puan for the store-safe market view.
--- If an older RPC still references price_puan, update that RPC separately or keep using the app-side fallback.
