@@ -1,23 +1,28 @@
 # DraBornGo Google Play Public Pages
 
-Bu paket, DraBornGo için GitHub Pages üzerinden yayınlanacak public HTML sayfalarını içerir.
+DraBornGo Google Play için gerekli public ürün/yasal sayfaları `https://www.draborneagle.com/draborngo/` altında yayınlanır.
 
-## Yayın hedefleri
+## Canonical canlı web kaynağı
 
-- https://www.draborneagle.com/draborngo/privacy/
-- https://www.draborneagle.com/draborngo/account-deletion/
+Canlı `draborneagle.com` web içeriğinin canonical GitHub kaynağı:
 
-## Paket içeriği
+- Repo: `DrabornEagle/DrabornEagle_Web`
+- Ürün: `https://www.draborneagle.com/draborngo/`
+- Gizlilik: `https://www.draborneagle.com/draborngo/privacy/`
+- Hesap ve veri silme: `https://www.draborneagle.com/draborngo/account-deletion/`
+- Kullanım şartları: `https://www.draborneagle.com/draborngo/terms/`
 
-- googleplay/index.html
-- googleplay/privacy/index.html
-- googleplay/account-deletion/index.html
-- googleplay/CNAME
-- googleplay/.nojekyll
-- .github/workflows/dkd_googleplay_pages.yml
+Bu mobil repodaki `web/draborngo/` dosyaları uygulama/politika geliştirmesi için izlenen kaynak kopyalarıdır; canlı sitenin tek yayın kaynağı değildir.
 
-## Önemli kontrol
+## Google Play gereklilikleri
 
-- support@draborneagle.com aktif değilse HTML dosyalarında kendi aktif destek e-posta adresinle değiştir.
-- Google Form gizli sekmede açılmalı ve giriş istemeden talep kabul etmelidir.
-- GitHub Pages custom domain için DNS ve repo Pages ayarları tamamlanmalıdır.
+- Hesap oluşturan kullanıcı için uygulama içinde hesap silme yolu bulunmalıdır.
+- Uygulama dışında, uygulamayı kaldırmış kullanıcının da erişebildiği public hesap silme talep yolu bulunmalıdır.
+- Gizlilik politikası public, erişilebilir ve DraBornGo/DrabornEagle kimliğini açıkça belirtmelidir.
+- Google Play sürümündeki uygulama webden APK indirerek kendini güncellememelidir; sürüm güncellemeleri Google Play üzerinden yapılmalıdır.
+- `support@draborneagle.com` hesabı aktif ve izleniyor olmalıdır.
+- Web hesap silme formu veya e-posta yolu giriş yapmadan erişilebilir olmalıdır.
+
+## v0.0.6 notu
+
+DraBornGo v0.0.6 / Android versionCode 6 aşamasında test Expo Go üzerinden yürütülür; APK/AAB yayınlanmaz. Eski APK indirme sayfaları canlı webde yeni APK dağıtımı için kullanılmamalıdır.
