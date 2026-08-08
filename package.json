@@ -7,7 +7,7 @@
     "web": "node ./node_modules/expo/bin/cli start --web",
     "doctor": "npx expo-doctor@latest",
     "expo:fix": "npx expo install --fix",
-    "dkd:start:go": "node ./node_modules/expo/bin/cli start --go --tunnel --clear",
+    "dkd:start:go": "node ./node_modules/expo/bin/cli start --go --lan --clear",
     "dkd:start:dev": "node ./node_modules/expo/bin/cli start --dev-client --tunnel --clear",
     "reset-project": "node ./scripts/reset-project.js",
     "android": "node ./node_modules/expo/bin/cli start --android",
