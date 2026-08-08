@@ -31,7 +31,7 @@ npm run dkd:start:go
 
 ## GitHub ile birebir yerel eşitleme
 ```bash
-cd ~/Projects/DraBornGo
+cd ~/projects/DraBornGo
 git fetch origin --prune
 git checkout main
 git reset --hard origin/main
@@ -43,7 +43,7 @@ npm run quality:local
 
 ## Her sürümden önce yedek
 ```bash
-cd ~/Projects/DraBornGo
+cd ~/projects/DraBornGo
 git fetch origin --prune
 git checkout main
 git pull --ff-only
@@ -55,7 +55,7 @@ echo "$DKD_BACKUP"
 
 ## Bir yedek dala yerel geri dönüş
 ```bash
-cd ~/Projects/DraBornGo
+cd ~/projects/DraBornGo
 git fetch origin --prune
 git checkout main
 git reset --hard origin/YEDEK_DAL_ADI
