@@ -1,0 +1,7 @@
+DraBornGo v0.0.10 remote source audit: PASS
+Android versionCode: 10
+Acil Kurye active source: REMOVED
+Android source export: PASS
+Web source export: PASS
+APK/AAB produced: NO
+Commit: 6e4a4554b9b777b1fb1cbe37a7027154fa237394
