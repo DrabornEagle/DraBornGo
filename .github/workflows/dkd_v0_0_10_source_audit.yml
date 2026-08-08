@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   dkd_source_audit:
-    name: Expo Go Android and web source audit
+    name: Expo Go Android, web and full-tree audit
     runs-on: ubuntu-latest
     timeout-minutes: 25
     env:
@@ -37,13 +37,17 @@ jobs:
       - name: Verify v0.0.10 identity
         run: npm run dkd:verify-v0.0.10
 
-      - name: Assert retired courier module stays absent
+      - name: Assert retired courier module stays absent from full main tree
         shell: bash
         run: |
           DKD_REMOVED_KEY='urgent''_courier'
           DKD_REMOVED_EDGE='send-urgent''-courier-alert'
-          if grep -RniEi "${DKD_REMOVED_KEY}|${DKD_REMOVED_EDGE}" src supabase/functions --exclude-dir=node_modules; then
-            echo 'Retired courier module residue detected.'
+          DKD_LABEL_ONE='Acil'
+          DKD_LABEL_TWO='Kurye'
+          if grep -RniEi "${DKD_REMOVED_KEY}|${DKD_REMOVED_EDGE}|${DKD_LABEL_ONE}[[:space:]]+${DKD_LABEL_TWO}" . \
+              --exclude-dir=.git \
+              --exclude-dir=node_modules; then
+            echo 'Retired courier module residue detected in main tree.'
             exit 1
           fi
 
@@ -60,7 +64,7 @@ jobs:
           {
             echo "DraBornGo v0.0.10 remote source audit: PASS"
             echo "Android versionCode: 10"
-            echo "Retired courier module active source: NONE"
+            echo "Full main-tree retired module scan: PASS"
             echo "Android source export: PASS"
             echo "Web source export: PASS"
             echo "APK/AAB produced: NO"
