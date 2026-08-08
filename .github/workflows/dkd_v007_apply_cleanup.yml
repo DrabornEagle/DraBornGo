@@ -17,22 +17,36 @@ jobs:
       - uses: actions/checkout@v4
       - name: Apply cleanup pass two
         shell: bash
-        run: python3 scripts/dkd_v007_fix2.py
+        run: |
+          set +e
+          python3 scripts/dkd_v007_fix2.py > /tmp/dkd_fix2.log 2>&1
+          echo "$?" > /tmp/dkd_fix2_code
       - name: Expo Go source validation
         shell: bash
         run: |
           set +e
-          npm install --no-package-lock > /tmp/dkd_npm2.log 2>&1
-          DKD_INSTALL_CODE=$?
+          DKD_FIX_CODE=$(cat /tmp/dkd_fix2_code)
+          DKD_INSTALL_CODE=99
           DKD_EXPORT_CODE=99
-          if [ "$DKD_INSTALL_CODE" = "0" ]; then
-            npx expo export --platform android --output-dir /tmp/dkd-v007-export > /tmp/dkd_export2.log 2>&1
-            DKD_EXPORT_CODE=$?
+          if [ "$DKD_FIX_CODE" = "0" ]; then
+            npm install --no-package-lock > /tmp/dkd_npm2.log 2>&1
+            DKD_INSTALL_CODE=$?
+            if [ "$DKD_INSTALL_CODE" = "0" ]; then
+              npx expo export --platform android --output-dir /tmp/dkd-v007-export > /tmp/dkd_export2.log 2>&1
+              DKD_EXPORT_CODE=$?
+            fi
           fi
           {
             echo "DKD v0.0.7 PASS TWO VALIDATION"
+            echo "fix_code=$DKD_FIX_CODE"
             echo "npm_install_code=$DKD_INSTALL_CODE"
             echo "expo_export_android_code=$DKD_EXPORT_CODE"
+            echo
+            echo "=== FIX SCRIPT LOG ==="
+            cat /tmp/dkd_fix2.log
+            echo
+            echo "=== NPM LOG TAIL ==="
+            tail -n 80 /tmp/dkd_npm2.log 2>/dev/null || true
             echo
             echo "=== EXPO EXPORT LOG TAIL ==="
             tail -n 180 /tmp/dkd_export2.log 2>/dev/null || true
