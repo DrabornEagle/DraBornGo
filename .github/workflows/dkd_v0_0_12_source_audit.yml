@@ -1,0 +1,37 @@
+name: DKD v0.0.12 Source Audit
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: dkd-v0-0-12-source-audit-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  source-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      CI: '1'
+      EXPO_NO_TELEMETRY: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+      - name: Install locked dependencies
+        run: npm ci
+      - name: Verify v0.0.12 identity
+        run: node ./scripts/dkd_verify_release_identity_v12.mjs
+      - name: Google Play source risk scan
+        run: npm run dkd:play-risk-scan
+      - name: Android and web source audit
+        run: npm run play:final-audit
