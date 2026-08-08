@@ -40,7 +40,7 @@ export default function AdminMenuModal({ visible, onClose, onCourier, onApplicat
 
             <ScrollView contentContainerStyle={{ paddingTop: 18, gap: 10 }}>
               <DkdAction icon="truck-fast-outline" title="Kurye Operasyonları" sub="Kurye ve teslimat merkezini aç" onPress={onCourier} />
-              <DkdAction icon="clipboard-account-outline" title="Başvurular" sub="Kurye ve nakliye başvurularını incele" onPress={onApplications} />
+              <DkdAction icon="clipboard-account-outline" title="Başvurular" sub="Kurye başvurularını incele" onPress={onApplications} />
               <DkdAction icon="shield-alert-outline" title="Moderasyon Kuyruğu" sub="Sosyal rapor ve şikayetleri incele" onPress={() => setModerationOpen(true)} />
             </ScrollView>
           </LinearGradient>
