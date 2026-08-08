@@ -1,0 +1,48 @@
+name: DKD v0.0.12 Verify Sync
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/dkd_v0_0_12_package_verify_sync.yml
+
+permissions:
+  contents: write
+
+jobs:
+  finalize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Point package verifier at v0.0.12 verifier
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const path = 'package.json';
+          const data = JSON.parse(fs.readFileSync(path, 'utf8'));
+          data.version = '0.0.12';
+          data.scripts = data.scripts || {};
+          data.scripts['dkd:verify-v0.0.12'] = 'node ./scripts/dkd_verify_release_identity_v12.mjs';
+          delete data.scripts['dkd:verify-v0.0.11'];
+          fs.writeFileSync(path, JSON.stringify(data, null, 2) + '\n');
+          NODE
+      - name: Synchronize package lock
+        run: npm install --package-lock-only --ignore-scripts
+      - name: Verify release identity
+        run: npm run dkd:verify-v0.0.12
+      - name: Remove one-time workflows and commit
+        shell: bash
+        run: |
+          rm -f .github/workflows/dkd_v0_0_12_package_verify_sync.yml .github/workflows/dkd_v0_0_12_lock_sync.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add package.json package-lock.json .github/workflows/dkd_v0_0_12_package_verify_sync.yml .github/workflows/dkd_v0_0_12_lock_sync.yml
+          git commit -m "chore: finalize v0.0.12 package identity" || exit 0
+          git pull --rebase origin main
+          git push origin HEAD:main
