@@ -1,6 +1,6 @@
 -- dkd_20260430_courier_reassign_admin_delete_order_details.sql
 -- Kurye reddederse: reddeden kurye kara listeye alınır, sipariş en yakın uygun başka kuryeye aktarılır.
--- Admin silerse: ilişkili kurye işi / kargo gönderisi / işletme siparişi / acil kurye kayıtları tüm kullanıcılardan kaldırılır.
+-- Admin silerse: ilişkili kurye işi / kargo gönderisi / işletme siparişi tüm kullanıcılardan kaldırılır.
 
 begin;
 
@@ -329,14 +329,10 @@ declare
   dkd_cargo_meta_value jsonb := '{}'::jsonb;
   dkd_order_id_text_value text := '';
   dkd_cargo_shipment_id_text_value text := '';
-  dkd_urgent_order_id_text_value text := '';
   dkd_deleted_jobs_count_value integer := 0;
   dkd_deleted_cargo_count_value integer := 0;
   dkd_deleted_business_orders_count_value integer := 0;
   dkd_deleted_business_history_count_value integer := 0;
-  dkd_deleted_urgent_orders_count_value integer := 0;
-  dkd_deleted_urgent_items_count_value integer := 0;
-  dkd_deleted_urgent_messages_count_value integer := 0;
 begin
   if not public.dkd_is_admin() then
     raise exception 'admin_required';
@@ -355,12 +351,6 @@ begin
   dkd_cargo_meta_value := coalesce(dkd_job_json_value->'cargo_meta', '{}'::jsonb);
   dkd_order_id_text_value := coalesce(nullif(dkd_job_json_value->>'order_id', ''), nullif(dkd_cargo_meta_value->>'dkd_order_id', ''), '');
   dkd_cargo_shipment_id_text_value := coalesce(nullif(dkd_job_json_value->>'cargo_shipment_id', ''), nullif(dkd_cargo_meta_value->>'dkd_cargo_shipment_id', ''), '');
-  dkd_urgent_order_id_text_value := coalesce(
-    nullif(dkd_cargo_meta_value->>'dkd_urgent_order_id', ''),
-    nullif(dkd_cargo_meta_value->'dkd_original_order'->>'dkd_order_id', ''),
-    nullif(dkd_job_json_value->>'dkd_urgent_order_id', ''),
-    ''
-  );
 
   update public.dkd_profiles
   set dkd_courier_auto_assigned_job_id = null
@@ -369,11 +359,7 @@ begin
   delete from public.dkd_courier_jobs dkd_job_row
   where dkd_job_row.id = dkd_param_job_id
      or (dkd_order_id_text_value <> '' and coalesce(to_jsonb(dkd_job_row)->>'order_id', '') = dkd_order_id_text_value)
-     or (dkd_cargo_shipment_id_text_value <> '' and coalesce(to_jsonb(dkd_job_row)->>'cargo_shipment_id', '') = dkd_cargo_shipment_id_text_value)
-     or (dkd_urgent_order_id_text_value <> '' and (
-       coalesce(to_jsonb(dkd_job_row)->'cargo_meta'->>'dkd_urgent_order_id', '') = dkd_urgent_order_id_text_value
-       or coalesce(to_jsonb(dkd_job_row)->'cargo_meta'->'dkd_original_order'->>'dkd_order_id', '') = dkd_urgent_order_id_text_value
-     ));
+     or (dkd_cargo_shipment_id_text_value <> '' and coalesce(to_jsonb(dkd_job_row)->>'cargo_shipment_id', '') = dkd_cargo_shipment_id_text_value);
   get diagnostics dkd_deleted_jobs_count_value = row_count;
 
   if to_regclass('public.dkd_business_order_status_history') is not null and dkd_order_id_text_value <> '' then
@@ -394,34 +380,13 @@ begin
     get diagnostics dkd_deleted_cargo_count_value = row_count;
   end if;
 
-  if to_regclass('public.dkd_urgent_courier_messages') is not null and dkd_urgent_order_id_text_value <> '' then
-    execute 'delete from public.dkd_urgent_courier_messages dkd_message_row where dkd_message_row.dkd_order_id::text = $1'
-      using dkd_urgent_order_id_text_value;
-    get diagnostics dkd_deleted_urgent_messages_count_value = row_count;
-  end if;
-
-  if to_regclass('public.dkd_urgent_courier_order_items') is not null and dkd_urgent_order_id_text_value <> '' then
-    execute 'delete from public.dkd_urgent_courier_order_items dkd_item_row where dkd_item_row.dkd_order_id::text = $1'
-      using dkd_urgent_order_id_text_value;
-    get diagnostics dkd_deleted_urgent_items_count_value = row_count;
-  end if;
-
-  if to_regclass('public.dkd_urgent_courier_orders') is not null and dkd_urgent_order_id_text_value <> '' then
-    execute 'delete from public.dkd_urgent_courier_orders dkd_order_row where dkd_order_row.dkd_order_id::text = $1'
-      using dkd_urgent_order_id_text_value;
-    get diagnostics dkd_deleted_urgent_orders_count_value = row_count;
-  end if;
-
   return jsonb_build_object(
     'dkd_ok', true,
     'dkd_deleted_job_id', dkd_param_job_id,
     'dkd_deleted_jobs_count', dkd_deleted_jobs_count_value,
     'dkd_deleted_cargo_count', dkd_deleted_cargo_count_value,
     'dkd_deleted_business_orders_count', dkd_deleted_business_orders_count_value,
-    'dkd_deleted_business_history_count', dkd_deleted_business_history_count_value,
-    'dkd_deleted_urgent_orders_count', dkd_deleted_urgent_orders_count_value,
-    'dkd_deleted_urgent_items_count', dkd_deleted_urgent_items_count_value,
-    'dkd_deleted_urgent_messages_count', dkd_deleted_urgent_messages_count_value
+    'dkd_deleted_business_history_count', dkd_deleted_business_history_count_value
   );
 end;
 $$;
