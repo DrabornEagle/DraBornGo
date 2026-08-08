@@ -22,7 +22,7 @@ jobs:
       CI: '1'
       EXPO_NO_TELEMETRY: '1'
     steps:
-      - name: Checkout
+      - name: Checkout finalized v0.0.9 source
         uses: actions/checkout@v4
 
       - name: Setup Node
