@@ -29,6 +29,7 @@ jobs:
           set -euo pipefail
           test -n "$SUPABASE_ACCESS_TOKEN"
           test -n "$DKD_SUPABASE_PROJECT_REF"
+          echo "Deleting retired DraBornGo edge function..."
           supabase functions delete send-urgent-courier-alert \
             --project-ref "$DKD_SUPABASE_PROJECT_REF" \
             --yes
