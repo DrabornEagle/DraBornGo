@@ -14,6 +14,7 @@ import {
   View,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { Image } from 'expo-image';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import SafeScreen from '../../components/layout/SafeScreen';
 import DkdCourierApplicationPanelValue from './dkd_courier_application_panel';
@@ -27,6 +28,8 @@ import {
   fetchCourierJobs,
   markCourierJobPickedUp,
 } from '../../services/courierService';
+
+const dkd_racing_motorcycle_asset_value = require('../../../assets/icons/dkd_racing_motorcycle.svg');
 
 export function DkdCourierInlineApplicationForm(dkd_props_value) {
   return <DkdCourierApplicationPanelValue {...dkd_props_value} />;
@@ -315,7 +318,9 @@ function CourierBoardModal({
           <View style={dkd_styles_value.dkd_header}>
             <View style={dkd_styles_value.dkd_header_icon_stage}>
               <Animated.View style={[dkd_styles_value.dkd_header_halo, { opacity: dkd_pulse_opacity_value, transform: [{ scale: dkd_pulse_scale_value }] }]} />
-              <LinearGradient colors={['#64F0B8', '#48DFFF', '#907CFF']} style={dkd_styles_value.dkd_header_icon}><MaterialCommunityIcons name="motorbike" size={30} color="#031019" /></LinearGradient>
+              <LinearGradient colors={['#07131F', '#0A2537', '#0B172B']} style={dkd_styles_value.dkd_header_icon}>
+                <Image source={dkd_racing_motorcycle_asset_value} style={dkd_styles_value.dkd_header_racing_motorcycle} contentFit="contain" transition={0} />
+              </LinearGradient>
             </View>
             <View style={dkd_styles_value.dkd_header_copy}>
               <Text style={dkd_styles_value.dkd_header_kicker}>DRABORNGO v0.0.11 • COURIER COMMAND</Text>
@@ -421,7 +426,8 @@ const dkd_styles_value = StyleSheet.create({
   dkd_header: { minHeight: 108, paddingHorizontal: 17, paddingTop: 13, paddingBottom: 13, flexDirection: 'row', alignItems: 'center', gap: 12, borderBottomWidth: 1, borderBottomColor: 'rgba(132,213,255,0.10)' },
   dkd_header_icon_stage: { width: 64, height: 64, alignItems: 'center', justifyContent: 'center' },
   dkd_header_halo: { position: 'absolute', width: 58, height: 58, borderRadius: 21, borderWidth: 2, borderColor: '#65E7FF' },
-  dkd_header_icon: { width: 54, height: 54, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
+  dkd_header_icon: { width: 54, height: 54, borderRadius: 20, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'rgba(111,226,255,0.24)' },
+  dkd_header_racing_motorcycle: { width: 50, height: 34 },
   dkd_header_copy: { flex: 1, minWidth: 0 },
   dkd_header_kicker: { color: '#72E1FF', fontSize: 9, fontWeight: '900', letterSpacing: 1.05 },
   dkd_header_title: { color: '#FFFFFF', fontSize: 21, fontWeight: '900', marginTop: 3, letterSpacing: -0.45 },
