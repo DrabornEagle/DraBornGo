@@ -1,12 +1,15 @@
 name: DKD v0.0.7 Cleanup Pass Two
-# trigger-pass-two
+
 on:
   push:
     branches: [main]
-    paths: ['.github/workflows/dkd_v007_fix2.yml']
+    paths:
+      - '.github/workflows/dkd_v007_fix2.yml'
   workflow_dispatch:
+
 permissions:
   contents: write
+
 jobs:
   fix:
     runs-on: ubuntu-latest
