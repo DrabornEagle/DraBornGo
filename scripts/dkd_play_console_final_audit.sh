@@ -7,17 +7,29 @@ cd "$DKD_PROJECT_ROOT"
 node - <<'NODE'
 const app = require('./app.json').expo;
 const pkg = require('./package.json');
-if (app.version !== '0.0.7') throw new Error(`Unexpected Expo version: ${app.version}`);
-if (app.android?.versionCode !== 7) throw new Error(`Unexpected Android versionCode: ${app.android?.versionCode}`);
-if (pkg.version !== '0.0.7') throw new Error(`Unexpected package version: ${pkg.version}`);
-console.log('DraBornGo release identity: v0.0.7 / Android versionCode 7');
+const expectedPermissions = [
+  'android.permission.ACCESS_COARSE_LOCATION',
+  'android.permission.ACCESS_FINE_LOCATION',
+  'android.permission.CAMERA',
+].sort();
+const actualPermissions = [...(app.android?.permissions || [])].sort();
+if (app.version !== '0.0.8') throw new Error(`Unexpected Expo version: ${app.version}`);
+if (app.android?.versionCode !== 8) throw new Error(`Unexpected Android versionCode: ${app.android?.versionCode}`);
+if (pkg.version !== '0.0.8') throw new Error(`Unexpected package version: ${pkg.version}`);
+if (JSON.stringify(actualPermissions) !== JSON.stringify(expectedPermissions)) throw new Error(`Unexpected Android permission set: ${actualPermissions.join(', ')}`);
+console.log('DraBornGo release identity: v0.0.8 / Android versionCode 8');
+console.log('Android permission set: foreground location + camera only');
 NODE
 
+npm run dkd:verify-v0.0.8
+npm run dkd:play-risk-scan
 npx expo-doctor@latest
+rm -rf /tmp/dkd-play-source-audit /tmp/dkd-play-web-audit
 npx expo export --platform android --output-dir /tmp/dkd-play-source-audit
+npx expo export --platform web --output-dir /tmp/dkd-play-web-audit
 
 echo "Privacy: https://www.draborneagle.com/draborngo/privacy/"
 echo "Terms: https://www.draborneagle.com/draborngo/terms/"
 echo "Community: https://www.draborneagle.com/draborngo/community/"
 echo "Account deletion: https://www.draborneagle.com/draborngo/account-deletion/"
-echo "DraBornGo source audit completed. No APK or AAB was produced."
+echo "DraBornGo v0.0.8 source + web audit completed. No APK or AAB was produced."
