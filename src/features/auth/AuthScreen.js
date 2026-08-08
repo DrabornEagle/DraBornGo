@@ -308,8 +308,8 @@ export default function AuthScreen({ mode = 'login', setMode = () => {} }) {
         <View style={dkd_styles.dkd_orb_blue} />
         <View style={dkd_styles.dkd_orb_purple} />
         <Animated.View style={[dkd_styles.dkd_hero_glow, { opacity: dkd_hero_glow_opacity_value, transform: [{ scale: dkd_hero_glow_scale_value }] }]} />
-        <KeyboardAvoidingView style={dkd_styles.dkd_keyboard_shell} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-          <ScrollView contentContainerStyle={dkd_styles.dkd_scroll_shell} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
+        <KeyboardAvoidingView style={dkd_styles.dkd_keyboard_shell} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+          <ScrollView contentContainerStyle={dkd_styles.dkd_scroll_shell} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag">
             <View style={dkd_styles.dkd_brand_shell}>
               <View style={dkd_styles.dkd_brand_overline_row}>
                 <MaterialCommunityIcons name="star-four-points" size={15} color="#FDE68A" />
@@ -319,7 +319,6 @@ export default function AuthScreen({ mode = 'login', setMode = () => {} }) {
             </View>
 
             <DkdLoginCityPreview dkd_glow_opacity_value={dkd_hero_glow_opacity_value} dkd_hero_glow_scale_value={dkd_hero_glow_scale_value} />
-
 
             <View style={dkd_styles.dkd_pill_row}>
               <DkdAuthPill dkd_icon_name="truck-fast-outline" dkd_text="Kurye-Kargo" />
@@ -382,7 +381,6 @@ export default function AuthScreen({ mode = 'login', setMode = () => {} }) {
                 <Text style={dkd_styles.dkd_primary_button_text}>{dkd_loading_name === 'login' ? 'Giriş yapılıyor...' : 'DraBornGo’ya Gir'}</Text>
               </Pressable>
 
-
               <View style={dkd_styles.dkd_auth_action_row}>
                 <Pressable onPress={() => Alert.alert('Şifre Sıfırla', 'Şifre sıfırlama akışı sonraki fazda bağlanacak.')} style={dkd_styles.dkd_link_button}>
                   <Text style={dkd_styles.dkd_link_text}>Şifremi unuttum</Text>
@@ -403,7 +401,7 @@ export default function AuthScreen({ mode = 'login', setMode = () => {} }) {
       </LinearGradient>
 
       <Modal visible={dkd_register_modal_open_flag} animationType="slide" onRequestClose={dkd_close_register_modal}>
-        <KeyboardAvoidingView style={dkd_styles.dkd_modal_backdrop} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+        <KeyboardAvoidingView style={dkd_styles.dkd_modal_backdrop} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
           <LinearGradient colors={['#040A19', '#082A3E', '#25104A', '#070915']} style={StyleSheet.absoluteFill} />
           <View style={dkd_styles.dkd_modal_orb_cyan} />
           <View style={dkd_styles.dkd_modal_orb_gold} />
@@ -423,7 +421,7 @@ export default function AuthScreen({ mode = 'login', setMode = () => {} }) {
               </Pressable>
             </View>
 
-            <ScrollView contentContainerStyle={dkd_styles.dkd_modal_scroll_content} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
+            <ScrollView contentContainerStyle={dkd_styles.dkd_modal_scroll_content} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag">
               <View style={dkd_styles.dkd_register_hero_card}>
                 <LinearGradient colors={['rgba(98,230,255,0.24)', 'rgba(114,255,191,0.14)', 'rgba(255,224,116,0.12)']} style={StyleSheet.absoluteFill} />
                 <View style={dkd_styles.dkd_register_hero_icon}>

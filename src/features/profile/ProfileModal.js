@@ -1,5 +1,5 @@
 import React, { memo, useCallback, useEffect, useState } from 'react';
-import { Alert, Modal, Pressable, ScrollView, StatusBar, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Alert, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StatusBar, StyleSheet, Text, TextInput, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Image } from 'expo-image';
 import * as ImagePicker from 'expo-image-picker';
@@ -193,117 +193,119 @@ function ProfileModal({ visible, onClose, profile, onSave }) {
     <Modal visible={Boolean(visible)} animationType="slide" onRequestClose={onClose}>
       <SafeScreen style={styles.screen}>
         <StatusBar barStyle="light-content" />
-        <LinearGradient colors={[theme.colors.bgTop, theme.colors.bgMid, theme.colors.bgBottom]} style={styles.wrap}>
-          <View style={styles.header}>
-            <View style={{ flex: 1 }}>
-              <Text style={styles.headerKicker}>DraBornGo v0.0.9</Text>
-              <Text style={styles.headerTitle}>Kullanıcı Kimliği</Text>
-              <Text style={styles.headerSub}>Profilini, kurye lisansını ve hesap ayarlarını buradan yönet.</Text>
-            </View>
-            <Pressable onPress={onClose} style={styles.close}>
-              <MaterialCommunityIcons name="arrow-right" size={24} color="#FFF" />
-              <Text style={styles.closeText}>Kapat</Text>
-            </Pressable>
-          </View>
-
-          <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-            <LinearGradient colors={['#071C2B', '#091725', '#11152B']} style={styles.hero}>
-              <View style={styles.heroTop}>
-                <View style={styles.avatarShell}>
-                  {dkd_resolved_image_value ? (
-                    <Image source={{ uri: dkd_resolved_image_value }} style={styles.avatarImage} contentFit="cover" />
-                  ) : (
-                    <Text style={styles.avatarText}>{avatar}</Text>
-                  )}
-                </View>
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.eyebrow}>KULLANICI KİMLİĞİ</Text>
-                  <Text style={styles.heroTitle} numberOfLines={1}>{nick.trim() || 'DrabornEagle'}</Text>
-                  <Text style={styles.heroSub}>DraBornGo şehir ağı profili</Text>
-                </View>
+        <KeyboardAvoidingView style={styles.wrap} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+          <LinearGradient colors={[theme.colors.bgTop, theme.colors.bgMid, theme.colors.bgBottom]} style={styles.wrap}>
+            <View style={styles.header}>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.headerKicker}>DraBornGo v0.0.11</Text>
+                <Text style={styles.headerTitle}>Kullanıcı Kimliği</Text>
+                <Text style={styles.headerSub}>Profilini, kurye lisansını ve hesap ayarlarını buradan yönet.</Text>
               </View>
-
-              <View style={styles.badgeRow}>
-                <DkdBadge
-                  text={dkd_courier_value.status === 'approved' ? 'Kurye Lisansı Aktif' : dkd_courier_value.shortLabel}
-                  icon="motorbike"
-                />
-                {dkd_logistics_active_value ? <DkdBadge text="Nakliyeci Lisanslı" icon="truck-fast-outline" /> : null}
-              </View>
-            </LinearGradient>
-
-            <View style={styles.card}>
-              <Text style={styles.cardKicker}>PROFİL</Text>
-              <Text style={styles.cardTitle}>Kimlik ayarı</Text>
-              <Text style={styles.cardSub}>Takma adını ve profil görselini burada düzenle.</Text>
-
-              <View style={styles.previewRow}>
-                <View style={styles.previewCircle}>
-                  {dkd_resolved_image_value ? (
-                    <Image source={{ uri: dkd_resolved_image_value }} style={styles.previewImage} contentFit="cover" />
-                  ) : (
-                    <Text style={styles.previewEmoji}>{avatar}</Text>
-                  )}
-                </View>
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.previewKicker}>PROFİL GÖRSELİ</Text>
-                  <Text style={styles.previewTitle}>{dkd_resolved_image_value ? 'Cihaz görseli seçildi' : 'Emoji avatar aktif'}</Text>
-                </View>
-              </View>
-
-              <View style={styles.actions}>
-                <Pressable onPress={dkd_pick_image_value} disabled={imageLoading} style={styles.secondaryButton}>
-                  <MaterialCommunityIcons name="image-plus" size={18} color="#FFF" />
-                  <Text style={styles.secondaryText}>{imageLoading ? 'Hazırlanıyor…' : 'Cihazdan Görsel Seç'}</Text>
-                </Pressable>
-                <Pressable onPress={() => setImageUrl('')} disabled={!dkd_resolved_image_value} style={[styles.secondaryButton, !dkd_resolved_image_value && styles.disabled]}>
-                  <MaterialCommunityIcons name="trash-can-outline" size={18} color="#FFF" />
-                  <Text style={styles.secondaryText}>Görseli Kaldır</Text>
-                </Pressable>
-              </View>
-
-              <TextInput
-                value={nick}
-                onChangeText={setNick}
-                maxLength={18}
-                autoCapitalize="none"
-                placeholder="takma-adın"
-                placeholderTextColor="rgba(255,255,255,0.35)"
-                style={styles.input}
-              />
-
-              <View style={styles.emojiGrid}>
-                {EMOJIS.map((dkd_emoji_value) => (
-                  <Pressable key={dkd_emoji_value} onPress={() => setAvatar(dkd_emoji_value)} style={[styles.emoji, avatar === dkd_emoji_value && styles.emojiActive]}>
-                    <Text style={{ fontSize: 24 }}>{dkd_emoji_value}</Text>
-                  </Pressable>
-                ))}
-              </View>
-
-              <Pressable onPress={dkd_save_value} disabled={!dkd_can_save_value || !dkd_changed_value || saving} style={[styles.primaryButton, (!dkd_can_save_value || !dkd_changed_value || saving) && styles.disabled]}>
-                <MaterialCommunityIcons name="content-save-outline" size={18} color="#07111C" />
-                <Text style={styles.primaryText}>{saving ? 'Kaydediliyor…' : dkd_changed_value ? 'Kaydet' : 'Kaydedildi'}</Text>
+              <Pressable onPress={onClose} style={styles.close}>
+                <MaterialCommunityIcons name="arrow-right" size={24} color="#FFF" />
+                <Text style={styles.closeText}>Kapat</Text>
               </Pressable>
             </View>
 
-            <View style={[styles.card, styles.deleteCard]}>
-              <Text style={styles.cardKicker}>GİZLİLİK</Text>
-              <Text style={styles.cardTitle}>Hesabımı Sil</Text>
-              <Text style={styles.cardSub}>Hesap ve kişisel veri silme talebini buradan oluşturabilirsin.</Text>
-              <Text style={styles.deleteStatus}>Durum: {String(deleteRequest?.dkd_status_value || 'talep yok')}</Text>
-              {String(deleteRequest?.dkd_status_value || '').toLowerCase() === 'pending' ? (
-                <Pressable onPress={dkd_cancel_delete_request_value} disabled={deleteBusy} style={[styles.secondaryButton, deleteBusy && styles.disabled]}>
-                  <Text style={styles.secondaryText}>{deleteBusy ? 'İşleniyor…' : 'Bekleyen Talebi İptal Et'}</Text>
+            <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag">
+              <LinearGradient colors={['#071C2B', '#091725', '#11152B']} style={styles.hero}>
+                <View style={styles.heroTop}>
+                  <View style={styles.avatarShell}>
+                    {dkd_resolved_image_value ? (
+                      <Image source={{ uri: dkd_resolved_image_value }} style={styles.avatarImage} contentFit="cover" />
+                    ) : (
+                      <Text style={styles.avatarText}>{avatar}</Text>
+                    )}
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.eyebrow}>KULLANICI KİMLİĞİ</Text>
+                    <Text style={styles.heroTitle} numberOfLines={1}>{nick.trim() || 'DrabornEagle'}</Text>
+                    <Text style={styles.heroSub}>DraBornGo şehir ağı profili</Text>
+                  </View>
+                </View>
+
+                <View style={styles.badgeRow}>
+                  <DkdBadge
+                    text={dkd_courier_value.status === 'approved' ? 'Kurye Lisansı Aktif' : dkd_courier_value.shortLabel}
+                    icon="motorbike"
+                  />
+                  {dkd_logistics_active_value ? <DkdBadge text="Nakliyeci Lisanslı" icon="truck-fast-outline" /> : null}
+                </View>
+              </LinearGradient>
+
+              <View style={styles.card}>
+                <Text style={styles.cardKicker}>PROFİL</Text>
+                <Text style={styles.cardTitle}>Kimlik ayarı</Text>
+                <Text style={styles.cardSub}>Takma adını ve profil görselini burada düzenle.</Text>
+
+                <View style={styles.previewRow}>
+                  <View style={styles.previewCircle}>
+                    {dkd_resolved_image_value ? (
+                      <Image source={{ uri: dkd_resolved_image_value }} style={styles.previewImage} contentFit="cover" />
+                    ) : (
+                      <Text style={styles.previewEmoji}>{avatar}</Text>
+                    )}
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.previewKicker}>PROFİL GÖRSELİ</Text>
+                    <Text style={styles.previewTitle}>{dkd_resolved_image_value ? 'Cihaz görseli seçildi' : 'Emoji avatar aktif'}</Text>
+                  </View>
+                </View>
+
+                <View style={styles.actions}>
+                  <Pressable onPress={dkd_pick_image_value} disabled={imageLoading} style={styles.secondaryButton}>
+                    <MaterialCommunityIcons name="image-plus" size={18} color="#FFF" />
+                    <Text style={styles.secondaryText}>{imageLoading ? 'Hazırlanıyor…' : 'Cihazdan Görsel Seç'}</Text>
+                  </Pressable>
+                  <Pressable onPress={() => setImageUrl('')} disabled={!dkd_resolved_image_value} style={[styles.secondaryButton, !dkd_resolved_image_value && styles.disabled]}>
+                    <MaterialCommunityIcons name="trash-can-outline" size={18} color="#FFF" />
+                    <Text style={styles.secondaryText}>Görseli Kaldır</Text>
+                  </Pressable>
+                </View>
+
+                <TextInput
+                  value={nick}
+                  onChangeText={setNick}
+                  maxLength={18}
+                  autoCapitalize="none"
+                  placeholder="takma-adın"
+                  placeholderTextColor="rgba(255,255,255,0.35)"
+                  style={styles.input}
+                />
+
+                <View style={styles.emojiGrid}>
+                  {EMOJIS.map((dkd_emoji_value) => (
+                    <Pressable key={dkd_emoji_value} onPress={() => setAvatar(dkd_emoji_value)} style={[styles.emoji, avatar === dkd_emoji_value && styles.emojiActive]}>
+                      <Text style={{ fontSize: 24 }}>{dkd_emoji_value}</Text>
+                    </Pressable>
+                  ))}
+                </View>
+
+                <Pressable onPress={dkd_save_value} disabled={!dkd_can_save_value || !dkd_changed_value || saving} style={[styles.primaryButton, (!dkd_can_save_value || !dkd_changed_value || saving) && styles.disabled]}>
+                  <MaterialCommunityIcons name="content-save-outline" size={18} color="#07111C" />
+                  <Text style={styles.primaryText}>{saving ? 'Kaydediliyor…' : dkd_changed_value ? 'Kaydet' : 'Kaydedildi'}</Text>
                 </Pressable>
-              ) : (
-                <Pressable onPress={dkd_delete_value} disabled={deleteBusy} style={[styles.deleteButton, deleteBusy && styles.disabled]}>
-                  <MaterialCommunityIcons name="delete-alert-outline" size={19} color="#FFF" />
-                  <Text style={styles.deleteText}>{deleteBusy ? 'İşleniyor…' : 'Hesap Silme Talebi Oluştur'}</Text>
-                </Pressable>
-              )}
-            </View>
-          </ScrollView>
-        </LinearGradient>
+              </View>
+
+              <View style={[styles.card, styles.deleteCard]}>
+                <Text style={styles.cardKicker}>GİZLİLİK</Text>
+                <Text style={styles.cardTitle}>Hesabımı Sil</Text>
+                <Text style={styles.cardSub}>Hesap ve kişisel veri silme talebini buradan oluşturabilirsin.</Text>
+                <Text style={styles.deleteStatus}>Durum: {String(deleteRequest?.dkd_status_value || 'talep yok')}</Text>
+                {String(deleteRequest?.dkd_status_value || '').toLowerCase() === 'pending' ? (
+                  <Pressable onPress={dkd_cancel_delete_request_value} disabled={deleteBusy} style={[styles.secondaryButton, deleteBusy && styles.disabled]}>
+                    <Text style={styles.secondaryText}>{deleteBusy ? 'İşleniyor…' : 'Bekleyen Talebi İptal Et'}</Text>
+                  </Pressable>
+                ) : (
+                  <Pressable onPress={dkd_delete_value} disabled={deleteBusy} style={[styles.deleteButton, deleteBusy && styles.disabled]}>
+                    <MaterialCommunityIcons name="delete-alert-outline" size={19} color="#FFF" />
+                    <Text style={styles.deleteText}>{deleteBusy ? 'İşleniyor…' : 'Hesap Silme Talebi Oluştur'}</Text>
+                  </Pressable>
+                )}
+              </View>
+            </ScrollView>
+          </LinearGradient>
+        </KeyboardAvoidingView>
       </SafeScreen>
     </Modal>
   );

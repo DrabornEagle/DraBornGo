@@ -1,8 +1,18 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Alert, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Alert, Animated, Easing, Modal, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { requireNativeModule } from 'expo-modules-core';
 import { dkd_make_native_axis_point } from '../../utils/dkdNativeAxis';
+
+let dkd_android_navigation_bar_module_value = null;
+if (Platform.OS === 'android') {
+  try {
+    dkd_android_navigation_bar_module_value = requireNativeModule('ExpoNavigationBar');
+  } catch {
+    dkd_android_navigation_bar_module_value = null;
+  }
+}
 
 function dkd_alert_buttons_value(dkd_buttons_value) {
   const dkd_safe_buttons_value = Array.isArray(dkd_buttons_value) && dkd_buttons_value.length
@@ -21,7 +31,7 @@ function dkd_alert_icon_name_value(dkd_alert_value) {
   const dkd_has_destructive_value = dkd_buttons_value.some((dkd_button_value) => dkd_button_value?.style === 'destructive');
   if (dkd_has_destructive_value) return 'trash-can-outline';
   if (dkd_title_value.includes('hata') || dkd_title_value.includes('uyarı')) return 'alert-decagram-outline';
-  if (dkd_title_value.includes('kurye')) return 'bike-fast';
+  if (dkd_title_value.includes('kurye')) return 'motorbike';
   if (dkd_title_value.includes('admin')) return 'shield-crown-outline';
   if (dkd_title_value.includes('başarı') || dkd_title_value.includes('ödül')) return 'star-four-points-outline';
   return 'information-variant-circle-outline';
@@ -38,10 +48,10 @@ function dkd_alert_tone_value(dkd_alert_value) {
 
 function dkd_alert_gradient_value(dkd_alert_value) {
   const dkd_tone_value = dkd_alert_tone_value(dkd_alert_value);
-  if (dkd_tone_value === 'danger') return ['rgba(48,12,30,0.98)', 'rgba(95,20,54,0.97)', 'rgba(28,16,56,0.97)'];
-  if (dkd_tone_value === 'warning') return ['rgba(48,33,12,0.98)', 'rgba(91,55,14,0.97)', 'rgba(42,20,64,0.97)'];
-  if (dkd_tone_value === 'courier') return ['rgba(5,22,36,0.99)', 'rgba(10,76,86,0.97)', 'rgba(31,25,86,0.97)'];
-  return ['rgba(6,18,34,0.99)', 'rgba(15,35,70,0.97)', 'rgba(18,10,35,0.97)'];
+  if (dkd_tone_value === 'danger') return ['rgba(48,12,30,0.99)', 'rgba(95,20,54,0.98)', 'rgba(28,16,56,0.98)'];
+  if (dkd_tone_value === 'warning') return ['rgba(48,33,12,0.99)', 'rgba(91,55,14,0.98)', 'rgba(42,20,64,0.98)'];
+  if (dkd_tone_value === 'courier') return ['rgba(3,20,34,0.995)', 'rgba(7,72,86,0.985)', 'rgba(26,22,82,0.985)'];
+  return ['rgba(5,17,33,0.995)', 'rgba(13,34,70,0.985)', 'rgba(19,9,38,0.985)'];
 }
 
 function dkd_alert_icon_gradient_value(dkd_alert_value) {
@@ -55,6 +65,9 @@ function dkd_alert_icon_gradient_value(dkd_alert_value) {
 export default function Dkd_modern_alert_provider(dkd_props_value) {
   const [dkd_alert_queue_value, setDkdAlertQueueValue] = useState([]);
   const dkd_original_alert_ref_value = useRef(null);
+  const dkd_entry_motion_value = useRef(new Animated.Value(0)).current;
+  const dkd_scan_motion_value = useRef(new Animated.Value(0)).current;
+  const dkd_pulse_motion_value = useRef(new Animated.Value(0)).current;
 
   const dkd_active_alert_value = dkd_alert_queue_value?.[0] || null;
   const dkd_active_buttons_value = useMemo(() => dkd_alert_buttons_value(dkd_active_alert_value?.dkd_buttons_value), [dkd_active_alert_value?.dkd_buttons_value]);
@@ -79,6 +92,17 @@ export default function Dkd_modern_alert_provider(dkd_props_value) {
   }, []);
 
   useEffect(() => {
+    if (Platform.OS !== 'android' || !dkd_android_navigation_bar_module_value) return undefined;
+    try {
+      dkd_android_navigation_bar_module_value.setHidden?.(false);
+      dkd_android_navigation_bar_module_value.setStyle?.('dark');
+    } catch (dkd_navigation_bar_error_value) {
+      console.log('[DraBornGo][navigation-bar]', dkd_navigation_bar_error_value?.message || String(dkd_navigation_bar_error_value));
+    }
+    return undefined;
+  }, []);
+
+  useEffect(() => {
     if (!dkd_original_alert_ref_value.current) {
       dkd_original_alert_ref_value.current = Alert.alert;
     }
@@ -90,84 +114,154 @@ export default function Dkd_modern_alert_provider(dkd_props_value) {
     };
   }, [dkd_enqueue_alert_value]);
 
+  useEffect(() => {
+    if (!dkd_active_alert_value?.dkd_id_value) {
+      dkd_entry_motion_value.setValue(0);
+      dkd_scan_motion_value.setValue(0);
+      dkd_pulse_motion_value.setValue(0);
+      return undefined;
+    }
+
+    dkd_entry_motion_value.setValue(0);
+    dkd_scan_motion_value.setValue(0);
+    dkd_pulse_motion_value.setValue(0);
+
+    Animated.spring(dkd_entry_motion_value, {
+      toValue: 1,
+      speed: 18,
+      bounciness: 5,
+      useNativeDriver: true,
+    }).start();
+
+    const dkd_scan_animation_value = Animated.loop(
+      Animated.timing(dkd_scan_motion_value, {
+        toValue: 1,
+        duration: 3200,
+        easing: Easing.linear,
+        useNativeDriver: true,
+      })
+    );
+    const dkd_pulse_animation_value = Animated.loop(
+      Animated.sequence([
+        Animated.timing(dkd_pulse_motion_value, { toValue: 1, duration: 1200, easing: Easing.inOut(Easing.quad), useNativeDriver: true }),
+        Animated.timing(dkd_pulse_motion_value, { toValue: 0, duration: 1200, easing: Easing.inOut(Easing.quad), useNativeDriver: true }),
+      ])
+    );
+    dkd_scan_animation_value.start();
+    dkd_pulse_animation_value.start();
+    return () => {
+      dkd_scan_animation_value.stop();
+      dkd_pulse_animation_value.stop();
+    };
+  }, [dkd_active_alert_value?.dkd_id_value, dkd_entry_motion_value, dkd_pulse_motion_value, dkd_scan_motion_value]);
+
   const dkd_handle_backdrop_press_value = useCallback(() => {
     if (dkd_active_alert_value?.dkd_options_value?.cancelable === true) {
       dkd_close_active_alert_value();
     }
   }, [dkd_active_alert_value?.dkd_options_value?.cancelable, dkd_close_active_alert_value]);
 
+  const dkd_card_translate_y_value = dkd_entry_motion_value.interpolate({ inputRange: [0, 1], outputRange: [34, 0] });
+  const dkd_card_scale_value = dkd_entry_motion_value.interpolate({ inputRange: [0, 1], outputRange: [0.93, 1] });
+  const dkd_scan_translate_x_value = dkd_scan_motion_value.interpolate({ inputRange: [0, 1], outputRange: [-150, 470] });
+  const dkd_icon_scale_value = dkd_pulse_motion_value.interpolate({ inputRange: [0, 1], outputRange: [1, 1.055] });
+  const dkd_orb_translate_value = dkd_pulse_motion_value.interpolate({ inputRange: [0, 1], outputRange: [0, -9] });
+
   return (
     <>
       {dkd_props_value.children}
-      <Modal visible={!!dkd_active_alert_value} transparent animationType="fade" statusBarTranslucent onRequestClose={dkd_handle_backdrop_press_value}>
+      <Modal visible={!!dkd_active_alert_value} transparent animationType="none" statusBarTranslucent onRequestClose={dkd_handle_backdrop_press_value}>
         <Pressable style={dkd_alert_styles_value.dkd_backdrop} onPress={dkd_handle_backdrop_press_value}>
-          <Pressable style={dkd_alert_styles_value.dkd_shell} onPress={() => {}}>
-            <LinearGradient
-              colors={dkd_alert_gradient_value(dkd_active_alert_value)}
-              start={dkd_make_native_axis_point(0, 0)}
-              end={dkd_make_native_axis_point(1, 1)}
-              style={dkd_alert_styles_value.dkd_card}
-            >
-              <View style={dkd_alert_styles_value.dkd_orb_top} />
-              <View style={dkd_alert_styles_value.dkd_orb_bottom} />
-              <View style={dkd_alert_styles_value.dkd_header_row}>
-                <LinearGradient
-                  colors={dkd_alert_icon_gradient_value(dkd_active_alert_value)}
-                  start={dkd_make_native_axis_point(0, 0)}
-                  end={dkd_make_native_axis_point(1, 1)}
-                  style={dkd_alert_styles_value.dkd_icon_shell}
-                >
-                  <MaterialCommunityIcons name={dkd_alert_icon_name_value(dkd_active_alert_value)} size={31} color="#FFFFFF" />
-                </LinearGradient>
-                <View style={dkd_alert_styles_value.dkd_header_copy}>
-                  <Text style={dkd_alert_styles_value.dkd_eyebrow}>DraBornGo BİLDİRİM</Text>
-                  <Text style={dkd_alert_styles_value.dkd_title}>{dkd_active_alert_value?.dkd_title_value || 'DraBornGo'}</Text>
-                </View>
-              </View>
+          <Animated.View
+            style={[
+              dkd_alert_styles_value.dkd_shell,
+              {
+                opacity: dkd_entry_motion_value,
+                transform: [{ translateY: dkd_card_translate_y_value }, { scale: dkd_card_scale_value }],
+              },
+            ]}
+          >
+            <Pressable onPress={() => {}}>
+              <LinearGradient
+                colors={dkd_alert_gradient_value(dkd_active_alert_value)}
+                start={dkd_make_native_axis_point(0, 0)}
+                end={dkd_make_native_axis_point(1, 1)}
+                style={dkd_alert_styles_value.dkd_card}
+              >
+                <Animated.View style={[dkd_alert_styles_value.dkd_scan_beam, { transform: [{ translateX: dkd_scan_translate_x_value }, { rotate: '16deg' }] }]} pointerEvents="none" />
+                <Animated.View style={[dkd_alert_styles_value.dkd_orb_top, { transform: [{ translateY: dkd_orb_translate_value }] }]} />
+                <Animated.View style={[dkd_alert_styles_value.dkd_orb_bottom, { transform: [{ translateY: Animated.multiply(dkd_orb_translate_value, -0.8) }] }]} />
 
-              {dkd_active_alert_value?.dkd_message_value ? (
-                <View style={dkd_alert_styles_value.dkd_message_panel}>
-                  <Text style={dkd_alert_styles_value.dkd_message}>{dkd_active_alert_value.dkd_message_value}</Text>
+                <View style={dkd_alert_styles_value.dkd_signal_row}>
+                  <View style={dkd_alert_styles_value.dkd_signal_pill}>
+                    <View style={dkd_alert_styles_value.dkd_signal_dot} />
+                    <Text style={dkd_alert_styles_value.dkd_signal_text}>DRABORNGO LIVE NOTICE</Text>
+                  </View>
+                  <MaterialCommunityIcons name="access-point" size={17} color="#8DF5FF" />
                 </View>
-              ) : null}
 
-              <View style={dkd_alert_styles_value.dkd_button_column}>
-                {dkd_active_buttons_value.map((dkd_button_value, dkd_button_index_value) => {
-                  const dkd_is_cancel_value = dkd_button_value?.style === 'cancel';
-                  const dkd_is_destructive_value = dkd_button_value?.style === 'destructive';
-                  const dkd_is_primary_value = !dkd_is_cancel_value && !dkd_is_destructive_value && dkd_button_index_value === dkd_active_buttons_value.length - 1;
-                  const dkd_button_colors_value = dkd_is_destructive_value
-                    ? ['#FF4D7D', '#FF8A3D']
-                    : dkd_is_primary_value
-                      ? ['#52F2A1', '#31D7FF', '#7C3AED']
-                      : ['rgba(255,255,255,0.12)', 'rgba(126,235,255,0.10)'];
-                  return (
-                    <Pressable
-                      key={`${dkd_active_alert_value?.dkd_id_value || 'dkd-alert'}-${dkd_button_index_value}`}
-                      hitSlop={8}
-                      onPress={() => {
-                        setDkdAlertQueueValue((dkd_previous_queue_value) => dkd_previous_queue_value.slice(1));
-                        if (typeof dkd_button_value?.onPress === 'function') {
-                          setTimeout(() => dkd_button_value.onPress(), 0);
-                        }
-                      }}
-                      style={({ pressed }) => [dkd_alert_styles_value.dkd_button_pressable, pressed ? dkd_alert_styles_value.dkd_button_pressed : null]}
+                <View style={dkd_alert_styles_value.dkd_header_row}>
+                  <Animated.View style={{ transform: [{ scale: dkd_icon_scale_value }] }}>
+                    <LinearGradient
+                      colors={dkd_alert_icon_gradient_value(dkd_active_alert_value)}
+                      start={dkd_make_native_axis_point(0, 0)}
+                      end={dkd_make_native_axis_point(1, 1)}
+                      style={dkd_alert_styles_value.dkd_icon_shell}
                     >
-                      <LinearGradient
-                        colors={dkd_button_colors_value}
-                        start={dkd_make_native_axis_point(0, 0)}
-                        end={dkd_make_native_axis_point(1, 1)}
-                        style={[dkd_alert_styles_value.dkd_button, dkd_is_cancel_value && dkd_alert_styles_value.dkd_button_cancel]}
+                      <MaterialCommunityIcons name={dkd_alert_icon_name_value(dkd_active_alert_value)} size={31} color="#FFFFFF" />
+                    </LinearGradient>
+                  </Animated.View>
+                  <View style={dkd_alert_styles_value.dkd_header_copy}>
+                    <Text style={dkd_alert_styles_value.dkd_eyebrow}>DraBornGo BİLDİRİM</Text>
+                    <Text style={dkd_alert_styles_value.dkd_title}>{dkd_active_alert_value?.dkd_title_value || 'DraBornGo'}</Text>
+                  </View>
+                </View>
+
+                {dkd_active_alert_value?.dkd_message_value ? (
+                  <View style={dkd_alert_styles_value.dkd_message_panel}>
+                    <View style={dkd_alert_styles_value.dkd_message_accent} />
+                    <Text style={dkd_alert_styles_value.dkd_message}>{dkd_active_alert_value.dkd_message_value}</Text>
+                  </View>
+                ) : null}
+
+                <View style={dkd_alert_styles_value.dkd_button_column}>
+                  {dkd_active_buttons_value.map((dkd_button_value, dkd_button_index_value) => {
+                    const dkd_is_cancel_value = dkd_button_value?.style === 'cancel';
+                    const dkd_is_destructive_value = dkd_button_value?.style === 'destructive';
+                    const dkd_is_primary_value = !dkd_is_cancel_value && !dkd_is_destructive_value && dkd_button_index_value === dkd_active_buttons_value.length - 1;
+                    const dkd_button_colors_value = dkd_is_destructive_value
+                      ? ['#FF4D7D', '#FF8A3D']
+                      : dkd_is_primary_value
+                        ? ['#52F2A1', '#31D7FF', '#7C3AED']
+                        : ['rgba(255,255,255,0.12)', 'rgba(126,235,255,0.10)'];
+                    return (
+                      <Pressable
+                        key={`${dkd_active_alert_value?.dkd_id_value || 'dkd-alert'}-${dkd_button_index_value}`}
+                        hitSlop={8}
+                        onPress={() => {
+                          setDkdAlertQueueValue((dkd_previous_queue_value) => dkd_previous_queue_value.slice(1));
+                          if (typeof dkd_button_value?.onPress === 'function') {
+                            setTimeout(() => dkd_button_value.onPress(), 0);
+                          }
+                        }}
+                        style={({ pressed }) => [dkd_alert_styles_value.dkd_button_pressable, pressed ? dkd_alert_styles_value.dkd_button_pressed : null]}
                       >
-                        <Text style={[dkd_alert_styles_value.dkd_button_text, dkd_is_cancel_value && dkd_alert_styles_value.dkd_button_cancel_text]}>{dkd_button_value.text}</Text>
-                        {!dkd_is_cancel_value ? <MaterialCommunityIcons name="chevron-right" size={20} color="#FFFFFF" /> : null}
-                      </LinearGradient>
-                    </Pressable>
-                  );
-                })}
-              </View>
-            </LinearGradient>
-          </Pressable>
+                        <LinearGradient
+                          colors={dkd_button_colors_value}
+                          start={dkd_make_native_axis_point(0, 0)}
+                          end={dkd_make_native_axis_point(1, 1)}
+                          style={[dkd_alert_styles_value.dkd_button, dkd_is_cancel_value && dkd_alert_styles_value.dkd_button_cancel]}
+                        >
+                          <Text style={[dkd_alert_styles_value.dkd_button_text, dkd_is_cancel_value && dkd_alert_styles_value.dkd_button_cancel_text]}>{dkd_button_value.text}</Text>
+                          {!dkd_is_cancel_value ? <MaterialCommunityIcons name="chevron-right" size={20} color="#FFFFFF" /> : null}
+                        </LinearGradient>
+                      </Pressable>
+                    );
+                  })}
+                </View>
+              </LinearGradient>
+            </Pressable>
+          </Animated.View>
         </Pressable>
       </Modal>
     </>
@@ -175,22 +269,28 @@ export default function Dkd_modern_alert_provider(dkd_props_value) {
 }
 
 const dkd_alert_styles_value = StyleSheet.create({
-  dkd_backdrop: { flex: 1, backgroundColor: 'rgba(1,6,14,0.72)', alignItems: 'center', justifyContent: 'center', padding: 18 },
-  dkd_shell: { width: '100%', maxWidth: 430, borderRadius: 32 },
-  dkd_card: { borderRadius: 32, padding: 18, overflow: 'hidden', borderWidth: 1, borderColor: 'rgba(126,235,255,0.28)', shadowColor: '#31D7FF', shadowOpacity: 0.35, shadowRadius: 28, shadowOffset: { width: 0, height: 16 }, elevation: 28 },
-  dkd_orb_top: { position: 'absolute', top: -58, right: -36, width: 160, height: 160, borderRadius: 80, backgroundColor: 'rgba(82,242,161,0.18)' },
-  dkd_orb_bottom: { position: 'absolute', bottom: -78, left: -40, width: 180, height: 180, borderRadius: 90, backgroundColor: 'rgba(124,58,237,0.22)' },
+  dkd_backdrop: { flex: 1, backgroundColor: 'rgba(1,6,14,0.76)', alignItems: 'center', justifyContent: 'center', padding: 18 },
+  dkd_shell: { width: '100%', maxWidth: 430, borderRadius: 34 },
+  dkd_card: { borderRadius: 34, padding: 18, overflow: 'hidden', borderWidth: 1, borderColor: 'rgba(126,235,255,0.30)', shadowColor: '#31D7FF', shadowOpacity: 0.38, shadowRadius: 30, shadowOffset: { width: 0, height: 18 }, elevation: 30 },
+  dkd_scan_beam: { position: 'absolute', top: -120, bottom: -120, width: 72, backgroundColor: 'rgba(255,255,255,0.065)' },
+  dkd_orb_top: { position: 'absolute', top: -58, right: -36, width: 160, height: 160, borderRadius: 80, backgroundColor: 'rgba(82,242,161,0.19)' },
+  dkd_orb_bottom: { position: 'absolute', bottom: -78, left: -40, width: 180, height: 180, borderRadius: 90, backgroundColor: 'rgba(124,58,237,0.23)' },
+  dkd_signal_row: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 13 },
+  dkd_signal_pill: { minHeight: 28, borderRadius: 999, paddingHorizontal: 9, flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: 'rgba(2,9,20,0.34)', borderWidth: 1, borderColor: 'rgba(126,235,255,0.14)' },
+  dkd_signal_dot: { width: 6, height: 6, borderRadius: 99, backgroundColor: '#62F0B6' },
+  dkd_signal_text: { color: '#BFF6FF', fontSize: 7.5, fontWeight: '950', letterSpacing: 1 },
   dkd_header_row: { flexDirection: 'row', alignItems: 'center', gap: 13 },
-  dkd_icon_shell: { width: 64, height: 64, borderRadius: 24, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.22)' },
+  dkd_icon_shell: { width: 66, height: 66, borderRadius: 25, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.25)', shadowColor: '#31D7FF', shadowOpacity: 0.36, shadowRadius: 16, shadowOffset: { width: 0, height: 8 } },
   dkd_header_copy: { flex: 1, minWidth: 0 },
   dkd_eyebrow: { color: '#7EEBFF', fontSize: 10.5, fontWeight: '950', letterSpacing: 0.9 },
   dkd_title: { color: '#FFFFFF', fontSize: 23, fontWeight: '950', marginTop: 3, lineHeight: 28 },
-  dkd_message_panel: { marginTop: 16, padding: 14, borderRadius: 23, backgroundColor: 'rgba(255,255,255,0.085)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.13)' },
-  dkd_message: { color: 'rgba(238,249,255,0.92)', fontSize: 14, fontWeight: '780', lineHeight: 20 },
+  dkd_message_panel: { marginTop: 16, minHeight: 76, padding: 14, paddingLeft: 18, borderRadius: 23, backgroundColor: 'rgba(255,255,255,0.085)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.13)', overflow: 'hidden' },
+  dkd_message_accent: { position: 'absolute', left: 0, top: 12, bottom: 12, width: 3, borderRadius: 99, backgroundColor: '#62E8FF' },
+  dkd_message: { color: 'rgba(238,249,255,0.94)', fontSize: 14, fontWeight: '780', lineHeight: 20 },
   dkd_button_column: { marginTop: 16, gap: 10 },
   dkd_button_pressable: { borderRadius: 22, overflow: 'hidden' },
   dkd_button_pressed: { transform: [{ scale: 0.985 }], opacity: 0.90 },
-  dkd_button: { minHeight: 55, borderRadius: 22, paddingHorizontal: 15, paddingVertical: 12, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, borderWidth: 1, borderColor: 'rgba(255,255,255,0.16)' },
+  dkd_button: { minHeight: 57, borderRadius: 22, paddingHorizontal: 15, paddingVertical: 12, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, borderWidth: 1, borderColor: 'rgba(255,255,255,0.16)' },
   dkd_button_cancel: { borderColor: 'rgba(255,255,255,0.14)' },
   dkd_button_text: { color: '#FFFFFF', fontSize: 15.5, fontWeight: '950', letterSpacing: 0.2 },
   dkd_button_cancel_text: { color: 'rgba(238,249,255,0.84)' },

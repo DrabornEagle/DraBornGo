@@ -34,7 +34,7 @@ const dkd_document_options_value = [
   { dkd_key: 'selfieUri', dkd_label: 'Selfie', dkd_icon: 'face-man-profile', dkd_required: true },
   { dkd_key: 'driverLicenseUri', dkd_label: 'Ehliyet', dkd_icon: 'card-bulleted-outline', dkd_required: false },
   { dkd_key: 'vehicleLicenseUri', dkd_label: 'Ruhsat', dkd_icon: 'file-document-outline', dkd_required: false },
-  { dkd_key: 'insuranceUri', dkd_label: 'Sigorta', dkd_icon: 'shield-car-outline', dkd_required: false },
+  { dkd_key: 'insuranceUri', dkd_label: 'Sigorta', dkd_icon: 'shield-check-outline', dkd_required: false },
 ];
 
 function dkd_clean_text_value(dkd_value) {
