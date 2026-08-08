@@ -9,7 +9,7 @@ import DkdDevicePermissionsGate from '../features/permissions/dkd_device_permiss
 import { primeNotificationsRuntime, registerDeviceForRemotePush, dkd_start_customer_status_local_notification_poll_value } from '../services/notificationService';
 import { buildHomeProps, buildModalProps, getHasVisibleModal } from './propBuilders';
 
-const dkd_active_delivery_status_values = new Set(['accepted','assigned','to_business','picked_up','to_customer','delivering']);
+const dkd_active_delivery_status_values = new Set(['accepted', 'assigned', 'to_pickup', 'picked_up', 'to_customer', 'delivering']);
 function dkd_text_value(dkd_value) { return String(dkd_value || '').trim(); }
 function dkd_find_active_delivery_value(dkd_rows_value, dkd_profile_value, dkd_session_user_id_value) {
   return (Array.isArray(dkd_rows_value) ? dkd_rows_value : []).find((dkd_job_value) => {
@@ -17,7 +17,9 @@ function dkd_find_active_delivery_value(dkd_rows_value, dkd_profile_value, dkd_s
     const dkd_status_value = dkd_text_value(dkd_job_value?.status).toLowerCase();
     const dkd_pickup_value = dkd_text_value(dkd_job_value?.pickup_status).toLowerCase();
     const dkd_own_value = dkd_assigned_value && dkd_assigned_value === dkd_text_value(dkd_session_user_id_value || dkd_profile_value?.user_id || dkd_profile_value?.id);
-    const dkd_active_value = !['completed','cancelled','canceled'].includes(dkd_status_value) && !['delivered','cancelled','canceled'].includes(dkd_pickup_value) && (dkd_active_delivery_status_values.has(dkd_status_value) || dkd_pickup_value === 'picked_up');
+    const dkd_active_value = !['completed', 'cancelled', 'canceled'].includes(dkd_status_value)
+      && !['delivered', 'cancelled', 'canceled'].includes(dkd_pickup_value)
+      && (dkd_active_delivery_status_values.has(dkd_status_value) || dkd_pickup_value === 'picked_up');
     return Boolean(dkd_own_value && dkd_active_value);
   }) || null;
 }
@@ -30,7 +32,6 @@ export default function GameFlow({ session, onSignedOut, dkd_on_home_ready_value
   const [adminMenuOpen, setAdminMenuOpen] = useState(false);
   const [adminApplicationsOpen, setAdminApplicationsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('map');
-  const [dkd_logistics_initial_panel_value, dkd_set_logistics_initial_panel_value] = useState('create');
   const [dkd_courier_initial_panel_value, dkd_set_courier_initial_panel_value] = useState('default');
   const [dkd_permission_gate_ready_flag, dkd_set_permission_gate_ready_flag] = useState(false);
   const [dkd_location_runtime_enabled_flag, dkd_set_location_runtime_enabled_flag] = useState(false);
@@ -61,7 +62,9 @@ export default function GameFlow({ session, onSignedOut, dkd_on_home_ready_value
     (async () => {
       await primeNotificationsRuntime();
       const dkd_result_value = await registerDeviceForRemotePush();
-      if (!dkd_cancelled_value && !dkd_result_value?.ok && !['expo_go_android_remote_push_unavailable','permission_denied'].includes(dkd_result_value?.reason)) console.log('[DraBornGo][push]', dkd_result_value?.reason);
+      if (!dkd_cancelled_value && !dkd_result_value?.ok && !['expo_go_android_remote_push_unavailable', 'permission_denied'].includes(dkd_result_value?.reason)) {
+        console.log('[DraBornGo][push]', dkd_result_value?.reason);
+      }
     })();
     const dkd_stop_poll_value = dkd_start_customer_status_local_notification_poll_value(session.user.id, { dkd_interval_ms_value: 4500 });
     return () => { dkd_cancelled_value = true; dkd_stop_poll_value?.(); };
@@ -89,10 +92,19 @@ export default function GameFlow({ session, onSignedOut, dkd_on_home_ready_value
       const dkd_region_value = dkd_text_value(profile?.dkd_region || profile?.courier_zone || profile?.dkd_courier_online_region || '');
       const { data, error } = await dkd_set_courier_online_status({ dkd_online: dkd_next_online_value, dkd_country: dkd_country_value, dkd_city: dkd_city_value, dkd_region: dkd_region_value, dkd_live_lat: loc?.lat, dkd_live_lng: loc?.lng });
       if (error) throw error;
-      setProfile((dkd_previous_value) => dkd_previous_value ? { ...dkd_previous_value, dkd_courier_online: dkd_next_online_value, dkd_courier_online_country: dkd_country_value, dkd_courier_online_city: dkd_city_value, dkd_courier_online_region: dkd_region_value, dkd_courier_auto_assigned_job_id: dkd_next_online_value ? (data?.dkd_assigned_job_id || data?.assigned_job_id || null) : null } : dkd_previous_value);
+      setProfile((dkd_previous_value) => dkd_previous_value ? {
+        ...dkd_previous_value,
+        dkd_courier_online: dkd_next_online_value,
+        dkd_courier_online_country: dkd_country_value,
+        dkd_courier_online_city: dkd_city_value,
+        dkd_courier_online_region: dkd_region_value,
+        dkd_courier_auto_assigned_job_id: dkd_next_online_value ? (data?.dkd_assigned_job_id || data?.assigned_job_id || null) : null,
+      } : dkd_previous_value);
     } catch (dkd_error_value) {
       Alert.alert('Kurye', dkd_error_value?.message || 'Çevrimiçi mod güncellenemedi.');
-    } finally { dkd_online_busy_ref_value.current = false; }
+    } finally {
+      dkd_online_busy_ref_value.current = false;
+    }
   }, [loc?.lat, loc?.lng, profile]);
 
   useEffect(() => {
@@ -105,9 +117,14 @@ export default function GameFlow({ session, onSignedOut, dkd_on_home_ready_value
         const dkd_result_value = await fetchCourierJobs({ dkd_force_refresh: true, dkd_cache_ttl_ms: 0 });
         if (dkd_result_value?.error) throw dkd_result_value.error;
         const dkd_job_value = dkd_find_active_delivery_value(dkd_result_value?.data, profile, dkd_user_id_value);
-        if (!dkd_cancelled_value && dkd_job_value?.id) setProfile((dkd_previous_value) => dkd_previous_value ? { ...dkd_previous_value, dkd_courier_online: false, dkd_courier_auto_assigned_job_id: dkd_job_value.id } : dkd_previous_value);
-      } catch (dkd_error_value) { console.warn('dkd active delivery restore skipped', dkd_error_value?.message || dkd_error_value); }
-      finally { dkd_restore_busy_ref_value.current = false; }
+        if (!dkd_cancelled_value && dkd_job_value?.id) {
+          setProfile((dkd_previous_value) => dkd_previous_value ? { ...dkd_previous_value, dkd_courier_online: false, dkd_courier_auto_assigned_job_id: dkd_job_value.id } : dkd_previous_value);
+        }
+      } catch (dkd_error_value) {
+        console.warn('dkd active delivery restore skipped', dkd_error_value?.message || dkd_error_value);
+      } finally {
+        dkd_restore_busy_ref_value.current = false;
+      }
     })();
     return () => { dkd_cancelled_value = true; };
   }, [profile, session?.user?.id]);
@@ -126,10 +143,14 @@ export default function GameFlow({ session, onSignedOut, dkd_on_home_ready_value
     if (activeTab !== 'map') { setActiveTab('map'); return true; }
     return false;
   }, [activeTab, actionMenuOpen, profileOpen, courierBoardOpen, adminMenuOpen, adminApplicationsOpen]);
-  useEffect(() => { const dkd_subscription_value = BackHandler.addEventListener('hardwareBackPress', dkd_handle_back_value); return () => dkd_subscription_value.remove(); }, [dkd_handle_back_value]);
+
+  useEffect(() => {
+    const dkd_subscription_value = BackHandler.addEventListener('hardwareBackPress', dkd_handle_back_value);
+    return () => dkd_subscription_value.remove();
+  }, [dkd_handle_back_value]);
 
   const homeProps = useMemo(() => buildHomeProps({ profile, loc, locationError, retryLocation, recenterToCurrentLocation, activeTab, setActiveTab, openActionMenu, openCourierBoard, openProfile, dkd_on_toggle_courier_online_value: dkd_toggle_courier_online_value }), [profile, loc, locationError, retryLocation, recenterToCurrentLocation, activeTab, openActionMenu, openCourierBoard, openProfile, dkd_toggle_courier_online_value]);
-  const modalProps = useMemo(() => buildModalProps({ actionMenuOpen, setActionMenuOpen, isAdmin, courierBoardOpen, setCourierBoardOpen, setProfile, setProfileOpen, logout, profileOpen, profile, refreshProfile, saveProfileNick, activeTab, setActiveTab, sessionUserId: session?.user?.id, loc, adminMenuOpen, setAdminMenuOpen, adminApplicationsOpen, setAdminApplicationsOpen, dkd_logistics_initial_panel_value, dkd_set_logistics_initial_panel_value, dkd_courier_initial_panel_value, dkd_set_courier_initial_panel_value }), [actionMenuOpen, isAdmin, courierBoardOpen, profileOpen, profile, refreshProfile, saveProfileNick, activeTab, session?.user?.id, loc, adminMenuOpen, adminApplicationsOpen, dkd_logistics_initial_panel_value, dkd_courier_initial_panel_value, logout]);
+  const modalProps = useMemo(() => buildModalProps({ actionMenuOpen, setActionMenuOpen, isAdmin, courierBoardOpen, setCourierBoardOpen, setProfile, setProfileOpen, logout, profileOpen, profile, refreshProfile, saveProfileNick, activeTab, setActiveTab, sessionUserId: session?.user?.id, loc, adminMenuOpen, setAdminMenuOpen, adminApplicationsOpen, setAdminApplicationsOpen, dkd_courier_initial_panel_value, dkd_set_courier_initial_panel_value }), [actionMenuOpen, isAdmin, courierBoardOpen, profileOpen, profile, refreshProfile, saveProfileNick, activeTab, session?.user?.id, loc, adminMenuOpen, adminApplicationsOpen, dkd_courier_initial_panel_value, logout]);
   const hasVisibleModal = useMemo(() => getHasVisibleModal({ actionMenuOpen, profileOpen, courierBoardOpen, activeTab, adminMenuOpen, adminApplicationsOpen }), [actionMenuOpen, profileOpen, courierBoardOpen, activeTab, adminMenuOpen, adminApplicationsOpen]);
   const dkd_courier_online_watcher_props = useMemo(() => ({ dkd_profile_value: profile, dkd_set_profile_value: setProfile, dkd_current_location_value: loc || null, dkd_courier_board_open_value: courierBoardOpen, dkd_on_open_courier_board_value: () => openCourierBoard('default') }), [profile, loc, courierBoardOpen, openCourierBoard]);
 
