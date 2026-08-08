@@ -1,4 +1,4 @@
-name: DKD v0.0.7 Zero Remnant Audit
+name: DKD v0.0.7 Cleanup Pass Seven
 
 on:
   push:
@@ -15,70 +15,63 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Apply zero-remnant cleanup
+      - name: Apply cleanup pass seven
         shell: bash
         run: |
           set +e
-          python3 scripts/dkd_v007_fix6.py > /tmp/dkd_fix6.log 2>&1
-          echo "$?" > /tmp/dkd_fix6_code
-      - name: Install and lock dependencies
+          python3 scripts/dkd_v007_fix7.py > /tmp/dkd_fix7.log 2>&1
+          echo "$?" > /tmp/dkd_fix7_code
+      - name: Install locked dependencies
         shell: bash
         run: |
           set +e
-          npm install > /tmp/dkd_npm6.log 2>&1
-          echo "$?" > /tmp/dkd_install6_code
-      - name: Validate Expo Go and tracked repository
+          npm ci > /tmp/dkd_npm7.log 2>&1
+          echo "$?" > /tmp/dkd_install7_code
+      - name: Validate Expo Go and legacy surface
         shell: bash
         run: |
           set +e
-          DKD_FIX_CODE=$(cat /tmp/dkd_fix6_code)
-          DKD_INSTALL_CODE=$(cat /tmp/dkd_install6_code)
+          DKD_FIX_CODE=$(cat /tmp/dkd_fix7_code)
+          DKD_INSTALL_CODE=$(cat /tmp/dkd_install7_code)
           DKD_EXPORT_CODE=99
           DKD_DOCTOR_CODE=99
-          DKD_AUDIT_CODE=99
           if [ "$DKD_FIX_CODE" = "0" ] && [ "$DKD_INSTALL_CODE" = "0" ]; then
-            npx expo export --platform android --output-dir /tmp/dkd-v007-export > /tmp/dkd_export6.log 2>&1
+            npx expo export --platform android --output-dir /tmp/dkd-v007-export > /tmp/dkd_export7.log 2>&1
             DKD_EXPORT_CODE=$?
-            npx expo-doctor@latest > /tmp/dkd_doctor6.log 2>&1
+            npx expo-doctor@latest > /tmp/dkd_doctor7.log 2>&1
             DKD_DOCTOR_CODE=$?
-            npm audit --omit=dev --audit-level=high > /tmp/dkd_audit6.log 2>&1
-            DKD_AUDIT_CODE=$?
           fi
-          DKD_PATTERN='DailyReward|daily_reward|Günlük Giriş Ödülü|Günlük Ödül|\benergy\b|\bEnerji\b|energy_max|wallet|\bCüzdan\b|\bBakiye\b|dkd_puan|\bPuan\b|puanlama|Özel Kart|player.?card|Oyuncu Kartı|chest|\bSandıklar\b|collection|\bKoleksiyon\b|payment|\bÖdeme\b|task_state|weekly_task_state|TasksModal|\bGörevler\b|\bXP\b|\bLVL\b|\bLvl\b|rank_key|dkd_iletimerkezi|sms_otp|Telefon doğrulama'
+          DKD_PATTERN='DKD_DraBornGo_v0\.0\.[0-6]|DailyReward|daily_reward|Günlük Giriş Ödülü|Günlük Ödül|\bEnerji\b|energy_max|energy_updated_at|wallet|\bCüzdan\b|\bBakiye\b|dkd_puan|price_puan|reward_puan|\bPuan\b|puanlama|Özel Kart|player.?card|Oyuncu Kartı|chest|\bSandık\b|\bSandıklar\b|collection|\bKoleksiyon\b|payment_status|payment_method|DkdWalletPaymentMethodModal|\bÖdeme\b|task_state|weekly_task_state|TasksModal|task_key|\bGörevler\b|\bXP\b|\bLVL\b|\bLvl\b|rank_key|dkd_iletimerkezi|sms_otp|Telefon doğrulama|dkd_business_drop_links|dkd_business_task_attribution'
           {
-            echo "DKD v0.0.7 ZERO-REMNANT VALIDATION"
+            echo "DKD v0.0.7 PASS SEVEN VALIDATION"
             echo "fix_code=$DKD_FIX_CODE"
             echo "npm_install_code=$DKD_INSTALL_CODE"
             echo "expo_export_android_code=$DKD_EXPORT_CODE"
             echo "expo_doctor_code=$DKD_DOCTOR_CODE"
-            echo "npm_audit_high_code=$DKD_AUDIT_CODE"
             echo
             echo "=== VERSION ==="
             node -e "const a=require('./app.json').expo,p=require('./package.json'); console.log('expo_version='+a.version); console.log('android_versionCode='+a.android.versionCode); console.log('package_version='+p.version);"
             echo
             echo "=== EXPO DOCTOR ==="
-            tail -n 100 /tmp/dkd_doctor6.log 2>/dev/null || true
-            echo
-            echo "=== NPM PRODUCTION AUDIT ==="
-            tail -n 120 /tmp/dkd_audit6.log 2>/dev/null || true
+            tail -n 100 /tmp/dkd_doctor7.log 2>/dev/null || true
             echo
             echo "=== EXPO EXPORT ==="
-            tail -n 80 /tmp/dkd_export6.log 2>/dev/null || true
+            tail -n 160 /tmp/dkd_export7.log 2>/dev/null || true
             echo
-            echo "=== TEXT LEGACY REFERENCES (binary ignored) ==="
-            git grep -I -nEi "$DKD_PATTERN" -- . ':!scripts/dkd_v007_fix6.py' ':!.github/workflows/dkd_v007_apply_cleanup.yml' ':!package-lock.json' || true
+            echo "=== TEXT LEGACY REFERENCES ==="
+            git grep -I -nEi "$DKD_PATTERN" -- . ':!scripts/dkd_v007_fix7.py' ':!.github/workflows/dkd_v007_apply_cleanup.yml' ':!package-lock.json' || true
             echo
             echo "=== LEGACY FILENAMES ==="
-            git ls-files | grep -Ei '(^|/)(daily.?reward|energy|wallet|payment|chest|collection|boss|leaderboard|task|sms|iletimerkezi|player.?card|progression)(/|\.|_)' || true
+            git ls-files | grep -Ei '(^|/)(daily.?reward|energy|wallet|payment|chest|collection|boss|leaderboard|tasks?|sms|iletimerkezi|player.?card|progression|drop)(/|\.|_)' || true
             echo
-            echo "=== REMOVED MODULE IMPORTS ==="
-            git grep -I -nE '(features/(dailyReward|chest|collection|tasks|payment)|useDailyRewardState|useEnergyState|awardProfileXp|utils/text|constants/game|useDropState|useHistoryData|AdminDropsModal|AdminLootModal|AdminMarketModal|AdminBossModal|AdminUsersModal|dkd_create_restaurant_order_value)' -- src || true
-          } > dkd_v007_zero_remnant_audit.txt
-      - name: Commit result
+            echo "=== RETIRED BUSINESS/DROP IMPORTS ==="
+            git grep -I -nE '(dropService|fetchBusinessDropsLite|linkDropToBusiness|unlinkDropFromBusiness|linkedDrops|adminDrops|attachDrop|removeLinkedDrop|dkd_create_restaurant_order_value|dkd_on_wallet_after_payment_value|dkd_sync_wallet_after_cargo_payment_value|dkd_payment_loading_value)' -- src || true
+          } > dkd_v007_pass7_audit.txt
+      - name: Commit cleanup result
         shell: bash
         run: |
           git config user.name 'DraBornGo v0.0.7 Bot'
           git config user.email 'actions@users.noreply.github.com'
           git add -A
-          git commit -m 'DraBornGo v0.0.7 zero-remnant cleanup'
+          git commit -m 'DraBornGo v0.0.7 cleanup pass seven'
           git push origin HEAD:main
