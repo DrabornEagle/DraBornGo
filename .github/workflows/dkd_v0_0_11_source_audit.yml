@@ -5,12 +5,14 @@ on:
     branches: [main, release/v0.0.11-20260808]
     paths-ignore:
       - audit/**
+  pull_request:
+    branches: [main]
 
 permissions:
   contents: write
 
 concurrency:
-  group: dkd-v0-0-11-source-audit-${{ github.ref_name }}
+  group: dkd-v0-0-11-source-audit-${{ github.event_name }}-${{ github.ref_name }}
   cancel-in-progress: true
 
 jobs:
@@ -56,7 +58,7 @@ jobs:
           if grep -RniEi "${DKD_REMOVED_KEY}|${DKD_REMOVED_EDGE}|${DKD_LABEL_ONE}[[:space:]]+${DKD_LABEL_TWO}" . \
               --exclude-dir=.git \
               --exclude-dir=node_modules; then
-            echo 'Retired courier module residue detected in main tree.'
+            echo 'Retired courier module residue detected in source tree.'
             exit 1
           fi
 
@@ -79,6 +81,7 @@ jobs:
         run: npm run play:final-audit
 
       - name: Record successful non-build audit
+        if: github.event_name == 'push'
         shell: bash
         run: |
           mkdir -p audit
