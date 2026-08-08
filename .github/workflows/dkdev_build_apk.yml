@@ -26,8 +26,7 @@ jobs:
       - name: Dkd setup node
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: npm
+          node-version: '22'
 
       - name: Dkd setup java
         uses: actions/setup-java@v4
@@ -87,7 +86,7 @@ jobs:
           DKD_NODE
 
       - name: Dkd install npm packages
-        run: npm ci
+        run: npm install --no-package-lock
 
       - name: Dkd verify embedded runtime env
         shell: bash
@@ -136,7 +135,7 @@ jobs:
           mkdir -p "$ANDROID_SDK_ROOT/cmdline-tools"
           export PATH="$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$ANDROID_SDK_ROOT/platform-tools:$PATH"
           yes | sdkmanager --licenses || true
-          sdkmanager --install "platform-tools" "platforms;android-35" "build-tools;35.0.0"
+          sdkmanager --install "platform-tools" "platforms;android-36" "build-tools;36.0.0"
 
       - name: Dkd generate android project
         run: npx expo prebuild --platform android --clean --non-interactive
@@ -157,12 +156,12 @@ jobs:
             echo "DKD ERROR: Dev APK output not found."
             exit 1
           fi
-          cp "${dkd_dev_apk_path}" dkd_dev_apk_output/DraBornGo-v0.0.5-code5-dev.apk
+          cp "${dkd_dev_apk_path}" dkd_dev_apk_output/DraBornGo-v0.0.6-code6-dev.apk
           ls -lh dkd_dev_apk_output
 
       - name: Dkd upload development APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: DKD_DraBornGo_v0_0_5_code5_dev_apk
-          path: dkd_dev_apk_output/DraBornGo-v0.0.5-code5-dev.apk
+          name: DKD_DraBornGo_v0_0_6_code6_dev_apk
+          path: dkd_dev_apk_output/DraBornGo-v0.0.6-code6-dev.apk
           retention-days: 7
