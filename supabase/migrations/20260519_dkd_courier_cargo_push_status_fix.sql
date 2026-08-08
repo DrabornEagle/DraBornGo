@@ -57,10 +57,7 @@ as $$
     on dkd_profile_scope.user_id = dkd_token_scope.user_id
   where dkd_token_scope.is_active = true
     and nullif(trim(coalesce(dkd_token_scope.expo_push_token, '')), '') is not null
-    and (
-      public.dkd_urgent_courier_license_active_dkd(dkd_token_scope.user_id) is true
-      or lower(coalesce(dkd_profile_scope.courier_status, '')) in ('approved', 'active', 'aktif', 'onayli', 'onaylı')
-    )
+    and lower(coalesce(dkd_profile_scope.courier_status, '')) in ('approved', 'active', 'aktif', 'onayli', 'onaylı')
   group by dkd_token_scope.user_id, dkd_token_scope.expo_push_token;
 $$;
 
