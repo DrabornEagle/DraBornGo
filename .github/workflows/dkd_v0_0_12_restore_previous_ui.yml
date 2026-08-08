@@ -1,0 +1,84 @@
+name: DKD v0.0.12 Restore Previous Home UI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/dkd_v0_0_12_restore_previous_ui.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  dkd_restore_previous_home_ui:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout current main
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Restore previous approved home design only
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin backup-v0.0.11-pre-v0.0.12-20260809-0051
+          git checkout origin/backup-v0.0.11-pre-v0.0.12-20260809-0051 -- src/features/map/MapHomeScreen.js
+
+          node <<'NODE'
+          const fs = require('fs');
+          const path = 'src/features/map/MapHomeScreen.js';
+          let text = fs.readFileSync(path, 'utf8');
+
+          text = text.replaceAll("const dkd_version_text_value = 'v0.0.11';", "const dkd_version_text_value = 'v0.0.12';");
+          text = text.replaceAll(
+            'Kurye, kargo, nakliye ve şehir içi hizmet taleplerini tek şehir ağı üzerinden keşfet.',
+            'Kurye, kargo ve şehir içi hizmet taleplerini tek şehir ağı üzerinden keşfet.'
+          );
+          text = text.replaceAll('Kurye ve nakliyeci süreçleri', 'Kurye başvuru süreci');
+
+          fs.writeFileSync(path, text);
+          NODE
+
+          if grep -Eqi 'nakliye|nakliyeci' src/features/map/MapHomeScreen.js; then
+            echo 'Retired Nakliye wording unexpectedly remains in restored home UI.'
+            grep -Ein 'nakliye|nakliyeci' src/features/map/MapHomeScreen.js || true
+            exit 1
+          fi
+
+          grep -q "const dkd_version_text_value = 'v0.0.12';" src/features/map/MapHomeScreen.js
+          grep -q 'DRABORNGO COURIER GRID' src/features/map/MapHomeScreen.js
+          grep -q 'Kurye Operasyon Merkezi' src/features/map/MapHomeScreen.js
+          grep -q 'Hizmet Ağı Merkezi' src/features/map/MapHomeScreen.js
+          grep -q 'DkdAnimatedPressable' src/features/map/MapHomeScreen.js
+          grep -q 'dkd_racing_motorcycle_asset_value' src/features/map/MapHomeScreen.js
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Verify v0.0.12 identity
+        run: npm run dkd:verify-v0.0.12
+
+      - name: Verify Android Expo bundle
+        run: npx expo export --platform android --output-dir /tmp/dkd-v0-0-12-ui-restore
+
+      - name: Commit restored UI
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git diff --quiet -- src/features/map/MapHomeScreen.js; then
+            echo 'Previous home UI already restored.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add src/features/map/MapHomeScreen.js
+          git commit -m 'fix: restore previous DraBornGo home design for v0.0.12'
+          git push origin HEAD:main
