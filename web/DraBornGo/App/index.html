@@ -3,85 +3,55 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>DraBornGo v0.0.6</title>
-  <meta name="description" content="DraBornGo v0.0.6 sürüm, test ve Google Play dağıtım bilgileri." />
+  <meta name="color-scheme" content="dark" />
+  <title>DraBornGo v0.0.8</title>
+  <meta name="description" content="DraBornGo v0.0.8 Android versionCode 8, Expo SDK 57 test ve Google Play politika merkezi." />
   <style>
-    :root {
-      color-scheme: dark;
-      --dkd_bg: #050b15;
-      --dkd_panel: #0c1726;
-      --dkd_panel_two: #101f33;
-      --dkd_line: rgba(255,255,255,.12);
-      --dkd_text: #f6fbff;
-      --dkd_soft: rgba(246,251,255,.72);
-      --dkd_cyan: #7be6ff;
-      --dkd_green: #58e2ab;
-      --dkd_gold: #f6b54e;
-    }
-    * { box-sizing: border-box; }
-    body { margin: 0; font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: radial-gradient(circle at top left, rgba(123,230,255,.18), transparent 34%), radial-gradient(circle at top right, rgba(88,226,171,.14), transparent 30%), var(--dkd_bg); color: var(--dkd_text); }
-    main { width: min(1080px, calc(100% - 28px)); margin: 0 auto; padding: 26px 0 42px; }
-    .dkd_nav { display: flex; justify-content: space-between; align-items: center; gap: 14px; margin-bottom: 20px; }
-    .dkd_brand { display: flex; align-items: center; gap: 10px; font-weight: 1000; letter-spacing: .2px; }
-    .dkd_logo { width: 42px; height: 42px; border-radius: 14px; display: grid; place-items: center; background: rgba(123,230,255,.14); border: 1px solid rgba(123,230,255,.28); }
-    .dkd_chip { border: 1px solid var(--dkd_line); border-radius: 999px; padding: 9px 12px; color: var(--dkd_soft); font-weight: 900; font-size: 12px; background: rgba(255,255,255,.05); }
-    .dkd_hero { display: grid; grid-template-columns: 1.1fr .9fr; gap: 18px; align-items: stretch; }
-    .dkd_card { border: 1px solid var(--dkd_line); border-radius: 28px; background: rgba(12,23,38,.86); padding: clamp(20px, 4vw, 34px); }
-    .dkd_badge { display: inline-flex; border: 1px solid rgba(123,230,255,.30); border-radius: 999px; padding: 8px 12px; color: var(--dkd_cyan); font-weight: 1000; font-size: 12px; background: rgba(123,230,255,.10); }
-    h1 { margin: 18px 0 12px; font-size: clamp(36px, 8vw, 76px); line-height: .94; letter-spacing: -2px; }
-    .dkd_lead { color: var(--dkd_soft); font-size: clamp(15px, 2.5vw, 19px); line-height: 1.7; font-weight: 750; max-width: 680px; }
-    .dkd_notice { margin-top: 18px; border-radius: 18px; border: 1px solid rgba(88,226,171,.28); background: rgba(88,226,171,.08); padding: 14px; color: #dfffee; line-height: 1.6; font-weight: 800; }
-    .dkd_actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 22px; }
-    .dkd_button { min-height: 52px; display: inline-flex; align-items: center; justify-content: center; gap: 9px; border-radius: 17px; padding: 0 18px; text-decoration: none; font-weight: 1000; border: 1px solid var(--dkd_line); }
-    .dkd_button_primary { background: var(--dkd_cyan); color: #06101c; border-color: var(--dkd_cyan); }
-    .dkd_button_secondary { background: rgba(255,255,255,.06); color: var(--dkd_text); }
-    .dkd_side { display: grid; gap: 12px; }
-    .dkd_stat { border: 1px solid var(--dkd_line); border-radius: 22px; background: rgba(16,31,51,.88); padding: 18px; }
-    .dkd_stat small { display: block; color: var(--dkd_soft); font-weight: 900; margin-bottom: 6px; }
-    .dkd_stat strong { display: block; font-size: 22px; }
-    .dkd_grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 18px; }
-    .dkd_step { border: 1px solid var(--dkd_line); border-radius: 22px; background: rgba(255,255,255,.045); padding: 18px; }
-    .dkd_step span { color: var(--dkd_gold); font-weight: 1000; font-size: 13px; }
-    .dkd_step h2 { margin: 8px 0; font-size: 18px; }
-    .dkd_step p { color: var(--dkd_soft); font-weight: 750; line-height: 1.6; margin: 0; }
-    footer { color: rgba(246,251,255,.52); font-size: 12px; font-weight: 800; margin-top: 22px; text-align: center; }
-    @media (max-width: 760px) { .dkd_hero, .dkd_grid { grid-template-columns: 1fr; } .dkd_nav { align-items: flex-start; } .dkd_chip { display: none; } }
+    :root{color-scheme:dark;--bg:#020611;--panel:#08172c;--panel2:#111b38;--line:rgba(139,219,255,.17);--text:#f8fcff;--soft:rgba(240,248,255,.72);--cyan:#73e5ff;--green:#5ce5b0;--gold:#ffd36f;--purple:#b99aff;--pink:#ff8da3}
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:radial-gradient(circle at 90% 0,rgba(73,95,255,.22),transparent 34%),radial-gradient(circle at 5% 40%,rgba(187,73,255,.15),transparent 32%),linear-gradient(145deg,#020611 0%,#07182d 52%,#120d2a 100%);color:var(--text);min-height:100vh}a{color:inherit}main{width:min(1120px,calc(100% - 28px));margin:0 auto;padding:24px 0 48px}.nav{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:18px}.brand{display:flex;align-items:center;gap:11px;font-weight:1000}.logo{width:46px;height:46px;border-radius:16px;display:grid;place-items:center;background:linear-gradient(135deg,#1e7d9b,#493aaf);border:1px solid rgba(255,255,255,.16);font-size:22px}.chip{border:1px solid var(--line);border-radius:999px;padding:9px 13px;color:#dff8ff;background:rgba(115,229,255,.07);font-size:12px;font-weight:900}.hero{display:grid;grid-template-columns:1.22fr .78fr;gap:16px}.card{position:relative;overflow:hidden;border:1px solid var(--line);border-radius:32px;background:rgba(7,20,40,.88);padding:clamp(22px,4vw,38px);backdrop-filter:blur(18px)}.card:before{content:"";position:absolute;width:260px;height:260px;border-radius:50%;right:-120px;top:-140px;background:rgba(115,229,255,.09)}.badge{position:relative;display:inline-flex;border:1px solid rgba(115,229,255,.31);border-radius:999px;padding:8px 12px;background:rgba(115,229,255,.09);color:var(--cyan);font-weight:1000;font-size:12px;letter-spacing:.35px}h1{position:relative;margin:18px 0 12px;font-size:clamp(42px,8vw,78px);line-height:.94;letter-spacing:-2.6px}.lead{position:relative;color:var(--soft);font-size:clamp(15px,2.4vw,19px);line-height:1.72;font-weight:750;max-width:720px}.notice{position:relative;margin-top:18px;border-radius:20px;border:1px solid rgba(92,229,176,.28);background:rgba(92,229,176,.08);padding:15px;color:#e6fff5;line-height:1.6;font-weight:800}.actions{position:relative;display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}.button{min-height:52px;display:inline-flex;align-items:center;justify-content:center;border-radius:17px;padding:0 18px;text-decoration:none;font-weight:1000;border:1px solid var(--line)}.primary{background:linear-gradient(135deg,var(--cyan),#8af2d0);color:#05101c;border-color:transparent}.secondary{background:rgba(255,255,255,.055);color:var(--text)}.side{display:grid;gap:11px}.stat{border:1px solid var(--line);border-radius:25px;background:rgba(11,26,53,.88);padding:20px}.stat small{display:block;color:var(--soft);font-weight:900;margin-bottom:7px}.stat strong{display:block;font-size:25px}.stat.cyan{background:linear-gradient(135deg,rgba(17,84,111,.92),rgba(37,46,106,.90))}.stat.green{background:linear-gradient(135deg,rgba(15,92,73,.88),rgba(18,64,92,.90))}.stat.purple{background:linear-gradient(135deg,rgba(64,43,118,.90),rgba(71,31,87,.88))}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:17px}.item{border:1px solid var(--line);border-radius:24px;background:rgba(255,255,255,.045);padding:19px}.icon{width:45px;height:45px;border-radius:16px;display:grid;place-items:center;background:rgba(115,229,255,.10);font-size:21px}.item h2{font-size:18px;margin:13px 0 7px}.item p{color:var(--soft);font-size:14px;line-height:1.62;font-weight:700;margin:0}.policy{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:17px}.policy a{border:1px solid var(--line);border-radius:22px;background:rgba(8,23,44,.80);padding:17px;text-decoration:none;font-weight:900}.policy small{display:block;color:var(--soft);margin-top:5px;font-weight:700;line-height:1.5}footer{color:rgba(240,248,255,.50);font-size:12px;font-weight:800;margin-top:24px;text-align:center}@media(max-width:780px){.hero,.grid,.policy{grid-template-columns:1fr}.chip{display:none}.card{border-radius:27px}.side{grid-template-columns:repeat(3,1fr)}.stat{padding:15px}.stat strong{font-size:19px}}@media(max-width:540px){.side{grid-template-columns:1fr}.nav{align-items:flex-start}}
   </style>
 </head>
 <body>
   <main>
-    <nav class="dkd_nav">
-      <div class="dkd_brand"><span class="dkd_logo">🦅</span><span>DraBornGo</span></div>
-      <span class="dkd_chip">Resmi Sürüm Merkezi</span>
+    <nav class="nav">
+      <div class="brand"><span class="logo">🏍️</span><span>DraBornGo</span></div>
+      <span class="chip">Resmi Sürüm ve Politika Merkezi</span>
     </nav>
 
-    <section class="dkd_hero">
-      <div class="dkd_card">
-        <span class="dkd_badge">v0.0.6 • Android • Expo SDK 57</span>
-        <h1>DraBornGo v0.0.6</h1>
-        <p class="dkd_lead">Bu sürüm Expo Go üzerinden geliştirme ve test aşamasındadır. Bu aşamada APK veya AAB dosyası yayınlanmamaktadır.</p>
-        <div class="dkd_notice">Google Play sürümünde uygulama güncellemeleri yalnızca Google Play üzerinden sunulur. DraBornGo uygulaması dışarıdan APK indirerek kendisini güncellemez.</div>
-        <div class="dkd_actions">
-          <a class="dkd_button dkd_button_primary" href="./dkd_draborngo_release_notes.html">Sürüm Notları</a>
-          <a class="dkd_button dkd_button_secondary" href="./dkd_draborngo_update_manifest.json">Sürüm Manifesti</a>
-          <a class="dkd_button dkd_button_secondary" href="../../draborngo/privacy/">Gizlilik</a>
-          <a class="dkd_button dkd_button_secondary" href="../../draborngo/account-deletion/">Hesap Silme</a>
+    <section class="hero">
+      <div class="card">
+        <span class="badge">v0.0.8 • Android code 8 • Expo SDK 57</span>
+        <h1>Kurye ağı yeniden tasarlandı.</h1>
+        <p class="lead">DraBornGo v0.0.8; Login ekranını koruyarak Ana Sayfa ve ortak uygulama temasını daha modern, renkli ve kurye odaklı hale getirir. Kurye durumu, operasyon merkezleri ve hızlı erişimler yeni görsel hiyerarşiyle sunulur.</p>
+        <div class="notice">Bu sürüm Expo Go geliştirme/test aşamasındadır. APK veya AAB bu aşamada üretilmez. Google Play yayın sürümünde güncellemeler yalnız resmi Google Play dağıtım mekanizması üzerinden sunulur.</div>
+        <div class="actions">
+          <a class="button primary" href="./dkd_draborngo_release_notes.html">Sürüm Notları</a>
+          <a class="button secondary" href="./dkd_draborngo_update_manifest.json">Sürüm Manifesti</a>
+          <a class="button secondary" href="../../draborngo/privacy/">Gizlilik</a>
+          <a class="button secondary" href="../../draborngo/account-deletion/">Hesap Silme</a>
         </div>
       </div>
-      <aside class="dkd_side">
-        <div class="dkd_stat"><small>Son geliştirme sürümü</small><strong>0.0.6</strong></div>
-        <div class="dkd_stat"><small>Version Code</small><strong>6</strong></div>
-        <div class="dkd_stat"><small>Test kanalı</small><strong>Expo Go</strong></div>
+      <aside class="side">
+        <div class="stat cyan"><small>Geliştirme sürümü</small><strong>0.0.8</strong></div>
+        <div class="stat green"><small>Android Version Code</small><strong>8</strong></div>
+        <div class="stat purple"><small>Test kanalı</small><strong>Expo Go</strong></div>
       </aside>
     </section>
 
-    <section class="dkd_grid" aria-label="Sürüm bilgileri">
-      <article class="dkd_step"><span>01</span><h2>Expo Go testi</h2><p>v0.0.6 geliştirme testi Expo SDK 57 uyumlu Expo Go üzerinden yürütülür.</p></article>
-      <article class="dkd_step"><span>02</span><h2>APK/AAB yok</h2><p>Bu aşamada kurulum paketi üretilmez veya web üzerinden dağıtılmaz.</p></article>
-      <article class="dkd_step"><span>03</span><h2>Google Play dağıtımı</h2><p>Yayın aşamasında güncellemeler Google Play'in resmi güncelleme mekanizması üzerinden sunulur.</p></article>
+    <section class="grid" aria-label="v0.0.8 ana değişiklikler">
+      <article class="item"><div class="icon">🏍️</div><h2>Kurye temalı modern UI</h2><p>Ana Sayfa; canlı kurye durumu, operasyon kartları, modern ikonlar ve hareketli vurgu efektleriyle yeniden kuruldu.</p></article>
+      <article class="item"><div class="icon">🛡️</div><h2>Google Play hazırlığı</h2><p>İzin kapsamı konum ve kamera ile sınırlı tutulur; arka plan konum, mikrofon ve geniş depolama izinleri istenmez.</p></article>
+      <article class="item"><div class="icon">🌐</div><h2>Web senkronu</h2><p>Sürüm sayfası, manifest, gizlilik, kullanım şartları ve hesap silme kaynakları v0.0.8 ile eşitlenir.</p></article>
     </section>
 
-    <footer>© DraBornGo • com.draborneagle.draborngo</footer>
+    <section class="policy" aria-label="Politika bağlantıları">
+      <a href="../../draborngo/terms/">Kullanım Şartları<small>DraBornGo kullanım, güvenlik ve hizmet kuralları.</small></a>
+      <a href="../../draborngo/community/">Topluluk Kuralları<small>Raporlama, engelleme ve güvenli iletişim esasları.</small></a>
+      <a href="../../draborngo/privacy/">Gizlilik Politikası<small>İşlenen veriler, izinler, saklama ve kullanıcı hakları.</small></a>
+      <a href="../../draborngo/account-deletion/">Hesap ve Veri Silme<small>Uygulama dışından da silme talebi oluşturma yolu.</small></a>
+    </section>
+
+    <footer>© 2026 DraBornGo • com.draborneagle.draborngo • v0.0.8</footer>
   </main>
 </body>
 </html>
