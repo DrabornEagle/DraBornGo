@@ -13,15 +13,15 @@ const expectedPermissions = [
   'android.permission.CAMERA',
 ].sort();
 const actualPermissions = [...(app.android?.permissions || [])].sort();
-if (app.version !== '0.0.8') throw new Error(`Unexpected Expo version: ${app.version}`);
-if (app.android?.versionCode !== 8) throw new Error(`Unexpected Android versionCode: ${app.android?.versionCode}`);
-if (pkg.version !== '0.0.8') throw new Error(`Unexpected package version: ${pkg.version}`);
+if (app.version !== '0.0.9') throw new Error(`Unexpected Expo version: ${app.version}`);
+if (app.android?.versionCode !== 9) throw new Error(`Unexpected Android versionCode: ${app.android?.versionCode}`);
+if (pkg.version !== '0.0.9') throw new Error(`Unexpected package version: ${pkg.version}`);
 if (JSON.stringify(actualPermissions) !== JSON.stringify(expectedPermissions)) throw new Error(`Unexpected Android permission set: ${actualPermissions.join(', ')}`);
-console.log('DraBornGo release identity: v0.0.8 / Android versionCode 8');
+console.log('DraBornGo release identity: v0.0.9 / Android versionCode 9');
 console.log('Android permission set: foreground location + camera only');
 NODE
 
-npm run dkd:verify-v0.0.8
+npm run dkd:verify-v0.0.9
 npm run dkd:play-risk-scan
 npx expo-doctor@latest
 rm -rf /tmp/dkd-play-source-audit /tmp/dkd-play-web-audit
@@ -32,4 +32,4 @@ echo "Privacy: https://www.draborneagle.com/draborngo/privacy/"
 echo "Terms: https://www.draborneagle.com/draborngo/terms/"
 echo "Community: https://www.draborneagle.com/draborngo/community/"
 echo "Account deletion: https://www.draborneagle.com/draborngo/account-deletion/"
-echo "DraBornGo v0.0.8 source + web audit completed. No APK or AAB was produced."
+echo "DraBornGo v0.0.9 source + web audit completed. No APK or AAB was produced."
