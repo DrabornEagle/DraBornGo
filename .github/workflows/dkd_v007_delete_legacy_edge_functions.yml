@@ -1,0 +1,25 @@
+name: DKD v0.0.7 Delete Legacy Edge Functions
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/dkd_v007_delete_legacy_edge_functions.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  delete:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+      - name: Delete removed Edge Functions
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          DKD_PROJECT_REF: ${{ secrets.DKD_SUPABASE_PROJECT_REF }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          yes | supabase functions delete dkd-iletimerkezi-otp --project-ref "$DKD_PROJECT_REF" || true
+          yes | supabase functions delete dkd-bank-receipt-ocr --project-ref "$DKD_PROJECT_REF" || true
+          supabase functions list --project-ref "$DKD_PROJECT_REF"
