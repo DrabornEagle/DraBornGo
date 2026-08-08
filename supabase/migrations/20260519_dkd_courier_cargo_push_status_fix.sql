@@ -3,7 +3,7 @@
 -- Purpose:
 -- 1) Provide courier target token RPC used by send-courier-order-alert for Gönderi Paneli/cargo orders.
 -- 2) Provide customer status push RPC used by app when courier accepts, picks up, and delivers restaurant/cargo jobs.
--- Safe rerun: does not delete order/profile/wallet data.
+-- Safe rerun: does not delete existing order or profile data.
 
 begin;
 

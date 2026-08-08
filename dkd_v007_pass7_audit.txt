@@ -1,0 +1,286 @@
+DKD v0.0.7 PASS SEVEN VALIDATION
+fix_code=0
+npm_install_code=0
+expo_export_android_code=0
+expo_doctor_code=0
+
+=== VERSION ===
+expo_version=0.0.7
+android_versionCode=7
+package_version=0.0.7
+
+=== EXPO DOCTOR ===
+npm warn exec The following package was not found and will be installed: expo-doctor@1.20.1
+env: load .env.local .env
+env: export EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN EXPO_PUBLIC_SUPABASE_ANON_KEY EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY EXPO_PUBLIC_SUPABASE_URL
+Running 20 checks on your project...
+20/20 checks passed. No issues detected!
+
+=== EXPO EXPORT ===
+env: load .env.local .env.production .env
+env: export EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN EXPO_PUBLIC_SUPABASE_ANON_KEY EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY EXPO_PUBLIC_SUPABASE_URL
+React Compiler enabled
+Starting Metro Bundler
+
+Android Bundled 28447ms node_modules/expo/AppEntry.js (1106 modules)
+
+› Assets (28):
+assets/dkd_login/dkd_city_network_opening.png (1.6MB)
+assets/dkd_login/dkd_login_secure_gate.png (1.4MB)
+assets/dkd_onboarding/dkd_intro_city_ecosystem.png (1.5MB)
+assets/dkd_onboarding/dkd_intro_delivery_route.png (1.5MB)
+assets/dkd_onboarding/dkd_intro_live_tracking.png (1.5MB)
+assets/dkd_onboarding/dkd_intro_role_hub.png (1.5MB)
+node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/AntDesign.ttf (130KB)
+node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/Entypo.ttf (66KB)
+node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/EvilIcons.ttf (13KB)
+node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/Feather.ttf (56KB)
+node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/FontAwesome.ttf (166KB)
+node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/FontAwesome5_Brands.ttf (134KB)
+node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/FontAwesome5_Regular.ttf (34KB)
+node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/FontAwesome5_Solid.ttf (203KB)
+node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/FontAwesome6_Brands.ttf (209KB)
+node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/FontAwesome6_Regular.ttf (68KB)
+node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/FontAwesome6_Solid.ttf (424KB)
+node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/Fontisto.ttf (314KB)
+node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/Foundation.ttf (57KB)
+node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/Ionicons.ttf (390KB)
+node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/MaterialCommunityIcons.ttf (1.3MB)
+node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/MaterialIcons.ttf (357KB)
+node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/Octicons.ttf (69KB)
+node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/SimpleLineIcons.ttf (54KB)
+node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/Zocial.ttf (26KB)
+node_modules/@rnmapbox/maps/lib/module/assets/heading.png (3 variations | 450B)
+
+› android bundles (1):
+_expo/static/js/android/AppEntry-e8369d347b4507ba4b74726a3351dfb4.hbc (4.8MB)
+
+› Files (1):
+metadata.json (1.9KB)
+
+Exported: /tmp/dkd-v007-export
+
+=== TEXT LEGACY REFERENCES ===
+dkd_v007_zero_remnant_audit.txt:182:README.md:29:- The TL wallet is for physical service/order flows.
+dkd_v007_zero_remnant_audit.txt:183:README.md:30:- Points, collection cards, and gamification elements do not represent cash, crypto, investment value, or withdrawable financial value.
+dkd_v007_zero_remnant_audit.txt:184:README.md:106:Kart satış/ilan akışı mağaza sürümünde kapalıdır. Kazanılmış puan dili yalnızca fiziksel hizmet, teslimat ve güvenli vitrin bağlamında kullanılır. Eski marka storage anahtarları dkd_draborngo_* standardına taşınmıştır.
+dkd_v007_zero_remnant_audit.txt:185:scripts/check-all-migrations.sh:6:  002_cards_loot_chests_market_base.sql
+dkd_v007_zero_remnant_audit.txt:186:scripts/check-all-migrations.sh:7:  003_rpc_chests_and_market.sql
+dkd_v007_zero_remnant_audit.txt:187:scripts/check-all-migrations.sh:13:  009_drop_chest_core.sql
+dkd_v007_zero_remnant_audit.txt:188:scripts/check-all-migrations.sh:17:  013_secure_chest_manual_code.sql
+dkd_v007_zero_remnant_audit.txt:190:scripts/dkd_v007_fix5.py:16:t=t.replace("dkd_key: 'dkd_account_wallet'", "dkd_key: 'dkd_account_access'")
+dkd_v007_zero_remnant_audit.txt:191:scripts/dkd_v007_fix5.py:17:t=t.replace("dkd_title: 'Hesap / Bakiye'", "dkd_title: 'Hesap / Erişim'")
+dkd_v007_zero_remnant_audit.txt:192:scripts/dkd_v007_fix5.py:18:t=t.replace("dkd_text: 'Profil, giriş, bakiye, ödeme ve hesap erişimiyle ilgili destek.'", "dkd_text: 'Profil, giriş, hesap güvenliği ve erişim sorunlarıyla ilgili destek.'")
+dkd_v007_zero_remnant_audit.txt:193:src/features/admin/AdminBroadcastModal.js:19:  { key: 'tasks', label: 'Görevler' },
+dkd_v007_zero_remnant_audit.txt:194:src/features/admin/AdminBroadcastModal.js:146:              <TextInput value={body} onChangeText={setBody} placeholder="Örn: 15 dakika için puan duyurusu aktif." placeholderTextColor="rgba(232,244,255,0.35)" style={[dkd_styles.input, dkd_styles.textarea]} multiline maxLength={240} />
+dkd_v007_zero_remnant_audit.txt:195:src/features/business/AdminBusinessModal.js:584:                <Section title="Trafik getiren görevler" sub="Hangi görev gerçekten oyuncu getirmiş?">
+dkd_v007_zero_remnant_audit.txt:196:src/features/business/BusinessPanelModal.js:139:          <Section title="Trafik Getiren Görevler">
+dkd_v007_zero_remnant_audit.txt:197:src/features/business/MerchantHubModal.js:424:                    <Section title="Trafik getiren görevler" sub="Hangi görev gerçekten oyuncu taşıyor?">
+dkd_v007_zero_remnant_audit.txt:199:src/features/courier/CourierBoardModal.js:3192:      dkd_on_wallet_after_payment_value={dkd_sync_wallet_after_cargo_payment_value}
+dkd_v007_zero_remnant_audit.txt:200:src/features/courier/CourierBoardModal.js:5650:  dkdHeroLicenseWalletRow: {
+dkd_v007_zero_remnant_audit.txt:201:src/features/courier/CourierBoardModal.js:5675:  dkdHeroWalletSummary: {
+dkd_v007_zero_remnant_audit.txt:202:src/features/courier/CourierBoardModal.js:5686:  dkdHeroWalletSummaryShell: {
+dkd_v007_zero_remnant_audit.txt:203:src/features/courier/CourierBoardModal.js:5697:  dkdHeroWalletIconShell: {
+dkd_v007_zero_remnant_audit.txt:204:src/features/courier/CourierBoardModal.js:5706:  dkdHeroWalletTextWrap: {
+dkd_v007_zero_remnant_audit.txt:205:src/features/courier/CourierBoardModal.js:5711:  dkdHeroWalletSummaryLabel: {
+dkd_v007_zero_remnant_audit.txt:206:src/features/courier/CourierBoardModal.js:5717:  dkdHeroWalletSummaryValue: {
+dkd_v007_zero_remnant_audit.txt:208:src/features/courier/dkd_urgent_courier_panel.js:311:  dkd_on_wallet_after_payment_value,
+dkd_v007_zero_remnant_audit.txt:209:src/features/courier/dkd_urgent_courier_panel.js:454:      const dkd_wallet_after_value = dkd_result_value?.data?.dkd_wallet_after_tl;
+dkd_v007_zero_remnant_audit.txt:210:src/features/courier/dkd_urgent_courier_panel.js:455:      if (dkd_wallet_after_value != null) dkd_on_wallet_after_payment_value?.(dkd_wallet_after_value);
+dkd_v007_zero_remnant_audit.txt:211:src/features/courier/dkd_urgent_courier_panel.js:466:  }, [dkd_load_snapshot_value, dkd_on_wallet_after_payment_value]);
+dkd_v007_zero_remnant_audit.txt:212:src/features/courier/dkd_urgent_courier_panel.js:1269:              <MaterialCommunityIcons name="wallet-outline" size={14} color="#68E8FF" />
+dkd_v007_zero_remnant_audit.txt:213:src/features/courier/dkd_urgent_courier_panel.js:1270:              <Text style={dkd_styles.dkd_queue_only_meta_text}>{dkd_format_money_value(dkd_wallet_value)}</Text>
+dkd_v007_zero_remnant_audit.txt:214:src/features/serviceNetwork/dkd_service_network_modal.js:200:  if (Number.isFinite(dkd_reward_puan_value) && dkd_reward_puan_value > 0) return `${dkd_reward_puan_value} puan`;
+dkd_v007_zero_remnant_audit.txt:216:src/features/serviceNetwork/dkd_service_network_modal.js:288:  dkd_home_cleaning: { dkd_primary_question_value: 'Ev büyüklüğü, oda sayısı, temizlik türü ve ekipman ihtiyacı alınır.', dkd_address_placeholder_value: 'Hizmet verilecek ev adresi ve giriş bilgisi', dkd_delivery_placeholder_value: 'Anahtar teslim/alım noktası veya görev sonrası kontrol notu', dkd_detail_placeholder_value: '1+1, 2+1, detaylı temizlik, cam, mutfak, banyo, boş ev veya eşyalı ev notu', dkd_photo_note_value: 'Temizlik alanı fotoğrafı veya özel hassas alan notu', dkd_option_values: ['Standart temizlik', 'Detaylı temizlik', 'Cam dahil', 'Ekipman partnerden'], dkd_flow_values: ['Uygun ekip saat teklifi verir', 'Güven rozetli partner atanır', 'Görev sonrası kontrol ve puanlama açılır'] },
+dkd_v007_zero_remnant_audit.txt:217:src/features/serviceNetwork/dkd_service_network_modal.js:303:  dkd_white_goods: { dkd_primary_question_value: 'Beyaz eşya türü, marka/model, arıza belirtisi ve servis zamanı alınır.', dkd_address_placeholder_value: 'Servis adresi ve cihaz konumu', dkd_delivery_placeholder_value: 'Parça/ürün taşıma notu varsa yaz', dkd_detail_placeholder_value: 'Buzdolabı, çamaşır, bulaşık, fırın; marka/model, hata kodu ve arıza notu', dkd_photo_note_value: 'Etiket, hata kodu veya arızalı bölüm fotoğrafı', dkd_option_values: ['Arıza tespit', 'Parça teklifi', 'Yerinde servis', 'Garanti notu'], dkd_flow_values: ['Servis ön tanı ve ziyaret ücreti verir', 'Randevu onaylanır', 'İşlem sonrası rapor ve puanlama açılır'] },
+dkd_v007_zero_remnant_audit.txt:218:src/features/serviceNetwork/dkd_service_network_modal.js:317:  dkd_event_support: { dkd_primary_question_value: 'Etkinlik türü, tarih/saat, kişi sayısı ve ekipman ihtiyacı alınır.', dkd_address_placeholder_value: 'Etkinlik adresi, giriş ve yükleme alanı notu', dkd_delivery_placeholder_value: 'Malzeme teslim/toplama noktası varsa yaz', dkd_detail_placeholder_value: 'Doğum günü, nişan, organizasyon, masa-sandalye, süsleme, ses, saha destek ve süre notu', dkd_photo_note_value: 'Mekan fotoğrafı, konsept görseli veya ekipman listesi', dkd_option_values: ['Süsleme', 'Ekipman', 'Saha personeli', 'Toplama hizmeti'], dkd_flow_values: ['Organizasyon partneri paket teklifini verir', 'Kurulum/toplama saatleri planlanır', 'Etkinlik sonrası kapanış ve puanlama alınır'] },
+dkd_v007_zero_remnant_audit.txt:219:src/features/serviceNetwork/dkd_service_network_modal.js:1071:function DkdServiceNetworkHero({ dkd_on_payment_method_press_value }) {
+dkd_v007_zero_remnant_audit.txt:220:src/features/serviceNetwork/dkd_service_network_modal.js:1072:  const dkd_wallet_corner_cue_anim_value = useRef(new Animated.Value(0)).current;
+dkd_v007_zero_remnant_audit.txt:221:src/features/serviceNetwork/dkd_service_network_modal.js:1075:    const dkd_wallet_corner_cue_loop_value = Animated.loop(
+dkd_v007_zero_remnant_audit.txt:222:src/features/serviceNetwork/dkd_service_network_modal.js:1077:        Animated.timing(dkd_wallet_corner_cue_anim_value, {
+dkd_v007_zero_remnant_audit.txt:223:src/features/serviceNetwork/dkd_service_network_modal.js:1083:        Animated.timing(dkd_wallet_corner_cue_anim_value, {
+dkd_v007_zero_remnant_audit.txt:224:src/features/serviceNetwork/dkd_service_network_modal.js:1092:    dkd_wallet_corner_cue_loop_value.start();
+dkd_v007_zero_remnant_audit.txt:225:src/features/serviceNetwork/dkd_service_network_modal.js:1093:    return () => dkd_wallet_corner_cue_loop_value.stop();
+dkd_v007_zero_remnant_audit.txt:226:src/features/serviceNetwork/dkd_service_network_modal.js:1094:  }, [dkd_wallet_corner_cue_anim_value]);
+dkd_v007_zero_remnant_audit.txt:227:src/features/serviceNetwork/dkd_service_network_modal.js:1096:  const dkd_wallet_corner_cue_scale_value = dkd_wallet_corner_cue_anim_value.interpolate({
+dkd_v007_zero_remnant_audit.txt:228:src/features/serviceNetwork/dkd_service_network_modal.js:1100:  const dkd_wallet_corner_cue_opacity_value = dkd_wallet_corner_cue_anim_value.interpolate({
+dkd_v007_zero_remnant_audit.txt:229:src/features/serviceNetwork/dkd_service_network_modal.js:1120:      <Pressable onPress={dkd_on_payment_method_press_value} style={({ pressed: dkd_pressed_value }) => [dkd_styles.dkd_hero_wallet_button, dkd_pressed_value && dkd_styles.dkd_hero_wallet_button_pressed]}>
+dkd_v007_zero_remnant_audit.txt:230:src/features/serviceNetwork/dkd_service_network_modal.js:1124:            dkd_styles.dkd_hero_wallet_corner_cue,
+dkd_v007_zero_remnant_audit.txt:231:src/features/serviceNetwork/dkd_service_network_modal.js:1126:              opacity: dkd_wallet_corner_cue_opacity_value,
+dkd_v007_zero_remnant_audit.txt:232:src/features/serviceNetwork/dkd_service_network_modal.js:1127:              transform: [{ scale: dkd_wallet_corner_cue_scale_value }],
+dkd_v007_zero_remnant_audit.txt:233:src/features/serviceNetwork/dkd_service_network_modal.js:1131:          <View style={dkd_styles.dkd_hero_wallet_corner_cue_ring} />
+dkd_v007_zero_remnant_audit.txt:234:src/features/serviceNetwork/dkd_service_network_modal.js:1134:        <View style={dkd_styles.dkd_hero_wallet_icon_wrap}>
+dkd_v007_zero_remnant_audit.txt:235:src/features/serviceNetwork/dkd_service_network_modal.js:1135:          <MaterialCommunityIcons name="wallet-plus-outline" size={20} color="#07131C" />
+dkd_v007_zero_remnant_audit.txt:236:src/features/serviceNetwork/dkd_service_network_modal.js:1137:        <View style={dkd_styles.dkd_hero_wallet_copy}>
+dkd_v007_zero_remnant_audit.txt:237:src/features/serviceNetwork/dkd_service_network_modal.js:1138:          <Text numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.84} style={dkd_styles.dkd_hero_wallet_title}>Cüzdanına Para Yükle</Text>
+dkd_v007_zero_remnant_audit.txt:238:src/features/serviceNetwork/dkd_service_network_modal.js:1139:          <Text numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.78} style={dkd_styles.dkd_hero_wallet_text}>TL bakiyeni hızlıca ekle</Text>
+dkd_v007_zero_remnant_audit.txt:239:src/features/serviceNetwork/dkd_service_network_modal.js:1741:            <DkdServiceNetworkHero dkd_on_payment_method_press_value={dkd_open_service_wallet_modal_value} />
+dkd_v007_zero_remnant_audit.txt:240:src/services/businessSuiteService.js:548:export async function emitTrafficFromChestResult({
+dkd_v007_zero_remnant_audit.txt:241:src/services/businessTelemetryService.js:278:export async function emitTrafficFromChestResult({
+dkd_v007_zero_remnant_audit.txt:242:src/services/notificationRouteHandler.js:55:  if (['map', 'collection', 'market', 'tasks', 'leader'].includes(route)) {
+dkd_v007_zero_remnant_audit.txt:243:src/services/notificationService.js:602:          dkd_source_value: String(dkd_input_value?.dkd_source_value || 'dkd_restaurant_wallet_payment'),
+dkd_v007_zero_remnant_audit.txt:244:src/theme/appStyles.js:218:  chestOuter: {
+dkd_v007_zero_remnant_audit.txt:245:src/theme/appStyles.js:317:  shardWallet: {
+dkd_v007_zero_remnant_audit.txt:246:src/theme/appStyles.js:328:  shardWalletLabel: { color: 'rgba(255,255,255,0.62)', fontWeight: '800', fontSize: 12 },
+dkd_v007_zero_remnant_audit.txt:247:src/theme/appStyles.js:329:  shardWalletValue: { color: '#FFFFFF', fontWeight: '900', fontSize: 18, marginTop: 6 },
+dkd_v007_zero_remnant_audit.txt:249:src/theme/appStyles.js:557:  // Puan pop FX
+dkd_v007_zero_remnant_audit.txt:250:src/theme/minimalLootUi.js:113:  return { icon: 'treasure-chest-outline', tone: 'drop', title: 'Ödül Noktası', color: '#AA88FF', bg: 'rgba(170,136,255,0.14)', border: 'rgba(170,136,255,0.28)' };
+dkd_v007_zero_remnant_audit.txt:251:supabase/migrations/019_push_deeplink_segment_hotfix.sql:40:  if dkd_var_target_screen not in ('map', 'tasks', 'leader', 'market', 'collection', 'courier', 'admin', 'scanner') then
+dkd_v007_zero_remnant_audit.txt:252:supabase/migrations/20260519_dkd_courier_cargo_push_status_fix.sql:6:-- Safe rerun: does not delete order/profile/wallet data.
+dkd_v007_zero_remnant_audit.txt:253:supabase/migrations/README_DKD_LEGACY_BILLING_MIGRATIONS_REMOVED_v0_217.md:3:Google Play final audit içinde karışıklık oluşturan eski billing/puan migration geçmişi aktif `supabase/migrations` klasöründen çıkarıldı.
+dkd_v007_zero_remnant_audit.txt:254:supabase/migrations/README_DKD_LEGACY_BILLING_MIGRATIONS_REMOVED_v0_217.md:5:Aktif istemci kodu artık yalnızca yeni güvenli kazanılmış puan RPC akışlarını kullanır. Güncel çalıştırılacak SQL dosyası `supabase/sql/20260515_dkd_google_play_point_redeem_direct_v0_216.sql` içinde korunur.
+dkd_v007_zero_remnant_audit.txt:258:assets/mapmarkers/chest.png
+src/features/business/AdminBusinessModal.js:60:        <Text style={dkd_styles.productMeta} numberOfLines={1}>{item?.category || 'genel'} • {Number(item?.price_puan || 0)} fiziksel sipariş puanı • ürün {item?.price_cash == null ? '-' : Number(item?.price_cash || 0)} TL • kurye {Number(item?.delivery_fee_tl || 0)} TL • stok {Number(item?.stock || 0)}</Text>
+src/features/business/AdminBusinessModal.js:339:      pricePuan: String(product.price_puan || 0),
+src/features/business/BusinessPanelModal.js:150:                  Görev: {item?.task_key || 'organic'} • Stok: {Number(item?.stock_left || 0)} / {Number(item?.stock_total || 0)}
+src/features/business/MerchantHubModal.js:223:            {(product?.category || 'genel')} • {Number(product?.price_puan || 0)} fiziksel sipariş puanı • ürün {product?.price_cash == null ? '-' : Number(product?.price_cash || 0)} TL • kurye {Number(product?.delivery_fee_tl || 0)} TL • stok {Number(product?.stock || 0)}
+src/features/business/MerchantHubModal.js:513:                        <Field label="Fiziksel sipariş puanı" value={String(productDraft.pricePuan || '')} onChangeText={(dkd_price_puan_value) => setProductDraft((dkd_previous_product_draft) => ({ ...normalizeProductDraft(dkd_previous_product_draft), pricePuan: dkd_price_puan_value }))} placeholder="120" containerStyle={dkd_styles.fieldHalf} keyboardType="numeric" autoCapitalize="none" />
+src/features/business/MerchantHubModal.js:550:                    <Section title="Kupon doğrula" sub="Müşteri kodu sandık ödül ekranında veya Kuponlarım bölümünde görür.">
+src/features/business/MyCouponsModal.js:89:                <Text style={dkd_styles.emptyText}>Bağlı işletmede aktif kampanya varken QR sandık açarsan kupon burada görünür.</Text>
+src/features/serviceNetwork/dkd_service_network_modal.js:305:  dkd_event_support: { dkd_primary_question_value: 'Etkinlik türü, tarih/saat, kişi sayısı ve ekipman ihtiyacı alınır.', dkd_address_placeholder_value: 'Etkinlik adresi, giriş ve yükleme alanı notu', dkd_delivery_placeholder_value: 'Malzeme teslim/toplama noktası varsa yaz', dkd_detail_placeholder_value: 'Doğum günü, nişan, organizasyon, masa-sandalye, süsleme, ses, saha destek ve süre notu', dkd_photo_note_value: 'Mekan fotoğrafı, konsept görseli veya ekipman listesi', dkd_option_values: ['Süsleme', 'Ekipman', 'Saha personeli', 'Toplama hizmeti'], dkd_flow_values: ['Organizasyon partneri paket teklifini verir', 'Kurulum/toplama saatleri planlanır', 'Etkinlik sonrası kapanış ve puanlama alınır'] },
+src/features/serviceNetwork/dkd_service_network_modal.js:1059:function DkdServiceNetworkHero({ dkd_on_payment_method_press_value }) {
+src/features/serviceNetwork/dkd_service_network_modal.js:1060:  const dkd_wallet_corner_cue_anim_value = useRef(new Animated.Value(0)).current;
+src/features/serviceNetwork/dkd_service_network_modal.js:1063:    const dkd_wallet_corner_cue_loop_value = Animated.loop(
+src/features/serviceNetwork/dkd_service_network_modal.js:1065:        Animated.timing(dkd_wallet_corner_cue_anim_value, {
+src/features/serviceNetwork/dkd_service_network_modal.js:1071:        Animated.timing(dkd_wallet_corner_cue_anim_value, {
+src/features/serviceNetwork/dkd_service_network_modal.js:1080:    dkd_wallet_corner_cue_loop_value.start();
+src/features/serviceNetwork/dkd_service_network_modal.js:1081:    return () => dkd_wallet_corner_cue_loop_value.stop();
+src/features/serviceNetwork/dkd_service_network_modal.js:1082:  }, [dkd_wallet_corner_cue_anim_value]);
+src/features/serviceNetwork/dkd_service_network_modal.js:1084:  const dkd_wallet_corner_cue_scale_value = dkd_wallet_corner_cue_anim_value.interpolate({
+src/features/serviceNetwork/dkd_service_network_modal.js:1088:  const dkd_wallet_corner_cue_opacity_value = dkd_wallet_corner_cue_anim_value.interpolate({
+src/features/serviceNetwork/dkd_service_network_modal.js:1108:      <Pressable onPress={dkd_on_payment_method_press_value} style={({ pressed: dkd_pressed_value }) => [dkd_styles.dkd_hero_wallet_button, dkd_pressed_value && dkd_styles.dkd_hero_wallet_button_pressed]}>
+src/features/serviceNetwork/dkd_service_network_modal.js:1112:            dkd_styles.dkd_hero_wallet_corner_cue,
+src/features/serviceNetwork/dkd_service_network_modal.js:1114:              opacity: dkd_wallet_corner_cue_opacity_value,
+src/features/serviceNetwork/dkd_service_network_modal.js:1115:              transform: [{ scale: dkd_wallet_corner_cue_scale_value }],
+src/features/serviceNetwork/dkd_service_network_modal.js:1119:          <View style={dkd_styles.dkd_hero_wallet_corner_cue_ring} />
+src/features/serviceNetwork/dkd_service_network_modal.js:1122:        <View style={dkd_styles.dkd_hero_wallet_icon_wrap}>
+src/features/serviceNetwork/dkd_service_network_modal.js:1123:          <MaterialCommunityIcons name="wallet-plus-outline" size={20} color="#07131C" />
+src/features/serviceNetwork/dkd_service_network_modal.js:1125:        <View style={dkd_styles.dkd_hero_wallet_copy}>
+src/features/serviceNetwork/dkd_service_network_modal.js:1126:          <Text numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.84} style={dkd_styles.dkd_hero_wallet_title}>Cüzdanına Para Yükle</Text>
+src/features/serviceNetwork/dkd_service_network_modal.js:1127:          <Text numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.78} style={dkd_styles.dkd_hero_wallet_text}>TL bakiyeni hızlıca ekle</Text>
+src/features/serviceNetwork/dkd_service_network_modal.js:1729:            <DkdServiceNetworkHero dkd_on_payment_method_press_value={dkd_open_service_wallet_modal_value} />
+src/hooks/useMerchantPortal.js:300:      pricePuan: String(product.dkd_reward_puan ?? product.price_puan ?? product.point_price ?? 0),
+src/services/businessAdminService.js:119:    dkd_param_task_key: nullableText(payload?.task_key || payload?.taskKey),
+src/services/businessAdminService.js:143:    dkd_param_task_key: nullableText(payload?.task_key || payload?.taskKey),
+src/services/businessAdminService.js:154:    dkd_param_task_key: nullableText(payload?.task_key || payload?.taskKey),
+src/services/businessPanelService.js:53:    dkd_param_task_key: taskKey,
+src/services/businessPanelService.js:69:    dkd_param_task_key: taskKey,
+src/services/businessProductService.js:151:    dkd_price_puan: Math.max(0, Number(input?.pricePuan ?? input?.dkd_price_puan ?? 0) || 0),
+src/services/businessProductService.js:173:    dkd_param_price_puan: payload.dkd_price_puan,
+src/services/businessProductService.js:214:    dkd_reward_puan: Number(row?.dkd_reward_puan ?? row?.price_puan ?? row?.point_price ?? 0),
+src/services/businessSuiteService.js:296:    dkd_param_task_key: String(input?.sourceKey || '').trim() || null,
+src/services/businessSuiteService.js:344:    dkd_param_task_key: sourceKey || null,
+src/services/businessSuiteService.js:368:    dkd_param_task_key: sourceKey || null,
+src/services/businessSuiteService.js:388:export async function emitTrafficFromChestResult({
+src/services/businessSuiteService.js:403:    dkd_param_task_key: result?.task_key || result?.mission_key || result?.source_task_key || null,
+src/services/businessSuiteService.js:423:    sourceKey: result?.task_key || result?.mission_key || result?.source_task_key || null,
+src/services/businessSuiteService.js:509:    dkd_param_task_key: sourceKey || null,
+src/services/businessSuiteService.js:525:    .select('id, business_id, campaign_id, player_id, coupon_code, task_key, status, issued_at, redeemed_at, expires_at, created_at, dkd_businesses(name, city, district), dkd_business_campaigns(title, reward_label, sponsor_name)')
+src/services/businessTelemetryService.js:24:      .select('id, player_id, task_key, source_type, created_at')
+src/services/businessTelemetryService.js:30:      .select('id, player_id, coupon_code, task_key, created_at')
+src/services/businessTelemetryService.js:56:    const key = String(row.task_key || 'organik').trim() || 'organik';
+src/services/businessTelemetryService.js:73:      .map(([task_key, scan_count]) => ({ task_key, scan_count }))
+src/services/businessTelemetryService.js:115:      .from('dkd_business_task_attribution')
+src/services/businessTelemetryService.js:150:      task_key: row.task_key || 'organik',
+src/services/businessTelemetryService.js:205:    dkd_param_task_key: taskKey || null,
+src/services/businessTelemetryService.js:220:    task_key: taskKey || null,
+src/services/businessTelemetryService.js:245:    dkd_param_task_key: taskKey || null,
+src/services/businessTelemetryService.js:257:    task_key: taskKey || null,
+src/services/businessTelemetryService.js:269:    .from('dkd_business_drop_links')
+src/services/businessTelemetryService.js:278:export async function emitTrafficFromChestResult({
+src/services/businessTelemetryService.js:295:    taskKey: result?.task_key || result?.mission_key || result?.source_task_key || null,
+src/services/dkd_service_network_service.js:109:  return dkd_number_or_null_value(dkd_product_value?.dkd_reward_puan ?? dkd_product_value?.price_puan ?? dkd_product_value?.point_price ?? 0) || 0;
+src/services/notificationRouteHandler.js:55:  if (['map', 'collection', 'market', 'tasks', 'leader'].includes(route)) {
+src/services/notificationService.js:602:          dkd_source_value: String(dkd_input_value?.dkd_source_value || 'dkd_restaurant_wallet_payment'),
+src/theme/appStyles.js:218:  chestOuter: {
+src/theme/appStyles.js:317:  shardWallet: {
+src/theme/appStyles.js:328:  shardWalletLabel: { color: 'rgba(255,255,255,0.62)', fontWeight: '800', fontSize: 12 },
+src/theme/appStyles.js:329:  shardWalletValue: { color: '#FFFFFF', fontWeight: '900', fontSize: 18, marginTop: 6 },
+src/theme/appStyles.js:557:  // Puan pop FX
+src/theme/minimalLootUi.js:113:  return { icon: 'treasure-chest-outline', tone: 'drop', title: 'Ödül Noktası', color: '#AA88FF', bg: 'rgba(170,136,255,0.14)', border: 'rgba(170,136,255,0.28)' };
+supabase/migrations/20260330_dkd_business_panel_demo_seed.sql:41:  task_key,
+supabase/migrations/20260330_dkd_business_panel_foundation.sql:36:create table if not exists public.dkd_business_drop_links (
+supabase/migrations/20260330_dkd_business_panel_foundation.sql:53:  task_key text,
+supabase/migrations/20260330_dkd_business_panel_foundation.sql:74:  task_key text,
+supabase/migrations/20260330_dkd_business_panel_foundation.sql:88:  task_key text,
+supabase/migrations/20260330_dkd_business_panel_foundation.sql:98:create index if not exists idx_dkd_business_qr_scans_business_task on public.dkd_business_qr_scans(business_id, task_key, local_day desc);
+supabase/migrations/20260330_dkd_business_panel_foundation.sql:143:alter table public.dkd_business_drop_links enable row level security;
+supabase/migrations/20260330_dkd_business_panel_foundation.sql:169:drop policy if exists dkd_business_drop_links_member_select on public.dkd_business_drop_links;
+supabase/migrations/20260330_dkd_business_panel_foundation.sql:170:create policy dkd_business_drop_links_member_select
+supabase/migrations/20260330_dkd_business_panel_foundation.sql:171:on public.dkd_business_drop_links
+supabase/migrations/20260330_dkd_business_panel_foundation.sql:317:returns public.dkd_business_drop_links
+supabase/migrations/20260330_dkd_business_panel_foundation.sql:323:  dkd_row public.dkd_business_drop_links;
+supabase/migrations/20260330_dkd_business_panel_foundation.sql:329:  insert into public.dkd_business_drop_links (
+supabase/migrations/20260330_dkd_business_panel_foundation.sql:361:  dkd_param_task_key text,
+supabase/migrations/20260330_dkd_business_panel_foundation.sql:399:      task_key,
+supabase/migrations/20260330_dkd_business_panel_foundation.sql:416:      nullif(trim(coalesce(dkd_param_task_key, '')), ''),
+supabase/migrations/20260330_dkd_business_panel_foundation.sql:436:      task_key = nullif(trim(coalesce(dkd_param_task_key, '')), ''),
+supabase/migrations/20260330_dkd_business_panel_foundation.sql:463:  dkd_param_task_key text default null,
+supabase/migrations/20260330_dkd_business_panel_foundation.sql:480:    task_key,
+supabase/migrations/20260330_dkd_business_panel_foundation.sql:489:    nullif(trim(coalesce(dkd_param_task_key, '')), ''),
+supabase/migrations/20260330_dkd_business_panel_foundation.sql:509:  dkd_param_task_key text default null
+supabase/migrations/20260330_dkd_business_panel_foundation.sql:524:    task_key,
+supabase/migrations/20260330_dkd_business_panel_foundation.sql:532:    nullif(trim(coalesce(dkd_param_task_key, '')), ''),
+supabase/migrations/20260330_dkd_business_panel_foundation.sql:610:create or replace view public.dkd_business_task_attribution as
+supabase/migrations/20260330_dkd_business_panel_foundation.sql:614:  coalesce(nullif(dkd_scan.task_key, ''), 'organic') as task_key,
+supabase/migrations/20260330_dkd_business_panel_foundation.sql:622:  coalesce(nullif(dkd_scan.task_key, ''), 'organic'),
+supabase/migrations/20260330_dkd_business_panel_foundation.sql:676:  select coalesce(jsonb_agg(to_jsonb(dkd_row) order by dkd_row.local_day desc, dkd_row.qr_scan_count desc, dkd_row.task_key asc), '[]'::jsonb)
+supabase/migrations/20260330_dkd_business_panel_foundation.sql:682:      task_key,
+supabase/migrations/20260330_dkd_business_panel_foundation.sql:686:    from public.dkd_business_task_attribution
+supabase/migrations/20260330_dkd_business_panel_foundation.sql:689:    order by local_day desc, qr_scan_count desc, task_key asc
+supabase/migrations/20260330_dkd_business_panel_foundation.sql:700:      task_key,
+supabase/migrations/20260330_dkd_business_suite_demo_seed.sql:25:insert into public.dkd_business_drop_links (business_id, drop_id, is_primary)
+supabase/migrations/20260330_dkd_business_suite_demo_seed.sql:34:  from public.dkd_business_drop_links dkd_alias_x
+supabase/migrations/20260330_dkd_business_suite_mega.sql:27:create table if not exists public.dkd_business_drop_links (
+supabase/migrations/20260330_dkd_business_suite_mega.sql:58:  task_key text,
+supabase/migrations/20260330_dkd_business_suite_mega.sql:72:  task_key text,
+supabase/migrations/20260330_dkd_business_suite_mega.sql:79:create index if not exists idx_dkd_business_drop_links_drop on public.dkd_business_drop_links(drop_id);
+supabase/migrations/20260330_dkd_business_suite_mega.sql:82:create index if not exists idx_dkd_business_qr_scans_task on public.dkd_business_qr_scans(business_id, task_key, created_at desc);
+supabase/migrations/20260330_dkd_business_suite_mega.sql:165:  dkd_param_task_key text default null,
+supabase/migrations/20260330_dkd_business_suite_mega.sql:184:    task_key,
+supabase/migrations/20260330_dkd_business_suite_mega.sql:194:    nullif(trim(coalesce(dkd_param_task_key, '')), ''),
+supabase/migrations/20260330_dkd_business_suite_mega.sql:210:  dkd_param_task_key text default null,
+supabase/migrations/20260330_dkd_business_suite_mega.sql:227:    task_key,
+supabase/migrations/20260330_dkd_business_suite_mega.sql:234:    nullif(trim(coalesce(dkd_param_task_key, '')), ''),
+supabase/migrations/20260330_dkd_business_suite_mega.sql:287:drop view if exists public.dkd_business_task_attribution;
+supabase/migrations/20260330_dkd_business_suite_mega.sql:288:create view public.dkd_business_task_attribution as
+supabase/migrations/20260330_dkd_business_suite_mega.sql:292:  coalesce(nullif(trim(task_key), ''), 'organik') as task_key,
+supabase/migrations/20260330_dkd_business_suite_mega.sql:295:group by business_id, (created_at at time zone 'UTC')::date, coalesce(nullif(trim(task_key), ''), 'organik');
+supabase/migrations/20260330_dkd_business_suite_mega.sql:317:grant select on public.dkd_business_drop_links to authenticated;
+supabase/migrations/20260330_dkd_business_suite_mega.sql:323:grant select on public.dkd_business_task_attribution to authenticated;
+supabase/migrations/20260330_dkd_business_suite_mega.sql:334:alter table public.dkd_business_drop_links enable row level security;
+supabase/migrations/20260330_dkd_business_suite_mega.sql:365:drop policy if exists dkd_business_drop_links_select on public.dkd_business_drop_links;
+supabase/migrations/20260330_dkd_business_suite_mega.sql:366:create policy dkd_business_drop_links_select
+supabase/migrations/20260330_dkd_business_suite_mega.sql:367:on public.dkd_business_drop_links
+supabase/migrations/20260330_dkd_business_suite_mega.sql:371:drop policy if exists dkd_business_drop_links_admin_write on public.dkd_business_drop_links;
+supabase/migrations/20260330_dkd_business_suite_mega.sql:372:create policy dkd_business_drop_links_admin_write
+supabase/migrations/20260330_dkd_business_suite_mega.sql:373:on public.dkd_business_drop_links
+supabase/migrations/20260330_dkd_business_traffic_bridge.sql:11:  task_key text,
+supabase/migrations/20260330_dkd_business_traffic_bridge.sql:28:    from public.dkd_business_drop_links dkd_link
+supabase/migrations/20260330_dkd_business_traffic_bridge.sql:36:      dkd_campaign.task_key,
+supabase/migrations/20260330_dkd_business_traffic_bridge.sql:54:    dkd_campaign.task_key,
+supabase/migrations/20260404_dkd_coupon_flow_and_legacy_cleanup.sql:11:create index if not exists idx_dkd_business_drop_links_drop_primary
+supabase/migrations/20260404_dkd_coupon_flow_and_legacy_cleanup.sql:12:  on public.dkd_business_drop_links(drop_id, is_primary desc, created_at asc);
+supabase/migrations/20260404_dkd_coupon_flow_and_legacy_cleanup.sql:46:  dkd_param_task_key text default null,
+supabase/migrations/20260404_dkd_coupon_flow_and_legacy_cleanup.sql:70:  from public.dkd_business_drop_links dkd_alias_l
+supabase/migrations/20260404_dkd_coupon_flow_and_legacy_cleanup.sql:135:    task_key,
+supabase/migrations/20260404_dkd_coupon_flow_and_legacy_cleanup.sql:143:    nullif(trim(coalesce(dkd_param_task_key, '')), ''),
+supabase/migrations/20260404_dkd_coupon_flow_and_legacy_cleanup.sql:179:  task_key text,
+supabase/migrations/20260404_dkd_coupon_flow_and_legacy_cleanup.sql:200:    dkd_alias_c.task_key,
+supabase/migrations/20260404_dkd_drop_campaign_public_meta_live_stock_fix.sql:65:  from public.dkd_business_drop_links dkd_alias_l
+supabase/sql/20260515_dkd_market_shop_defs_safe_compat_v0_222.sql:3:-- The app no longer requires dkd_market_shop_defs.price_puan for the store-safe market view.
+supabase/sql/20260515_dkd_market_shop_defs_safe_compat_v0_222.sql:4:-- If an older RPC still references price_puan, update that RPC separately or keep using the app-side fallback.
+
+=== LEGACY FILENAMES ===
+
+=== RETIRED BUSINESS/DROP IMPORTS ===
+src/features/business/AdminBusinessModal.js:259:    adminDrops,
+src/features/business/AdminBusinessModal.js:272:    attachDrop,
+src/features/business/AdminBusinessModal.js:273:    removeLinkedDrop,
+src/features/business/AdminBusinessModal.js:281:  const linkedDrops = useMemo(() => (Array.isArray(dashboard?.linkedDrops) ? dashboard.linkedDrops : []), [dashboard?.linkedDrops]);
+src/features/business/AdminBusinessModal.js:288:    const taken = new Set(linkedDrops.map((row) => String(row?.drop_id)));
+src/features/business/AdminBusinessModal.js:289:    return (adminDrops || []).filter((row) => !taken.has(String(row?.id)));
+src/features/business/AdminBusinessModal.js:290:  }, [adminDrops, linkedDrops]);
+src/features/business/AdminBusinessModal.js:521:                  {linkedDrops.length ? linkedDrops.map((row) => (
+src/features/business/AdminBusinessModal.js:528:                      <Pressable style={dkd_styles.rowActionBtn} onPress={() => removeLinkedDrop(row.drop_id)}>
+src/hooks/useMerchantPortal.js:25:  linkedDrops: [],

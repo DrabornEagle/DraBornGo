@@ -3189,7 +3189,6 @@ export default function CourierBoardModal({ visible, onClose, profile, setProfil
       dkd_is_admin_value={isAdmin}
       dkd_default_tab_value={dkd_urgent_panel_mode_value === 'queue_only' ? 'courier' : 'create'}
       dkd_queue_only_value={dkd_urgent_panel_mode_value === 'queue_only'}
-      dkd_on_wallet_after_payment_value={dkd_sync_wallet_after_cargo_payment_value}
     />
   );
 
@@ -5647,13 +5646,6 @@ const styles = StyleSheet.create({
     fontWeight: '900',
     marginTop: 6,
   },
-  dkdHeroLicenseWalletRow: {
-    marginTop: 10,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'flex-start',
-    gap: 12,
-  },
   heroLicenseChip: {
     alignSelf: 'flex-start',
     borderRadius: 999,
@@ -5671,54 +5663,6 @@ const styles = StyleSheet.create({
     color: '#DFFBF0',
     fontSize: 12,
     fontWeight: '900',
-  },
-  dkdHeroWalletSummary: {
-    minWidth: 122,
-    maxWidth: 136,
-    borderRadius: 16,
-    overflow: 'hidden',
-    shadowColor: '#52E9B3',
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 3,
-  },
-  dkdHeroWalletSummaryShell: {
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: 'rgba(108,255,212,0.16)',
-    backgroundColor: 'rgba(6,28,20,0.72)',
-    paddingHorizontal: 8,
-    paddingVertical: 7,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 7,
-  },
-  dkdHeroWalletIconShell: {
-    width: 26,
-    height: 26,
-    borderRadius: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.10)',
-  },
-  dkdHeroWalletTextWrap: {
-    flex: 1,
-    minWidth: 0,
-    alignItems: 'flex-end',
-  },
-  dkdHeroWalletSummaryLabel: {
-    color: 'rgba(205,255,230,0.82)',
-    fontSize: 9,
-    fontWeight: '900',
-    letterSpacing: 0.2,
-  },
-  dkdHeroWalletSummaryValue: {
-    color: '#75FFD0',
-    fontSize: 13,
-    fontWeight: '900',
-    marginTop: 1,
   },
   heroStatsRow: {
     flexDirection: 'row',

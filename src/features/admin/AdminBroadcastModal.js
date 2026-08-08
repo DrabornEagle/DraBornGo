@@ -16,7 +16,6 @@ const AUDIENCES = [
 ];
 const TARGETS = [
   { key: 'map', label: 'Harita' },
-  { key: 'tasks', label: 'Görevler' },
   { key: 'leader', label: 'Liderlik' },
   { key: 'market', label: 'Market' },
   { key: 'courier', label: 'Kurye' },
@@ -143,7 +142,7 @@ export default function AdminBroadcastModal({ visible, onClose, onSend, loading,
               <Text style={dkd_styles.label}>Başlık</Text>
               <TextInput value={title} onChangeText={setTitle} placeholder="Örn: Ankara özel hedef başladı" placeholderTextColor="rgba(232,244,255,0.35)" style={dkd_styles.input} maxLength={64} />
               <Text style={dkd_styles.label}>Mesaj</Text>
-              <TextInput value={body} onChangeText={setBody} placeholder="Örn: 15 dakika için puan duyurusu aktif." placeholderTextColor="rgba(232,244,255,0.35)" style={[dkd_styles.input, dkd_styles.textarea]} multiline maxLength={240} />
+              <TextInput value={body} onChangeText={setBody} placeholder="Örn: 15 dakika için kurye operasyon duyurusu aktif." placeholderTextColor="rgba(232,244,255,0.35)" style={[dkd_styles.input, dkd_styles.textarea]} multiline maxLength={240} />
               <Text style={dkd_styles.helper}>Bildirime dokununca seçtiğin ekran açılır. Segmente göre hedef oyuncu kitlesi ayrılır.</Text>
               <Text style={dkd_styles.helper}>Expo Go Android içinde gerçek remote push yok. Dev client / development build içindir.</Text>
               <Text style={dkd_styles.helper}>Durum: {pushSupportedLabel}</Text>

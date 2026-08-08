@@ -403,26 +403,22 @@ export default function MerchantHubModal({ visible, onClose }) {
                 {tab === 'today' ? (
                   <>
                     <View style={dkd_styles.metricGrid}>
-                      <MetricCard icon="account-group-outline" label="Bugün Oyuncu" value={String(today.uniquePlayers || 0)} tone="cyan" />
+                      <MetricCard icon="account-group-outline" label="Bugün Müşteri" value={String(today.uniquePlayers || 0)} tone="cyan" />
                       <MetricCard icon="qrcode-scan" label="QR Okutma" value={String(today.scanCount || 0)} tone="green" />
                       <MetricCard icon="cards-playing-diamond-outline" label="Kupon Kullanım" value={String(today.couponCount || 0)} tone="gold" />
                       <MetricCard icon="chart-line" label="Dönüşüm" value={`%${Number(today.conversionRate || 0)}`} tone="purple" />
                     </View>
                     <View style={dkd_styles.metricGrid}>
-                      <MetricCard icon="account-plus-outline" label="Yeni Oyuncu" value={String(today.newPlayers || 0)} tone="cyan" />
+                      <MetricCard icon="account-plus-outline" label="Yeni Müşteri" value={String(today.newPlayers || 0)} tone="cyan" />
                       <MetricCard icon="account-sync-outline" label="Geri Gelen" value={String(today.returningPlayers || 0)} tone="green" />
                     </View>
 
-                    <Section title="Saatlik yoğunluk" sub="Hangi saatlerde mağazaya daha çok oyuncu gelmiş?">
+                    <Section title="Saatlik yoğunluk" sub="Hangi saatlerde mağazaya daha çok müşteri gelmiş?">
                       {hourly.length ? hourly.map((row) => <TinyBar key={row.label} label={row.label} value={Number(row.scan_count || 0)} max={maxHourly} tone="green" />) : <EmptyState icon="clock-outline" title="Henüz veri yok" text="Bugün trafik geldikçe saatlik barlar burada dolacak." />}
                     </Section>
 
                     <Section title="Son 7 günlük akış" sub="İşletmenin günlük nabzı">
                       {daily.length ? daily.map((row) => <TinyBar key={row.bucket_day} label={row.label} value={Number(row.scan_count || 0)} max={maxDaily} tone="cyan" />) : <EmptyState icon="calendar-week-outline" title="7 günlük veri yok" text="Henüz yeterli trafik logu oluşmadı." />}
-                    </Section>
-
-                    <Section title="Trafik getiren görevler" sub="Hangi görev gerçekten oyuncu taşıyor?">
-                      {tasks.length ? tasks.map((row) => <TinyBar key={row.task_key} label={row.task_key} value={Number(row.scan_count || 0)} max={maxTask} tone="gold" />) : <EmptyState icon="map-marker-star-outline" title="Görev verisi yok" text="Oyuncu görev üzerinden geldiğinde burada görünür." />}
                     </Section>
                   </>
                 ) : null}
@@ -431,9 +427,9 @@ export default function MerchantHubModal({ visible, onClose }) {
                   <>
                     <Section title="Müşteri bu kampanyayı nasıl kazanır?" sub="Kupon akışı daha net ve kısa.">
                       <View style={dkd_styles.stepList}>
-                        <View style={dkd_styles.stepRow}><Text style={dkd_styles.stepIdx}>1</Text><Text style={dkd_styles.stepText}>Aktif kampanya bağlı dropta görünür.</Text></View>
-                        <View style={dkd_styles.stepRow}><Text style={dkd_styles.stepIdx}>2</Text><Text style={dkd_styles.stepText}>Oyuncu QR sandık açar veya görevden gelir.</Text></View>
-                        <View style={dkd_styles.stepRow}><Text style={dkd_styles.stepIdx}>3</Text><Text style={dkd_styles.stepText}>Kupon kodu sandık ödül ekranında çıkar.</Text></View>
+                        <View style={dkd_styles.stepRow}><Text style={dkd_styles.stepIdx}>1</Text><Text style={dkd_styles.stepText}>Aktif kampanya işletmenin kendi kampanya alanında görünür.</Text></View>
+                        <View style={dkd_styles.stepRow}><Text style={dkd_styles.stepIdx}>2</Text><Text style={dkd_styles.stepText}>Müşteri işletmenin kampanya bağlantısını veya QR alanını açar.</Text></View>
+                        <View style={dkd_styles.stepRow}><Text style={dkd_styles.stepIdx}>3</Text><Text style={dkd_styles.stepText}>Kupon kodu kampanya ekranında gösterilir.</Text></View>
                         <View style={dkd_styles.stepRow}><Text style={dkd_styles.stepIdx}>4</Text><Text style={dkd_styles.stepText}>Kod Kuponlarım ekranında tekrar görünür.</Text></View>
                         <View style={dkd_styles.stepRow}><Text style={dkd_styles.stepIdx}>5</Text><Text style={dkd_styles.stepText}>Kasada doğrulanınca tekrar kullanılamaz.</Text></View>
                       </View>

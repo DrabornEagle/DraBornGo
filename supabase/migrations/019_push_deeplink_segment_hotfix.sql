@@ -37,7 +37,7 @@ begin
     dkd_var_audience := 'everyone';
   end if;
 
-  if dkd_var_target_screen not in ('map', 'tasks', 'leader', 'market', 'collection', 'courier', 'admin', 'scanner') then
+  if dkd_var_target_screen not in ('map', 'market', 'courier', 'admin', 'scanner') then
     dkd_var_target_screen := 'map';
   end if;
 

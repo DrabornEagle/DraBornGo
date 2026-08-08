@@ -1104,7 +1104,7 @@ export default function DkdCargoSenderPanel({
           </View>
         </View>
 
-        <Pressable onPress={dkd_submit_cargo_request} disabled={dkd_submitting_value || dkd_payment_loading_value} style={[dkd_styles.dkd_primaryAction, (dkd_submitting_value || dkd_payment_loading_value) && dkd_styles.dkd_actionDisabled]}>
+        <Pressable onPress={dkd_submit_cargo_request} disabled={dkd_submitting_value} style={[dkd_styles.dkd_primaryAction, dkd_submitting_value && dkd_styles.dkd_actionDisabled]}>
           <LinearGradient colors={['#40D8FF', '#2A8DFF', '#0E1840']} style={StyleSheet.absoluteFill} />
           <Text style={dkd_styles.dkd_primaryActionText}>{dkd_submitting_value ? 'Hazırlanıyor…' : 'Paketimi Teslim AL'}</Text>
         </Pressable>

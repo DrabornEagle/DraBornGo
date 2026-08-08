@@ -1,5 +1,4 @@
 import { supabase } from '../lib/supabase';
-import { fetchAllDropsForAdmin } from './dropService';
 
 function safeArray(value) {
   return Array.isArray(value) ? value : [];
@@ -96,159 +95,39 @@ export async function fetchBusinesses() {
   return safeArray(data);
 }
 
-export async function fetchBusinessDropsLite() {
-  const res = await fetchAllDropsForAdmin();
-  if (res?.error) throw res.error;
-  return safeArray(res?.data);
-}
 
 export async function fetchBusinessDashboard(businessId) {
   if (!businessId) {
     return {
       today: { uniquePlayers: 0, scanCount: 0, couponCount: 0, conversionRate: 0, newPlayers: 0, returningPlayers: 0 },
-      hourly: [],
-      tasks: [],
-      daily: [],
-      campaigns: [],
-      linkedDrops: [],
-      recentCoupons: [],
-      recentUses: [],
-      products: [],
+      hourly: [], daily: [], campaigns: [], recentCoupons: [], recentUses: [], products: [], orders: [],
     };
   }
 
-  const min7d = startOfDayIso(6).slice(0, 10);
-  const today = todayStr();
-
-  const [todayRes, hourlyRes, tasksRes, dailyRes, campaignsRes, linksRes, couponsRes, campaignCouponCountsRes, usesRes, productsRes] = await Promise.all([
-    supabase
-      .from('dkd_business_today_metrics')
-      .select('*')
-      .eq('business_id', businessId)
-      .maybeSingle(),
-    supabase
-      .from('dkd_business_hourly_heatmap')
-      .select('*')
-      .eq('business_id', businessId)
-      .eq('bucket_day', today)
-      .order('hour_slot', { ascending: true }),
-    supabase
-      .from('dkd_business_task_attribution')
-      .select('*')
-      .eq('business_id', businessId)
-      .eq('bucket_day', today)
-      .order('scan_count', { ascending: false }),
-    supabase
-      .from('dkd_business_daily_metrics')
-      .select('*')
-      .eq('business_id', businessId)
-      .gte('bucket_day', min7d)
-      .order('bucket_day', { ascending: true }),
-    supabase
-      .from('dkd_business_campaigns')
-      .select('*')
-      .eq('business_id', businessId)
-      .order('updated_at', { ascending: false }),
-    supabase
-      .from('dkd_business_drop_links')
-      .select('id, drop_id, is_primary, traffic_weight, dkd_drops(id, name, type, is_active)')
-      .eq('business_id', businessId)
-      .order('created_at', { ascending: false }),
-    supabase
-      .from('dkd_business_coupons')
-      .select('*')
-      .eq('business_id', businessId)
-      .order('created_at', { ascending: false })
-      .limit(20),
-    supabase
-      .from('dkd_business_coupons')
-      .select('campaign_id,status')
-      .eq('business_id', businessId),
-    supabase
-      .from('dkd_business_coupon_uses')
-      .select('*')
-      .eq('business_id', businessId)
-      .order('created_at', { ascending: false })
-      .limit(20),
-    supabase
-      .from('dkd_business_market_products')
-      .select('*')
-      .eq('business_id', businessId)
-      .order('sort_order', { ascending: true })
-      .order('updated_at', { ascending: false }),
+  const [dkd_products_result_value, dkd_orders_result_value] = await Promise.all([
+    supabase.from('dkd_business_market_products').select('*').eq('business_id', businessId).order('sort_order', { ascending: true }).order('updated_at', { ascending: false }),
+    supabase.from('dkd_business_product_orders').select('*').eq('business_id', businessId).order('created_at', { ascending: false }).limit(50),
   ]);
-
-  const errors = [todayRes, hourlyRes, tasksRes, dailyRes, campaignsRes, linksRes, couponsRes, campaignCouponCountsRes, usesRes, productsRes]
-    .map((res) => res?.error)
-    .filter(Boolean);
-  if (errors.length) throw errors[0];
-
-  const couponCountMap = safeArray(campaignCouponCountsRes?.data).reduce((acc, row) => {
-    const campaignId = row?.campaign_id;
-    if (!campaignId) return acc;
-    const status = String(row?.status || '').toLowerCase();
-    if (status !== 'issued' && status !== 'redeemed') return acc;
-    acc.set(String(campaignId), (acc.get(String(campaignId)) || 0) + 1);
-    return acc;
-  }, new Map());
-
-  const dailyRows = safeArray(dailyRes?.data).map((row) => ({
-    bucket_day: row.bucket_day,
-    label: String(row.bucket_day || '').slice(5),
-    scan_count: Number(row.scan_count || 0),
-    unique_players: Number(row.unique_players || 0),
-    coupon_count: Number(row.coupon_count || 0),
-  }));
-
-  const hourlyMap = new Map(safeArray(hourlyRes?.data).map((row) => [Number(row.hour_slot || 0), Number(row.scan_count || 0)]));
-  const hourly = Array.from({ length: 24 }).map((_, hour) => ({
-    hour,
-    label: hourLabel(hour),
-    scan_count: hourlyMap.get(hour) || 0,
-  }));
-
+  if (dkd_products_result_value?.error) throw dkd_products_result_value.error;
+  if (dkd_orders_result_value?.error) throw dkd_orders_result_value.error;
+  const dkd_orders_value = safeArray(dkd_orders_result_value?.data);
+  const dkd_today_key_value = todayStr();
+  const dkd_today_orders_value = dkd_orders_value.filter((dkd_row_value) => String(dkd_row_value?.created_at || '').slice(0, 10) === dkd_today_key_value);
   return {
-    today: {
-      uniquePlayers: Number(todayRes?.data?.unique_players || 0),
-      scanCount: Number(todayRes?.data?.scan_count || 0),
-      couponCount: Number(todayRes?.data?.coupon_count || 0),
-      conversionRate: Number(todayRes?.data?.conversion_rate_pct || 0),
-      newPlayers: Number(todayRes?.data?.new_players || 0),
-      returningPlayers: Number(todayRes?.data?.returning_players || 0),
-    },
-    hourly,
-    tasks: safeArray(tasksRes?.data).map((row) => ({
-      task_key: row.task_key || 'organik',
-      scan_count: Number(row.scan_count || 0),
+    today: { uniquePlayers: 0, scanCount: dkd_today_orders_value.length, couponCount: 0, conversionRate: 0, newPlayers: 0, returningPlayers: 0 },
+    hourly: [],
+    daily: [],
+    campaigns: [],
+    recentCoupons: [],
+    recentUses: [],
+    products: safeArray(dkd_products_result_value?.data).map((dkd_row_value) => ({
+      ...dkd_row_value,
+      price_amount: Number(dkd_row_value?.price_amount || 0),
+      discounted_price_amount: dkd_row_value?.discounted_price_amount == null ? null : Number(dkd_row_value.discounted_price_amount),
+      stock_quantity: Number(dkd_row_value?.stock_quantity || 0),
+      sort_order: Number(dkd_row_value?.sort_order || 0),
     })),
-    daily: dailyRows,
-    campaigns: safeArray(campaignsRes?.data).map((row) => {
-      const liveUsed = couponCountMap.get(String(row?.id || '')) || 0;
-      const redeemedCount = Math.max(Number(row?.redeemed_count || 0), liveUsed);
-      return {
-        ...row,
-        redeemed_count: redeemedCount,
-        stock_left: Math.max(0, Number(row?.stock_limit || 0) - redeemedCount),
-      };
-    }),
-    linkedDrops: safeArray(linksRes?.data).map((row) => ({
-      id: row.id,
-      drop_id: row.drop_id,
-      is_primary: !!row.is_primary,
-      traffic_weight: Number(row.traffic_weight || 1),
-      drop_name: row?.dkd_drops?.name || `Drop ${String(row.drop_id || '').slice(0, 8)}`,
-      drop_type: row?.dkd_drops?.type || 'map',
-      drop_active: !!row?.dkd_drops?.is_active,
-    })),
-    recentCoupons: safeArray(couponsRes?.data),
-    recentUses: safeArray(usesRes?.data),
-    products: safeArray(productsRes?.data).map((row) => ({
-      ...row,
-      price_amount: Number(row?.price_amount || 0),
-      discounted_price_amount: row?.discounted_price_amount == null ? null : Number(row.discounted_price_amount),
-      stock_quantity: Number(row?.stock_quantity || 0),
-      sort_order: Number(row?.sort_order || 0),
-    })),
+    orders: dkd_orders_value,
   };
 }
 
@@ -325,45 +204,7 @@ export async function upsertBusiness(input) {
   return inserted?.data?.id || null;
 }
 
-export async function linkDropToBusiness({ businessId, dropId, isPrimary = true, trafficWeight = 1 }) {
-  const rpc = await supabase.rpc('dkd_business_link_drop', {
-    dkd_param_business_id: businessId,
-    dkd_param_drop_id: dropId,
-    dkd_param_is_primary: !!isPrimary,
-    dkd_param_traffic_weight: Number(trafficWeight || 1) || 1,
-  });
-  if (!rpc.error) return rpc.data;
 
-  const fallback = await supabase
-    .from('dkd_business_drop_links')
-    .upsert({
-      business_id: businessId,
-      drop_id: dropId,
-      is_primary: !!isPrimary,
-      traffic_weight: Number(trafficWeight || 1) || 1,
-    }, { onConflict: 'drop_id' })
-    .select('*')
-    .maybeSingle();
-
-  if (fallback.error) throw fallback.error;
-  return fallback?.data?.id || null;
-}
-
-
-export async function unlinkDropFromBusiness({ businessId, dropId }) {
-  if (!businessId || !dropId) return null;
-
-  const fallback = await supabase
-    .from('dkd_business_drop_links')
-    .delete()
-    .eq('business_id', businessId)
-    .eq('drop_id', dropId)
-    .select('id')
-    .maybeSingle();
-
-  if (fallback.error) throw fallback.error;
-  return fallback?.data?.id || true;
-}
 
 export async function upsertBusinessCampaign(input) {
   const id = String(input?.id || '').trim() || null;
@@ -452,7 +293,7 @@ export async function issueBusinessCoupon(input) {
     dkd_param_business_id: input?.businessId,
     dkd_param_campaign_id: input?.campaignId || null,
     dkd_param_player_id: input?.playerId || null,
-    dkd_param_task_key: String(input?.taskKey || '').trim() || null,
+    dkd_param_task_key: String(input?.sourceKey || '').trim() || null,
     dkd_param_coupon_code: codeHint || null,
     dkd_param_expires_at: toIsoOrNull(input?.expiresAt),
     dkd_param_meta: input?.meta || {},
@@ -465,7 +306,6 @@ export async function issueBusinessCoupon(input) {
     campaign_id: input?.campaignId || null,
     player_id: input?.playerId || null,
     coupon_code: generatedCode,
-    task_key: String(input?.taskKey || '').trim() || null,
     expires_at: toIsoOrNull(input?.expiresAt),
     meta: input?.meta || {},
   }).select('*').maybeSingle();
@@ -489,7 +329,7 @@ export async function logBusinessTraffic({
   playerId = null,
   dropId = null,
   sourceType = 'qr',
-  taskKey = null,
+  sourceKey = null,
   qrToken = null,
   codeValue = null,
   bossReward = false,
@@ -501,7 +341,7 @@ export async function logBusinessTraffic({
     dkd_param_player_id: playerId,
     dkd_param_drop_id: dropId,
     dkd_param_source_type: String(sourceType || 'qr'),
-    dkd_param_task_key: taskKey || null,
+    dkd_param_task_key: sourceKey || null,
     dkd_param_qr_token: qrToken || null,
     dkd_param_code_value: codeValue || null,
     dkd_param_boss_reward: !!bossReward,
@@ -515,7 +355,7 @@ export async function logBusinessCouponUse({
   businessId,
   playerId = null,
   couponCode = null,
-  taskKey = null,
+  sourceKey = null,
   campaignId = null,
   couponId = null,
   meta = null,
@@ -525,7 +365,7 @@ export async function logBusinessCouponUse({
     dkd_param_business_id: businessId,
     dkd_param_player_id: playerId,
     dkd_param_coupon_code: String(couponCode || '').trim().toUpperCase() || null,
-    dkd_param_task_key: taskKey || null,
+    dkd_param_task_key: sourceKey || null,
     dkd_param_campaign_id: campaignId || null,
     dkd_param_coupon_id: couponId || null,
     dkd_param_meta: meta || {},
@@ -580,7 +420,7 @@ export async function emitTrafficFromChestResult({
     playerId: sessionUserId || null,
     dropId,
     sourceType: String(sourceType || 'qr'),
-    taskKey: result?.task_key || result?.mission_key || result?.source_task_key || null,
+    sourceKey: result?.task_key || result?.mission_key || result?.source_task_key || null,
     qrToken: qrText || null,
     codeValue: codeText || null,
     bossReward: String(sourceType || '') === 'boss',
@@ -659,14 +499,14 @@ export async function fetchMyBusinessMemberships() {
 
 export async function claimPlayerCampaignCouponByDrop({
   dropId,
-  taskKey = null,
+  sourceKey = null,
   sourceType = 'qr',
   meta = {},
 }) {
   if (!dropId) return { ok: false, reason: 'drop_required' };
   const rpc = await supabase.rpc('dkd_player_claim_campaign_coupon_by_drop', {
     dkd_param_drop_id: dropId,
-    dkd_param_task_key: taskKey || null,
+    dkd_param_task_key: sourceKey || null,
     dkd_param_source_type: String(sourceType || 'qr'),
     dkd_param_meta: meta || {},
   });
@@ -691,7 +531,6 @@ export async function fetchMyPlayerCoupons() {
     business_id: row.business_id,
     campaign_id: row.campaign_id,
     coupon_code: row.coupon_code,
-    task_key: row.task_key,
     status: row.status || 'issued',
     issued_at: row.issued_at || row.created_at,
     redeemed_at: row.redeemed_at || null,

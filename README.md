@@ -26,8 +26,6 @@ For every version upgrade, the current GitHub `main` state must be preserved fir
 
 DraBornGo is prepared for physical service and delivery workflows.
 
-- The TL wallet is for physical service/order flows.
-- Points, collection cards, and gamification elements do not represent cash, crypto, investment value, or withdrawable financial value.
 - Digital item sales language must not be used in store-facing screens.
 - Location is used for address matching, route drawing, courier visibility, and active delivery tracking.
 - Background location and foreground-location service permissions are disabled unless a future reviewed feature explicitly requires them.
@@ -103,7 +101,6 @@ EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN=YOUR_PUBLIC_MAPBOX_TOKEN
 
 ## DKD mağaza güvenliği güncel notu
 
-Kart satış/ilan akışı mağaza sürümünde kapalıdır. Kazanılmış puan dili yalnızca fiziksel hizmet, teslimat ve güvenli vitrin bağlamında kullanılır. Eski marka storage anahtarları dkd_draborngo_* standardına taşınmıştır.
 
 ## Web yayın ayrımı
 

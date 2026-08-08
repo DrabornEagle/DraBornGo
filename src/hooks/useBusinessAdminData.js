@@ -4,13 +4,10 @@ import {
   deleteBusinessCampaign,
   fetchBusinesses,
   fetchBusinessDashboard,
-  fetchBusinessDropsLite,
   issueBusinessCoupon,
-  linkDropToBusiness,
   logBusinessCouponUse,
   logBusinessTraffic,
   redeemBusinessCoupon,
-  unlinkDropFromBusiness,
   upsertBusiness,
   upsertBusinessCampaign,
 } from '../services/businessSuiteService';
@@ -50,7 +47,6 @@ const EMPTY_CAMPAIGN_DRAFT = {
 const EMPTY_COUPON_ISSUE = {
   campaignId: '',
   playerId: '',
-  taskKey: '',
   couponCode: '',
   expiresAt: '',
 };
@@ -63,10 +59,8 @@ const EMPTY_COUPON_REDEEM = {
 const EMPTY_DASHBOARD = {
   today: { uniquePlayers: 0, scanCount: 0, couponCount: 0, conversionRate: 0, newPlayers: 0, returningPlayers: 0 },
   hourly: [],
-  tasks: [],
   daily: [],
   campaigns: [],
-  linkedDrops: [],
   recentCoupons: [],
   recentUses: [],
 };
@@ -83,7 +77,6 @@ export function useBusinessAdminData(visible) {
   const [businesses, setBusinesses] = useState([]);
   const [selectedBusinessId, setSelectedBusinessIdState] = useState(null);
   const [isCreatingBusiness, setIsCreatingBusiness] = useState(false);
-  const [adminDrops, setAdminDrops] = useState([]);
   const [dashboard, setDashboard] = useState(EMPTY_DASHBOARD);
   const [businessDraft, setBusinessDraft] = useState(EMPTY_BUSINESS_DRAFT);
   const [campaignDraft, setCampaignDraft] = useState(EMPTY_CAMPAIGN_DRAFT);
@@ -91,7 +84,6 @@ export function useBusinessAdminData(visible) {
   const [couponRedeemDraft, setCouponRedeemDraft] = useState(EMPTY_COUPON_REDEEM);
   const [accessDraft, setAccessDraft] = useState(EMPTY_ACCESS_DRAFT);
   const [lastAccessCode, setLastAccessCode] = useState('');
-  const [linkDropId, setLinkDropId] = useState('');
 
   const selectedBusiness = useMemo(
     () => businesses.find((row) => String(row.id) === String(selectedBusinessId)) || null,
@@ -150,12 +142,8 @@ export function useBusinessAdminData(visible) {
     setLoading(true);
     setMessage('');
     try {
-      const [nextBusinesses, nextDrops] = await Promise.all([
-        fetchBusinesses(),
-        fetchBusinessDropsLite(),
-      ]);
+      const nextBusinesses = await fetchBusinesses();
       setBusinesses(nextBusinesses);
-      setAdminDrops(nextDrops);
 
       let nextSelectedId = forcedBusinessId || (isCreatingBusiness ? null : selectedBusinessId);
       const selectionMissing = nextSelectedId && !nextBusinesses.some((row) => String(row.id) === String(nextSelectedId));
@@ -282,48 +270,6 @@ export function useBusinessAdminData(visible) {
     }
   }, [campaignDraft?.id, refreshDashboard, selectedBusinessId]);
 
-  const attachDrop = useCallback(async (dropIdOverride = null) => {
-    const dropId = dropIdOverride || linkDropId;
-    if (!selectedBusinessId || !dropId) {
-      setMessage('İşletme ve drop seç.');
-      return null;
-    }
-    setSaving(true);
-    setMessage('');
-    try {
-      await linkDropToBusiness({ businessId: selectedBusinessId, dropId, isPrimary: true, trafficWeight: 1 });
-      setLinkDropId('');
-      await refreshDashboard(selectedBusinessId);
-      setMessage('Drop işletmeye bağlandı.');
-      return true;
-    } catch (error) {
-      setMessage(error?.message || String(error));
-      return false;
-    } finally {
-      setSaving(false);
-    }
-  }, [linkDropId, refreshDashboard, selectedBusinessId]);
-
-  const removeLinkedDrop = useCallback(async (dropId) => {
-    if (!selectedBusinessId || !dropId) {
-      setMessage('Önce işletme ve kaldırılacak drop seç.');
-      return false;
-    }
-    setSaving(true);
-    setMessage('');
-    try {
-      await unlinkDropFromBusiness({ businessId: selectedBusinessId, dropId });
-      await refreshDashboard(selectedBusinessId);
-      setMessage('Drop bağlantısı kaldırıldı.');
-      return true;
-    } catch (error) {
-      setMessage(error?.message || String(error));
-      return false;
-    } finally {
-      setSaving(false);
-    }
-  }, [refreshDashboard, selectedBusinessId]);
-
   const issueCoupon = useCallback(async () => {
     if (!selectedBusinessId) {
       setMessage('Önce işletme seç.');
@@ -336,7 +282,6 @@ export function useBusinessAdminData(visible) {
         businessId: selectedBusinessId,
         campaignId: couponIssueDraft?.campaignId || null,
         playerId: couponIssueDraft?.playerId || null,
-        taskKey: couponIssueDraft?.taskKey || null,
         couponCode: couponIssueDraft?.couponCode || null,
         expiresAt: couponIssueDraft?.expiresAt || null,
       });
@@ -484,7 +429,7 @@ export function useBusinessAdminData(visible) {
     startNewBusiness,
     isCreatingBusiness,
     selectedBusiness,
-    adminDrops,
+
     dashboard,
     businessDraft,
     setBusinessDraft,
@@ -500,10 +445,10 @@ export function useBusinessAdminData(visible) {
     couponRedeemDraft,
     setCouponRedeemDraft,
     redeemCoupon,
-    linkDropId,
-    setLinkDropId,
-    attachDrop,
-    removeLinkedDrop,
+
+
+
+
     refreshAll,
     refreshDashboard,
     writeTestTraffic,

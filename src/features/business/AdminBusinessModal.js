@@ -506,7 +506,7 @@ export default function AdminBusinessModal({ visible, onClose }) {
                   <View style={dkd_styles.scheduleCard}>
                     <View style={dkd_styles.scheduleHead}>
                       <Text style={dkd_styles.scheduleTitle}>Çalışma saatleri</Text>
-                      <Text style={dkd_styles.scheduleHint}>Oyuncunun işletmenin açık olduğu saati net görmesi için</Text>
+                      <Text style={dkd_styles.scheduleHint}>Müşterinun işletmenin açık olduğu saati net görmesi için</Text>
                     </View>
                     <View style={dkd_styles.dualRow}>
                       <TimeField label="Açılış saati" value={businessDraft.opensAt} onChangeText={(value) => setBusinessDraft((dkd_business_draft) => ({ ...dkd_business_draft, opensAt: value }))} />
@@ -530,19 +530,6 @@ export default function AdminBusinessModal({ visible, onClose }) {
                       </Pressable>
                     </View>
                   )) : <Empty icon="map-marker-off-outline" text="Henüz bağlı ödül noktası yok." />}
-                </Section>
-
-                <Section title="3) Yeni ödül noktası bağla" sub="Kullanıcı hangi fiziksel noktadan geliyorsa o nokta burada işletmeye bağlanır.">
-                  {availableDrops.length ? availableDrops.map((drop) => (
-                    <Pressable key={drop.id} style={dkd_styles.listRow} onPress={() => attachDrop(drop.id)}>
-                      <View style={dkd_styles.listRowIcon}><MaterialCommunityIcons name="map-marker-radius-outline" size={16} color={dkd_colors.cyanSoft} /></View>
-                      <View style={{ flex: 1 }}>
-                        <Text style={dkd_styles.listRowTitle}>{drop.name || 'Ödül Noktası'}</Text>
-                        <Text style={dkd_styles.listRowSub}>{drop.type || 'map'}</Text>
-                      </View>
-                      <Text style={dkd_styles.listRowAction}>Bağla</Text>
-                    </Pressable>
-                  )) : <Empty icon="map-search-outline" text="Bağlanacak uygun ödül noktası bulunamadı." />}
                 </Section>
 
                 <Section title="4) İşletme sahibini bağla" sub="Admin bu kodu işletme sahibine veya kasa görevlisine verir.">
@@ -573,30 +560,13 @@ export default function AdminBusinessModal({ visible, onClose }) {
             {tab === 'live' ? (
               <>
                 <View style={dkd_styles.metricGrid}>
-                  <Metric icon="account-group-outline" label="Bugün Oyuncu" value={String(today.uniquePlayers || 0)} tone="cyan" />
+                  <Metric icon="account-group-outline" label="Bugün Müşteri" value={String(today.uniquePlayers || 0)} tone="cyan" />
                   <Metric icon="qrcode-scan" label="QR Okutma" value={String(today.scanCount || 0)} tone="green" />
                   <Metric icon="cards-playing-diamond-outline" label="Kupon" value={String(today.couponCount || 0)} tone="gold" />
                   <Metric icon="chart-line" label="Dönüşüm" value={`%${Number(today.conversionRate || 0)}`} tone="purple" />
                 </View>
                 <Section title="Saatlik yoğunluk" sub="Canlı trafik akışı burada görünür.">
                   {hourly.length ? hourly.map((row) => <TinyBar key={row.label} label={row.label} value={Number(row.scan_count || 0)} max={maxHourly} tone="green" />) : <Empty icon="clock-outline" text="Henüz saatlik trafik verisi yok." />}
-                </Section>
-                <Section title="Trafik getiren görevler" sub="Hangi görev gerçekten oyuncu getirmiş?">
-                  {tasks.length ? tasks.map((row) => <TinyBar key={row.task_key} label={row.task_key} value={Number(row.scan_count || 0)} max={maxTask} tone="gold" />) : <Empty icon="map-marker-star-outline" text="Görev katkı verisi yok." />}
-                </Section>
-                <Section title="Bağlı ödül noktaları" sub="Gerekirse canlı durumdan da bağlantıyı kaldırabilirsin.">
-                  {linkedDrops.length ? linkedDrops.map((row) => (
-                    <View key={row.id} style={dkd_styles.listRow}>
-                      <View style={dkd_styles.listRowIcon}><MaterialCommunityIcons name="map-marker-check-outline" size={16} color={dkd_colors.green} /></View>
-                      <View style={{ flex: 1 }}>
-                        <Text style={dkd_styles.listRowTitle}>{row.drop_name}</Text>
-                        <Text style={dkd_styles.listRowSub}>{row.drop_type} • ağırlık {row.traffic_weight}</Text>
-                      </View>
-                      <Pressable style={dkd_styles.rowActionBtn} onPress={() => removeLinkedDrop(row.drop_id)}>
-                        <Text style={dkd_styles.rowActionBtnText}>Kaldır</Text>
-                      </Pressable>
-                    </View>
-                  )) : <Empty icon="map-marker-off-outline" text="Henüz bağlı ödül noktası yok." />}
                 </Section>
               </>
             ) : null}
@@ -707,7 +677,7 @@ export default function AdminBusinessModal({ visible, onClose }) {
             ) : null}
 
             {tab === 'cashier' ? (
-              <Section title="Kasada kupon doğrula" sub="Oyuncu kupon kodunu söyler, burada doğrulanır.">
+              <Section title="Kasada kupon doğrula" sub="Müşteri kupon kodunu söyler, burada doğrulanır.">
                 <Field label="Kupon kodu" value={couponRedeemDraft.couponCode} onChangeText={(value) => setCouponRedeemDraft((dkd_coupon_redeem_draft) => ({ ...dkd_coupon_redeem_draft, couponCode: value }))} placeholder="DKD-AB12CD34" autoCapitalize="characters" />
                 <Field label="Not" value={couponRedeemDraft.note} onChangeText={(value) => setCouponRedeemDraft((dkd_coupon_redeem_draft) => ({ ...dkd_coupon_redeem_draft, note: value }))} placeholder="Teslim edildi" multiline />
                 <PrimaryButton label={saving ? 'Doğrulanıyor…' : 'Kuponu Doğrula'} onPress={redeemCoupon} disabled={saving || !selectedBusinessId || !couponRedeemDraft.couponCode.trim()} />

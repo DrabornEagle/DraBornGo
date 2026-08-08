@@ -74,7 +74,7 @@ export default function BusinessPanelModal({
         <View>
           <Text style={styles.kicker}>İŞLETME PANELİ</Text>
           <Text style={styles.title}>Bugünkü trafik ve kampanya merkezi</Text>
-          <Text style={styles.subtitle}>Oyuncu akışı, QR yoğunluğu, kupon kullanımı ve görev kaynakları tek ekranda.</Text>
+          <Text style={styles.subtitle}>Müşteri akışı, QR yoğunluğu, kupon kullanımı ve görev kaynakları tek ekranda.</Text>
         </View>
         <View style={styles.heroActions}>
           <TouchableOpacity style={styles.secondaryButton} onPress={refresh}>
@@ -97,9 +97,9 @@ export default function BusinessPanelModal({
         <ScrollView contentContainerStyle={styles.content}>
           <View style={styles.statsGrid}>
             <StatCard
-              label="Bugün Gelen Oyuncu"
+              label="Bugün Gelen Müşteri"
               value={Number(snapshot?.today?.today_player_count || 0)}
-              hint="benzersiz oyuncu"
+              hint="benzersiz müşteri"
             />
             <StatCard
               label="QR Okutma"
@@ -121,7 +121,7 @@ export default function BusinessPanelModal({
           <Section title="Anlık Özet">
             <View style={styles.infoCard}>
               <Text style={styles.infoLine}>Son okutma saati: {formatTime(snapshot?.today?.last_scan_at)}</Text>
-              <Text style={styles.infoLine}>Bu kartın altına yarın yeni oyuncu / geri gelen oyuncu oranı da eklenmeli.</Text>
+              <Text style={styles.infoLine}>Bu kartın altına yarın yeni müşteri / geri gelen müşteri oranı da eklenmeli.</Text>
             </View>
           </Section>
 
@@ -129,21 +129,10 @@ export default function BusinessPanelModal({
             {(topHours || []).length ? topHours.map((item, index) => (
               <View key={`${item?.local_day}-${item?.local_hour}-${index}`} style={styles.rowCard}>
                 <Text style={styles.rowTitle}>{String(item?.local_hour).padStart(2, '0')}:00</Text>
-                <Text style={styles.rowMeta}>{Number(item?.qr_scan_count || 0)} QR • {Number(item?.unique_player_count || 0)} oyuncu</Text>
+                <Text style={styles.rowMeta}>{Number(item?.qr_scan_count || 0)} QR • {Number(item?.unique_player_count || 0)} müşteri</Text>
               </View>
             )) : (
               <Text style={styles.emptyBody}>Henüz saatlik yoğunluk verisi yok.</Text>
-            )}
-          </Section>
-
-          <Section title="Trafik Getiren Görevler">
-            {(topTasks || []).length ? topTasks.map((item, index) => (
-              <View key={`${item?.task_key}-${item?.local_day}-${index}`} style={styles.rowCard}>
-                <Text style={styles.rowTitle}>{item?.task_key || 'organic'}</Text>
-                <Text style={styles.rowMeta}>{Number(item?.qr_scan_count || 0)} QR • {Number(item?.unique_player_count || 0)} oyuncu • kaynak: {item?.source_kind || 'drop'}</Text>
-              </View>
-            )) : (
-              <Text style={styles.emptyBody}>Henüz görev katkı verisi yok.</Text>
             )}
           </Section>
 

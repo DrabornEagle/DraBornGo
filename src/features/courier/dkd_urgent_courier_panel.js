@@ -308,7 +308,6 @@ export default function DkdUrgentCourierPanel({
   dkd_default_tab_value = 'create',
   dkd_queue_only_value = false,
   dkd_hide_courier_tab_value = false,
-  dkd_on_wallet_after_payment_value,
 }) {
   const [dkd_active_tab_value, setDkdActiveTabValue] = useState(dkd_default_tab_value || 'create');
   const [dkd_form_value, setDkdFormValue] = useState(() => dkd_default_form_value());
@@ -451,8 +450,6 @@ export default function DkdUrgentCourierPanel({
     try {
       const dkd_result_value = await dkd_action_callback_value();
       if (dkd_result_value?.error) throw dkd_result_value.error;
-      const dkd_wallet_after_value = dkd_result_value?.data?.dkd_wallet_after_tl;
-      if (dkd_wallet_after_value != null) dkd_on_wallet_after_payment_value?.(dkd_wallet_after_value);
       if (dkd_delayed_refresh_ref_value.current) clearTimeout(dkd_delayed_refresh_ref_value.current);
       dkd_delayed_refresh_ref_value.current = setTimeout(() => {
         dkd_load_snapshot_value({ dkd_silent_value: true, dkd_force_value: true });
@@ -463,7 +460,7 @@ export default function DkdUrgentCourierPanel({
     } finally {
       setDkdActionBusyKeyValue('');
     }
-  }, [dkd_load_snapshot_value, dkd_on_wallet_after_payment_value]);
+  }, [dkd_load_snapshot_value]);
 
   const dkd_open_phone_value = useCallback(async (dkd_phone_text_value) => {
     const dkd_url_value = dkd_phone_dial_url_value(dkd_phone_text_value);
@@ -1264,10 +1261,6 @@ export default function DkdUrgentCourierPanel({
             <View style={dkd_styles.dkd_queue_only_meta_pill}>
               <MaterialCommunityIcons name="bike-fast" size={14} color="#FFD75C" />
               <Text style={dkd_styles.dkd_queue_only_meta_text}>Açık iş {String(dkd_snapshot_value.dkd_courier_orders.length)}</Text>
-            </View>
-            <View style={dkd_styles.dkd_queue_only_meta_pill}>
-              <MaterialCommunityIcons name="wallet-outline" size={14} color="#68E8FF" />
-              <Text style={dkd_styles.dkd_queue_only_meta_text}>{dkd_format_money_value(dkd_wallet_value)}</Text>
             </View>
           </View>
         </LinearGradient>
