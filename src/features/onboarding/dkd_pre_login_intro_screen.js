@@ -1,7 +1,6 @@
 import React, { useMemo, useRef, useState } from 'react';
 import {
   Animated,
-  Image,
   Pressable,
   ScrollView,
   StatusBar,
@@ -11,6 +10,7 @@ import {
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { LinearGradient } from 'expo-linear-gradient';
+import { Image } from 'expo-image';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import SafeScreen from '../../components/layout/SafeScreen';
 import { dkd_make_native_axis_point } from '../../utils/dkdNativeAxis';
@@ -102,7 +102,7 @@ function DkdIntroIllustration({ dkd_art_image_source_value, dkd_accent_colors_va
       />
       <Image
         source={dkd_art_image_source_value}
-        resizeMode="cover"
+        contentFit="cover"
         blurRadius={12}
         style={dkd_styles_value.dkd_mockup_background_image}
       />
@@ -129,7 +129,7 @@ function DkdIntroIllustration({ dkd_art_image_source_value, dkd_accent_colors_va
           { transform: [{ translateY: dkd_float_translate_value }, { scale: dkd_scale_value }] },
         ]}
       >
-        <Image source={dkd_art_image_source_value} resizeMode="cover" style={dkd_styles_value.dkd_mockup_image} />
+        <Image source={dkd_art_image_source_value} contentFit="cover" style={dkd_styles_value.dkd_mockup_image} />
       </Animated.View>
       <LinearGradient
         colors={['rgba(255,255,255,0.18)', 'rgba(255,255,255,0.03)', 'rgba(255,255,255,0)']}
