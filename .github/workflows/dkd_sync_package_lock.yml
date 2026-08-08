@@ -1,4 +1,4 @@
-name: DKD Sync Release Metadata
+name: DKD Sync Package Lock
 
 on:
   push:
@@ -11,12 +11,12 @@ permissions:
   contents: write
 
 concurrency:
-  group: dkd-sync-release-metadata-main
+  group: dkd-sync-package-lock-main
   cancel-in-progress: true
 
 jobs:
-  dkd_sync_release_metadata:
-    name: Sync lockfile and policy metadata
+  dkd_sync_package_lock:
+    name: Keep package lock synchronized
     runs-on: ubuntu-latest
     timeout-minutes: 10
     env:
@@ -26,7 +26,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node
+      - name: Setup Node 22
         uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -35,20 +35,15 @@ jobs:
       - name: Sync package lock without build scripts
         run: npm install --package-lock-only --ignore-scripts
 
-      - name: Sync Login policy acceptance metadata without UI changes
+      - name: Commit lock only when changed
         shell: bash
         run: |
-          sed -i "s/2026-08-08-v0\.0\.7/2026-08-08-v0.0.8/g" src/features/auth/AuthScreen.js
-
-      - name: Commit synchronized metadata only when changed
-        shell: bash
-        run: |
-          if git diff --quiet -- package-lock.json src/features/auth/AuthScreen.js; then
-            echo "Release metadata already synchronized."
+          if git diff --quiet -- package-lock.json; then
+            echo "Package lock already synchronized."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add package-lock.json src/features/auth/AuthScreen.js
-          git commit -m "chore: sync v0.0.8 release metadata"
+          git add package-lock.json
+          git commit -m "chore: sync package lock"
           git push origin HEAD:main
