@@ -5,6 +5,7 @@ import { Image } from 'expo-image';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 const dkd_version_text_value = 'v0.0.11';
+const dkd_racing_motorcycle_asset_value = require('../../../assets/icons/dkd_racing_motorcycle.svg');
 
 function DkdAnimatedPressable({ dkd_children_value, dkd_on_press_value, dkd_style_value, dkd_disabled_value = false }) {
   const dkd_scale_value = useRef(new Animated.Value(1)).current;
@@ -147,6 +148,8 @@ function MapHomeScreen({
   const dkd_scan_translate_value = dkd_scan_value.interpolate({ inputRange: [0, 1], outputRange: [-240, 450] });
   const dkd_float_translate_value = dkd_float_value.interpolate({ inputRange: [0, 1], outputRange: [0, -8] });
   const dkd_lane_translate_value = dkd_lane_value.interpolate({ inputRange: [0, 1], outputRange: [-90, 170] });
+  const dkd_racing_motorcycle_translate_value = dkd_pulse_value.interpolate({ inputRange: [0, 1], outputRange: [1.5, -2.5] });
+  const dkd_racing_motorcycle_rotate_value = dkd_pulse_value.interpolate({ inputRange: [0, 1], outputRange: ['-1deg', '1deg'] });
 
   return (
     <View style={dkd_styles_value.dkd_root}>
@@ -184,8 +187,12 @@ function MapHomeScreen({
             <View style={dkd_styles_value.dkd_control_hero}>
               <View style={dkd_styles_value.dkd_gate_icon_stage}>
                 <Animated.View style={[dkd_styles_value.dkd_gate_icon_halo, { opacity: dkd_pulse_opacity_value, transform: [{ scale: dkd_pulse_scale_value }], borderColor: dkd_status_value.dkd_accent_value }]} />
-                <LinearGradient colors={[dkd_status_value.dkd_accent_value, dkd_status_value.dkd_secondary_value]} style={dkd_styles_value.dkd_gate_icon_shell}><MaterialCommunityIcons name="motorbike" size={44} color="#031019" /></LinearGradient>
-                <View style={dkd_styles_value.dkd_gate_icon_label}><Text style={dkd_styles_value.dkd_gate_icon_label_text}>COURIER</Text></View>
+                <LinearGradient colors={['#07131F', '#0A2537', '#0B172B']} style={dkd_styles_value.dkd_gate_icon_shell}>
+                  <Animated.View style={{ transform: [{ translateY: dkd_racing_motorcycle_translate_value }, { rotate: dkd_racing_motorcycle_rotate_value }] }}>
+                    <Image source={dkd_racing_motorcycle_asset_value} style={dkd_styles_value.dkd_racing_motorcycle_image} contentFit="contain" transition={0} />
+                  </Animated.View>
+                </LinearGradient>
+                <View style={dkd_styles_value.dkd_gate_icon_label}><Text style={dkd_styles_value.dkd_gate_icon_label_text}>RACING</Text></View>
               </View>
               <View style={dkd_styles_value.dkd_control_copy}>
                 <Text style={dkd_styles_value.dkd_control_kicker}>KURYE KONTROL MERKEZİ</Text>
@@ -278,10 +285,11 @@ const dkd_styles_value = StyleSheet.create({
   dkd_network_dot: { width: 7, height: 7, borderRadius: 99 },
   dkd_network_pill_text: { color: '#FFFFFF', fontSize: 9, fontWeight: '900' },
   dkd_control_hero: { flexDirection: 'row', alignItems: 'center', gap: 16, marginTop: 19 },
-  dkd_gate_icon_stage: { width: 88, height: 92, alignItems: 'center', justifyContent: 'center' },
-  dkd_gate_icon_halo: { position: 'absolute', width: 80, height: 80, borderRadius: 29, borderWidth: 2 },
-  dkd_gate_icon_shell: { width: 72, height: 72, borderRadius: 26, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.36)' },
-  dkd_gate_icon_label: { position: 'absolute', bottom: 0, minWidth: 52, height: 19, borderRadius: 999, backgroundColor: '#06111B', borderWidth: 1, borderColor: 'rgba(255,255,255,0.16)', alignItems: 'center', justifyContent: 'center' },
+  dkd_gate_icon_stage: { width: 94, height: 94, alignItems: 'center', justifyContent: 'center' },
+  dkd_gate_icon_halo: { position: 'absolute', width: 86, height: 86, borderRadius: 30, borderWidth: 2 },
+  dkd_gate_icon_shell: { width: 80, height: 76, borderRadius: 27, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'rgba(126,235,255,0.34)', overflow: 'visible' },
+  dkd_racing_motorcycle_image: { width: 76, height: 48 },
+  dkd_gate_icon_label: { position: 'absolute', bottom: -1, minWidth: 52, height: 19, borderRadius: 999, backgroundColor: '#06111B', borderWidth: 1, borderColor: 'rgba(255,255,255,0.16)', alignItems: 'center', justifyContent: 'center' },
   dkd_gate_icon_label_text: { color: '#CFF7FF', fontSize: 7, fontWeight: '900', letterSpacing: 0.7 },
   dkd_control_copy: { flex: 1, minWidth: 0 },
   dkd_control_kicker: { color: 'rgba(235,247,255,0.70)', fontSize: 9, fontWeight: '900', letterSpacing: 1.4 },
