@@ -85,11 +85,11 @@ function DkdAppUpdateCenterModal({ dkd_visible_value, dkd_on_close_value }) {
 
   const dkd_handle_download_value = useCallback(async () => {
     try {
-      await dkd_open_app_update_download_value(dkd_manifest_value);
+      await dkd_open_app_update_download_value();
     } catch (dkd_error_value) {
-      Alert.alert('Güncelleme', dkd_error_value?.message || 'DraBornGo güncelleme sayfası açılamadı.');
+      Alert.alert('Güncelleme', dkd_error_value?.message || 'DraBornGo Google Play sayfası açılamadı.');
     }
-  }, [dkd_manifest_value]);
+  }, []);
 
   return (
     <Modal visible={dkd_visible_value} transparent animationType="fade" onRequestClose={dkd_on_close_value}>
@@ -100,7 +100,7 @@ function DkdAppUpdateCenterModal({ dkd_visible_value, dkd_on_close_value }) {
             <View style={dkd_styles.dkd_title_wrap}>
               <Text style={dkd_styles.dkd_eyebrow}>DraBornGo</Text>
               <Text style={dkd_styles.dkd_title}>Sürüm ve Güncelleme Merkezi</Text>
-              <Text style={dkd_styles.dkd_subtitle}>Resmi APK yalnızca draborneagle.com üzerinden indirilir. Kurulumda Android onayı gerekir.</Text>
+              <Text style={dkd_styles.dkd_subtitle}>Google Play sürümünde güncellemeler yalnızca Google Play üzerinden sunulur. Uygulama dışarıdan APK indirip kurmaz.</Text>
             </View>
             <Pressable onPress={dkd_on_close_value} style={dkd_styles.dkd_close_button}>
               <MaterialCommunityIcons name="close" size={20} color="#EAF7FF" />
@@ -114,7 +114,7 @@ function DkdAppUpdateCenterModal({ dkd_visible_value, dkd_on_close_value }) {
               </View>
               <View style={dkd_styles.dkd_status_text_wrap}>
                 <Text style={dkd_styles.dkd_status_label}>{dkd_status_label_value}</Text>
-                <Text style={dkd_styles.dkd_status_body}>Uygulama açılışta yeni sürümü kontrol eder; indirme ve kurulum adımı kullanıcı onayıyla tamamlanır.</Text>
+                <Text style={dkd_styles.dkd_status_body}>Uygulama yeni sürüm bilgisini kontrol eder; güncelleme varsa yalnızca resmi Google Play sayfasını açar.</Text>
               </View>
             </View>
 
@@ -136,34 +136,34 @@ function DkdAppUpdateCenterModal({ dkd_visible_value, dkd_on_close_value }) {
               <DkdUpdateInfoCard
                 dkd_icon_value="cellphone-check"
                 dkd_label_value="Cihazdaki sürüm"
-                dkd_value={`v${dkd_status_value?.dkd_current_version_name || '0.0.5'} • Kod ${dkd_status_value?.dkd_current_version_code || 5}`}
+                dkd_value={`v${dkd_status_value?.dkd_current_version_name || '0.0.6'} • Kod ${dkd_status_value?.dkd_current_version_code || 6}`}
                 dkd_tone_value="dkd_current"
               />
               <DkdUpdateInfoCard
                 dkd_icon_value="cloud-download-outline"
-                dkd_label_value="Webdeki son sürüm"
-                dkd_value={`v${dkd_status_value?.dkd_latest_version_name || dkd_manifest_value.dkd_latest_version_name || '0.0.5'} • Kod ${dkd_status_value?.dkd_latest_version_code || dkd_manifest_value.dkd_latest_version_code || 5}`}
+                dkd_label_value="Yayınlanan son sürüm"
+                dkd_value={`v${dkd_status_value?.dkd_latest_version_name || dkd_manifest_value.dkd_latest_version_name || '0.0.6'} • Kod ${dkd_status_value?.dkd_latest_version_code || dkd_manifest_value.dkd_latest_version_code || 6}`}
                 dkd_tone_value={dkd_status_tone_value}
               />
               <DkdUpdateInfoCard
-                dkd_icon_value="shield-key-outline"
-                dkd_label_value="Kaynak"
-                dkd_value={dkd_manifest_value.dkd_download_page_url || dkd_app_update_download_page_url_value}
+                dkd_icon_value="google-play"
+                dkd_label_value="Güncelleme kaynağı"
+                dkd_value={dkd_app_update_download_page_url_value}
                 dkd_tone_value="dkd_neutral"
               />
               <DkdUpdateInfoCard
-                dkd_icon_value="fingerprint"
-                dkd_label_value="SHA-256"
-                dkd_value={dkd_manifest_value.dkd_sha256 || 'APK build sonrası eklenecek'}
+                dkd_icon_value="shield-check-outline"
+                dkd_label_value="Dağıtım politikası"
+                dkd_value="Google Play üzerinden güncelleme"
                 dkd_tone_value="dkd_neutral"
               />
             </View>
 
             <View style={dkd_styles.dkd_notes_card}>
               <Text style={dkd_styles.dkd_notes_title}>Sürüm notu</Text>
-              <Text style={dkd_styles.dkd_notes_text}>{dkd_manifest_value.dkd_release_notes || 'DraBornGo APK indirme ve güncelleme merkezi hazırlandı.'}</Text>
+              <Text style={dkd_styles.dkd_notes_text}>{dkd_manifest_value.dkd_release_notes || 'DraBornGo güncellemeleri Google Play üzerinden sunulur.'}</Text>
             </View>
-<View style={dkd_styles.dkd_action_row}>
+            <View style={dkd_styles.dkd_action_row}>
               <DkdUpdateActionButton
                 dkd_label_value="Tekrar Kontrol Et"
                 dkd_icon_value="refresh"
@@ -171,8 +171,8 @@ function DkdAppUpdateCenterModal({ dkd_visible_value, dkd_on_close_value }) {
                 dkd_disabled_flag={dkd_loading_flag}
               />
               <DkdUpdateActionButton
-                dkd_label_value="Güncellemeyi İndir"
-                dkd_icon_value="download-circle-outline"
+                dkd_label_value="Google Play'de Aç"
+                dkd_icon_value="google-play"
                 dkd_on_press_value={dkd_handle_download_value}
                 dkd_primary_flag
               />
