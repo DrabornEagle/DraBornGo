@@ -34,41 +34,64 @@ jobs:
           node-version: '22'
           cache: 'npm'
 
-      - name: Apply guarded v0.0.10 transform
-        run: node ./scripts/dkd_v0_0_10_transform.mjs
-
-      - name: Synchronize package lock
-        run: npm install --package-lock-only --ignore-scripts
-
-      - name: Install locked dependencies
-        run: npm ci
-
-      - name: Verify release identity
-        run: npm run dkd:verify-v0.0.10
-
-      - name: Scan Google Play source risks
-        run: npm run dkd:play-risk-scan
-
-      - name: Assert removed feature is absent from active source
+      - name: Guarded transform and validation
         shell: bash
         run: |
-          if grep -RniE 'urgent_courier|dkd_urgent|Acil Kurye|acil kurye|send-urgent-courier-alert' src supabase/functions --exclude-dir=node_modules; then
-            echo 'Acil Kurye active-source residue detected.'
-            exit 1
+          set +e
+          mkdir -p audit
+          DKD_LOG_FILE="$RUNNER_TEMP/dkd_v0_0_10_transform.log"
+          : > "$DKD_LOG_FILE"
+
+          node ./scripts/dkd_v0_0_10_transform.mjs >> "$DKD_LOG_FILE" 2>&1
+          DKD_CODE=$?
+          if [ "$DKD_CODE" -eq 0 ]; then
+            npm install --package-lock-only --ignore-scripts >> "$DKD_LOG_FILE" 2>&1 || DKD_CODE=$?
+          fi
+          if [ "$DKD_CODE" -eq 0 ]; then
+            npm ci >> "$DKD_LOG_FILE" 2>&1 || DKD_CODE=$?
+          fi
+          if [ "$DKD_CODE" -eq 0 ]; then
+            npm run dkd:verify-v0.0.10 >> "$DKD_LOG_FILE" 2>&1 || DKD_CODE=$?
+          fi
+          if [ "$DKD_CODE" -eq 0 ]; then
+            npm run dkd:play-risk-scan >> "$DKD_LOG_FILE" 2>&1 || DKD_CODE=$?
+          fi
+          if [ "$DKD_CODE" -eq 0 ]; then
+            if grep -RniE 'urgent_courier|dkd_urgent|Acil Kurye|acil kurye|send-urgent-courier-alert' src supabase/functions --exclude-dir=node_modules >> "$DKD_LOG_FILE" 2>&1; then
+              echo 'Acil Kurye active-source residue detected.' >> "$DKD_LOG_FILE"
+              DKD_CODE=91
+            fi
+          fi
+          if [ "$DKD_CODE" -eq 0 ]; then
+            npm run play:final-audit >> "$DKD_LOG_FILE" 2>&1 || DKD_CODE=$?
           fi
 
-      - name: Expo Android and web source audit
-        run: npm run play:final-audit
-
-      - name: Commit validated v0.0.10
-        shell: bash
-        run: |
           git config user.name "github-actions[bot]"
-          git config user.email "4189826+github-actions[bot]@users.noreply.github.com"
-          git add -A
-          if git diff --cached --quiet; then
-            echo 'No transformed changes to commit.'
-            exit 0
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          if [ "$DKD_CODE" -ne 0 ]; then
+            git reset --hard HEAD
+            {
+              echo "DraBornGo v0.0.10 guarded transform: FAIL"
+              echo "Exit code: $DKD_CODE"
+              echo "Commit: $GITHUB_SHA"
+              echo
+              tail -n 120 "$DKD_LOG_FILE"
+            } > audit/dkd_v0_0_10_transform_status.txt
+            git add audit/dkd_v0_0_10_transform_status.txt
+            git commit -m "audit: record v0.0.10 transform failure" || true
+            git push origin HEAD:main
+            exit "$DKD_CODE"
           fi
+
+          {
+            echo "DraBornGo v0.0.10 guarded transform: PASS"
+            echo "Android versionCode: 10"
+            echo "Acil Kurye active source: REMOVED"
+            echo "APK/AAB produced: NO"
+            echo "Source commit: $GITHUB_SHA"
+          } > audit/dkd_v0_0_10_transform_status.txt
+
+          git add -A
           git commit -m "release: DraBornGo v0.0.10 remove urgent courier"
           git push origin HEAD:main
