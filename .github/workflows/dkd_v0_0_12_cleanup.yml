@@ -6,6 +6,7 @@ on:
     paths:
       - scripts/dkd_v0_0_12_cleanup.mjs
       - .github/workflows/dkd_v0_0_12_cleanup.yml
+  workflow_dispatch:
 
 permissions:
   contents: write
