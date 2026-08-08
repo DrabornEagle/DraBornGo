@@ -358,8 +358,8 @@ export async function markCourierJobPickedUp(dkd_job_id_value, dkd_input_value =
 export async function completeCourierJob(dkd_job_id_value) {
   const dkd_numeric_job_id_value = Number(dkd_job_id_value);
   const dkd_result_value = await dkd_run_rpc_with_fallback('dkd_courier_job_complete', [
-    { dkd_job_id: dkd_numeric_job_id_value },
     { dkd_param_job_id: dkd_numeric_job_id_value },
+    { dkd_job_id: dkd_numeric_job_id_value },
   ]);
   if (!dkd_result_value?.error) {
     dkd_clear_courier_jobs_cache_value();
