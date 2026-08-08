@@ -1,13 +1,34 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Modal, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as DkdExpoLocation from 'expo-location';
-import * as DkdExpoNotifications from 'expo-notifications';
+import { isRunningInExpoGo } from 'expo';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { cityLootTheme as theme } from '../../theme/cityLootTheme';
 
 const dkd_device_permission_storage_key_value = 'dkd_device_permissions_gate_completed_v1';
+let dkd_expo_notifications_module_promise_value = null;
+
+function dkd_notification_runtime_available_value() {
+  return !(Platform.OS === 'android' && isRunningInExpoGo());
+}
+
+async function dkd_get_expo_notifications_module_value() {
+  if (!dkd_notification_runtime_available_value()) {
+    return null;
+  }
+  if (!dkd_expo_notifications_module_promise_value) {
+    dkd_expo_notifications_module_promise_value = import('expo-notifications');
+  }
+  try {
+    return await dkd_expo_notifications_module_promise_value;
+  } catch (dkd_notification_import_error_value) {
+    console.log('[DraBornGo][permission-gate][notification-import]', dkd_notification_import_error_value?.message || String(dkd_notification_import_error_value));
+    dkd_expo_notifications_module_promise_value = null;
+    return null;
+  }
+}
 
 async function dkd_read_permission_storage_value() {
   try {
@@ -37,7 +58,14 @@ async function dkd_get_foreground_location_status_value() {
 }
 
 async function dkd_get_notification_status_value() {
+  if (!dkd_notification_runtime_available_value()) {
+    return 'unavailable';
+  }
   try {
+    const DkdExpoNotifications = await dkd_get_expo_notifications_module_value();
+    if (!DkdExpoNotifications) {
+      return 'unavailable';
+    }
     const dkd_notification_permission_value = await DkdExpoNotifications.getPermissionsAsync();
     return dkd_notification_permission_value?.status || 'undetermined';
   } catch (dkd_notification_error_value) {
@@ -123,10 +151,19 @@ export default function DkdDevicePermissionsGate({
     dkd_set_status_note_value('İzin ekranları açılıyor; konum yalnızca uygulama açıkken kullanılacak.');
     try {
       const dkd_location_request_value = await DkdExpoLocation.requestForegroundPermissionsAsync();
-      const dkd_notification_request_value = await DkdExpoNotifications.requestPermissionsAsync();
+      let dkd_notification_granted_value = false;
+
+      if (dkd_notification_runtime_available_value()) {
+        const DkdExpoNotifications = await dkd_get_expo_notifications_module_value();
+        if (DkdExpoNotifications) {
+          const dkd_notification_request_value = await DkdExpoNotifications.requestPermissionsAsync();
+          dkd_notification_granted_value = dkd_notification_request_value?.status === 'granted';
+        }
+      }
+
       await dkd_finish_gate_value({
         dkd_location_granted_value: dkd_location_request_value?.status === 'granted',
-        dkd_notification_granted_value: dkd_notification_request_value?.status === 'granted',
+        dkd_notification_granted_value,
       });
     } catch (dkd_permission_request_error_value) {
       dkd_set_status_note_value(dkd_permission_request_error_value?.message || 'İzinler alınamadı; uygulama konumsuz şekilde açılacak.');
