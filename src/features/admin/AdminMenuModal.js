@@ -4,9 +4,67 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import SecondaryButton from '../../components/ui/SecondaryButton';
 import { cityLootTheme } from '../../theme/cityLootTheme';
-import AdminBusinessModal from '../business/AdminBusinessModal';
 import dkd_support_admin_queue_modal from '../support/dkd_support_admin_queue_modal';
 import dkd_social_moderation_admin_modal from './dkd_social_moderation_admin_modal';
-function DkdAction({icon,title,sub,onPress}){return <Pressable style={styles.action} onPress={onPress}><View style={styles.icon}><MaterialCommunityIcons name={icon} size={23} color={cityLootTheme.colors.cyanSoft}/></View><View style={{flex:1}}><Text style={styles.actionTitle}>{title}</Text><Text style={styles.actionSub}>{sub}</Text></View><MaterialCommunityIcons name="chevron-right" size={22} color={cityLootTheme.colors.textMuted}/></Pressable>}
-export default function AdminMenuModal({visible,onClose,onCourier,onApplications}){const [businessOpen,setBusinessOpen]=useState(false);const [supportOpen,setSupportOpen]=useState(false);const [moderationOpen,setModerationOpen]=useState(false);return <><Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}><View style={styles.backdrop}><LinearGradient colors={['#04101A','#0B1426','#090E18']} style={styles.card}><View style={styles.header}><View style={{flex:1}}><Text style={styles.kicker}>CONTROL TOWER</Text><Text style={styles.title}>Admin Komuta Güvertesi</Text><Text style={styles.sub}>Kurye, işletme, başvuru, destek ve moderasyon operasyonlarını buradan yönet.</Text></View><SecondaryButton label="Kapat" onPress={onClose} size="compact" fullWidth={false}/></View><ScrollView contentContainerStyle={{paddingTop:18,gap:10}}><DkdAction icon="truck-fast-outline" title="Kurye Operasyonları" sub="Kurye ve teslimat merkezini aç" onPress={onCourier}/><DkdAction icon="storefront-outline" title="İşletme Merkezi" sub="İşletme ve kampanya operasyonlarını yönet" onPress={()=>setBusinessOpen(true)}/><DkdAction icon="clipboard-account-outline" title="Başvurular" sub="Kurye ve nakliye başvurularını incele" onPress={onApplications}/><DkdAction icon="headset" title="Destek Kuyruğu" sub="Destek taleplerini incele ve yanıtla" onPress={()=>setSupportOpen(true)}/><DkdAction icon="shield-alert-outline" title="Moderasyon Kuyruğu" sub="Sosyal rapor ve şikayetleri incele" onPress={()=>setModerationOpen(true)}/></ScrollView></LinearGradient></View></Modal><AdminBusinessModal visible={businessOpen} onClose={()=>setBusinessOpen(false)}/>{React.createElement(dkd_support_admin_queue_modal,{visible:supportOpen,onClose:()=>setSupportOpen(false)})}{React.createElement(dkd_social_moderation_admin_modal,{visible:moderationOpen,onClose:()=>setModerationOpen(false)})}</>}
-const styles=StyleSheet.create({backdrop:{flex:1,backgroundColor:'rgba(2,6,12,0.86)',alignItems:'center',justifyContent:'center',padding:18},card:{width:'100%',maxWidth:760,maxHeight:'92%',borderRadius:30,borderWidth:1,borderColor:'rgba(255,255,255,0.10)',padding:18},header:{flexDirection:'row',alignItems:'flex-start',gap:12},kicker:{color:cityLootTheme.colors.goldSoft,fontSize:11,fontWeight:'900',letterSpacing:1.4},title:{color:cityLootTheme.colors.text,fontSize:28,fontWeight:'900',marginTop:4},sub:{color:cityLootTheme.colors.textSoft,fontSize:13,lineHeight:18,marginTop:8},action:{minHeight:82,borderRadius:22,borderWidth:1,borderColor:'rgba(255,255,255,0.10)',backgroundColor:'rgba(255,255,255,0.05)',padding:14,flexDirection:'row',alignItems:'center',gap:12},icon:{width:50,height:50,borderRadius:17,backgroundColor:'rgba(123,230,255,0.10)',alignItems:'center',justifyContent:'center'},actionTitle:{color:cityLootTheme.colors.text,fontSize:16,fontWeight:'900'},actionSub:{color:cityLootTheme.colors.textSoft,fontSize:12,lineHeight:17,marginTop:3}});
+
+function DkdAction({ icon, title, sub, onPress }) {
+  return (
+    <Pressable style={styles.action} onPress={onPress}>
+      <View style={styles.icon}>
+        <MaterialCommunityIcons name={icon} size={23} color={cityLootTheme.colors.cyanSoft} />
+      </View>
+      <View style={{ flex: 1 }}>
+        <Text style={styles.actionTitle}>{title}</Text>
+        <Text style={styles.actionSub}>{sub}</Text>
+      </View>
+      <MaterialCommunityIcons name="chevron-right" size={22} color={cityLootTheme.colors.textMuted} />
+    </Pressable>
+  );
+}
+
+export default function AdminMenuModal({ visible, onClose, onCourier, onApplications }) {
+  const [supportOpen, setSupportOpen] = useState(false);
+  const [moderationOpen, setModerationOpen] = useState(false);
+
+  return (
+    <>
+      <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
+        <View style={styles.backdrop}>
+          <LinearGradient colors={['#04101A', '#0B1426', '#090E18']} style={styles.card}>
+            <View style={styles.header}>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.kicker}>CONTROL TOWER</Text>
+                <Text style={styles.title}>Admin Komuta Güvertesi</Text>
+                <Text style={styles.sub}>Kurye, başvuru, destek ve moderasyon operasyonlarını buradan yönet.</Text>
+              </View>
+              <SecondaryButton label="Kapat" onPress={onClose} size="compact" fullWidth={false} />
+            </View>
+
+            <ScrollView contentContainerStyle={{ paddingTop: 18, gap: 10 }}>
+              <DkdAction icon="truck-fast-outline" title="Kurye Operasyonları" sub="Kurye ve teslimat merkezini aç" onPress={onCourier} />
+              <DkdAction icon="clipboard-account-outline" title="Başvurular" sub="Kurye ve nakliye başvurularını incele" onPress={onApplications} />
+              <DkdAction icon="headset" title="Destek Kuyruğu" sub="Destek taleplerini incele ve yanıtla" onPress={() => setSupportOpen(true)} />
+              <DkdAction icon="shield-alert-outline" title="Moderasyon Kuyruğu" sub="Sosyal rapor ve şikayetleri incele" onPress={() => setModerationOpen(true)} />
+            </ScrollView>
+          </LinearGradient>
+        </View>
+      </Modal>
+
+      {React.createElement(dkd_support_admin_queue_modal, { visible: supportOpen, onClose: () => setSupportOpen(false) })}
+      {React.createElement(dkd_social_moderation_admin_modal, { visible: moderationOpen, onClose: () => setModerationOpen(false) })}
+    </>
+  );
+}
+
+const styles = StyleSheet.create({
+  backdrop: { flex: 1, backgroundColor: 'rgba(2,6,12,0.86)', alignItems: 'center', justifyContent: 'center', padding: 18 },
+  card: { width: '100%', maxWidth: 760, maxHeight: '92%', borderRadius: 30, borderWidth: 1, borderColor: 'rgba(255,255,255,0.10)', padding: 18 },
+  header: { flexDirection: 'row', alignItems: 'flex-start', gap: 12 },
+  kicker: { color: cityLootTheme.colors.goldSoft, fontSize: 11, fontWeight: '900', letterSpacing: 1.4 },
+  title: { color: cityLootTheme.colors.text, fontSize: 28, fontWeight: '900', marginTop: 4 },
+  sub: { color: cityLootTheme.colors.textSoft, fontSize: 13, lineHeight: 18, marginTop: 8 },
+  action: { minHeight: 82, borderRadius: 22, borderWidth: 1, borderColor: 'rgba(255,255,255,0.10)', backgroundColor: 'rgba(255,255,255,0.05)', padding: 14, flexDirection: 'row', alignItems: 'center', gap: 12 },
+  icon: { width: 50, height: 50, borderRadius: 17, backgroundColor: 'rgba(123,230,255,0.10)', alignItems: 'center', justifyContent: 'center' },
+  actionTitle: { color: cityLootTheme.colors.text, fontSize: 16, fontWeight: '900' },
+  actionSub: { color: cityLootTheme.colors.textSoft, fontSize: 12, lineHeight: 17, marginTop: 3 },
+});
