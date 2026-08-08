@@ -1,0 +1,39 @@
+name: DKD v0.0.12 Cleanup
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - scripts/dkd_v0_0_12_cleanup.mjs
+      - .github/workflows/dkd_v0_0_12_cleanup.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: dkd-v0-0-12-cleanup
+  cancel-in-progress: false
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Apply v0.0.12 cleanup
+        run: node scripts/dkd_v0_0_12_cleanup.mjs
+      - name: Synchronize package lock
+        run: npm run dkd:lock:sync
+      - name: Commit release cleanup
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "release: DraBornGo v0.0.12 cleanup" || true
+          git push origin HEAD:main
