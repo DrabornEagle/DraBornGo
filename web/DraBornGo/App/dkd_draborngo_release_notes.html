@@ -1,58 +1,24 @@
 <!doctype html>
 <html lang="tr">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>DraBornGo v0.0.11 Sürüm Notları</title>
-  <style>
-    :root{color-scheme:dark;--panel:#0a1930;--line:rgba(128,214,255,.17);--text:#f8fcff;--soft:rgba(240,248,255,.72);--cyan:#73e5ff;--green:#5ce5b0;--gold:#ffd36f}
-    *{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:radial-gradient(circle at 90% 0,rgba(71,78,255,.18),transparent 34%),linear-gradient(145deg,#020611,#08192f 60%,#120c29);color:var(--text);min-height:100vh}main{width:min(940px,calc(100% - 28px));margin:0 auto;padding:32px 0}.card{border:1px solid var(--line);border-radius:30px;background:rgba(8,24,47,.91);padding:clamp(21px,4vw,34px)}.badge{display:inline-flex;border:1px solid rgba(115,229,255,.30);border-radius:999px;padding:8px 12px;color:var(--cyan);background:rgba(115,229,255,.08);font-weight:900;font-size:12px}h1{margin:16px 0 10px;font-size:clamp(31px,7vw,58px);line-height:1;letter-spacing:-1.4px}h2{margin-top:27px;color:#e9f9ff}p,li{color:var(--soft);font-weight:700;line-height:1.72}li{margin:7px 0}strong{color:#fff}a{color:var(--cyan);font-weight:900}.callout{border:1px solid rgba(92,229,176,.24);background:rgba(92,229,176,.07);border-radius:20px;padding:15px;margin-top:18px;color:#e7fff6;font-weight:800}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:18px}.mini{border:1px solid var(--line);border-radius:20px;background:rgba(255,255,255,.04);padding:16px}.mini b{display:block;color:var(--gold);margin-bottom:5px}@media(max-width:650px){.grid{grid-template-columns:1fr}}
-  </style>
-</head>
-<body>
-  <main>
-    <section class="card">
-      <span class="badge">DraBornGo v0.0.11 • Android versionCode 11</span>
-      <h1>Sürüm Notları</h1>
-      <p><strong>8 Ağustos 2026</strong> tarihli v0.0.11; gönderi oluşturma hatasını gideren, Admin Panelini sadeleştiren ve Google Play/Web politika kaynaklarını sürümle eşitleyen bakım ve güvenlik sürümüdür.</p>
-
-      <h2>Hata düzeltmeleri</h2>
-      <ul>
-        <li><strong>Gönderi Oluştur</strong> akışında eksik olan <code>dkd_cargo_shipment_create</code> sunucu fonksiyonu geri getirildi.</li>
-        <li>Gönderi ve karşılık gelen kurye işi tek veritabanı işlemi içinde oluşturulur ve birbirine bağlanır.</li>
-        <li>Gönderi ücretleri sunucu tarafında yeniden doğrulanır; istemciden değiştirilmiş ücret kabul edilmez.</li>
-        <li>SafeScreen güvenli alan bileşeni çözümlemesi sağlamlaştırıldı; bileşen dışa aktarımı bulunamadığında uygulamanın render aşamasında çökmesi önlenir.</li>
-      </ul>
-
-      <h2>Admin Paneli</h2>
-      <ul>
-        <li><strong>Destek Kuyruğu Admin Panelinden tamamen kaldırıldı.</strong></li>
-        <li>Destek Kuyruğu admin bileşeni ve ilgili import/state/render bağlantıları temizlendi.</li>
-        <li>Kurye Operasyonları, Başvurular ve Moderasyon Kuyruğu korunur.</li>
-      </ul>
-
-      <h2>Google Play, gizlilik ve güvenlik</h2>
-      <ul>
-        <li>Android sürüm kimliği <strong>0.0.11 / versionCode 11</strong> olarak eşitlendi.</li>
-        <li>Expo SDK 57 hattı ve Android API 36 hedefi korunur.</li>
-        <li>Ön plan konum ve kamera dışındaki arka plan konum, mikrofon ve geniş medya/depolama izinleri açıkça engellenir.</li>
-        <li>Gönderi RPC erişimi anonim kullanıcılara kapatıldı; yalnız oturum açmış kullanıcı ve sunucu rolü çalıştırabilir.</li>
-        <li>Kargo kurye işi ekleme RLS kuralındaki genel <code>job_type='cargo'</code> geçişi kaldırıldı.</li>
-        <li>Gizlilik sayfası, gönderi akışında işlenen kimlik/doğrulama verilerini ve kullanım amacını daha açık belirtir.</li>
-        <li>Uygulama içi hesap silme akışı ile uygulama dışı hesap silme web kaynağı korunur.</li>
-      </ul>
-
-      <h2>Web ve test</h2>
-      <div class="grid">
-        <div class="mini"><b>Expo Go</b>Geliştirme ve cihaz testi Expo SDK 57 uyumlu Expo Go akışında sürer.</div>
-        <div class="mini"><b>APK/AAB yok</b>Bu test aşamasında APK veya AAB üretilmez ve web üzerinden uygulama paketi dağıtılmaz.</div>
-        <div class="mini"><b>Web senkronu</b>Sürüm merkezi, manifest, gizlilik, kullanım şartları, topluluk ve hesap silme sayfaları v0.0.11 ile eşitlenir.</div>
-        <div class="mini"><b>CI denetimi</b>Release doğrulama akışı sürüm kimliği, izin seti, kaldırılan Admin Destek Kuyruğu, Expo Doctor ve Android/Web source export kontrollerini kapsar.</div>
-      </div>
-
-      <div class="callout">Google Play üretim dağıtımında uygulama güncellemeleri yalnız Google Play üzerinden sunulacaktır. v0.0.11 şu anda Expo Go test sürümüdür.</div>
-      <p><a href="./">v0.0.11 sürüm merkezine dön</a></p>
-    </section>
-  </main>
-</body>
-</html>
+<head><meta charset="utf-8" /><meta name="viewport" content="width=device-width,initial-scale=1" /><meta name="color-scheme" content="dark" /><title>DraBornGo v0.0.12 Sürüm Notları</title><style>:root{color-scheme:dark}body{margin:0;font-family:Inter,system-ui,sans-serif;background:#050b18;color:#fff}main{width:min(900px,calc(100% - 28px));margin:auto;padding:30px 0}.card{border:1px solid rgba(126,235,255,.18);border-radius:28px;background:#09192d;padding:clamp(20px,4vw,34px)}.badge,a{color:#7eebff;font-weight:900}h1{font-size:clamp(34px,7vw,56px)}h2{margin-top:26px}p,li{color:rgba(240,248,255,.75);line-height:1.7;font-weight:700}li{margin:7px 0}.callout{padding:14px;border-radius:18px;border:1px solid rgba(108,231,183,.25);background:rgba(108,231,183,.08);color:#eafff6;font-weight:800}</style></head>
+<body><main><section class="card">
+<span class="badge">DraBornGo v0.0.12 • Android versionCode 12</span>
+<h1>Sürüm Notları</h1>
+<p><strong>9 Ağustos 2026</strong> tarihli v0.0.12, ürün kapsamını kurye, kargo ve genel Hizmet Ağı üzerinde sadeleştiren temizlik ve politika sürümüdür.</p>
+<div class="callout">Bu aşamada Expo Go ile test edilir; APK veya AAB üretilmez.</div>
+<h2>Temizlik</h2><ul>
+<li>Kullanımdan kaldırılan başvuru kartları, ekranlar, servisler, veri modelleri ve bildirim köprüleri güncel çalışma ağacından çıkarıldı.</li>
+<li>Aktif kurye, kargo, hızlı görev ve Hizmet Ağı sipariş havuzu temiz başlangıç için sıfırlandı.</li>
+<li>Genel Hizmet Ağı; Ev & Yaşam, Tamir & Teknik, Araç Destek ve Özel Teslimat gruplarıyla devam eder.</li>
+<li>Kurye görev akışı “alım noktası → teslimat noktası” terminolojisine geçirildi.</li>
+</ul>
+<h2>Android & Google Play</h2><ul>
+<li>Sürüm kimliği <strong>0.0.12 / versionCode 12</strong> olarak eşitlendi.</li>
+<li>Expo SDK 57 ve Android API 36 hattı korunur.</li>
+<li>Arka plan konumu, mikrofon ve geniş depolama/medya izinleri engelli kalır.</li>
+<li>Ön plan konumu rota ve teslimat için; kamera/fotoğraf erişimi yalnız kullanıcı tarafından başlatılan gönderi, profil veya kurye başvurusu görselleri için açıklanır.</li>
+<li>Gizlilik, kullanım şartları, hesap silme ve sürüm merkezi güncel ürün kapsamıyla eşleştirildi.</li>
+</ul>
+<h2>Dağıtım</h2><p>v0.0.12 şu anda kaynak kodu + Expo Go test sürümüdür. Üretim paketi hazır olduğunda resmi dağıtım kanalı Google Play olacaktır.</p>
+<p><a href="./">v0.0.12 sürüm merkezine dön</a></p>
+</section></main></body></html>
