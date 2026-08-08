@@ -1,73 +1,33 @@
 import { useCallback, useRef, useState } from 'react';
 import { Alert } from 'react-native';
-import { supabase } from '../lib/supabase';
-import {
-  awardProfileXp,
-  checkIsAdmin,
-  ensureProfile,
-  fetchProfile,
-  setProfileNickname,
-  updateProfileNicknameDirect
-} from '../services/profileService';
-import { levelFromXp, rankFromLevel } from '../utils/progression';
+import { checkIsAdmin, ensureProfile, fetchProfile, setProfileNickname, updateProfileNicknameDirect } from '../services/profileService';
 
-
-function dkd_normalize_wallet_tl_value(dkd_row_value = {}) {
-  const dkd_wallet_value = Number(dkd_row_value?.wallet_tl ?? 0);
-  return Number.isFinite(dkd_wallet_value) ? Math.max(0, dkd_wallet_value) : 0;
-}
-
-function normalizeFallbackProfile(userId, row = {}) {
+function dkd_fallback_profile_value(dkd_user_id_value, dkd_row_value = {}) {
   return {
-    user_id: userId,
-    id: userId,
-    dbg_id: row?.dbg_id == null ? null : Number(row?.dbg_id),
-    social_last_seen_at: row?.social_last_seen_at || null,
-    nickname: row?.nickname || 'DrabornEagle',
-    avatar_emoji: row?.avatar_emoji || '🦅',
-    avatar_image_url: row?.avatar_image_url ? String(row.avatar_image_url) : '',
-    dkd_puan: Number(row?.dkd_puan ?? 0),
-    puan: Number(row?.dkd_puan ?? 0),
-    shards: Number(row?.shards ?? 0),
-    boss_tickets: Number(row?.boss_tickets ?? 0),
-    energy: Number(row?.energy ?? 20),
-    energy_max: Number(row?.energy_max ?? 20),
-    energy_updated_at: row?.energy_updated_at || new Date().toISOString(),
-    task_state: row?.task_state || {},
-    boss_state: row?.boss_state || {},
-    weekly_task_state: row?.weekly_task_state || {},
-    xp: Number(row?.xp ?? 0),
-    level: Math.max(1, Number(row?.level ?? 1)),
-    rank_key: row?.rank_key || 'rookie',
-    wallet_tl: dkd_normalize_wallet_tl_value(row),
-    courier_status: row?.courier_status || 'none',
-    courier_score: Number(row?.courier_score ?? 0),
-    courier_completed_jobs: Number(row?.courier_completed_jobs ?? 0),
-    courier_wallet_tl: Number(row?.courier_wallet_tl ?? 0),
-    merchant_wallet_tl: Number(row?.merchant_wallet_tl ?? 0),
-    courier_total_earned_tl: Number(row?.courier_total_earned_tl ?? 0),
-    courier_withdrawn_tl: Number(row?.courier_withdrawn_tl ?? 0),
-    courier_active_days: Number(row?.courier_active_days ?? 0),
-    courier_last_completed_at: row?.courier_last_completed_at || null,
-    courier_fastest_eta_min: row?.courier_fastest_eta_min == null ? null : Number(row?.courier_fastest_eta_min),
-    courier_city: row?.courier_city || 'Ankara',
-    courier_zone: row?.courier_zone || '',
-    courier_vehicle_type: row?.courier_vehicle_type || 'moto',
-    courier_profile_meta: row?.courier_profile_meta && typeof row.courier_profile_meta === 'object' ? row.courier_profile_meta : {},
+    ...dkd_row_value,
+    user_id: dkd_user_id_value,
+    id: dkd_user_id_value,
+    nickname: dkd_row_value?.nickname || 'DrabornEagle',
+    avatar_emoji: dkd_row_value?.avatar_emoji || '🦅',
+    avatar_image_url: String(dkd_row_value?.avatar_image_url || ''),
+    courier_status: dkd_row_value?.courier_status || 'none',
+    courier_score: Number(dkd_row_value?.courier_score || 0),
+    courier_completed_jobs: Number(dkd_row_value?.courier_completed_jobs || 0),
+    courier_cancelled_jobs: Number(dkd_row_value?.courier_cancelled_jobs || 0),
+    dkd_courier_online: dkd_row_value?.dkd_courier_online === true,
   };
 }
 
-
-export function useProfileData({ sessionUserId, setProfile, setDbReadyFlags }) {
+export function useProfileData({ sessionUserId, setProfile }) {
   const [isAdmin, setIsAdmin] = useState(false);
-  const profileRef = useRef(null);
+  const dkd_profile_ref_value = useRef(null);
 
   const checkAdmin = useCallback(async () => {
     try {
       const { data, error } = await checkIsAdmin();
       if (error) throw error;
-      setIsAdmin(!!data);
-      return !!data;
+      setIsAdmin(Boolean(data));
+      return Boolean(data);
     } catch {
       setIsAdmin(false);
       return false;
@@ -76,208 +36,47 @@ export function useProfileData({ sessionUserId, setProfile, setDbReadyFlags }) {
 
   const refreshProfile = useCallback(async () => {
     if (!sessionUserId) return null;
-
-    let data = null;
-    let nextTasksDbReady = true;
-    let nextWeeklyDbReady = true;
-
+    let dkd_data_value = null;
     try {
-      const result = await fetchProfile(sessionUserId);
-      data = result?.data || null;
-      nextTasksDbReady = !!result?.tasksDbReady;
-      nextWeeklyDbReady = !!result?.weeklyDbReady;
+      dkd_data_value = (await fetchProfile(sessionUserId))?.data || null;
     } catch (dkd_error_value) {
-      console.log('[DraBornGo][refreshProfile][fetchProfile]', dkd_error_value?.message || String(dkd_error_value));
-
-      const direct = await supabase
-        .from('dkd_profiles')
-        .select('user_id, dbg_id, social_last_seen_at, nickname, avatar_emoji, avatar_image_url, dkd_puan, shards, boss_tickets, energy, energy_max, energy_updated_at, task_state, boss_state, weekly_task_state, xp, level, rank_key, wallet_tl, courier_status, courier_score, courier_completed_jobs, courier_wallet_tl, courier_total_earned_tl, courier_withdrawn_tl, courier_active_days, courier_last_completed_at, courier_fastest_eta_min, courier_city, courier_zone, courier_vehicle_type, courier_profile_meta')
-        .eq('user_id', sessionUserId)
-        .maybeSingle();
-
-      if (direct?.error) {
-        console.log('[DraBornGo][refreshProfile][direct]', direct.error?.message || String(direct.error));
-      }
-
-      data = normalizeFallbackProfile(sessionUserId, direct?.data || {});
-      nextTasksDbReady = false;
-      nextWeeklyDbReady = false;
+      console.log('[DraBornGo][refreshProfile]', dkd_error_value?.message || String(dkd_error_value));
     }
-
-    if (!data) {
-      data = normalizeFallbackProfile(sessionUserId, {});
-      nextTasksDbReady = false;
-      nextWeeklyDbReady = false;
-    }
-
-    setDbReadyFlags(nextTasksDbReady, nextWeeklyDbReady);
-
-    setProfile((prev) => {
-      const lockUntil = Number(prev?._energy_lock_until || 0);
-      const lockActive = lockUntil > Date.now();
-      const serverEnergy = Number(data?.energy ?? 0);
-      const prevEnergy = Number(prev?.energy ?? 0);
-      const preserveLockedEnergy = lockActive && prev && serverEnergy > prevEnergy;
-
-      const merged = {
-        ...(prev || {}),
-        id: data.user_id,
-        ...data,
-        shards: Number(data?.shards || 0),
-        xp: Math.max(Number(prev?.xp || 0), Number(data?.xp || 0)),
-        level: Math.max(1, Number(prev?.level || 1), Number(data?.level || 1)),
-        rank_key: data?.rank_key || prev?.rank_key || 'rookie',
-        _energy_lock_until: preserveLockedEnergy ? lockUntil : 0,
-      };
-
-      if (preserveLockedEnergy) {
-        merged.energy = prevEnergy;
-        merged.energy_updated_at = prev?.energy_updated_at || data?.energy_updated_at;
-      }
-
-      profileRef.current = merged;
-      return merged;
-    });
-
-    return data;
-  }, [sessionUserId, setDbReadyFlags, setProfile]);
+    const dkd_next_value = dkd_fallback_profile_value(sessionUserId, dkd_data_value || {});
+    dkd_profile_ref_value.current = dkd_next_value;
+    setProfile((dkd_previous_value) => ({ ...(dkd_previous_value || {}), ...dkd_next_value }));
+    return dkd_next_value;
+  }, [sessionUserId, setProfile]);
 
   const bootstrapProfile = useCallback(async () => {
     if (!sessionUserId) return null;
-
-    try {
-      const ensured = await ensureProfile(sessionUserId);
-      if (ensured?.error) {
-        console.log('[DraBornGo][ensureProfile]', ensured.error?.message || String(ensured.error));
-      }
-    } catch (dkd_error_value) {
-      console.log('[DraBornGo][ensureProfile][throw]', dkd_error_value?.message || String(dkd_error_value));
-    }
-
-    const [profileResult, adminResult] = await Promise.allSettled([
-      refreshProfile(),
-      checkAdmin(),
-    ]);
-
-    if (profileResult.status === 'rejected') {
-      console.log('[DraBornGo][bootstrapProfile][refreshProfile]', profileResult.reason?.message || String(profileResult.reason));
-    }
-    if (adminResult.status === 'rejected') {
-      console.log('[DraBornGo][bootstrapProfile][checkAdmin]', adminResult.reason?.message || String(adminResult.reason));
-    }
-
-    return profileResult.status === 'fulfilled' ? profileResult.value : null;
+    try { await ensureProfile(sessionUserId); } catch {}
+    const [dkd_profile_result_value] = await Promise.allSettled([refreshProfile(), checkAdmin()]);
+    return dkd_profile_result_value.status === 'fulfilled' ? dkd_profile_result_value.value : null;
   }, [sessionUserId, refreshProfile, checkAdmin]);
 
-  const saveProfileNick = useCallback(async (nicknameRaw, avatarRaw, dkd_avatar_image_url_raw = undefined) => {
+  const saveProfileNick = useCallback(async (dkd_nickname_raw_value, dkd_avatar_raw_value, dkd_avatar_image_raw_value = undefined) => {
     if (!sessionUserId) return;
-
-    const nickname = String(nicknameRaw || '').trim();
-    const avatar = String(avatarRaw || '🦅');
-    const dkd_avatar_image_url = dkd_avatar_image_url_raw === undefined
-      ? undefined
-      : (String(dkd_avatar_image_url_raw || '').trim() || null);
-    if (nickname.length < 3 || nickname.length > 18) {
-      Alert.alert('Profil', 'Nickname 3–18 karakter olmalı.');
+    const dkd_nickname_value = String(dkd_nickname_raw_value || '').trim();
+    const dkd_avatar_value = String(dkd_avatar_raw_value || '🦅');
+    const dkd_image_value = dkd_avatar_image_raw_value === undefined ? undefined : (String(dkd_avatar_image_raw_value || '').trim() || null);
+    if (dkd_nickname_value.length < 3 || dkd_nickname_value.length > 18) {
+      Alert.alert('Profil', 'Takma ad 3–18 karakter olmalı.');
       return;
     }
-
-    setProfile((dkd_previous_profile_value) => {
-      const dkd_profile_next_value = dkd_previous_profile_value ? {
-        ...dkd_previous_profile_value,
-        nickname,
-        avatar_emoji: avatar,
-        avatar_image_url: dkd_avatar_image_url == null ? '' : String(dkd_avatar_image_url || ''),
-      } : dkd_previous_profile_value;
-      profileRef.current = dkd_profile_next_value;
-      return dkd_profile_next_value;
-    });
-
-    try {
-      const { error } = await setProfileNickname(nickname, avatar, dkd_avatar_image_url);
-
-      if (error) {
-        const msg = String(error?.message || '');
-        if (msg.toLowerCase().includes('function') || msg.toLowerCase().includes('dkd_set_profile')) {
-          let { error: directError } = await updateProfileNicknameDirect(sessionUserId, nickname, avatar, dkd_avatar_image_url);
-          if (directError) {
-            const dkd_direct_message = String(directError?.message || directError?.details || '');
-            if (dkd_direct_message.includes('avatar_image_url')) {
-              const dkd_retry_result = await updateProfileNicknameDirect(sessionUserId, nickname, avatar);
-              directError = dkd_retry_result?.error || null;
-            }
-          }
-          if (directError) throw directError;
-        } else {
-          throw error;
-        }
-      }
-
-      await refreshProfile();
-    } catch (dkd_error_value) {
-      Alert.alert('Profil', dkd_error_value?.message || String(dkd_error_value));
-      throw dkd_error_value;
+    setProfile((dkd_previous_value) => ({
+      ...(dkd_previous_value || {}),
+      nickname: dkd_nickname_value,
+      avatar_emoji: dkd_avatar_value,
+      ...(dkd_image_value !== undefined ? { avatar_image_url: dkd_image_value || '' } : {}),
+    }));
+    const dkd_result_value = await setProfileNickname(dkd_nickname_value, dkd_avatar_value, dkd_image_value);
+    if (dkd_result_value?.error) {
+      const dkd_direct_result_value = await updateProfileNicknameDirect(sessionUserId, dkd_nickname_value, dkd_avatar_value, dkd_image_value);
+      if (dkd_direct_result_value?.error) throw dkd_direct_result_value.error;
     }
+    await refreshProfile();
   }, [sessionUserId, refreshProfile, setProfile]);
 
-  const grantXp = useCallback(async (amount, reason = 'progress') => {
-    if (!sessionUserId) return null;
-
-    const xpAmount = Math.max(0, Number(amount || 0));
-    if (!xpAmount) return null;
-
-    const base = profileRef.current || {};
-    const prevXp = Math.max(0, Number(base?.xp || 0));
-    const nextXp = prevXp + xpAmount;
-    const nextLevel = levelFromXp(nextXp);
-    const nextRank = rankFromLevel(nextLevel);
-
-    const optimistic = {
-      xp: nextXp,
-      level: nextLevel,
-      rank_key: nextRank.key,
-    };
-
-    setProfile((prev) => {
-      const merged = prev ? {
-        ...prev,
-        ...optimistic,
-      } : prev;
-      profileRef.current = merged;
-      return merged;
-    });
-
-    try {
-      const { data, error } = await awardProfileXp(sessionUserId, base, xpAmount);
-      if (error) throw error;
-
-      if (data) {
-        setProfile((prev) => {
-          const merged = prev ? {
-            ...prev,
-            xp: Number(data?.xp || optimistic.xp),
-            level: Math.max(1, Number(data?.level || optimistic.level)),
-            rank_key: data?.rank_key || optimistic.rank_key || prev.rank_key || 'rookie',
-          } : prev;
-          profileRef.current = merged;
-          return merged;
-        });
-      }
-
-      return { data, reason };
-    } catch (dkd_error_value) {
-      console.log('[DraBornGo][grantXp]', reason, dkd_error_value?.message || String(dkd_error_value));
-      return { data: optimistic, reason, localOnly: true };
-    }
-  }, [sessionUserId, setProfile]);
-
-  return {
-    isAdmin,
-    setIsAdmin,
-    checkAdmin,
-    refreshProfile,
-    bootstrapProfile,
-    saveProfileNick,
-    grantXp,
-  };
+  return { isAdmin, setIsAdmin, checkAdmin, refreshProfile, bootstrapProfile, saveProfileNick };
 }

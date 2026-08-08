@@ -4,6 +4,3 @@ verify_jwt = false
 [functions.send-push-event-bridge]
 verify_jwt = false
 
-[functions.dkd-iletimerkezi-otp]
-verify_jwt = false
-

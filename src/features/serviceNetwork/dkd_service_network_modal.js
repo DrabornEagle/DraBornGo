@@ -7,7 +7,6 @@ import DkdUrgentCourierPanel from '../courier/dkd_urgent_courier_panel';
 import DkdCargoLiveMapModal from '../courier/dkd_cargo_live_map_modal';
 import DkdLogisticsModal from '../logistics/dkd_logistics_modal';
 import DkdWalletPaymentMethodModal from '../payment/dkd_wallet_payment_method_modal';
-import { dkd_build_unified_wallet_patch_value, resolveUnifiedWalletTl } from '../../services/walletService';
 import { fetchBusinessMarketCatalog as dkd_fetch_business_market_catalog_value } from '../../services/businessProductService';
 import { dkd_create_restaurant_order_value, dkd_create_service_network_request_value, dkd_delete_completed_service_network_order_value, dkd_fetch_service_network_my_orders_value } from '../../services/dkd_service_network_service';
 import { dkd_send_customer_order_local_notification_value } from '../../services/notificationService';
@@ -1934,7 +1933,6 @@ function DkdServiceNetworkRequestPage({
   );
 }
 
-function DkdServiceNetworkModal({ dkd_visible_value, dkd_on_close_value, dkd_profile_value, dkd_set_profile_value, dkd_current_location_value, dkd_on_profile_press_value, dkd_is_admin_value = false, dkd_wallet_topup_request_key_value = 0 }) {
   const dkd_scroll_view_ref_value = useRef(null);
   const dkd_scroll_position_y_ref_value = useRef(0);
   const dkd_category_section_y_ref_value = useRef(0);
@@ -1983,12 +1981,10 @@ function DkdServiceNetworkModal({ dkd_visible_value, dkd_on_close_value, dkd_pro
   }, []);
   const dkd_last_wallet_topup_request_key_ref_value = useRef(0);
   useEffect(() => {
-    const dkd_next_wallet_request_key_value = Number(dkd_wallet_topup_request_key_value || 0);
     if (!dkd_visible_value || !dkd_next_wallet_request_key_value) return;
     if (dkd_last_wallet_topup_request_key_ref_value.current === dkd_next_wallet_request_key_value) return;
     dkd_last_wallet_topup_request_key_ref_value.current = dkd_next_wallet_request_key_value;
     dkd_set_service_wallet_modal_visible_value(true);
-  }, [dkd_visible_value, dkd_wallet_topup_request_key_value]);
 
 
   const dkd_load_restaurant_catalog_value = useCallback(async () => {

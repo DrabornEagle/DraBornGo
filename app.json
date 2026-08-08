@@ -2,7 +2,7 @@
   "expo": {
     "name": "DraBornGo",
     "slug": "draborngo",
-    "version": "0.0.6",
+    "version": "0.0.7",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "draborngo",
@@ -25,7 +25,7 @@
           "apiKey": "AIzaSyDznPFvHQMVOqdJhPPyJ4jkqQINUUymcpY"
         }
       },
-      "versionCode": 6,
+      "versionCode": 7,
       "permissions": [
         "android.permission.ACCESS_COARSE_LOCATION",
         "android.permission.ACCESS_FINE_LOCATION",

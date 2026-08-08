@@ -18,7 +18,6 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { signInWithEmail, signUpWithEmail } from '../../services/authService';
-import { dkd_normalize_iletimerkezi_phone_value, dkd_request_iletimerkezi_otp_value, dkd_verify_iletimerkezi_otp_value } from '../../services/dkd_iletimerkezi_otp_service';
 import { dkd_make_native_axis_point } from '../../utils/dkdNativeAxis';
 
 const dkd_login_secure_mockup_image_value = require('../../../assets/dkd_login/dkd_login_secure_gate.png');
@@ -143,10 +142,6 @@ export default function AuthScreen({ mode = 'login', setMode = () => {} }) {
   const [dkd_register_city_value, dkd_set_register_city_value] = useState('Ankara');
   const [dkd_register_region_value, dkd_set_register_region_value] = useState('Çankaya');
   const [dkd_terms_accepted_flag, dkd_set_terms_accepted_flag] = useState(false);
-  const [dkd_sms_phone_value, dkd_set_sms_phone_value] = useState('');
-  const [dkd_sms_code_value, dkd_set_sms_code_value] = useState('');
-  const [dkd_sms_verified_flag, dkd_set_sms_verified_flag] = useState(false);
-  const [dkd_sms_note_value, dkd_set_sms_note_value] = useState('Telefon doğrulama; giriş güvenliği, hesap kurtarma ve sipariş bildirimleri için eklenir.');
   const dkd_glow_motion_value = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -226,55 +221,6 @@ export default function AuthScreen({ mode = 'login', setMode = () => {} }) {
       if (dkd_result_value?.error) throw dkd_result_value.error;
     } catch (dkd_error_value) {
       Alert.alert('Giriş Hatası', dkd_pretty_auth_error(dkd_error_value, 'login'));
-    } finally {
-      dkd_set_loading_name(null);
-    }
-  }
-
-  async function dkd_send_sms_otp_value() {
-    try {
-      const dkd_phone_clean_value = dkd_normalize_iletimerkezi_phone_value(dkd_sms_phone_value);
-      if (!dkd_phone_clean_value) {
-        Alert.alert('SMS Doğrulama', 'Telefon numarasını 905XXXXXXXXX formatında gir.');
-        return;
-      }
-      dkd_set_loading_name('sms-send');
-      dkd_set_sms_verified_flag(false);
-      const dkd_sms_result_value = await dkd_request_iletimerkezi_otp_value(dkd_phone_clean_value, 'login');
-      if (!dkd_sms_result_value?.dkd_ok_value) throw new Error(dkd_sms_result_value?.dkd_error_message_value || 'SMS kodu gönderilemedi.');
-      dkd_set_sms_phone_value(dkd_phone_clean_value);
-      dkd_set_sms_note_value(dkd_sms_result_value?.dkd_message_value || 'SMS doğrulama kodu gönderildi.');
-      Alert.alert('SMS Gönderildi', 'DraBornGo doğrulama kodu telefonuna gönderildi.');
-    } catch (dkd_error_value) {
-      const dkd_sms_error_text_value = dkd_error_value?.message || 'SMS kodu gönderilemedi.';
-      dkd_set_sms_note_value(dkd_sms_error_text_value);
-      Alert.alert('SMS Hatası', dkd_sms_error_text_value);
-    } finally {
-      dkd_set_loading_name(null);
-    }
-  }
-
-  async function dkd_verify_sms_otp_code_value() {
-    try {
-      const dkd_phone_clean_value = dkd_normalize_iletimerkezi_phone_value(dkd_sms_phone_value);
-      const dkd_code_clean_value = String(dkd_sms_code_value || '').replace(/\D+/g, '');
-      if (!dkd_phone_clean_value || dkd_code_clean_value.length !== 6) {
-        Alert.alert('SMS Doğrulama', 'Telefon numarası ve 6 haneli kod gerekli.');
-        return;
-      }
-      dkd_set_loading_name('sms-verify');
-      const dkd_sms_result_value = await dkd_verify_iletimerkezi_otp_value(dkd_phone_clean_value, dkd_code_clean_value, 'login');
-      if (!dkd_sms_result_value?.dkd_ok_value || !dkd_sms_result_value?.dkd_verified_value) {
-        throw new Error(dkd_sms_result_value?.dkd_error_message_value || 'SMS kodu doğrulanamadı.');
-      }
-      dkd_set_sms_verified_flag(true);
-      dkd_set_sms_note_value('Telefon doğrulandı. E-posta/şifre girişinle devam edebilirsin.');
-      Alert.alert('Telefon Doğrulandı', 'SMS doğrulama başarılı.');
-    } catch (dkd_error_value) {
-      const dkd_sms_error_text_value = dkd_error_value?.message || 'SMS kodu doğrulanamadı.';
-      dkd_set_sms_verified_flag(false);
-      dkd_set_sms_note_value(dkd_sms_error_text_value);
-      Alert.alert('Kod Hatası', dkd_sms_error_text_value);
     } finally {
       dkd_set_loading_name(null);
     }
@@ -377,7 +323,7 @@ export default function AuthScreen({ mode = 'login', setMode = () => {} }) {
             <View style={dkd_styles.dkd_pill_row}>
               <DkdAuthPill dkd_icon_name="truck-fast-outline" dkd_text="Kurye-Kargo" />
               <DkdAuthPill dkd_icon_name="food-fork-drink" dkd_text="Yemek-Market" />
-              <DkdAuthPill dkd_icon_name="treasure-chest" dkd_text="Kartlar" />
+              <DkdAuthPill dkd_icon_name="storefront-outline" dkd_text="Hizmet Ağı" />
             </View>
 
             <View style={dkd_styles.dkd_auth_card}>
@@ -392,7 +338,7 @@ export default function AuthScreen({ mode = 'login', setMode = () => {} }) {
                   <Text style={dkd_styles.dkd_card_title}>Şehir merkezine giriş</Text>
                 </View>
               </View>
-              <Text style={dkd_styles.dkd_card_subtitle}>Hesabınla devam et; sipariş havuzu, canlı harita, market ve görev akışların açılsın.</Text>
+              <Text style={dkd_styles.dkd_card_subtitle}>Hesabınla devam et; sipariş havuzu, kurye, işletme ve hizmet ağı akışların açılsın.</Text>
 
               <View style={dkd_styles.dkd_input_shell}>
                 <MaterialCommunityIcons name="email-outline" size={20} color="#9AF8FF" />
@@ -435,62 +381,6 @@ export default function AuthScreen({ mode = 'login', setMode = () => {} }) {
                 <Text style={dkd_styles.dkd_primary_button_text}>{dkd_loading_name === 'login' ? 'Giriş yapılıyor...' : 'DraBornGo’ya Gir'}</Text>
               </Pressable>
 
-              <View style={dkd_styles.dkd_sms_otp_card}>
-                <LinearGradient colors={['rgba(34,211,238,0.18)', 'rgba(16,185,129,0.10)', 'rgba(250,204,21,0.08)']} style={StyleSheet.absoluteFill} />
-                <View style={dkd_styles.dkd_sms_otp_header_row}>
-                  <View style={dkd_styles.dkd_sms_otp_icon_shell}>
-                    <MaterialCommunityIcons name="cellphone-key" size={20} color="#061427" />
-                  </View>
-                  <View style={dkd_styles.dkd_sms_otp_copy}>
-                    <Text style={dkd_styles.dkd_sms_otp_kicker}>İLETİ MERKEZİ SMS</Text>
-                    <Text style={dkd_styles.dkd_sms_otp_title}>Telefon doğrulama</Text>
-                  </View>
-                  {dkd_sms_verified_flag ? <MaterialCommunityIcons name="shield-check" size={22} color="#72FFBF" /> : null}
-                </View>
-                <Text style={dkd_styles.dkd_sms_otp_note}>{dkd_sms_note_value}</Text>
-                <View style={dkd_styles.dkd_sms_otp_input_row}>
-                  <View style={[dkd_styles.dkd_input_shell, dkd_styles.dkd_sms_otp_input_shell]}>
-                    <MaterialCommunityIcons name="phone-outline" size={18} color="#9AF8FF" />
-                    <TextInput
-                      value={dkd_sms_phone_value}
-                      onChangeText={(dkd_next_phone_value) => {
-                        dkd_set_sms_phone_value(dkd_next_phone_value);
-                        dkd_set_sms_verified_flag(false);
-                      }}
-                      placeholder="905XXXXXXXXX"
-                      placeholderTextColor="rgba(231,241,255,0.42)"
-                      keyboardType="phone-pad"
-                      autoCapitalize="none"
-                      autoCorrect={false}
-                      selectionColor="#9AF8FF"
-                      style={dkd_styles.dkd_input_text}
-                    />
-                  </View>
-                  <Pressable onPress={dkd_send_sms_otp_value} disabled={dkd_loading_name === 'sms-send'} style={[dkd_styles.dkd_sms_otp_small_button, dkd_loading_name === 'sms-send' && dkd_styles.dkd_disabled_button]}>
-                    <Text style={dkd_styles.dkd_sms_otp_small_button_text}>{dkd_loading_name === 'sms-send' ? 'Gönderiliyor' : 'Kod Gönder'}</Text>
-                  </Pressable>
-                </View>
-                <View style={dkd_styles.dkd_sms_otp_input_row}>
-                  <View style={[dkd_styles.dkd_input_shell, dkd_styles.dkd_sms_otp_code_shell]}>
-                    <MaterialCommunityIcons name="numeric" size={18} color="#FFE074" />
-                    <TextInput
-                      value={dkd_sms_code_value}
-                      onChangeText={(dkd_next_code_value) => dkd_set_sms_code_value(String(dkd_next_code_value || '').replace(/\D+/g, '').slice(0, 6))}
-                      placeholder="6 haneli kod"
-                      placeholderTextColor="rgba(231,241,255,0.42)"
-                      keyboardType="number-pad"
-                      autoCapitalize="none"
-                      autoCorrect={false}
-                      selectionColor="#FFE074"
-                      style={dkd_styles.dkd_input_text}
-                    />
-                  </View>
-                  <Pressable onPress={dkd_verify_sms_otp_code_value} disabled={dkd_loading_name === 'sms-verify'} style={[dkd_styles.dkd_sms_otp_verify_button, dkd_loading_name === 'sms-verify' && dkd_styles.dkd_disabled_button]}>
-                    <MaterialCommunityIcons name={dkd_sms_verified_flag ? 'check-bold' : 'shield-key-outline'} size={16} color="#061427" />
-                    <Text style={dkd_styles.dkd_sms_otp_verify_button_text}>{dkd_loading_name === 'sms-verify' ? 'Kontrol' : 'Doğrula'}</Text>
-                  </Pressable>
-                </View>
-              </View>
 
               <View style={dkd_styles.dkd_auth_action_row}>
                 <Pressable onPress={() => Alert.alert('Şifre Sıfırla', 'Şifre sıfırlama akışı sonraki fazda bağlanacak.')} style={dkd_styles.dkd_link_button}>
@@ -524,7 +414,7 @@ export default function AuthScreen({ mode = 'login', setMode = () => {} }) {
                 </LinearGradient>
                 <View style={dkd_styles.dkd_modal_header_copy}>
                   <Text style={dkd_styles.dkd_modal_title}>Kayıt Ol</Text>
-                  <Text style={dkd_styles.dkd_modal_subtitle}>Hesap, lokasyon ve kazanç bölgesi tek adımda hazır.</Text>
+                  <Text style={dkd_styles.dkd_modal_subtitle}>Hesap ve lokasyon bilgilerin tek adımda hazır.</Text>
                 </View>
               </View>
               <Pressable onPress={dkd_close_register_modal} style={dkd_styles.dkd_modal_close_button}>
@@ -536,7 +426,7 @@ export default function AuthScreen({ mode = 'login', setMode = () => {} }) {
               <View style={dkd_styles.dkd_register_hero_card}>
                 <LinearGradient colors={['rgba(98,230,255,0.24)', 'rgba(114,255,191,0.14)', 'rgba(255,224,116,0.12)']} style={StyleSheet.absoluteFill} />
                 <View style={dkd_styles.dkd_register_hero_icon}>
-                  <MaterialCommunityIcons name="treasure-chest" size={26} color="#FFE074" />
+                  <MaterialCommunityIcons name="city-variant-outline" size={26} color="#FFE074" />
                 </View>
                 <View style={dkd_styles.dkd_register_hero_copy}>
                   <Text style={dkd_styles.dkd_register_hero_title}>DraBornGo hesabını kur</Text>
