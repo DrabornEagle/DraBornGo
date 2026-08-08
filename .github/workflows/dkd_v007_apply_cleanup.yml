@@ -15,53 +15,53 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Apply cleanup pass two
+      - name: Apply cleanup pass three
         shell: bash
         run: |
           set +e
-          python3 scripts/dkd_v007_fix2.py > /tmp/dkd_fix2.log 2>&1
-          echo "$?" > /tmp/dkd_fix2_code
+          python3 scripts/dkd_v007_fix3.py > /tmp/dkd_fix3.log 2>&1
+          echo "$?" > /tmp/dkd_fix3_code
       - name: Expo Go source validation
         shell: bash
         run: |
           set +e
-          DKD_FIX_CODE=$(cat /tmp/dkd_fix2_code)
+          DKD_FIX_CODE=$(cat /tmp/dkd_fix3_code)
           DKD_INSTALL_CODE=99
           DKD_EXPORT_CODE=99
           if [ "$DKD_FIX_CODE" = "0" ]; then
-            npm install --no-package-lock > /tmp/dkd_npm2.log 2>&1
+            npm install --no-package-lock > /tmp/dkd_npm3.log 2>&1
             DKD_INSTALL_CODE=$?
             if [ "$DKD_INSTALL_CODE" = "0" ]; then
-              npx expo export --platform android --output-dir /tmp/dkd-v007-export > /tmp/dkd_export2.log 2>&1
+              npx expo export --platform android --output-dir /tmp/dkd-v007-export > /tmp/dkd_export3.log 2>&1
               DKD_EXPORT_CODE=$?
             fi
           fi
           {
-            echo "DKD v0.0.7 PASS TWO VALIDATION"
+            echo "DKD v0.0.7 PASS THREE VALIDATION"
             echo "fix_code=$DKD_FIX_CODE"
             echo "npm_install_code=$DKD_INSTALL_CODE"
             echo "expo_export_android_code=$DKD_EXPORT_CODE"
             echo
             echo "=== FIX SCRIPT LOG ==="
-            cat /tmp/dkd_fix2.log
+            cat /tmp/dkd_fix3.log
             echo
             echo "=== NPM LOG TAIL ==="
-            tail -n 80 /tmp/dkd_npm2.log 2>/dev/null || true
+            tail -n 60 /tmp/dkd_npm3.log 2>/dev/null || true
             echo
             echo "=== EXPO EXPORT LOG TAIL ==="
-            tail -n 180 /tmp/dkd_export2.log 2>/dev/null || true
+            tail -n 220 /tmp/dkd_export3.log 2>/dev/null || true
             echo
             echo "=== LEGACY SOURCE REFERENCES ==="
             grep -RInE '(DKD_DraBornGo_v0\.0\.[0-6]|DailyReward|daily_reward|Günlük Giriş Ödülü|Günlük Ödül|\bEnerji\b|energy_max|dkd_puan|\bCüzdan\b|wallet_tl|courier_wallet_tl|merchant_wallet_tl|boss_tickets|Özel Kart|Harita=Sandıklar|\bSandıklar\b|\bKoleksiyon\b|CollectionModal|ChestModal|useChestActions|useCollectionActions|useTaskProgress|\bXP\b|\bLVL\b|\bLvl\b|rank_key|Oyuncu Kartı|İLETİ MERKEZİ SMS|dkd_iletimerkezi|sms_otp|DkdWalletPaymentMethodModal|payment_status|Ödeme Onayı|Ödeme Yöntemi)' src web supabase --exclude='20260808_dkd_v0_0_7_remove_legacy_game_economy_sms.sql' 2>/dev/null || true
             echo
             echo "=== REMOVED IMPORT TARGETS ==="
             grep -RInE '(features/(dailyReward|chest|collection|tasks|payment)|useDailyRewardState|useEnergyState|awardProfileXp|utils/(geo|text)|constants/game)' src 2>/dev/null || true
-          } > dkd_v007_validation2.txt
+          } > dkd_v007_validation3.txt
       - name: Commit cleanup result
         shell: bash
         run: |
           git config user.name 'DraBornGo v0.0.7 Bot'
           git config user.email 'actions@users.noreply.github.com'
           git add -A
-          git commit -m 'DraBornGo v0.0.7 finish legacy feature cleanup pass two'
+          git commit -m 'DraBornGo v0.0.7 cleanup pass three'
           git push origin HEAD:main
