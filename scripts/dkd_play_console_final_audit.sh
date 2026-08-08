@@ -24,9 +24,15 @@ NODE
 npm run dkd:verify-v0.0.9
 npm run dkd:play-risk-scan
 npx expo-doctor@latest
-rm -rf /tmp/dkd-play-source-audit /tmp/dkd-play-web-audit
-npx expo export --platform android --output-dir /tmp/dkd-play-source-audit
-npx expo export --platform web --output-dir /tmp/dkd-play-web-audit
+
+DKD_AUDIT_ROOT="${TMPDIR:-${HOME:-$PWD}/.cache/draborngo}"
+DKD_SOURCE_AUDIT_DIR="${DKD_AUDIT_ROOT}/dkd-play-source-audit"
+DKD_WEB_AUDIT_DIR="${DKD_AUDIT_ROOT}/dkd-play-web-audit"
+mkdir -p "$DKD_AUDIT_ROOT"
+rm -rf "$DKD_SOURCE_AUDIT_DIR" "$DKD_WEB_AUDIT_DIR"
+
+npx expo export --platform android --output-dir "$DKD_SOURCE_AUDIT_DIR"
+npx expo export --platform web --output-dir "$DKD_WEB_AUDIT_DIR"
 
 echo "Privacy: https://www.draborneagle.com/draborngo/privacy/"
 echo "Terms: https://www.draborneagle.com/draborngo/terms/"
