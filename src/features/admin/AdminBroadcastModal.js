@@ -19,7 +19,6 @@ const TARGETS = [
   { key: 'tasks', label: 'Görevler' },
   { key: 'leader', label: 'Liderlik' },
   { key: 'market', label: 'Market' },
-  { key: 'collection', label: 'Koleksiyon' },
   { key: 'courier', label: 'Kurye' },
   { key: 'dbg', label: 'Sohbet' },
   { key: 'admin', label: 'Admin' },

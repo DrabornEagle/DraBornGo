@@ -267,7 +267,7 @@ async function dkd_fetch_direct_my_cargo_shipments_by_user_id_value(dkd_user_id_
 
   const dkd_shipment_result_value = await supabase
     .from('dkd_cargo_shipments')
-    .select('id, customer_user_id, customer_first_name, customer_last_name, customer_national_id, customer_phone_text, pickup_address_text, delivery_address_text, delivery_note, pickup_lat, pickup_lng, dropoff_lat, dropoff_lng, courier_fee_tl, customer_charge_tl, payment_status, paid_at, package_content_text, package_image_url, pickup_proof_image_url, package_weight_kg, status, created_at, accepted_at, picked_up_at, completed_at, assigned_courier_user_id, assigned_courier_plate_no, assigned_courier_vehicle_type, courier_eta_min, courier_job_id')
+    .select('id, customer_user_id, customer_first_name, customer_last_name, customer_national_id, customer_phone_text, pickup_address_text, delivery_address_text, delivery_note, pickup_lat, pickup_lng, dropoff_lat, dropoff_lng, courier_fee_tl, customer_charge_tl, package_content_text, package_image_url, pickup_proof_image_url, package_weight_kg, status, created_at, accepted_at, picked_up_at, completed_at, assigned_courier_user_id, assigned_courier_plate_no, assigned_courier_vehicle_type, courier_eta_min, courier_job_id')
     .eq('customer_user_id', dkd_user_id_value)
     .order('created_at', { ascending: false })
     .limit(30);

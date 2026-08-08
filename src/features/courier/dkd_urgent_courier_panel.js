@@ -336,13 +336,6 @@ export default function DkdUrgentCourierPanel({
   const dkd_delayed_refresh_ref_value = useRef(null);
   const dkd_mapbox_closed_order_id_ref_value = useRef('');
 
-  const dkd_wallet_value = useMemo(() => {
-    const dkd_snapshot_wallet_value = Number(dkd_snapshot_value?.dkd_profile?.wallet_tl ?? 0);
-    const dkd_profile_wallet_value = Number(dkd_profile_value?.wallet_tl ?? 0);
-    if (Number.isFinite(dkd_snapshot_wallet_value) && dkd_snapshot_wallet_value > 0) return dkd_snapshot_wallet_value;
-    return Number.isFinite(dkd_profile_wallet_value) ? dkd_profile_wallet_value : 0;
-  }, [dkd_profile_value?.wallet_tl, dkd_snapshot_value?.dkd_profile]);
-
   const dkd_load_snapshot_value = useCallback(async ({ dkd_silent_value = false, dkd_force_value = false } = {}) => {
     const dkd_now_ms_value = Date.now();
     if (dkd_snapshot_inflight_ref_value.current) return;
@@ -1291,7 +1284,6 @@ export default function DkdUrgentCourierPanel({
               </View>
             </View>
             <View style={dkd_styles.dkd_metric_row}>
-              <DkdMetricTile dkd_icon_name_value="wallet-outline" dkd_label_value="Cüzdan" dkd_value={dkd_format_money_value(dkd_wallet_value)} dkd_tone_value="gold" />
               <DkdMetricTile dkd_icon_name_value="receipt-text-outline" dkd_label_value="Siparişlerim" dkd_value={String(dkd_customer_active_count_value)} />
               {dkd_hide_courier_tab_value ? null : <DkdMetricTile dkd_icon_name_value="bike-fast" dkd_label_value="Açık İş" dkd_value={String(dkd_snapshot_value.dkd_courier_orders.length)} dkd_tone_value="green" />}
             </View>

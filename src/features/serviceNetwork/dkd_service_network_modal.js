@@ -470,7 +470,6 @@ function dkd_service_network_cargo_shipment_replica_value(dkd_order_value = {}) 
     delivery_address_text: dkd_service_network_first_text_value([dkd_payload_value?.delivery_address_text, dkd_payload_value?.dropoff_address_text, dkd_payload_value?.dkd_delivery_address_text, dkd_order_value?.dkd_delivery_text], 'Teslimat adresi bekleniyor'),
     delivery_note: dkd_service_network_first_text_value([dkd_payload_value?.delivery_note, dkd_payload_value?.dkd_delivery_note, dkd_payload_value?.customer_note_text, dkd_order_value?.dkd_note_text], '-'),
     customer_charge_tl: dkd_service_network_first_number_value([dkd_payload_value?.customer_charge_tl, dkd_payload_value?.dkd_customer_charge_tl, dkd_payload_value?.courier_fee_tl, dkd_payload_value?.fee_tl], 0),
-    payment_status: dkd_service_network_first_text_value([dkd_payload_value?.payment_status, dkd_payload_value?.dkd_payment_status], 'pending'),
     courier_display_name: dkd_service_network_first_text_value([dkd_payload_value?.courier_display_name, dkd_payload_value?.assigned_courier_display_name], 'Henüz atanmadı'),
     courier_vehicle_type: dkd_service_network_first_text_value([dkd_payload_value?.courier_vehicle_type, dkd_payload_value?.assigned_courier_vehicle_type, dkd_live_location_value?.dkd_vehicle_type], 'moto'),
     courier_plate_no: dkd_service_network_first_text_value([dkd_payload_value?.courier_plate_no, dkd_payload_value?.assigned_courier_plate_no], ''),

@@ -70,8 +70,8 @@
       [
         "expo-image-picker",
         {
-          "photosPermission": "DraBornGo; yalnızca senin seçtiğin paket, ürün, profil veya dekont görselini eklemek için galerine erişir.",
-          "cameraPermission": "DraBornGo; paket, ürün, profil veya dekont fotoğrafı çekmek için kameranı kullanır.",
+          "photosPermission": "DraBornGo; yalnızca senin seçtiğin paket, ürün, profil veya başvuru görselini eklemek için galerine erişir.",
+          "cameraPermission": "DraBornGo; paket, ürün, profil veya başvuru fotoğrafı çekmek için kameranı kullanır.",
           "microphonePermission": false
         }
       ]

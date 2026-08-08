@@ -324,7 +324,7 @@ function dkd_normalized_request_order_value(dkd_row_value = {}, dkd_job_value = 
 }
 
 function dkd_normalized_restaurant_order_value(dkd_row_value = {}, dkd_job_value = null, dkd_live_location_value = null) {
-  const dkd_status_value = dkd_service_network_effective_status_value(dkd_row_value?.dkd_status || dkd_row_value?.status || dkd_row_value?.dkd_payment_status, dkd_job_value?.status, 'pending');
+  const dkd_status_value = dkd_service_network_effective_status_value(dkd_row_value?.dkd_status || dkd_row_value?.status, dkd_job_value?.status, 'pending');
   const dkd_source_id_value = dkd_order_id_text_value('dkd_restaurant_order', dkd_row_value);
   const dkd_price_value = dkd_order_money_value(dkd_row_value?.dkd_customer_charge_tl ?? dkd_row_value?.customer_charge_tl ?? dkd_row_value?.dkd_product_price_tl ?? dkd_row_value?.product_price_tl);
   return {
@@ -869,7 +869,6 @@ export async function dkd_create_restaurant_order_value(dkd_input_value = {}) {
       dkd_currency_code: dkd_string_value(dkd_product_value?.product_price_currency || dkd_product_value?.currency_code, 'TRY'),
       dkd_delivery_fee_tl: dkd_delivery_fee_tl_value,
       dkd_customer_charge_tl: dkd_customer_charge_tl_value,
-      dkd_payment_status: dkd_input_value?.dkd_use_wallet_payment_value ? 'paid' : 'pending',
       dkd_payment_payload_json: dkd_payment_payload_value,
       dkd_delivery_address_text: dkd_string_value(dkd_input_value?.dkd_delivery_address_text_value),
       dkd_delivery_note: dkd_string_value(dkd_input_value?.dkd_delivery_note_value),

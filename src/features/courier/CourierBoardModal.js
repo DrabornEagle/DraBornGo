@@ -119,54 +119,6 @@ function defaultApplicationDraft(profile = {}) {
   };
 }
 
-function courierXpGoalForLevel(level) {
-  const lvl = Math.max(1, Number(level || 1));
-  return 110 + ((lvl - 1) * 35);
-}
-
-function courierProgressFromScore(scoreValue) {
-  let score = Math.max(0, Number(scoreValue || 0));
-  let level = 1;
-  let goal = courierXpGoalForLevel(level);
-
-  while (score >= goal) {
-    score -= goal;
-    level += 1;
-    goal = courierXpGoalForLevel(level);
-  }
-
-  const progressXp = score;
-  const progressPct = goal > 0 ? Math.max(0, Math.min(100, Math.round((progressXp / goal) * 100))) : 0;
-  return {
-    level,
-    levelGoal: goal,
-    progressXp,
-    progressPct,
-  };
-}
-
-function courierLevelReward(levelValue) {
-  const level = Math.max(1, Number(levelValue || 1));
-  return {
-    dkd_puan: 30 + (level * 10),
-    shards: Math.max(1, Math.floor((level + 1) / 2)),
-    xp: 40 + (level * 15),
-  };
-}
-
-function aggregateCourierLevelRewards(fromLevel, toLevel) {
-  let dkd_puan = 0;
-  let shards = 0;
-  let xp = 0;
-  for (let level = Math.max(1, Number(fromLevel || 1)) + 1; level <= Math.max(1, Number(toLevel || 1)); level += 1) {
-    const reward = courierLevelReward(level);
-    dkd_puan += Number(reward.dkd_puan || 0);
-    shards += Number(reward.shards || 0);
-    xp += Number(reward.xp || 0);
-  }
-  return { dkd_puan, shards, xp };
-}
-
 function courierRegionLabel(profile = {}) {
   const dkd_country_value = String(profile?.dkd_country || profile?.courier_profile_meta?.dkd_country || 'Türkiye').trim() || 'Türkiye';
   const dkd_city_value = String(profile?.dkd_city || profile?.courier_city || 'Ankara').trim() || 'Ankara';
@@ -249,49 +201,6 @@ function ImagePickTile({ label, value, onPick, optional = false }) {
         <Text style={styles.docSub}>{value ? 'Cihazdan seçildi' : optional ? 'İsteğe bağlı' : 'Dokun ve seç'}</Text>
       </View>
     </Pressable>
-  );
-}
-
-function CourierLevelUpModal({ visible, reward, onClose }) {
-  if (!visible || !reward) return null;
-
-  return (
-    <Modal visible={visible} animationType="fade" transparent onRequestClose={onClose}>
-      <View style={styles.rewardBackdrop}>
-        <LinearGradient colors={['rgba(6,12,20,0.88)', 'rgba(7,16,27,0.94)']} style={styles.rewardShell}>
-          <LinearGradient colors={['#61D8FF', '#B17CFF', '#61F2AE']} style={styles.rewardRing} />
-          <View style={styles.rewardBadge}>
-            <MaterialCommunityIcons name="trophy-award" size={28} color="#08111A" />
-          </View>
-          <Text style={styles.rewardEyebrow}>KURYE SEVİYE ATLADI</Text>
-          <Text style={styles.rewardTitle}>Seviye {reward.toLevel}</Text>
-          <Text style={styles.rewardSubtitle}>Yeni teslimat ödüllerin hesabına eklendi.</Text>
-
-          <View style={styles.rewardGrid}>
-            <View style={[styles.rewardStatCard, styles.rewardStatCardGold]}>
-              <MaterialCommunityIcons name="cash-multiple" size={18} color="#FFE39A" />
-              <Text style={styles.rewardStatLabel}>Puan</Text>
-              <Text style={styles.rewardStatValue}>+{reward.dkd_puan}</Text>
-            </View>
-            <View style={[styles.rewardStatCard, styles.rewardStatCardPurple]}>
-              <MaterialCommunityIcons name="diamond-stone" size={18} color="#D9C2FF" />
-              <Text style={styles.rewardStatLabel}>Bonus</Text>
-              <Text style={styles.rewardStatValue}>Aktif</Text>
-            </View>
-            <View style={[styles.rewardStatCard, styles.rewardStatCardBlue]}>
-              <MaterialCommunityIcons name="star-four-points-outline" size={18} color="#A9EEFF" />
-              <Text style={styles.rewardStatLabel}>XP</Text>
-              <Text style={styles.rewardStatValue}>+{reward.xp}</Text>
-            </View>
-          </View>
-
-          <Pressable onPress={onClose} style={styles.rewardCloseBtn}>
-            <LinearGradient colors={['#55DAFF', '#2D8EFF', '#182754']} style={StyleSheet.absoluteFill} />
-            <Text style={styles.rewardCloseText}>Harika</Text>
-          </Pressable>
-        </LinearGradient>
-      </View>
-    </Modal>
   );
 }
 
@@ -2424,7 +2333,6 @@ export default function CourierBoardModal({ visible, onClose, profile, setProfil
   const [geocodeCache, setGeocodeCache] = useState({});
   const dkd_geocode_cache_ref_value = useRef({});
   const [profileVisible, setProfileVisible] = useState(false);
-  const [rewardModal, setRewardModal] = useState(null);
   const [applicationDraft, setApplicationDraft] = useState(() => defaultApplicationDraft(profile));
   const [dkd_pickup_modal_task_value, setDkdPickupModalTaskValue] = useState(null);
   const [dkd_pickup_modal_image_uri_value, setDkdPickupModalImageUriValue] = useState('');
@@ -2522,21 +2430,6 @@ export default function CourierBoardModal({ visible, onClose, profile, setProfil
   const courierStatus = String(profile?.courier_status || 'none');
   const courierApproved = courierStatus === 'approved';
   const courierPending = courierStatus === 'pending';
-  const courierProgress = useMemo(() => courierProgressFromScore(profile?.courier_score || 0), [profile?.courier_score]);
-  const nextCourierReward = useMemo(() => courierLevelReward((courierProgress?.level || 1) + 1), [courierProgress?.level]);
-  const dkd_sync_wallet_after_cargo_payment_value = useCallback((dkd_wallet_after_value) => {
-    if (!setProfile) return;
-    const dkd_numeric_wallet_value = Number(dkd_wallet_after_value);
-    if (!Number.isFinite(dkd_numeric_wallet_value)) return;
-    setProfile((dkd_previous_profile_value) => (
-      dkd_previous_profile_value
-        ? {
-            ...dkd_previous_profile_value,
-            wallet_tl: dkd_numeric_wallet_value,
-          }
-        : dkd_previous_profile_value
-    ));
-  }, [setProfile]);
   const dkd_active_task_value = useMemo(() => tasks.find((dkd_task_value) => ['to_business', 'to_customer'].includes(jobPhase(dkd_task_value))) || null, [tasks]);
   const dkd_has_active_delivery_value = !!dkd_active_task_value;
   const dkd_live_arrival_value = useMemo(() => dkd_active_task_value ? nextDistanceAndArrival(dkd_active_task_value, currentLocation, geocodeCache)?.arrivalMin ?? null : null, [dkd_active_task_value, currentLocation, geocodeCache]);
@@ -3047,117 +2940,46 @@ export default function CourierBoardModal({ visible, onClose, profile, setProfil
 
   const handleComplete = useCallback(async (task) => {
     setSavingId(String(task?.id || ''));
-    const beforeProfile = profile || {};
-    const beforeCourier = courierProgressFromScore(beforeProfile?.courier_score || 0);
     try {
       const { data, error } = await completeCourierJob(task?.id);
       if (error) throw error;
       const row = Array.isArray(data) ? data[0] : data;
-      const feeTl = courierFeeTl({ ...(task || {}), ...(row || {}) }, nextDistanceAndArrival(task, currentLocation, geocodeCache).distanceKm);
-      const nextCourierScore = Number(row?.courier_score ?? (Number(beforeProfile?.courier_score || 0) + Number(task?.reward_score || 0)));
-      const nextCompletedJobs = Number(row?.courier_completed_jobs ?? (Number(beforeProfile?.courier_completed_jobs || 0) + 1));
-      const dkd_next_wallet_tl_value = Number(row?.wallet_tl ?? row?.dkd_wallet_after_tl ?? (Number(beforeProfile?.wallet_tl || 0) + feeTl));
-      const nextCourierWallet = Number(row?.courier_wallet_tl ?? (Number(beforeProfile?.courier_wallet_tl || 0) + feeTl));
-      const nextTotalEarned = Number(row?.courier_total_earned_tl ?? (Number(beforeProfile?.courier_total_earned_tl || 0) + feeTl));
-      const dkd_next_puan_value = Number(row?.dkd_puan ?? beforeProfile?.dkd_puan ?? 0);
-
-      if (row && setProfile) {
-        setProfile((prev) => (
-          prev
+      const dkd_next_courier_score_value = Number(row?.courier_score ?? (Number(profile?.courier_score || 0) + Number(task?.reward_score || 0)));
+      const dkd_next_completed_jobs_value = Number(row?.courier_completed_jobs ?? (Number(profile?.courier_completed_jobs || 0) + 1));
+      if (setProfile) {
+        setProfile((dkd_previous_profile_value) => (
+          dkd_previous_profile_value
             ? {
-                ...prev,
-                wallet_tl: dkd_next_wallet_tl_value,
-                courier_status: prev.courier_status || 'approved',
-                courier_score: nextCourierScore,
-                courier_completed_jobs: nextCompletedJobs,
-                courier_wallet_tl: nextCourierWallet,
-                courier_total_earned_tl: nextTotalEarned,
-                courier_withdrawn_tl: Number((row?.courier_withdrawn_tl ?? prev?.courier_withdrawn_tl ?? 0)),
-                courier_active_days: Number((row?.courier_active_days ?? prev?.courier_active_days ?? 0)),
+                ...dkd_previous_profile_value,
+                courier_status: dkd_previous_profile_value.courier_status || 'approved',
+                courier_score: dkd_next_courier_score_value,
+                courier_completed_jobs: dkd_next_completed_jobs_value,
+                courier_active_days: Number(row?.courier_active_days ?? dkd_previous_profile_value?.courier_active_days ?? 0),
                 courier_last_completed_at: row?.courier_last_completed_at || new Date().toISOString(),
                 courier_fastest_eta_min: row?.courier_fastest_eta_min == null
-                  ? (prev?.courier_fastest_eta_min ?? null)
+                  ? (dkd_previous_profile_value?.courier_fastest_eta_min ?? null)
                   : Number(row?.courier_fastest_eta_min),
-                dkd_puan: dkd_next_puan_value,
               }
-            : prev
+            : dkd_previous_profile_value
         ));
       }
-
-      const afterCourier = courierProgressFromScore(nextCourierScore);
-      if (afterCourier.level > beforeCourier.level) {
-        const reward = aggregateCourierLevelRewards(beforeCourier.level, afterCourier.level);
-        const rewardPatch = {
-          dkd_puan: Number(beforeProfile?.dkd_puan || 0) + Number(reward.dkd_puan || 0),
-          shards: Number(beforeProfile?.shards || 0) + Number(reward.shards || 0),
-        };
-
-        if (beforeProfile?.user_id) {
-          try {
-            await supabase
-              .from('dkd_profiles')
-              .update(rewardPatch)
-              .eq('user_id', beforeProfile.user_id);
-
-            const xpResult = await awardProfileXp(beforeProfile.user_id, beforeProfile, reward.xp);
-            setProfile?.((prev) => (
-              prev
-                ? {
-                    ...prev,
-                    ...rewardPatch,
-                    xp: Number(xpResult?.data?.xp ?? prev?.xp ?? 0),
-                    level: Math.max(1, Number(xpResult?.data?.level ?? prev?.level ?? 1)),
-                    rank_key: xpResult?.data?.rank_key || prev?.rank_key || 'rookie',
-                  }
-                : prev
-            ));
-          } catch {
-            setProfile?.((prev) => (
-              prev
-                ? {
-                    ...prev,
-                    ...rewardPatch,
-                    xp: Number(prev?.xp || 0) + Number(reward.xp || 0),
-                  }
-                : prev
-            ));
-          }
-        }
-
-        setRewardModal({
-          ...reward,
-          fromLevel: beforeCourier.level,
-          toLevel: afterCourier.level,
-        });
-      }
-
       const dkd_delivery_unlock_result_value = await dkd_unlock_courier_delivery_state_value(task?.id);
       if (dkd_delivery_unlock_result_value?.error) throw dkd_delivery_unlock_result_value.error;
       setDkdCourierOnlineFlagValue(true);
       setDkdAutoAssignedJobIdValue(null);
-      setProfile?.((dkd_previous_profile_value) => (
-        dkd_previous_profile_value
-          ? {
-              ...dkd_previous_profile_value,
-              dkd_courier_online: true,
-              dkd_courier_auto_assigned_job_id: null,
-            }
-          : dkd_previous_profile_value
-      ));
-      setTasks((dkd_prev_rows) => {
-        const dkd_next_rows_value = (Array.isArray(dkd_prev_rows) ? dkd_prev_rows : []).filter((dkd_row) => (
-          String(dkd_row?.id || '') !== String(task?.id || '')
-        ));
-        return dkd_keep_previous_task_rows_if_same_value(dkd_prev_rows, dkd_next_rows_value);
+      setProfile?.((dkd_previous_profile_value) => (dkd_previous_profile_value ? { ...dkd_previous_profile_value, dkd_courier_online: true, dkd_courier_auto_assigned_job_id: null } : dkd_previous_profile_value));
+      setTasks((dkd_previous_rows_value) => {
+        const dkd_next_rows_value = (Array.isArray(dkd_previous_rows_value) ? dkd_previous_rows_value : []).filter((dkd_row_value) => String(dkd_row_value?.id || '') !== String(task?.id || ''));
+        return dkd_keep_previous_task_rows_if_same_value(dkd_previous_rows_value, dkd_next_rows_value);
       });
       setTimeout(() => { loadJobs({ dkd_force_refresh: true, dkd_cache_ttl_ms: 0 }); }, 500);
-      Alert.alert('Kurye', `Teslimat tamamlandı. +${Number(task?.reward_score || 0)} skor • +${feeTl.toFixed(0)} TL cüzdana işlendi. Çevrimiçi mod açık kaldı, yeni sipariş aranıyor.`);
+      Alert.alert('Kurye', 'Teslimat tamamlandı. Çevrimiçi mod açık kaldı, yeni sipariş aranıyor.');
     } catch (dkd_error_value) {
       Alert.alert('Kurye', dkd_error_value?.message || 'Teslimat kaydedilemedi.');
     } finally {
       setSavingId(null);
     }
-  }, [currentLocation, geocodeCache, loadJobs, profile, setProfile]);
+  }, [loadJobs, profile, setProfile]);
 
   const dkd_admin_delete_courier_job_value = useCallback((dkd_task_value) => {
     if (!isAdmin || !dkd_task_value?.id) return;
@@ -3482,13 +3304,6 @@ export default function CourierBoardModal({ visible, onClose, profile, setProfil
         </View>
 
         <View style={styles.dkdCourierProfileXpPanel}>
-          <View style={styles.heroXpTopRow}>
-            <Text style={styles.heroXpLabel}>Kurye XP • {courierRegionLabel(profile)}</Text>
-            <Text style={styles.heroXpLevel}>Seviye {courierProgress.level}</Text>
-          </View>
-          <View style={styles.heroXpTrack}>
-            <LinearGradient colors={['#61D8FF', '#7E8BFF', '#C07BFF', '#61F2AE']} start={dkd_make_native_axis_point(0, 0.5)} end={dkd_make_native_axis_point(1, 0.5)} style={[styles.heroXpFill, { width: String(Math.max(8, courierProgress.progressPct)) + '%' }]} />
-          </View>
           <Text style={styles.heroXpMeta}>{courierProgress.progressXp}/{courierProgress.levelGoal} XP • %{courierProgress.progressPct}</Text>
           <Text style={styles.heroXpRewardLine}>Sonraki seviye: +{nextCourierReward.dkd_puan} Puan • +{nextCourierReward.xp} XP</Text>
         </View>
@@ -3689,8 +3504,6 @@ export default function CourierBoardModal({ visible, onClose, profile, setProfil
               )}
             </ScrollView>
           )}
-
-          <CourierLevelUpModal visible={!!rewardModal} reward={rewardModal} onClose={() => setRewardModal(null)} />
 
           <DkdCargoPickupProofModal
             dkd_visible_value={!!dkd_pickup_modal_task_value}

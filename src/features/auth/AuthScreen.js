@@ -23,6 +23,7 @@ import { dkd_make_native_axis_point } from '../../utils/dkdNativeAxis';
 const dkd_login_secure_mockup_image_value = require('../../../assets/dkd_login/dkd_login_secure_gate.png');
 const dkd_terms_public_url_value = 'https://www.draborneagle.com/draborngo/terms/';
 const dkd_privacy_public_url_value = 'https://www.draborneagle.com/draborngo/privacy/';
+const dkd_community_public_url_value = 'https://www.draborneagle.com/draborngo/community/';
 const dkd_terms_version_value = '2026-08-08-v0.0.7';
 const dkd_privacy_version_value = '2026-08-08-v0.0.7';
 const dkd_community_policy_version_value = '2026-08-08-v0.0.7';
