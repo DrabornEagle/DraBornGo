@@ -136,12 +136,20 @@ export async function dkd_approve_account_deletion_request_value(dkd_input_value
   const dkd_request_id_value = dkd_clean_text_value(dkd_input_value.dkd_request_id_value);
   if (!dkd_request_id_value) return { dkd_data_value: null, dkd_error_value: new Error('request_id_missing') };
 
-  const dkd_response_value = await supabase.rpc('dkd_admin_approve_account_deletion', {
-    dkd_param_request_id_value: dkd_request_id_value,
-    dkd_param_admin_note_value: dkd_clean_text_value(dkd_input_value.dkd_admin_note_value) || 'Admin panelinden onaylandı ve kullanıcı verileri silindi.',
+  const dkd_response_value = await supabase.functions.invoke('dkd-account-deletion-admin', {
+    body: {
+      dkd_request_id_value,
+      dkd_admin_note_value: dkd_clean_text_value(dkd_input_value.dkd_admin_note_value) || 'Admin panelinden onaylandı ve kullanıcı verileri silindi.',
+    },
   });
 
   if (dkd_response_value?.error) return { dkd_data_value: null, dkd_error_value: dkd_response_value.error };
+  if (!dkd_response_value?.data?.dkd_ok_value) {
+    return {
+      dkd_data_value: null,
+      dkd_error_value: new Error(dkd_clean_text_value(dkd_response_value?.data?.dkd_reason_value) || 'account_deletion_failed'),
+    };
+  }
   return { dkd_data_value: dkd_response_value?.data || null, dkd_error_value: null };
 }
 
