@@ -25,6 +25,7 @@
     "postinstall": "node ./scripts/dkd_restore_public_env.mjs && node ./scripts/dkd_clean_android_dependency_manifests.js",
     "dkd:clean-android-manifests": "node ./scripts/dkd_clean_android_dependency_manifests.js",
     "dkd:play-risk-scan": "node ./scripts/dkd_play_risk_scan.js",
+    "dkd:lock:sync": "npm install --package-lock-only --ignore-scripts",
     "env:restore": "node ./scripts/dkd_restore_public_env.mjs",
     "prestart": "npm run env:restore",
     "preandroid": "npm run env:restore",
