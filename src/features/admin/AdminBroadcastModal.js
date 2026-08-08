@@ -154,7 +154,7 @@ export default function AdminBroadcastModal({ visible, onClose, onSend, loading,
               <View style={dkd_styles.templateHeaderRow}>
                 <View style={{ flex: 1 }}>
                   <Text style={dkd_styles.sectionTitle}>Otomatik bildirim şablonları</Text>
-                  <Text style={dkd_styles.helper}>Kurye durumları, enerji full, sohbet, arkadaşlık ve market satışı gibi otomatik bildirimleri burada düzenle.</Text>
+                  <Text style={dkd_styles.helper}>Kurye durumları, sohbet, arkadaşlık, sipariş ve hizmet ağı bildirimlerini burada düzenle.</Text>
                 </View>
                 <SecondaryButton label="Yenile" onPress={() => onRefreshTemplates?.(true)} size="compact" fullWidth={false} />
               </View>

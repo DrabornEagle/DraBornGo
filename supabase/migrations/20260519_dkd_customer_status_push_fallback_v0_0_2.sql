@@ -1,6 +1,6 @@
 -- DKD DraBornGo v0.0.2 - Hizmet Ağı/Gönderi Paneli müşteri durum push düzeltmesi
 -- Amaç: Kurye görevi kabul etti / teslim aldı / teslim etti bildirimlerini müşteriye güvenli şekilde göndermek.
--- Güvenli tekrar çalıştırma: Sipariş, profil, cüzdan veya geçmiş veri silmez.
+-- Güvenli tekrar çalıştırma: Mevcut kullanıcı veya sipariş verisini silmez.
 
 begin;
 

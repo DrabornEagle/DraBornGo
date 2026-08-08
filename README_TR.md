@@ -24,7 +24,6 @@ GitHub `main` ve bu lokal repo her sürüm değişikliğinden sonra birebir eşi
 ## Google Play güvenlik kapsamı
 
 - TL cüzdanı fiziksel hizmet/sipariş akışları içindir.
-- Puan, koleksiyon ve oyunlaştırma unsurları nakit, kripto, yatırım veya çekilebilir finansal değer değildir.
 - Konum; adres eşleştirme, rota çizimi, kurye görünürlüğü ve aktif teslimat takibi için kullanılır.
 - Arka plan konumu ve foreground location service izni etkin değildir.
 - Kamera; QR, paket/hizmet/profil/dekont görselleri için kullanılır.

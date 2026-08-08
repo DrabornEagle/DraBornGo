@@ -1,7 +1,7 @@
 -- DraBornGo v0.224.0 - Google Play policy center visible version cleanup
 -- Amaç: Uygulama içindeki Gizlilik ve Veri Merkezi / policy metadata ekranında eski v0.210 görünmesini engellemek.
 -- Etki: Yalnızca public.dkd_policy_center_config tek satırlık metadata kaydını günceller.
--- Kullanıcı verisi, sipariş, cüzdan, profil veya ödeme kaydı değiştirmez.
+-- Kullanıcı veya sipariş verisini değiştirmez.
 
 create table if not exists public.dkd_policy_center_config (
   dkd_id_value integer primary key default 1,

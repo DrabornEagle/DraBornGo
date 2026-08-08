@@ -88,6 +88,6 @@ $$;
 revoke all on function public.dkd_admin_courier_application_delete_value(text, uuid) from public;
 grant execute on function public.dkd_admin_courier_application_delete_value(text, uuid) to authenticated;
 
-comment on function public.dkd_admin_courier_application_delete_value(text, uuid) is 'Admin Kurye/Lojistik Masası içindeki kurye başvuru inceleme ekranından başvuru kaydı siler ve ilgili kurye lisans durumunu none yapar; kazanç/cüzdan alanlarına dokunmaz.';
+comment on function public.dkd_admin_courier_application_delete_value(text, uuid) is 'Admin Kurye/Lojistik Masası içindeki kurye başvuru inceleme ekranından başvuru kaydı siler ve ilgili kurye lisans durumunu none yapar; diğer profil alanlarına dokunmaz.';
 
 commit;
