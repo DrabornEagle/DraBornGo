@@ -1,4 +1,4 @@
-name: DKD v0.0.7 Cleanup Pass Eight
+name: DKD v0.0.7 Operational Business Cleanup
 
 on:
   push:
@@ -15,35 +15,35 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Apply cleanup pass eight
+      - name: Apply operational cleanup
         shell: bash
         run: |
           set +e
-          python3 scripts/dkd_v007_fix8.py > /tmp/dkd_fix8.log 2>&1
-          echo "$?" > /tmp/dkd_fix8_code
+          python3 scripts/dkd_v007_fix9.py > /tmp/dkd_fix9.log 2>&1
+          echo "$?" > /tmp/dkd_fix9_code
       - name: Install locked dependencies
         shell: bash
         run: |
           set +e
-          npm ci > /tmp/dkd_npm8.log 2>&1
-          echo "$?" > /tmp/dkd_install8_code
+          npm ci > /tmp/dkd_npm9.log 2>&1
+          echo "$?" > /tmp/dkd_install9_code
       - name: Validate Expo Go and legacy surface
         shell: bash
         run: |
           set +e
-          DKD_FIX_CODE=$(cat /tmp/dkd_fix8_code)
-          DKD_INSTALL_CODE=$(cat /tmp/dkd_install8_code)
+          DKD_FIX_CODE=$(cat /tmp/dkd_fix9_code)
+          DKD_INSTALL_CODE=$(cat /tmp/dkd_install9_code)
           DKD_EXPORT_CODE=99
           DKD_DOCTOR_CODE=99
           if [ "$DKD_FIX_CODE" = "0" ] && [ "$DKD_INSTALL_CODE" = "0" ]; then
-            npx expo export --platform android --output-dir /tmp/dkd-v007-export > /tmp/dkd_export8.log 2>&1
+            npx expo export --platform android --output-dir /tmp/dkd-v007-export > /tmp/dkd_export9.log 2>&1
             DKD_EXPORT_CODE=$?
-            npx expo-doctor@latest > /tmp/dkd_doctor8.log 2>&1
+            npx expo-doctor@latest > /tmp/dkd_doctor9.log 2>&1
             DKD_DOCTOR_CODE=$?
           fi
-          DKD_PATTERN='DKD_DraBornGo_v0\.0\.[0-6]|DailyReward|daily_reward|Günlük Giriş Ödülü|Günlük Ödül|\bEnerji\b|energy_max|energy_updated_at|wallet|\bCüzdan\b|\bBakiye\b|dkd_puan|price_puan|reward_puan|\bPuan\b|puanlama|Özel Kart|player.?card|Oyuncu Kartı|chest|\bSandık\b|\bSandıklar\b|collection|\bKoleksiyon\b|payment_status|payment_method|DkdWalletPaymentMethodModal|\bÖdeme\b|task_state|weekly_task_state|TasksModal|task_key|\bGörevler\b|\bXP\b|\bLVL\b|\bLvl\b|rank_key|dkd_iletimerkezi|sms_otp|Telefon doğrulama|dkd_business_drop_links|dkd_business_task_attribution'
+          DKD_PATTERN='DKD_DraBornGo_v0\.0\.[0-6]|DailyReward|daily_reward|Günlük Giriş Ödülü|Günlük Ödül|\bEnerji\b|energy_max|energy_updated_at|wallet|\bCüzdan\b|\bBakiye\b|dkd_puan|price_puan|reward_puan|\bPuan\b|puanlama|Özel Kart|player.?card|Oyuncu Kartı|chest|\bSandık\b|\bSandıklar\b|collection|\bKoleksiyon\b|payment_status|payment_method|DkdWalletPaymentMethodModal|\bÖdeme\b|task_state|weekly_task_state|TasksModal|task_key|\bGörevler\b|\bXP\b|\bLVL\b|\bLvl\b|rank_key|dkd_iletimerkezi|sms_otp|Telefon doğrulama|dkd_business_drop_links|dkd_business_task_attribution|buy_with_token|point_order'
           {
-            echo "DKD v0.0.7 PASS EIGHT VALIDATION"
+            echo "DKD v0.0.7 OPERATIONAL CLEANUP VALIDATION"
             echo "fix_code=$DKD_FIX_CODE"
             echo "npm_install_code=$DKD_INSTALL_CODE"
             echo "expo_export_android_code=$DKD_EXPORT_CODE"
@@ -52,25 +52,25 @@ jobs:
             node -e "const a=require('./app.json').expo,p=require('./package.json'); console.log('expo_version='+a.version); console.log('android_versionCode='+a.android.versionCode); console.log('package_version='+p.version);"
             echo
             echo "=== EXPO DOCTOR ==="
-            tail -n 100 /tmp/dkd_doctor8.log 2>/dev/null || true
+            tail -n 120 /tmp/dkd_doctor9.log 2>/dev/null || true
             echo
             echo "=== EXPO EXPORT ==="
-            tail -n 160 /tmp/dkd_export8.log 2>/dev/null || true
+            tail -n 180 /tmp/dkd_export9.log 2>/dev/null || true
             echo
             echo "=== TEXT LEGACY REFERENCES ==="
-            git grep -I -nEi "$DKD_PATTERN" -- . ':!scripts/dkd_v007_fix7.py' ':!scripts/dkd_v007_fix8.py' ':!.github/workflows/dkd_v007_apply_cleanup.yml' ':!package-lock.json' || true
+            git grep -I -nEi "$DKD_PATTERN" -- . ':!scripts/dkd_v007_fix9.py' ':!.github/workflows/dkd_v007_apply_cleanup.yml' ':!package-lock.json' || true
             echo
             echo "=== LEGACY FILENAMES ==="
             git ls-files | grep -Ei '(^|/)(daily.?reward|energy|wallet|payment|chest|collection|boss|leaderboard|tasks?|sms|iletimerkezi|player.?card|progression|drop)(/|\.|_)' || true
             echo
-            echo "=== RETIRED IDENTIFIERS ==="
-            git grep -I -nE '(dropService|fetchBusinessDropsLite|linkDropToBusiness|unlinkDropFromBusiness|linkedDrops|adminDrops|attachDrop|removeLinkedDrop|dkd_create_restaurant_order_value|dkd_on_wallet_after_payment_value|dkd_sync_wallet_after_cargo_payment_value|dkd_payment_loading_value|dkd_on_payment_method_press_value)' -- src || true
-          } > dkd_v007_pass8_audit.txt
+            echo "=== RETIRED IDENTIFIERS / IMPORTS ==="
+            git grep -I -nE '(businessTelemetryService|businessAdminService|businessPanelService|merchantPortalService|playerCouponService|useBusinessPanelData|useMerchantPortal|BusinessPanelModal|MyCouponsModal|dropService|dkd_create_business_product_point_order|dkd_create_restaurant_order_value|dkd_on_wallet_after_payment_value|dkd_payment_loading_value)' -- src || true
+          } > dkd_v007_operational_cleanup_audit.txt
       - name: Commit cleanup result
         shell: bash
         run: |
           git config user.name 'DraBornGo v0.0.7 Bot'
           git config user.email 'actions@users.noreply.github.com'
           git add -A
-          git commit -m 'DraBornGo v0.0.7 cleanup pass eight'
+          git commit -m 'DraBornGo v0.0.7 operational business cleanup'
           git push origin HEAD:main
