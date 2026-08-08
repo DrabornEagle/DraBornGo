@@ -6,13 +6,14 @@
     "start": "expo start",
     "dkd:start:go": "expo start --go --tunnel --clear",
     "android": "expo start --android",
-    "quality:local": "npx expo-doctor"
+    "dkd:deps:fix": "npx expo install --fix",
+    "quality:local": "npx expo install --check && npx expo-doctor"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.2",
     "@react-native-async-storage/async-storage": "2.2.0",
     "@supabase/supabase-js": "^2.98.0",
-    "expo": "~57.0.1",
+    "expo": "~57.0.8",
     "expo-font": "~57.0.1",
     "expo-haptics": "~57.0.1",
     "expo-linear-gradient": "~57.0.1",
@@ -27,6 +28,9 @@
   "devDependencies": {
     "@types/react": "~19.2.4",
     "typescript": "~6.0.3"
+  },
+  "engines": {
+    "node": ">=22.13.0"
   },
   "private": true
 }
