@@ -1,0 +1,74 @@
+name: DKD v0.0.10 Guarded Transform
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/dkd_v0_0_10_transform.yml
+      - scripts/dkd_v0_0_10_transform.mjs
+
+permissions:
+  contents: write
+
+concurrency:
+  group: dkd-v0-0-10-guarded-transform
+  cancel-in-progress: true
+
+jobs:
+  dkd_transform:
+    name: Transform, validate and commit v0.0.10
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      CI: '1'
+      EXPO_NO_TELEMETRY: '1'
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Apply guarded v0.0.10 transform
+        run: node ./scripts/dkd_v0_0_10_transform.mjs
+
+      - name: Synchronize package lock
+        run: npm install --package-lock-only --ignore-scripts
+
+      - name: Install locked dependencies
+        run: npm ci
+
+      - name: Verify release identity
+        run: npm run dkd:verify-v0.0.10
+
+      - name: Scan Google Play source risks
+        run: npm run dkd:play-risk-scan
+
+      - name: Assert removed feature is absent from active source
+        shell: bash
+        run: |
+          if grep -RniE 'urgent_courier|dkd_urgent|Acil Kurye|acil kurye|send-urgent-courier-alert' src supabase/functions --exclude-dir=node_modules; then
+            echo 'Acil Kurye active-source residue detected.'
+            exit 1
+          fi
+
+      - name: Expo Android and web source audit
+        run: npm run play:final-audit
+
+      - name: Commit validated v0.0.10
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "4189826+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo 'No transformed changes to commit.'
+            exit 0
+          fi
+          git commit -m "release: DraBornGo v0.0.10 remove urgent courier"
+          git push origin HEAD:main
