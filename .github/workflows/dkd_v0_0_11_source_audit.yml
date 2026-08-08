@@ -34,6 +34,15 @@ jobs:
       - name: Install locked dependencies
         run: npm ci
 
+      - name: Synchronize package-lock release identity
+        run: |
+          npm run dkd:lock:sync
+          node - <<'NODE'
+          const lock = require('./package-lock.json');
+          if (lock.version !== '0.0.11') throw new Error(`Unexpected package-lock version: ${lock.version}`);
+          if (lock.packages?.['']?.version !== '0.0.11') throw new Error(`Unexpected package-lock root package version: ${lock.packages?.['']?.version}`);
+          NODE
+
       - name: Verify v0.0.11 identity
         run: npm run dkd:verify-v0.0.11
 
@@ -76,6 +85,7 @@ jobs:
           {
             echo "DraBornGo v0.0.11 remote source audit: PASS"
             echo "Android versionCode: 11"
+            echo "Package lock identity: v0.0.11"
             echo "Admin Support Queue removal scan: PASS"
             echo "Android source export: PASS"
             echo "Web source export: PASS"
@@ -84,6 +94,6 @@ jobs:
           } > audit/dkd_v0_0_11_remote_audit.txt
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add audit/dkd_v0_0_11_remote_audit.txt
+          git add package-lock.json audit/dkd_v0_0_11_remote_audit.txt
           git commit -m "audit: confirm v0.0.11 Expo source checks" || true
           git push origin HEAD:main
