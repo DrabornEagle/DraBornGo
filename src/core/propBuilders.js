@@ -20,8 +20,14 @@ export function buildModalProps(dkd_input_value) {
 
 export function getHasVisibleModal({ actionMenuOpen, profileOpen, courierBoardOpen, activeTab, adminMenuOpen, adminApplicationsOpen }) {
   return Boolean(
-    actionMenuOpen || profileOpen || courierBoardOpen || adminMenuOpen || adminApplicationsOpen ||
-    activeTab === 'dbg' || activeTab === 'logistics' || activeTab === 'applications' ||
-    activeTab === 'serviceNetwork' || activeTab === 'dkd_legal_center'
+    actionMenuOpen
+    || profileOpen
+    || courierBoardOpen
+    || adminMenuOpen
+    || adminApplicationsOpen
+    || activeTab === 'dbg'
+    || activeTab === 'applications'
+    || activeTab === 'serviceNetwork'
+    || activeTab === 'dkd_legal_center'
   );
 }
