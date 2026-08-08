@@ -40,8 +40,8 @@ export async function dkd_save_policy_center_config_value(dkd_input_value = {}) 
     dkd_privacy_policy_doc_url_value: dkd_clean_policy_text_value(dkd_input_value.dkd_privacy_policy_doc_url_value),
     dkd_account_deletion_form_url_value: dkd_clean_policy_text_value(dkd_input_value.dkd_account_deletion_form_url_value),
     dkd_package_name_value: dkd_clean_policy_text_value(dkd_input_value.dkd_package_name_value || 'com.draborneagle.draborngo'),
-    dkd_version_name_value: dkd_clean_policy_text_value(dkd_input_value.dkd_version_name_value || 'v0.0.8'),
-    dkd_version_code_value: dkd_clean_policy_version_code_value(dkd_input_value.dkd_version_code_value || 8),
+    dkd_version_name_value: dkd_clean_policy_text_value(dkd_input_value.dkd_version_name_value || 'v0.0.9'),
+    dkd_version_code_value: dkd_clean_policy_version_code_value(dkd_input_value.dkd_version_code_value || 9),
     dkd_updated_at_value: new Date().toISOString(),
   };
 
