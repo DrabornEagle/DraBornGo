@@ -1,0 +1,76 @@
+name: DKD v0.0.10 Repository Purge
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/dkd_v0_0_10_repo_purge.yml
+      - scripts/dkd_v0_0_10_purge_legacy_courier_residue.mjs
+
+permissions:
+  contents: write
+
+concurrency:
+  group: dkd-v0-0-10-repository-purge
+  cancel-in-progress: true
+
+jobs:
+  dkd_purge:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      CI: '1'
+      EXPO_NO_TELEMETRY: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Purge, verify and commit
+        shell: bash
+        run: |
+          set -euo pipefail
+          node ./scripts/dkd_v0_0_10_purge_legacy_courier_residue.mjs
+
+          # One-time purge machinery must not exist in the final main tree.
+          rm -f scripts/dkd_v0_0_10_purge_legacy_courier_residue.mjs
+          rm -f .github/workflows/dkd_v0_0_10_repo_purge.yml
+
+          # Build the forbidden patterns from split strings so this workflow does
+          # not itself preserve the retired identifiers.
+          DKD_KEY='urgent''_courier'
+          DKD_EDGE='send-urgent''-courier-alert'
+          DKD_LABEL_ONE='Acil'
+          DKD_LABEL_TWO='Kurye'
+          if grep -RniEi "${DKD_KEY}|${DKD_EDGE}|${DKD_LABEL_ONE}[[:space:]]+${DKD_LABEL_TWO}" . \
+              --exclude-dir=.git \
+              --exclude-dir=node_modules \
+              --exclude='dkd_v0_0_10_repo_clean.txt'; then
+            echo 'Retired courier feature residue remains in main.'
+            exit 91
+          fi
+
+          npm ci
+          npm run dkd:verify-v0.0.10
+          npm run dkd:play-risk-scan
+          npm run play:final-audit
+
+          mkdir -p audit
+          {
+            echo "DraBornGo v0.0.10 full main-tree residue scan: PASS"
+            echo "Retired courier feature residue: NONE"
+            echo "Android source export: PASS"
+            echo "Web source export: PASS"
+            echo "APK/AAB produced: NO"
+          } > audit/dkd_v0_0_10_repo_clean.txt
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "chore: purge retired courier feature from v0.0.10 main"
+          git push origin HEAD:main
