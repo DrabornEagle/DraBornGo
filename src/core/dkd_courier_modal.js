@@ -237,6 +237,10 @@ function dkd_courier_modal_value({
     )
   ));
 
+  const dkd_jobs_content_value = dkd_jobs_value.length === 0
+    ? [dkd_empty_jobs_value]
+    : dkd_job_cards_value;
+
   return dkd_e_value(
     Modal,
     {
@@ -272,9 +276,7 @@ function dkd_courier_modal_value({
           { style: dkd_styles_value.dkd_section_label_value },
           'BANA ATANAN TESLİMATLAR',
         ),
-        dkd_jobs_value.length === 0
-          ? dkd_empty_jobs_value
-          : ...dkd_job_cards_value,
+        ...dkd_jobs_content_value,
       ),
     ),
   );
