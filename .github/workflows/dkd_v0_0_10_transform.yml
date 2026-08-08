@@ -42,9 +42,6 @@ jobs:
           DKD_LOG_FILE="$RUNNER_TEMP/dkd_v0_0_10_transform.log"
           : > "$DKD_LOG_FILE"
 
-          # The generic support system legitimately uses dkd_urgent as a ticket
-          # priority. Narrow the one-time transform guard to the removed
-          # urgent-courier feature rather than the generic word "urgent".
           python3 - <<'PY'
           from pathlib import Path
           dkd_path = Path('scripts/dkd_v0_0_10_transform.mjs')
@@ -56,6 +53,10 @@ jobs:
           dkd_text = dkd_text.replace(
               "if (/urgent_courier|dkd_urgent|Acil Kurye|acil kurye/i.test(dkd_source_value)) dkd_residual_value.push(path.relative(dkd_root_value, dkd_full_value));",
               "if (/urgent_courier|Acil Kurye|acil kurye|send-urgent-courier-alert/i.test(dkd_source_value)) dkd_residual_value.push(path.relative(dkd_root_value, dkd_full_value));",
+          )
+          dkd_text = dkd_text.replace(
+              ".replaceAll('Acil Kurye', 'Kurye Ağı').replaceAll('acil kurye', 'kurye')",
+              ".replaceAll('Acil Kurye', 'Kurye Ağı').replaceAll('Acil kurye', 'Kurye').replaceAll('acil kurye', 'kurye')",
           )
           dkd_path.write_text(dkd_text)
           PY
@@ -75,7 +76,7 @@ jobs:
             npm run dkd:play-risk-scan >> "$DKD_LOG_FILE" 2>&1 || DKD_CODE=$?
           fi
           if [ "$DKD_CODE" -eq 0 ]; then
-            if grep -RniE 'urgent_courier|Acil Kurye|acil kurye|send-urgent-courier-alert' src supabase/functions --exclude-dir=node_modules >> "$DKD_LOG_FILE" 2>&1; then
+            if grep -RniEi 'urgent_courier|Acil[[:space:]]+Kurye|send-urgent-courier-alert' src supabase/functions --exclude-dir=node_modules >> "$DKD_LOG_FILE" 2>&1; then
               echo 'Acil Kurye active-source residue detected.' >> "$DKD_LOG_FILE"
               DKD_CODE=91
             fi
@@ -94,7 +95,7 @@ jobs:
               echo "Exit code: $DKD_CODE"
               echo "Commit: $GITHUB_SHA"
               echo
-              tail -n 140 "$DKD_LOG_FILE"
+              tail -n 160 "$DKD_LOG_FILE"
             } > audit/dkd_v0_0_10_transform_status.txt
             git add audit/dkd_v0_0_10_transform_status.txt
             git commit -m "audit: record v0.0.10 transform failure" || true
@@ -111,7 +112,6 @@ jobs:
             echo "Source commit: $GITHUB_SHA"
           } > audit/dkd_v0_0_10_transform_status.txt
 
-          # One-time release machinery should not remain in the final source.
           rm -f scripts/dkd_v0_0_10_transform.mjs
           rm -f .github/workflows/dkd_v0_0_10_transform.yml
 
