@@ -599,7 +599,7 @@ export async function dkd_send_customer_order_local_notification_value(dkd_input
         data: {
           dkd_type_value: 'dkd_customer_order_created',
           dkd_order_id_value: String(dkd_input_value?.dkd_order_id_value || ''),
-          dkd_source_value: String(dkd_input_value?.dkd_source_value || 'dkd_restaurant_wallet_payment'),
+          dkd_source_value: String(dkd_input_value?.dkd_source_value || 'dkd_restaurant_order'),
         },
       },
       trigger: null,

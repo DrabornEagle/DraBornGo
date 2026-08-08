@@ -106,7 +106,7 @@ function dkd_location_payload_value(dkd_current_location_value = {}) {
 function dkd_product_price_value(dkd_product_value = {}) {
   const dkd_cash_value = dkd_number_or_null_value(dkd_product_value?.product_price_tl ?? dkd_product_value?.price_cash ?? dkd_product_value?.price_tl);
   if (dkd_cash_value != null) return dkd_cash_value;
-  return dkd_number_or_null_value(dkd_product_value?.dkd_reward_puan ?? dkd_product_value?.price_puan ?? dkd_product_value?.point_price ?? 0) || 0;
+  return 0;
 }
 
 function dkd_product_business_delivery_fee_value(dkd_product_value = {}) {
@@ -767,4 +767,3 @@ export async function dkd_delete_completed_service_network_order_value(dkd_input
     return { data: null, error: dkd_error_value };
   }
 }
-

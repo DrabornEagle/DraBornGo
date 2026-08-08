@@ -52,7 +52,7 @@ export function applyNotificationRoute({ route, dropId, payload }, api = {}) {
     return true;
   }
 
-  if (['map', 'collection', 'market', 'tasks', 'leader'].includes(route)) {
+  if (['map', 'market'].includes(route)) {
     api.openTab?.(route, payload);
     if (dropId) api.setDropId?.(String(dropId));
     return true;

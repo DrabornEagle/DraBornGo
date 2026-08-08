@@ -110,7 +110,7 @@ export function dropAccent(drop = {}) {
   if (name.includes('cafe') || name.includes('kafe')) {
     return { icon: 'coffee-outline', tone: 'cafe', title: 'Cafe', color: '#F6CD67', bg: 'rgba(246,205,103,0.14)', border: 'rgba(246,205,103,0.28)' };
   }
-  return { icon: 'treasure-chest-outline', tone: 'drop', title: 'Ödül Noktası', color: '#AA88FF', bg: 'rgba(170,136,255,0.14)', border: 'rgba(170,136,255,0.28)' };
+  return { icon: 'map-marker-outline', tone: 'nav', title: 'Konum', color: '#7BE6FF', bg: 'rgba(123,230,255,0.10)', border: 'rgba(123,230,255,0.22)' };
 }
 
 export function cardFromEntry(entry = {}) {

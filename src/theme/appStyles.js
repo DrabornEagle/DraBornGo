@@ -215,17 +215,6 @@ const styles = StyleSheet.create({
   rewardStripe: { marginTop: 10, padding: 10, borderRadius: 14, backgroundColor: 'rgba(255,255,255,0.06)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.10)' },
   rewardStripeText: { color: 'rgba(255,255,255,0.80)', fontWeight: '800' },
 
-  chestOuter: {
-    width: 98,
-    height: 98,
-    borderRadius: 24,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'rgba(255,255,255,0.06)',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.12)',
-  },
-
   particleLayer: { position: 'absolute', left: '50%', top: 86, width: 1, height: 1, alignItems: 'center', justifyContent: 'center' },
   particleDot: { position: 'absolute', borderRadius: 999, backgroundColor: 'rgba(221,230,255,0.95)' },
 
@@ -314,29 +303,6 @@ const styles = StyleSheet.create({
   shardHeroKicker: { color: 'rgba(140,214,255,0.92)', fontWeight: '900', letterSpacing: 0.8, fontSize: 12 },
   shardHeroTitle: { color: '#FFFFFF', fontWeight: '900', fontSize: 19, marginTop: 4 },
   shardHeroSub: { color: 'rgba(255,255,255,0.74)', fontWeight: '700', marginTop: 6, lineHeight: 19 },
-  shardWallet: {
-    minWidth: 98,
-    borderRadius: 20,
-    paddingVertical: 12,
-    paddingHorizontal: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'rgba(3,8,20,0.62)',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.12)',
-  },
-  shardWalletLabel: { color: 'rgba(255,255,255,0.62)', fontWeight: '800', fontSize: 12 },
-  shardWalletValue: { color: '#FFFFFF', fontWeight: '900', fontSize: 18, marginTop: 6 },
-
-  shardGrid: { flexDirection: 'row', justifyContent: 'space-between', gap: 10, marginBottom: 12 },
-  shardStatCard: {
-    flex: 1,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.10)',
-    backgroundColor: 'rgba(255,255,255,0.045)',
-    padding: 14,
-  },
   shardStatK: { color: 'rgba(255,255,255,0.62)', fontWeight: '800', fontSize: 12 },
   shardStatV: { color: '#FFFFFF', fontWeight: '900', fontSize: 22, marginTop: 8 },
   shardStatSub: { color: 'rgba(255,255,255,0.55)', fontWeight: '700', marginTop: 4, fontSize: 12 },
@@ -554,7 +520,7 @@ const styles = StyleSheet.create({
   codeBoxText: { color: '#FFFFFF', fontWeight: '900', fontSize: 22, letterSpacing: 2, textAlign: 'center' },
   codeBoxSub: { color: 'rgba(255,255,255,0.78)', marginTop: 8, fontWeight: '800', textAlign: 'center', fontSize: 12 },
 
-  // Puan pop FX
+  // UI feedback FX
   tokenBurstWrap: {
     position: 'absolute',
     left: 12,
