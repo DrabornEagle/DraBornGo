@@ -1,4 +1,4 @@
-name: DKD v0.0.7 Final Cleanup Audit
+name: DKD v0.0.7 Zero Remnant Audit
 
 on:
   push:
@@ -15,72 +15,70 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Apply final policy cleanup
+      - name: Apply zero-remnant cleanup
         shell: bash
         run: |
           set +e
-          python3 scripts/dkd_v007_fix5.py > /tmp/dkd_fix5.log 2>&1
-          echo "$?" > /tmp/dkd_fix5_code
-      - name: Validate Expo Go and policy surface
+          python3 scripts/dkd_v007_fix6.py > /tmp/dkd_fix6.log 2>&1
+          echo "$?" > /tmp/dkd_fix6_code
+      - name: Install and lock dependencies
         shell: bash
         run: |
           set +e
-          DKD_FIX_CODE=$(cat /tmp/dkd_fix5_code)
-          DKD_INSTALL_CODE=99
+          npm install > /tmp/dkd_npm6.log 2>&1
+          echo "$?" > /tmp/dkd_install6_code
+      - name: Validate Expo Go and tracked repository
+        shell: bash
+        run: |
+          set +e
+          DKD_FIX_CODE=$(cat /tmp/dkd_fix6_code)
+          DKD_INSTALL_CODE=$(cat /tmp/dkd_install6_code)
           DKD_EXPORT_CODE=99
           DKD_DOCTOR_CODE=99
-          if [ "$DKD_FIX_CODE" = "0" ]; then
-            npm install --no-package-lock > /tmp/dkd_npm5.log 2>&1
-            DKD_INSTALL_CODE=$?
-            if [ "$DKD_INSTALL_CODE" = "0" ]; then
-              npx expo export --platform android --output-dir /tmp/dkd-v007-export > /tmp/dkd_export5.log 2>&1
-              DKD_EXPORT_CODE=$?
-              npx expo-doctor@latest > /tmp/dkd_doctor5.log 2>&1
-              DKD_DOCTOR_CODE=$?
-              npm audit --omit=dev --json > /tmp/dkd_audit5.json 2>/tmp/dkd_audit5.err || true
-            fi
+          DKD_AUDIT_CODE=99
+          if [ "$DKD_FIX_CODE" = "0" ] && [ "$DKD_INSTALL_CODE" = "0" ]; then
+            npx expo export --platform android --output-dir /tmp/dkd-v007-export > /tmp/dkd_export6.log 2>&1
+            DKD_EXPORT_CODE=$?
+            npx expo-doctor@latest > /tmp/dkd_doctor6.log 2>&1
+            DKD_DOCTOR_CODE=$?
+            npm audit --omit=dev --audit-level=high > /tmp/dkd_audit6.log 2>&1
+            DKD_AUDIT_CODE=$?
           fi
-          node - <<'NODE' > /tmp/dkd_audit_summary5.txt 2>/dev/null || true
-          const fs=require('fs');
-          try {
-            const d=JSON.parse(fs.readFileSync('/tmp/dkd_audit5.json','utf8'));
-            console.log(JSON.stringify(d.metadata?.vulnerabilities || {}, null, 2));
-          } catch(e) { console.log('audit_summary_unavailable'); }
-          NODE
-          DKD_PATTERN='DKD_DraBornGo_v0\.0\.[0-6]|DailyReward|daily_reward|Günlük Giriş Ödülü|Günlük Ödül|\bEnerji\b|energy_max|dkd_puan|\bCüzdan\b|wallet_tl|courier_wallet_tl|merchant_wallet_tl|boss_tickets|Özel Kart|Harita=Sandıklar|\bSandıklar\b|\bKoleksiyon\b|CollectionModal|ChestModal|useChestActions|useCollectionActions|useTaskProgress|\bXP\b|\bLVL\b|\bLvl\b|rank_key|Oyuncu Kartı|İLETİ MERKEZİ SMS|dkd_iletimerkezi|sms_otp|Telefon doğrulama|DkdWalletPaymentMethodModal|payment_status|\bÖdeme\b|\bBakiye\b'
+          DKD_PATTERN='DailyReward|daily_reward|Günlük Giriş Ödülü|Günlük Ödül|\benergy\b|\bEnerji\b|energy_max|wallet|\bCüzdan\b|\bBakiye\b|dkd_puan|\bPuan\b|puanlama|Özel Kart|player.?card|Oyuncu Kartı|chest|\bSandıklar\b|collection|\bKoleksiyon\b|payment|\bÖdeme\b|task_state|weekly_task_state|TasksModal|\bGörevler\b|\bXP\b|\bLVL\b|\bLvl\b|rank_key|dkd_iletimerkezi|sms_otp|Telefon doğrulama'
           {
-            echo "DKD v0.0.7 FINAL VALIDATION"
+            echo "DKD v0.0.7 ZERO-REMNANT VALIDATION"
             echo "fix_code=$DKD_FIX_CODE"
             echo "npm_install_code=$DKD_INSTALL_CODE"
             echo "expo_export_android_code=$DKD_EXPORT_CODE"
             echo "expo_doctor_code=$DKD_DOCTOR_CODE"
+            echo "npm_audit_high_code=$DKD_AUDIT_CODE"
             echo
             echo "=== VERSION ==="
             node -e "const a=require('./app.json').expo,p=require('./package.json'); console.log('expo_version='+a.version); console.log('android_versionCode='+a.android.versionCode); console.log('package_version='+p.version);"
             echo
-            echo "=== NPM PRODUCTION AUDIT SUMMARY ==="
-            cat /tmp/dkd_audit_summary5.txt
+            echo "=== EXPO DOCTOR ==="
+            tail -n 100 /tmp/dkd_doctor6.log 2>/dev/null || true
             echo
-            echo "=== EXPO DOCTOR TAIL ==="
-            tail -n 100 /tmp/dkd_doctor5.log 2>/dev/null || true
+            echo "=== NPM PRODUCTION AUDIT ==="
+            tail -n 120 /tmp/dkd_audit6.log 2>/dev/null || true
             echo
-            echo "=== EXPO EXPORT TAIL ==="
-            tail -n 120 /tmp/dkd_export5.log 2>/dev/null || true
+            echo "=== EXPO EXPORT ==="
+            tail -n 80 /tmp/dkd_export6.log 2>/dev/null || true
             echo
-            echo "=== TRACKED LEGACY REFERENCES ==="
-            git grep -nEi "$DKD_PATTERN" -- . ':!scripts/dkd_v007_fix5.py' ':!.github/workflows/dkd_v007_apply_cleanup.yml' || true
+            echo "=== TEXT LEGACY REFERENCES (binary ignored) ==="
+            git grep -I -nEi "$DKD_PATTERN" -- . ':!scripts/dkd_v007_fix6.py' ':!.github/workflows/dkd_v007_apply_cleanup.yml' ':!package-lock.json' || true
             echo
-            echo "=== REMOVED MODULE IMPORT REFERENCES ==="
-            git grep -nE '(features/(dailyReward|chest|collection|tasks|payment)|useDailyRewardState|useEnergyState|awardProfileXp|utils/text|constants/game|useDropState|useHistoryData|AdminDropsModal|AdminLootModal|AdminMarketModal|AdminBossModal|AdminUsersModal)' -- src || true
+            echo "=== LEGACY FILENAMES ==="
+            git ls-files | grep -Ei '(^|/)(daily.?reward|energy|wallet|payment|chest|collection|boss|leaderboard|task|sms|iletimerkezi|player.?card|progression)(/|\.|_)' || true
             echo
-            echo "=== POLICY CONTROLS ==="
-            git grep -nE '(Hesabımı Sil|account-deletion|Topluluk Kuralları|Şikayet et|Engelle|Google Gemini|READ_MEDIA_IMAGES|READ_MEDIA_VIDEO|ACCESS_BACKGROUND_LOCATION)' -- app.json src web || true
-          } > dkd_v007_final_audit.txt
-      - name: Commit final cleanup result
+            echo "=== REMOVED MODULE IMPORTS ==="
+            git grep -I -nE '(features/(dailyReward|chest|collection|tasks|payment)|useDailyRewardState|useEnergyState|awardProfileXp|utils/text|constants/game|useDropState|useHistoryData|AdminDropsModal|AdminLootModal|AdminMarketModal|AdminBossModal|AdminUsersModal|dkd_create_restaurant_order_value)' -- src || true
+          } > dkd_v007_zero_remnant_audit.txt
+      - name: Commit result
         shell: bash
         run: |
           git config user.name 'DraBornGo v0.0.7 Bot'
           git config user.email 'actions@users.noreply.github.com'
           git add -A
-          git commit -m 'DraBornGo v0.0.7 final cleanup and policy audit'
+          git commit -m 'DraBornGo v0.0.7 zero-remnant cleanup'
           git push origin HEAD:main
