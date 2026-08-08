@@ -1,12 +1,12 @@
 DraBornGo v0.0.10 guarded transform: FAIL
 Exit code: 1
-Commit: 5ed7147f70ada132d5ef79c2140059f32c57b52d
+Commit: 072c464d5305b2ed300b212744edcd4ec81d4761
 
 file:///home/runner/work/DraBornGo/DraBornGo/scripts/dkd_v0_0_10_transform.mjs:213
 if (dkd_residual_value.length) throw new Error(`Acil Kurye aktif kaynak kalıntıları: ${dkd_residual_value.join(', ')}`);
                                      ^
 
-Error: Acil Kurye aktif kaynak kalıntıları: src/features/onboarding/dkd_pre_login_intro_screen.js, src/features/serviceNetwork/dkd_service_network_modal.js
+Error: Acil Kurye aktif kaynak kalıntıları: src/features/serviceNetwork/dkd_service_network_modal.js
     at file:///home/runner/work/DraBornGo/DraBornGo/scripts/dkd_v0_0_10_transform.mjs:213:38
     at ModuleJob.run (node:internal/modules/esm/module_job:343:25)
     at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:681:26)
