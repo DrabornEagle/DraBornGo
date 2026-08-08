@@ -6,14 +6,27 @@ const dkd_package_value = JSON.parse(dkd_file_system_module.readFileSync(dkd_pat
 const dkd_app_value = JSON.parse(dkd_file_system_module.readFileSync(dkd_path_module.join(dkd_root_path_value, 'app.json'), 'utf8'));
 const dkd_env_value = JSON.parse(dkd_file_system_module.readFileSync(dkd_path_module.join(dkd_root_path_value, 'config', 'dkd_public_env.defaults.json'), 'utf8'));
 const dkd_error_text_values = [];
+const dkd_expected_permission_values = [
+  'android.permission.ACCESS_COARSE_LOCATION',
+  'android.permission.ACCESS_FINE_LOCATION',
+  'android.permission.CAMERA',
+];
 
-if (dkd_package_value.version !== '0.0.6') dkd_error_text_values.push('package.json version 0.0.6 değil.');
-if (dkd_app_value?.expo?.version !== '0.0.6') dkd_error_text_values.push('app.json expo.version 0.0.6 değil.');
-if (Number(dkd_app_value?.expo?.android?.versionCode) !== 6) dkd_error_text_values.push('Android versionCode 6 değil.');
+if (dkd_package_value.version !== '0.0.8') dkd_error_text_values.push('package.json version 0.0.8 değil.');
+if (dkd_app_value?.expo?.version !== '0.0.8') dkd_error_text_values.push('app.json expo.version 0.0.8 değil.');
+if (Number(dkd_app_value?.expo?.android?.versionCode) !== 8) dkd_error_text_values.push('Android versionCode 8 değil.');
 if (dkd_app_value?.expo?.name !== 'DraBornGo') dkd_error_text_values.push('Uygulama adı DraBornGo değil.');
 if (!String(dkd_package_value?.dependencies?.expo || '').includes('57.0')) dkd_error_text_values.push('Expo SDK 57 bağımlılığı tanımlı değil.');
 if (String(dkd_package_value?.dependencies?.react || '') !== '19.2.3') dkd_error_text_values.push('React 19.2.3 değil.');
 if (!String(dkd_package_value?.dependencies?.['react-native'] || '').startsWith('0.86.')) dkd_error_text_values.push('React Native 0.86.x değil.');
+
+const dkd_android_permission_values = Array.isArray(dkd_app_value?.expo?.android?.permissions)
+  ? [...dkd_app_value.expo.android.permissions].sort()
+  : [];
+const dkd_expected_permission_sorted_values = [...dkd_expected_permission_values].sort();
+if (JSON.stringify(dkd_android_permission_values) !== JSON.stringify(dkd_expected_permission_sorted_values)) {
+  dkd_error_text_values.push('Android izin listesi v0.0.8 güvenli izin setiyle eşleşmiyor.');
+}
 
 for (const dkd_key_name_value of ['EXPO_PUBLIC_SUPABASE_URL', 'EXPO_PUBLIC_SUPABASE_ANON_KEY', 'EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY', 'EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN']) {
   if (!String(dkd_env_value?.[dkd_key_name_value] || '').trim()) dkd_error_text_values.push(`${dkd_key_name_value} boş.`);
@@ -56,4 +69,4 @@ if (dkd_error_text_values.length) {
   console.error(dkd_error_text_values.join('\n'));
   process.exit(1);
 }
-console.log('DKD v0.0.6 kimlik, Expo SDK 57 ve public env doğrulaması başarılı.');
+console.log('DKD v0.0.8 kimlik, Expo SDK 57 ve Google Play izin doğrulaması başarılı.');
