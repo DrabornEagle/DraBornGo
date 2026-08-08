@@ -4,10 +4,11 @@
   "version": "0.0.6",
   "scripts": {
     "start": "expo start",
-    "dkd:start:go": "expo start --go --tunnel --clear",
+    "dkd:syntax:check": "node tools/dkd_syntax_check.mjs",
+    "dkd:start:go": "npm run dkd:syntax:check && expo start --go --tunnel --clear",
     "android": "expo start --android",
     "dkd:deps:fix": "npx expo install --fix",
-    "quality:local": "npx expo install --check && npx expo-doctor"
+    "quality:local": "npm run dkd:syntax:check && npx expo install --check && npx expo-doctor"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.2",
