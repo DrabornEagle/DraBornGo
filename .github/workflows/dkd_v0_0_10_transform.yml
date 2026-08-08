@@ -67,6 +67,18 @@ jobs:
 
           node ./scripts/dkd_v0_0_10_transform.mjs >> "$DKD_LOG_FILE" 2>&1
           DKD_CODE=$?
+
+          if [ "$DKD_CODE" -eq 0 ]; then
+            python3 - <<'PY' >> "$DKD_LOG_FILE" 2>&1
+          from pathlib import Path
+          dkd_path = Path('src/features/serviceNetwork/dkd_service_network_modal.js')
+          dkd_text = dkd_path.read_text()
+          dkd_text = dkd_text.replace("  if (dkd_source_key_value.includes('urgent')) return 'urgent_courier';\n", "")
+          dkd_path.write_text(dkd_text)
+          PY
+            DKD_CODE=$?
+          fi
+
           if [ "$DKD_CODE" -eq 0 ]; then
             npm install --package-lock-only --ignore-scripts >> "$DKD_LOG_FILE" 2>&1 || DKD_CODE=$?
           fi
@@ -99,7 +111,7 @@ jobs:
               echo "Exit code: $DKD_CODE"
               echo "Commit: $GITHUB_SHA"
               echo
-              tail -n 200 "$DKD_LOG_FILE"
+              tail -n 240 "$DKD_LOG_FILE"
             } > audit/dkd_v0_0_10_transform_status.txt
             git add audit/dkd_v0_0_10_transform_status.txt
             git commit -m "audit: record v0.0.10 transform failure" || true
