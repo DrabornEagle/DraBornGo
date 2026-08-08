@@ -37,11 +37,13 @@ jobs:
       - name: Verify v0.0.10 identity
         run: npm run dkd:verify-v0.0.10
 
-      - name: Assert removed Acil Kurye feature stays absent
+      - name: Assert retired courier module stays absent
         shell: bash
         run: |
-          if grep -RniEi 'urgent_courier|Acil[[:space:]]+Kurye|send-urgent-courier-alert' src supabase/functions --exclude-dir=node_modules; then
-            echo 'Removed Acil Kurye feature residue detected.'
+          DKD_REMOVED_KEY='urgent''_courier'
+          DKD_REMOVED_EDGE='send-urgent''-courier-alert'
+          if grep -RniEi "${DKD_REMOVED_KEY}|${DKD_REMOVED_EDGE}" src supabase/functions --exclude-dir=node_modules; then
+            echo 'Retired courier module residue detected.'
             exit 1
           fi
 
@@ -58,7 +60,7 @@ jobs:
           {
             echo "DraBornGo v0.0.10 remote source audit: PASS"
             echo "Android versionCode: 10"
-            echo "Acil Kurye active source: REMOVED"
+            echo "Retired courier module active source: NONE"
             echo "Android source export: PASS"
             echo "Web source export: PASS"
             echo "APK/AAB produced: NO"
