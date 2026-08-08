@@ -1,6 +1,6 @@
 DraBornGo v0.0.10 guarded transform: FAIL
-Exit code: 91
-Commit: 4a14f79d7a8dbe730e80420cec8b470d83f2d3ac
+Exit code: 1
+Commit: d8187f83315904bfdc0bc701bf277e42cfe81adb
 
 DKD residue candidates: src/features/serviceNetwork/dkd_service_network_modal.js
 DKD v0.0.10 transform complete: release identity updated, DraBornGate speedometer identity retained, urgent courier active source removed.
@@ -56,5 +56,118 @@ DKD v0.0.10 kimlik, Expo SDK 57 ve Google Play izin doğrulaması başarılı.
 > node ./scripts/dkd_play_risk_scan.js
 
 DKD Play risk scan temiz: riskli foreground service / background location / audio izi bulunmadı.
-src/features/serviceNetwork/dkd_service_network_modal.js:374:  if (dkd_source_key_value.includes('urgent')) return 'urgent_courier';
-Acil Kurye active-source residue detected.
+
+> draborngo@0.0.10 play:final-audit
+> bash ./scripts/dkd_play_console_final_audit.sh .
+
+DraBornGo release identity: v0.0.10 / Android versionCode 10
+Android permission set: foreground location + camera only
+
+> draborngo@0.0.10 dkd:verify-v0.0.10
+> node ./scripts/dkd_verify_release_identity.mjs
+
+DKD v0.0.10 kimlik, Expo SDK 57 ve Google Play izin doğrulaması başarılı.
+
+> draborngo@0.0.10 dkd:play-risk-scan
+> node ./scripts/dkd_play_risk_scan.js
+
+DKD Play risk scan temiz: riskli foreground service / background location / audio izi bulunmadı.
+npm warn exec The following package was not found and will be installed: expo-doctor@1.20.1
+env: load .env.local .env
+env: export EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN EXPO_PUBLIC_SUPABASE_ANON_KEY EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY EXPO_PUBLIC_SUPABASE_URL
+Running 20 checks on your project...
+20/20 checks passed. No issues detected!
+env: load .env.local .env.production .env
+env: export EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN EXPO_PUBLIC_SUPABASE_ANON_KEY EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY EXPO_PUBLIC_SUPABASE_URL
+React Compiler enabled
+Starting Metro Bundler
+
+Android Bundled 23971ms node_modules/expo/AppEntry.js (1083 modules)
+
+› Assets (28):
+assets/dkd_login/dkd_city_network_opening.png (1.6MB)
+assets/dkd_login/dkd_login_secure_gate.png (1.4MB)
+assets/dkd_onboarding/dkd_intro_city_ecosystem.png (1.5MB)
+assets/dkd_onboarding/dkd_intro_delivery_route.png (1.5MB)
+assets/dkd_onboarding/dkd_intro_live_tracking.png (1.5MB)
+assets/dkd_onboarding/dkd_intro_role_hub.png (1.5MB)
+node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/AntDesign.ttf (130KB)
+node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/Entypo.ttf (66KB)
+node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/EvilIcons.ttf (13KB)
+node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/Feather.ttf (56KB)
+node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/FontAwesome.ttf (166KB)
+node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/FontAwesome5_Brands.ttf (134KB)
+node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/FontAwesome5_Regular.ttf (34KB)
+node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/FontAwesome5_Solid.ttf (203KB)
+node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/FontAwesome6_Brands.ttf (209KB)
+node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/FontAwesome6_Regular.ttf (68KB)
+node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/FontAwesome6_Solid.ttf (424KB)
+node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/Fontisto.ttf (314KB)
+node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/Foundation.ttf (57KB)
+node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/Ionicons.ttf (390KB)
+node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/MaterialCommunityIcons.ttf (1.3MB)
+node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/MaterialIcons.ttf (357KB)
+node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/Octicons.ttf (69KB)
+node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/SimpleLineIcons.ttf (54KB)
+node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/Zocial.ttf (26KB)
+node_modules/@rnmapbox/maps/lib/module/assets/heading.png (3 variations | 450B)
+
+› android bundles (1):
+_expo/static/js/android/AppEntry-9de6e87de35c32de31c586d8c7ab42e5.hbc (4.2MB)
+
+› Files (1):
+metadata.json (1.9KB)
+
+Exported: /home/runner/.cache/draborngo/dkd-play-source-audit
+env: load .env.local .env.production .env
+env: export EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN EXPO_PUBLIC_SUPABASE_ANON_KEY EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY EXPO_PUBLIC_SUPABASE_URL
+React Compiler enabled
+Starting Metro Bundler
+
+Web Bundling failed 20876ms node_modules/expo/AppEntry.js (721 modules)
+
+Error: Unable to resolve module mapbox-gl/dist/mapbox-gl.css from /home/runner/work/DraBornGo/DraBornGo/node_modules/@rnmapbox/maps/lib/module/web/index.js: mapbox-gl/dist/mapbox-gl.css could not be found within the project or in these directories:
+  node_modules
+[0m [90m 1 |[39m [32m"use strict"[39m[33m;[39m
+ [90m 2 |[39m
+[31m[1m>[22m[39m[90m 3 |[39m [36mimport[39m [32m'mapbox-gl/dist/mapbox-gl.css'[39m[33m;[39m
+ [90m   |[39m         [31m[1m^[22m[39m
+ [90m 4 |[39m [36mimport[39m [33mMapboxModule[39m [36mfrom[39m [32m"./MapboxModule.js"[39m[33m;[39m
+ [90m 5 |[39m [36mimport[39m [33mCamera[39m [36mfrom[39m [32m"./components/Camera.js"[39m[33m;[39m
+ [90m 6 |[39m [36mimport[39m [33mMapView[39m [36mfrom[39m [32m"./components/MapView.js"[39m[33m;[39m[0m
+
+Import stack:
+
+ node_modules/@rnmapbox/maps/lib/module/web/index.js
+ | import "mapbox-gl/dist/mapbox-gl.css"
+
+ node_modules/@rnmapbox/maps/lib/module/Mapbox.js
+ | import "./web/index.js"
+
+ node_modules/@rnmapbox/maps/lib/module/index.js
+ | import "./Mapbox"
+
+ src/features/courier/dkd_cargo_live_map_modal.js
+ | import "@rnmapbox/maps"
+
+ src/features/serviceNetwork/dkd_service_network_modal.js
+ | import "../courier/dkd_cargo_live_map_modal"
+
+ src/core/ModalHost.js
+ | import "../features/serviceNetwork/dkd_service_network_modal"
+
+ src/core/AppShell.js
+ | import "./ModalHost"
+
+ src/core/GameFlow.js
+ | import "./AppShell"
+
+ App.js
+ | import "./src/core/GameFlow"
+
+ node_modules/expo/AppEntry.js
+ | import "../../App"
+
+ 
+ | import "./node_modules/expo/AppEntry"
+
