@@ -97,7 +97,6 @@ function dkd_offer_title_value(dkd_job_value) {
 
 function dkd_pickup_text_value(dkd_job_value) {
   return dkd_trim_text_value(dkd_job_value?.pickup)
-    )
     || 'Gönderici noktası';
 }
 
