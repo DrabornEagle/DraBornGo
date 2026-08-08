@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -12,7 +12,7 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import dkd_safe_screen_value from '../components/layout/dkd_safe_screen';
+import dkd_safe_screen_component_value from '../components/layout/dkd_safe_screen';
 import dkd_racing_motorcycle_value from '../components/dkd_racing_motorcycle';
 import { supabase } from '../lib/supabase';
 import dkd_dbg_hub_modal_value from '../features/social/dkd_dbg_hub_modal';
@@ -26,23 +26,14 @@ import { dkd_applications_modal_value } from './dkd_applications_modal';
 import { dkd_policy_modal_value, dkd_help_modal_value } from './dkd_policy_help_modals';
 import { dkd_admin_modal_value } from './dkd_admin_modal';
 
+const DkdSafeScreenValue = dkd_safe_screen_component_value;
+
 function dkd_icon_value(dkd_name_value, dkd_size_value, dkd_color_value) {
   return React.createElement(MaterialCommunityIcons, {
     name: dkd_name_value,
     size: dkd_size_value,
     color: dkd_color_value,
   });
-}
-
-function dkd_status_dot_value({ dkd_active_value }) {
-  return (
-    <View
-      style={[
-        dkd_styles_value.dkd_status_dot_value,
-        { backgroundColor: dkd_active_value ? '#56F2B0' : '#FFD166' },
-      ]}
-    />
-  );
 }
 
 function dkd_operation_card_value({
@@ -62,24 +53,22 @@ function dkd_operation_card_value({
     <Pressable onPress={dkd_on_press_value} style={dkd_styles_value.dkd_operation_press_value}>
       <LinearGradient colors={dkd_gradient_value} style={dkd_styles_value.dkd_operation_value}>
         <View style={dkd_styles_value.dkd_operation_top_value}>
-          <View style={dkd_styles_value.dkd_operation_icons_value}>
-            {dkd_courier_value ? (
-              React.createElement(dkd_racing_motorcycle_value, {
+          {dkd_courier_value
+            ? React.createElement(dkd_racing_motorcycle_value, {
                 dkd_color_value: '#6DE9FF',
                 dkd_size_value: 86,
               })
-            ) : (
-              <View style={dkd_styles_value.dkd_service_icon_cluster_value}>
+            : (
+              <View style={dkd_styles_value.dkd_service_icons_value}>
                 {dkd_icon_value('storefront-outline', 25, '#8CF3C7')}
-                {dkd_icon_value('silverware-fork-knife', 23, '#FFD66E')}
-                {dkd_icon_value('truck-delivery-outline', 23, '#FF8E91')}
-                {dkd_icon_value('wrench-outline', 23, '#7FCBFF')}
+                {dkd_icon_value('silverware-fork-knife', 22, '#FFD66E')}
+                {dkd_icon_value('truck-delivery-outline', 22, '#FF8E91')}
+                {dkd_icon_value('wrench-outline', 22, '#7FCBFF')}
               </View>
             )}
-          </View>
-          <View style={[dkd_styles_value.dkd_operation_tag_value, { borderColor: dkd_accent_value + '66' }]}>
+          <View style={[dkd_styles_value.dkd_tag_value, { borderColor: dkd_accent_value + '66' }]}>
             {dkd_icon_value(dkd_courier_value ? 'timer-outline' : 'access-point', 14, dkd_accent_value)}
-            <Text style={[dkd_styles_value.dkd_operation_tag_text_value, { color: dkd_accent_value }]}>
+            <Text style={[dkd_styles_value.dkd_tag_text_value, { color: dkd_accent_value }]}>
               {dkd_courier_value ? (dkd_active_value ? 'AKTİF' : 'KURYE') : 'HİZMET'}
             </Text>
           </View>
@@ -98,18 +87,18 @@ function dkd_operation_card_value({
 function dkd_quick_tile_value({
   dkd_title_value,
   dkd_subtitle_value,
-  dkd_icon_value: dkd_icon_name_value,
+  dkd_icon_name_value,
   dkd_accent_value,
   dkd_on_press_value,
 }) {
   return (
     <Pressable onPress={dkd_on_press_value} style={dkd_styles_value.dkd_quick_tile_value}>
-      <View style={[dkd_styles_value.dkd_quick_top_line_value, { backgroundColor: dkd_accent_value }]} />
-      <View style={[dkd_styles_value.dkd_quick_icon_shell_value, { backgroundColor: dkd_accent_value + '16' }]}>
+      <View style={[dkd_styles_value.dkd_quick_line_value, { backgroundColor: dkd_accent_value }]} />
+      <View style={[dkd_styles_value.dkd_quick_icon_value, { backgroundColor: dkd_accent_value + '16' }]}>
         {dkd_icon_value(dkd_icon_name_value, 31, dkd_accent_value)}
       </View>
       <Text style={dkd_styles_value.dkd_quick_title_value}>{dkd_title_value}</Text>
-      <Text style={dkd_styles_value.dkd_quick_subtitle_value}>{dkd_subtitle_value}</Text>
+      <Text style={dkd_styles_value.dkd_quick_body_value}>{dkd_subtitle_value}</Text>
       <View style={dkd_styles_value.dkd_quick_footer_value}>
         <Text style={[dkd_styles_value.dkd_quick_open_value, { color: dkd_accent_value }]}>AÇ</Text>
         {dkd_icon_value('arrow-right', 24, dkd_accent_value)}
@@ -193,8 +182,8 @@ export default function dkd_courier_flow_v2_value({ dkd_session_value, dkd_on_si
   }
 
   async function dkd_toggle_online_value() {
-    const dkd_approved_value = String(dkd_profile_value?.courier_status || '') === 'approved';
-    if (!dkd_approved_value) {
+    const dkd_approved_check_value = String(dkd_profile_value?.courier_status || '') === 'approved';
+    if (!dkd_approved_check_value) {
       dkd_set_modal_value('applications');
       return;
     }
@@ -204,7 +193,6 @@ export default function dkd_courier_flow_v2_value({ dkd_session_value, dkd_on_si
       dkd_profile_value,
     });
     dkd_set_home_toggle_busy_value(false);
-
     if (dkd_result_value?.dkd_permission_denied_value) {
       Alert.alert('Konum izni', 'Çevrimiçi olmak için yalnızca uygulama açıkken konum izni gerekir.');
       return;
@@ -230,19 +218,16 @@ export default function dkd_courier_flow_v2_value({ dkd_session_value, dkd_on_si
     dkd_profile_value?.dkd_region || dkd_profile_value?.courier_zone,
   ].filter(Boolean).join(' / ') || 'Bölge seçilmedi';
 
-  const dkd_menu_rows_value = useMemo(() => {
-    const dkd_rows_value = [
-      ['account-circle-outline', 'Profil', 'profile'],
-      ['shield-check-outline', 'Gizlilik ve Güvenlik', 'policy'],
-      ['headset', 'Destek', 'help'],
-    ];
-    if (dkd_is_admin_value) dkd_rows_value.push(['cog-outline', 'Yönetim', 'admin']);
-    return dkd_rows_value;
-  }, [dkd_is_admin_value]);
+  const dkd_menu_rows_value = [
+    ['account-circle-outline', 'Profil', 'profile'],
+    ['shield-check-outline', 'Gizlilik ve Güvenlik', 'policy'],
+    ['headset', 'Destek', 'help'],
+    ...(dkd_is_admin_value ? [['cog-outline', 'Yönetim', 'admin']] : []),
+  ];
 
   return (
     <React.Fragment>
-      <dkd_safe_screen_value style={dkd_styles_value.dkd_safe_value}>
+      <DkdSafeScreenValue style={dkd_styles_value.dkd_safe_value}>
         <ScrollView style={dkd_styles_value.dkd_home_value} contentContainerStyle={dkd_styles_value.dkd_home_content_value} showsVerticalScrollIndicator={false}>
           <LinearGradient colors={['#091425', '#07111D', '#06101A']} style={dkd_styles_value.dkd_identity_value}>
             <View style={dkd_styles_value.dkd_identity_row_value}>
@@ -285,7 +270,6 @@ export default function dkd_courier_flow_v2_value({ dkd_session_value, dkd_on_si
               </View>
               <View style={dkd_styles_value.dkd_online_arrow_value}>{dkd_icon_value('chevron-double-right', 31, '#07111C')}</View>
             </Pressable>
-
             <View style={dkd_styles_value.dkd_search_value}>
               <View style={dkd_styles_value.dkd_search_icon_value}>{dkd_icon_value(dkd_online_value ? 'radar' : 'timer-sand', 25, '#07111C')}</View>
               <View style={{ flex: 1 }}>
@@ -311,7 +295,6 @@ export default function dkd_courier_flow_v2_value({ dkd_session_value, dkd_on_si
             dkd_on_press_value: () => dkd_set_modal_value('courier'),
             dkd_active_value: dkd_online_value,
           })}
-
           {React.createElement(dkd_operation_card_value, {
             dkd_kind_value: 'service',
             dkd_title_value: 'Hizmet Ağı Merkezi',
@@ -323,14 +306,14 @@ export default function dkd_courier_flow_v2_value({ dkd_session_value, dkd_on_si
             {React.createElement(dkd_quick_tile_value, {
               dkd_title_value: 'Başvurular',
               dkd_subtitle_value: 'Kurye, nakliye ve işletme başvurularını yönet',
-              dkd_icon_value: 'bike-fast',
+              dkd_icon_name_value: 'bike-fast',
               dkd_accent_value: '#58D7F0',
               dkd_on_press_value: () => dkd_set_modal_value('applications'),
             })}
             {React.createElement(dkd_quick_tile_value, {
               dkd_title_value: 'Sohbet',
               dkd_subtitle_value: 'DBG mesaj ve ekip sohbetini aç',
-              dkd_icon_value: 'message-text-outline',
+              dkd_icon_name_value: 'message-text-outline',
               dkd_accent_value: '#F05AA7',
               dkd_on_press_value: () => dkd_set_modal_value('chat'),
             })}
@@ -338,7 +321,7 @@ export default function dkd_courier_flow_v2_value({ dkd_session_value, dkd_on_si
 
           <Text style={dkd_styles_value.dkd_region_note_value}>Aktif bölge: {dkd_city_label_value}</Text>
         </ScrollView>
-      </dkd_safe_screen_value>
+      </DkdSafeScreenValue>
 
       <Modal visible={dkd_menu_visible_value} transparent animationType="fade" onRequestClose={() => dkd_set_menu_visible_value(false)}>
         <Pressable style={dkd_styles_value.dkd_menu_backdrop_value} onPress={() => dkd_set_menu_visible_value(false)}>
@@ -452,20 +435,19 @@ const dkd_styles_value = StyleSheet.create({
   dkd_operation_press_value: { marginBottom: 13 },
   dkd_operation_value: { borderRadius: 27, padding: 18, minHeight: 235, borderWidth: 1, borderColor: '#31566D', overflow: 'hidden' },
   dkd_operation_top_value: { flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between' },
-  dkd_operation_icons_value: { minHeight: 82, justifyContent: 'center' },
-  dkd_operation_tag_value: { height: 36, borderRadius: 18, borderWidth: 1, paddingHorizontal: 12, flexDirection: 'row', alignItems: 'center', gap: 5, backgroundColor: 'rgba(4,16,27,0.45)' },
-  dkd_operation_tag_text_value: { fontSize: 11, fontWeight: '900' },
-  dkd_service_icon_cluster_value: { flexDirection: 'row', gap: 9, borderRadius: 15, padding: 10, backgroundColor: 'rgba(74,206,197,0.15)' },
+  dkd_service_icons_value: { flexDirection: 'row', gap: 9, borderRadius: 15, padding: 10, backgroundColor: 'rgba(74,206,197,0.15)' },
+  dkd_tag_value: { height: 36, borderRadius: 18, borderWidth: 1, paddingHorizontal: 12, flexDirection: 'row', alignItems: 'center', gap: 5, backgroundColor: 'rgba(4,16,27,0.45)' },
+  dkd_tag_text_value: { fontSize: 11, fontWeight: '900' },
   dkd_operation_title_value: { color: '#FFFFFF', fontSize: 27, fontWeight: '900', marginTop: 13 },
   dkd_operation_body_value: { color: '#C3CCDB', fontSize: 13, lineHeight: 20, marginTop: 8, maxWidth: '92%' },
   dkd_operation_footer_value: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 'auto', paddingTop: 18 },
   dkd_operation_open_value: { fontSize: 12, fontWeight: '900', letterSpacing: 1.2 },
   dkd_quick_grid_value: { flexDirection: 'row', gap: 12, marginTop: 2 },
   dkd_quick_tile_value: { flex: 1, minHeight: 200, borderRadius: 25, borderWidth: 1, borderColor: '#2B4059', backgroundColor: '#0B1726', padding: 15, overflow: 'hidden' },
-  dkd_quick_top_line_value: { position: 'absolute', left: 20, right: 20, top: 0, height: 4, borderBottomLeftRadius: 4, borderBottomRightRadius: 4 },
-  dkd_quick_icon_shell_value: { width: 52, height: 52, borderRadius: 17, alignItems: 'center', justifyContent: 'center', marginTop: 6 },
+  dkd_quick_line_value: { position: 'absolute', left: 20, right: 20, top: 0, height: 4, borderBottomLeftRadius: 4, borderBottomRightRadius: 4 },
+  dkd_quick_icon_value: { width: 52, height: 52, borderRadius: 17, alignItems: 'center', justifyContent: 'center', marginTop: 6 },
   dkd_quick_title_value: { color: '#FFFFFF', fontSize: 22, fontWeight: '900', marginTop: 17 },
-  dkd_quick_subtitle_value: { color: '#9DAABD', fontSize: 12, lineHeight: 18, marginTop: 7 },
+  dkd_quick_body_value: { color: '#9DAABD', fontSize: 12, lineHeight: 18, marginTop: 7 },
   dkd_quick_footer_value: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 'auto' },
   dkd_quick_open_value: { fontSize: 11, fontWeight: '900' },
   dkd_region_note_value: { color: '#657990', fontSize: 11, textAlign: 'center', marginTop: 22, fontWeight: '700' },
@@ -475,5 +457,4 @@ const dkd_styles_value = StyleSheet.create({
   dkd_menu_title_value: { color: '#FFFFFF', fontSize: 20, fontWeight: '900' },
   dkd_menu_row_value: { minHeight: 54, borderBottomWidth: 1, borderBottomColor: '#1B2A3A', flexDirection: 'row', alignItems: 'center', gap: 11, paddingHorizontal: 8 },
   dkd_menu_row_text_value: { flex: 1, color: '#E7EFF9', fontSize: 14, fontWeight: '800' },
-  dkd_status_dot_value: { width: 8, height: 8, borderRadius: 4 },
 });
