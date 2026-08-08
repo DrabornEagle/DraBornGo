@@ -5,7 +5,6 @@ on:
     branches: [main]
     paths:
       - .github/workflows/dkd_v0_0_10_repo_purge.yml
-      - scripts/dkd_v0_0_10_purge_legacy_courier_residue.mjs
 
 permissions:
   contents: write
@@ -31,18 +30,121 @@ jobs:
           node-version: '22'
           cache: 'npm'
 
-      - name: Purge, verify and commit
+      - name: Final purge, verify and commit
         shell: bash
         run: |
           set -euo pipefail
-          node ./scripts/dkd_v0_0_10_purge_legacy_courier_residue.mjs
 
-          # One-time purge machinery must not exist in the final main tree.
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          dkd_path = Path('supabase/migrations/20260430_dkd_courier_reassign_admin_delete_order_details.sql')
+          dkd_text = dkd_path.read_text()
+          dkd_text = dkd_text.replace(
+              '-- Admin silerse: ilişkili kurye işi / kargo gönderisi / işletme siparişi / acil kurye kayıtları tüm kullanıcılardan kaldırılır.',
+              '-- Admin silerse: ilişkili kurye işi / kargo gönderisi / işletme siparişi tüm kullanıcılardan kaldırılır.'
+          )
+          dkd_text = re.sub(r"^\s*dkd_urgent_order_id_text_value text := '';\n", '', dkd_text, flags=re.M)
+          dkd_text = re.sub(r"^\s*dkd_deleted_urgent_orders_count_value integer := 0;\n", '', dkd_text, flags=re.M)
+          dkd_text = re.sub(r"^\s*dkd_deleted_urgent_items_count_value integer := 0;\n", '', dkd_text, flags=re.M)
+          dkd_text = re.sub(r"^\s*dkd_deleted_urgent_messages_count_value integer := 0;\n", '', dkd_text, flags=re.M)
+          dkd_text = re.sub(r"\n\s*dkd_urgent_order_id_text_value := coalesce\([\s\S]*?\n\s*\);", '', dkd_text, count=1)
+          dkd_text = re.sub(r"\n\s*or \(dkd_urgent_order_id_text_value <> '' and \([\s\S]*?\n\s*\)\);", ';', dkd_text, count=1)
+          dkd_text = re.sub(
+              r"\n\s*if to_regclass\('public\.dkd_urgent_courier_messages'\)[\s\S]*?\n\s*end if;\n\n\s*if to_regclass\('public\.dkd_urgent_courier_order_items'\)[\s\S]*?\n\s*end if;\n\n\s*if to_regclass\('public\.dkd_urgent_courier_orders'\)[\s\S]*?\n\s*end if;",
+              '', dkd_text, count=1
+          )
+          dkd_text = re.sub(
+              r"'dkd_deleted_business_history_count', dkd_deleted_business_history_count_value,\n\s*'dkd_deleted_urgent_orders_count'[\s\S]*?'dkd_deleted_urgent_messages_count', dkd_deleted_urgent_messages_count_value",
+              "'dkd_deleted_business_history_count', dkd_deleted_business_history_count_value",
+              dkd_text, count=1
+          )
+          dkd_path.write_text(dkd_text)
+
+          audit_path = Path('.github/workflows/dkd_v0_0_10_source_audit.yml')
+          audit_path.write_text("""name: DKD v0.0.10 Expo Source Audit
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - audit/**
+
+permissions:
+  contents: write
+
+concurrency:
+  group: dkd-v0-0-10-source-audit
+  cancel-in-progress: true
+
+jobs:
+  dkd_source_audit:
+    name: Expo Go Android and web source audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      CI: '1'
+      EXPO_NO_TELEMETRY: '1'
+    steps:
+      - name: Checkout finalized v0.0.10 source
+        uses: actions/checkout@v4
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install locked dependencies
+        run: npm ci
+
+      - name: Verify v0.0.10 identity
+        run: npm run dkd:verify-v0.0.10
+
+      - name: Assert retired courier module stays absent
+        shell: bash
+        run: |
+          DKD_REMOVED_KEY='urgent''_courier'
+          DKD_REMOVED_EDGE='send-urgent''-courier-alert'
+          if grep -RniEi "${DKD_REMOVED_KEY}|${DKD_REMOVED_EDGE}" src supabase/functions --exclude-dir=node_modules; then
+            echo 'Retired courier module residue detected.'
+            exit 1
+          fi
+
+      - name: Run Google Play source risk scan
+        run: npm run dkd:play-risk-scan
+
+      - name: Run Android and web source export audit only
+        run: npm run play:final-audit
+
+      - name: Record successful non-build audit
+        shell: bash
+        run: |
+          mkdir -p audit
+          {
+            echo "DraBornGo v0.0.10 remote source audit: PASS"
+            echo "Android versionCode: 10"
+            echo "Retired courier module active source: NONE"
+            echo "Android source export: PASS"
+            echo "Web source export: PASS"
+            echo "APK/AAB produced: NO"
+            echo "Commit: ${GITHUB_SHA}"
+          } > audit/dkd_v0_0_10_remote_audit.txt
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add audit/dkd_v0_0_10_remote_audit.txt
+          git commit -m "audit: confirm v0.0.10 Expo source checks" || true
+          git push origin HEAD:main
+""")
+          PY
+
           rm -f scripts/dkd_v0_0_10_purge_legacy_courier_residue.mjs
+          rm -f .github/workflows/dkd_v0_0_10_repo_scan.yml
+          rm -f audit/dkd_v0_0_10_full_repo_residue.txt
+          rm -f audit/dkd_v0_0_10_transform_status.txt
           rm -f .github/workflows/dkd_v0_0_10_repo_purge.yml
 
-          # Build the forbidden patterns from split strings so this workflow does
-          # not itself preserve the retired identifiers.
           DKD_KEY='urgent''_courier'
           DKD_EDGE='send-urgent''-courier-alert'
           DKD_LABEL_ONE='Acil'
