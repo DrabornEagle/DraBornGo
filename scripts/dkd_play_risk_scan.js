@@ -2,8 +2,9 @@ const dkd_file_system_module = require('fs');
 const dkd_path_module = require('path');
 
 const dkd_project_root_path_value = dkd_path_module.resolve(__dirname, '..');
+const dkd_app_json_path_value = dkd_path_module.join(dkd_project_root_path_value, 'app.json');
 const dkd_scan_root_path_list_value = [
-  dkd_path_module.join(dkd_project_root_path_value, 'app.json'),
+  dkd_app_json_path_value,
   dkd_path_module.join(dkd_project_root_path_value, 'app.config.js'),
   dkd_path_module.join(dkd_project_root_path_value, 'plugins'),
   dkd_path_module.join(dkd_project_root_path_value, 'src'),
@@ -66,8 +67,24 @@ function dkd_collect_file_paths_value(dkd_scan_path_value) {
   return dkd_file_path_list_value;
 }
 
+function dkd_read_scan_text_value(dkd_file_path_value) {
+  if (dkd_path_module.resolve(dkd_file_path_value) !== dkd_path_module.resolve(dkd_app_json_path_value)) {
+    return dkd_file_system_module.readFileSync(dkd_file_path_value, 'utf8');
+  }
+
+  // `android.blockedPermissions` is a deny-list: those strings are present in
+  // app.json specifically so Expo removes them from the generated manifest.
+  // Remove only that deny-list before searching the rest of the app config.
+  const dkd_app_config_value = JSON.parse(dkd_file_system_module.readFileSync(dkd_file_path_value, 'utf8'));
+  const dkd_android_config_value = dkd_app_config_value?.expo?.android;
+  if (dkd_android_config_value && Object.prototype.hasOwnProperty.call(dkd_android_config_value, 'blockedPermissions')) {
+    delete dkd_android_config_value.blockedPermissions;
+  }
+  return JSON.stringify(dkd_app_config_value);
+}
+
 function dkd_scan_file_value(dkd_file_path_value) {
-  const dkd_file_text_value = dkd_file_system_module.readFileSync(dkd_file_path_value, 'utf8');
+  const dkd_file_text_value = dkd_read_scan_text_value(dkd_file_path_value);
   const dkd_match_list_value = [...new Set(dkd_file_text_value.match(dkd_risk_pattern_value) || [])];
 
   if (dkd_match_list_value.length === 0) {
@@ -92,4 +109,4 @@ if (dkd_result_list_value.length > 0) {
   process.exit(1);
 }
 
-console.log('DKD Play risk scan temiz: riskli foreground service / background location / audio izi bulunmadı.');
+console.log('DKD Play risk scan temiz: etkin foreground service / background location / audio izi bulunmadı.');

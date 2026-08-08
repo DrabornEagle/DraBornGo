@@ -1,0 +1,102 @@
+name: DKD v0.0.11 Full Source Audit
+
+on:
+  push:
+    branches: [main, release/v0.0.11-20260808]
+    paths-ignore:
+      - audit/**
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: dkd-v0-0-11-source-audit-${{ github.event_name }}-${{ github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  dkd_source_audit:
+    name: Expo Go Android, web and full-tree audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      CI: '1'
+      EXPO_NO_TELEMETRY: '1'
+    steps:
+      - name: Checkout finalized v0.0.11 source
+        uses: actions/checkout@v4
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install locked dependencies
+        run: npm ci
+
+      - name: Synchronize package-lock release identity
+        run: |
+          npm run dkd:lock:sync
+          node - <<'NODE'
+          const lock = require('./package-lock.json');
+          if (lock.version !== '0.0.11') throw new Error(`Unexpected package-lock version: ${lock.version}`);
+          if (lock.packages?.['']?.version !== '0.0.11') throw new Error(`Unexpected package-lock root package version: ${lock.packages?.['']?.version}`);
+          NODE
+
+      - name: Verify v0.0.11 identity
+        run: npm run dkd:verify-v0.0.11
+
+      - name: Assert retired courier module stays absent from full main tree
+        shell: bash
+        run: |
+          DKD_REMOVED_KEY='urgent''_courier'
+          DKD_REMOVED_EDGE='send-urgent''-courier-alert'
+          DKD_LABEL_ONE='Acil'
+          DKD_LABEL_TWO='Kurye'
+          if grep -RniEi "${DKD_REMOVED_KEY}|${DKD_REMOVED_EDGE}|${DKD_LABEL_ONE}[[:space:]]+${DKD_LABEL_TWO}" . \
+              --exclude-dir=.git \
+              --exclude-dir=node_modules; then
+            echo 'Retired courier module residue detected in source tree.'
+            exit 1
+          fi
+
+      - name: Assert Admin Support Queue stays removed
+        shell: bash
+        run: |
+          if grep -RniF 'dkd_support_admin_queue_modal' src --exclude-dir=node_modules; then
+            echo 'Retired Admin Support Queue component reference detected.'
+            exit 1
+          fi
+          if grep -RniF 'Destek Kuyruğu' src/features/admin --exclude-dir=node_modules; then
+            echo 'Retired Admin Support Queue label detected in admin surfaces.'
+            exit 1
+          fi
+
+      - name: Run Google Play source risk scan
+        run: npm run dkd:play-risk-scan
+
+      - name: Run Android and web source export audit only
+        run: npm run play:final-audit
+
+      - name: Record successful non-build audit
+        if: github.event_name == 'push'
+        shell: bash
+        run: |
+          mkdir -p audit
+          {
+            echo "DraBornGo v0.0.11 remote source audit: PASS"
+            echo "Android versionCode: 11"
+            echo "Package lock identity: v0.0.11"
+            echo "Admin Support Queue removal scan: PASS"
+            echo "Android source export: PASS"
+            echo "Web source export: PASS"
+            echo "APK/AAB produced: NO"
+            echo "Commit: ${GITHUB_SHA}"
+          } > audit/dkd_v0_0_11_remote_audit.txt
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add package-lock.json audit/dkd_v0_0_11_remote_audit.txt
+          git commit -m "audit: confirm v0.0.11 Expo source checks" || true
+          git push origin "HEAD:${GITHUB_REF_NAME}"

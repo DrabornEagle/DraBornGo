@@ -4,7 +4,6 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import SecondaryButton from '../../components/ui/SecondaryButton';
 import { cityLootTheme } from '../../theme/cityLootTheme';
-import dkd_support_admin_queue_modal from '../support/dkd_support_admin_queue_modal';
 import dkd_social_moderation_admin_modal from './dkd_social_moderation_admin_modal';
 
 function DkdAction({ icon, title, sub, onPress }) {
@@ -23,7 +22,6 @@ function DkdAction({ icon, title, sub, onPress }) {
 }
 
 export default function AdminMenuModal({ visible, onClose, onCourier, onApplications }) {
-  const [supportOpen, setSupportOpen] = useState(false);
   const [moderationOpen, setModerationOpen] = useState(false);
 
   return (
@@ -35,7 +33,7 @@ export default function AdminMenuModal({ visible, onClose, onCourier, onApplicat
               <View style={{ flex: 1 }}>
                 <Text style={styles.kicker}>CONTROL TOWER</Text>
                 <Text style={styles.title}>Admin Komuta Güvertesi</Text>
-                <Text style={styles.sub}>Kurye, başvuru, destek ve moderasyon operasyonlarını buradan yönet.</Text>
+                <Text style={styles.sub}>Kurye, başvuru ve moderasyon operasyonlarını buradan yönet.</Text>
               </View>
               <SecondaryButton label="Kapat" onPress={onClose} size="compact" fullWidth={false} />
             </View>
@@ -43,14 +41,12 @@ export default function AdminMenuModal({ visible, onClose, onCourier, onApplicat
             <ScrollView contentContainerStyle={{ paddingTop: 18, gap: 10 }}>
               <DkdAction icon="truck-fast-outline" title="Kurye Operasyonları" sub="Kurye ve teslimat merkezini aç" onPress={onCourier} />
               <DkdAction icon="clipboard-account-outline" title="Başvurular" sub="Kurye ve nakliye başvurularını incele" onPress={onApplications} />
-              <DkdAction icon="headset" title="Destek Kuyruğu" sub="Destek taleplerini incele ve yanıtla" onPress={() => setSupportOpen(true)} />
               <DkdAction icon="shield-alert-outline" title="Moderasyon Kuyruğu" sub="Sosyal rapor ve şikayetleri incele" onPress={() => setModerationOpen(true)} />
             </ScrollView>
           </LinearGradient>
         </View>
       </Modal>
 
-      {React.createElement(dkd_support_admin_queue_modal, { visible: supportOpen, onClose: () => setSupportOpen(false) })}
       {React.createElement(dkd_social_moderation_admin_modal, { visible: moderationOpen, onClose: () => setModerationOpen(false) })}
     </>
   );

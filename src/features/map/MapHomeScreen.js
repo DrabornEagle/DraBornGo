@@ -12,7 +12,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Image } from 'expo-image';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-const dkd_version_text_value = 'v0.0.10';
+const dkd_version_text_value = 'v0.0.11';
 
 function DkdAnimatedPressable({ dkd_children_value, dkd_on_press_value, dkd_style_value, dkd_disabled_value = false }) {
   const dkd_scale_value = useRef(new Animated.Value(1)).current;
