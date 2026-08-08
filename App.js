@@ -17,6 +17,7 @@ const dkd_ignore_pattern_list_value = [
   'expo-notifications: Android Push notifications (remote notifications) functionality provided by expo-notifications was removed from Expo Go',
   'expo-notifications: Android Push notifications',
   '`expo-notifications` functionality is not fully supported in Expo Go',
+  'dkd courier online watcher skipped',
 ];
 
 LogBox.ignoreLogs(dkd_ignore_pattern_list_value);
