@@ -1,10 +1,12 @@
 {
-  "dkd_latest_version_name": "0.0.6",
-  "dkd_latest_version_code": 6,
-  "dkd_min_supported_version_code": 5,
+  "dkd_latest_version_name": "0.0.8",
+  "dkd_latest_version_code": 8,
+  "dkd_min_supported_version_code": 7,
   "dkd_update_required": false,
+  "dkd_distribution_channel": "expo-go-test",
+  "dkd_target_android_api": 36,
   "dkd_apk_url": "",
   "dkd_download_page_url": "https://play.google.com/store/apps/details?id=com.draborneagle.draborngo",
   "dkd_sha256": "",
-  "dkd_release_notes": "DraBornGo v0.0.6 Expo SDK 57 test sürümü. APK/AAB üretilmiyor; Google Play dağıtımında güncellemeler yalnızca Google Play üzerinden sunulacaktır."
+  "dkd_release_notes": "DraBornGo v0.0.8: Login tasarımı korunarak Ana Sayfa ve ortak arayüz kurye temalı modern renklerle yenilendi; Ana Sayfa Destek Paneli kaldırıldı; Google Play izin/politika ve web sürüm kaynakları güncellendi. Expo Go test aşamasında APK/AAB üretilmez."
 }
