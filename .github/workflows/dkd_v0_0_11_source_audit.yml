@@ -2,7 +2,7 @@ name: DKD v0.0.11 Full Source Audit
 
 on:
   push:
-    branches: [main]
+    branches: [main, release/v0.0.11-20260808]
     paths-ignore:
       - audit/**
 
@@ -10,7 +10,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: dkd-v0-0-11-source-audit
+  group: dkd-v0-0-11-source-audit-${{ github.ref_name }}
   cancel-in-progress: true
 
 jobs:
@@ -96,4 +96,4 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add package-lock.json audit/dkd_v0_0_11_remote_audit.txt
           git commit -m "audit: confirm v0.0.11 Expo source checks" || true
-          git push origin HEAD:main
+          git push origin "HEAD:${GITHUB_REF_NAME}"
