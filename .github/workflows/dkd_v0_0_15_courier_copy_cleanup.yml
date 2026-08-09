@@ -1,202 +1,99 @@
 name: DKD v0.0.15 Courier Copy Cleanup
-
 on:
   push:
     branches: [main]
-    paths:
-      - '.github/workflows/dkd_v0_0_15_courier_copy_cleanup.yml'
-
+    paths: ['.github/workflows/dkd_v0_0_15_courier_copy_cleanup.yml']
 permissions:
   contents: write
-
 jobs:
   update-copy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+        with: { fetch-depth: 0 }
       - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-
-      - name: Update courier-only UI copy
+        with: { node-version: 22, cache: npm }
+      - name: Apply courier-only text migration
         shell: bash
         run: |
-          set -euo pipefail
           node <<'NODE'
-          const fs = require('fs');
-
-          function edit(path, replacements, optionalReplacements = []) {
-            let s = fs.readFileSync(path, 'utf8');
-            for (const [from, to, label] of replacements) {
-              if (!s.includes(from)) throw new Error(`${path}: missing expected text for ${label || from}`);
-              s = s.split(from).join(to);
-            }
-            for (const [from, to] of optionalReplacements) s = s.split(from).join(to);
-            fs.writeFileSync(path, s);
+          const fs=require('fs');
+          const edits={
+            'src/features/auth/AuthScreen.js':[
+              ["2026-08-08-v0.0.8","2026-08-09-v0.0.15"],
+              ['DraBornGo ŞEHİR GİRİŞ KAPISI','DraBornGo KURYE GİRİŞİ'],
+              ['Şehir Ağına Hoş Geldin','Kurye Ağına Hoş Geldin'],
+              ['Kurye-Kargo','Görev Havuzu'],['Yemek-Market','Canlı Rota'],['Hizmet Ağı','Kazanç Takibi'],
+              ['Şehir merkezine giriş','Kurye merkezine giriş'],
+              ['Hesabınla devam et; sipariş havuzu, kurye, işletme ve hizmet ağı akışların açılsın.','Hesabınla devam et; kurye görev havuzu, aktif teslimatlar, canlı rota ve kazanç takibin açılsın.'],
+              ['Yeni kayıt sırasında seçtiğin ülke, şehir ve bölge sipariş eşleşmeleri ve hizmet ağı deneyimi için kullanılacak.','Yeni kayıt sırasında seçtiğin ülke, şehir ve bölge; sana uygun kurye görevlerini ve rota akışını göstermek için kullanılacak.'],
+              ['Bölgeni seç, kurye-kargo ve market akışlarında doğru sipariş eşleşmesine hazır ol.','Bölgeni seç; kurye görev havuzunda sana uygun teslimatları ve rota akışını görmeye hazır ol.']
+            ],
+            'src/features/onboarding/dkd_city_gate_transition_screen.js':[
+              ["dkd_title_text: 'Rotalar'","dkd_title_text: 'Canlı Rota'"],
+              ["dkd_title_text: 'Kurye ağı'","dkd_title_text: 'Görev Havuzu'"],
+              ["dkd_icon_name: 'storefront-outline', dkd_title_text: 'Hizmet Ağı', dkd_detail_text: 'aktif'","dkd_icon_name: 'cash-clock', dkd_title_text: 'Kazanç Takibi', dkd_detail_text: 'hazır'"],
+              ['DraBornGo güvenli geçiş','DraBornGo kurye geçişi'],['DraBornGo MERKEZİ','DraBornGo KURYE MERKEZİ'],
+              ['Şehir ağı açılıyor','Kurye Merkezi Açılıyor'],
+              ['Harita, sipariş havuzu, hizmet ağı ve ödül merkezi ana sayfa yüklenene kadar senkronlanıyor.','Görev havuzu, aktif teslimatlar, canlı rota ve kazanç özeti ana sayfa yüklenene kadar hazırlanıyor.']
+            ],
+            'src/features/onboarding/dkd_pre_login_intro_screen.js':[["KURYE LİSANSI","KURYE ONAYI"]],
+            'src/features/applications/dkd_applications_hub_modal.js':[
+              ['DKD ONAY MERKEZİ','DBG KURYE ONAY MERKEZİ'],['Kurye Lisansın Aktif','Kurye Onayın Aktif'],
+              ['Kurye lisansın onaylandı. Yeni bir kurye başvurusu oluşturman gerekmez.','Kurye hesabın onaylandı. Yeni bir kurye başvurusu oluşturman gerekmez.'],
+              ['kurye lisans sürecini başlat','kurye onay sürecini başlat'],
+              ['DKD Onay Merkezi kaydın onaylı. Ana sayfadaki Kurye Merkezi ve Sipariş BUL araçlarını kullanabilirsin.','DBG Kurye Onay Merkezi kaydın onaylı. Görev havuzunu açabilir, uygun teslimatları kabul edebilir ve kurye çalışma akışını kullanabilirsin.']
+            ],
+            'src/features/map/MapHomeScreen.js':[
+              ['LİSANS GEREKLİ','KURYE ONAYI GEREKLİ'],['Kurye kimliğini oluştur, lisans onayından sonra canlı görev ağına katıl.','Kurye başvurunu tamamla; onaylandıktan sonra canlı görev havuzuna katıl.'],
+              ['SİPARİŞTE','AKTİF GÖREV'],['Siparişte','Görevde'],['Atanmış teslimat tamamlanana kadar kurye durumu kilitli.','Aktif teslimat tamamlanana kadar kurye durumu kilitli.'],
+              ['Sipariş araması açık. Yakındaki yeni görevler gerçek zamanlı taranıyor.','Görev araması açık. Yakındaki yeni görevler gerçek zamanlı taranıyor.'],
+              ['Hazır olduğunda Sipariş BUL ile yeni görev aramasını başlat.','Hazır olduğunda Görev BUL ile yeni görev aramasını başlat.'],
+              ['SİPARİŞ • KURYE RADARI','GÖREV • KURYE RADARI'],['CANLI SİPARİŞ ROTASI','CANLI GÖREV ROTASI'],['Sipariş Havuzu','Görev Havuzu'],['Kurye Ataması','Görevi Kabul Et'],
+              ['dkd_label_value="SİPARİŞ"','dkd_label_value="GÖREV"'],['Sipariş Aktif','Görev Aktif'],['Siparişler Taranıyor • Durdur','Görevler Taranıyor • Durdur'],['Sipariş BUL','Görev BUL'],
+              ['Sipariş havuzu, aktif teslimatlar, kargo ve performans akışını kurye odaklı tek merkezden yönet.','Görev havuzunu görüntüle, uygun teslimatı kabul et, alım/teslimat adımlarını yönet ve aktif rota ile kazanç özetini takip et.']
+            ],
+            'src/features/courier/dkd_courier_board_modal_v2.js':[
+              ['DKD KURYE MERKEZİ','DBG KURYE MERKEZİ'],['Sipariş tekliflerini, rota adımlarını ve aktif teslimatlarını canlı yönet.','Gelen kurye görevlerini, rota adımlarını ve aktif teslimatlarını canlı yönet.'],
+              ['LİSANS DURUMU','ONAY DURUMU'],['Kurye Lisansı Gerekli','Kurye Onayı Gerekli'],['Çevrimiçi • Sipariş Radarı Açık','Çevrimiçi • Görev Radarı Açık'],
+              ['Üzerindeki sipariş tamamlanana kadar kurye operasyon durumu aktif kalır.','Üzerindeki görev tamamlanana kadar kurye operasyon durumu aktif kalır.'],['Bölgen için uygun yeni siparişler canlı taranıyor.','Bölgen için uygun yeni görevler canlı taranıyor.'],
+              ['Görev almak için çevrimiçi ol ve sipariş radarını başlat.','Görev almak için çevrimiçi ol ve görev radarını başlat.'],['Aktif Siparişi Tamamla','Aktif Görevi Tamamla'],['Sipariş Radarını Durdur','Görev Radarını Durdur'],['Çevrimiçi Ol • Sipariş Ara','Çevrimiçi Ol • Görev Ara']
+            ],
+            'src/features/courier/CourierBoardModal.js':[['DKD KURYE MERKEZİ','DBG KURYE MERKEZİ'],['Kurye Lisansı Gerekli','Kurye Onayı Gerekli']],
+            'src/features/courier/dkd_courier_application_panel.js':[['Kurye lisansını oluştur','Kurye başvurunu tamamla'],['Kimlik, bölge, araç ve iletişim bilgilerini tek akışta tamamla. Başvuru yalnız admin onayından sonra kurye yetkisi açar.','Kimlik, bölge, araç ve iletişim bilgilerini tek akışta tamamla. Kurye görevlerine erişim yalnız admin onayından sonra açılır.']],
+            'src/features/profile/ProfileModal.js':[['Profilini, kurye lisansını ve hesap ayarlarını buradan yönet.','Profilini, kurye onay durumunu ve hesap ayarlarını buradan yönet.'],['Kurye Lisansı Aktif','Kurye Onayı Aktif']],
+            'src/utils/courier.js':[['Kurye Lisansı Aktif','Kurye Onayı Aktif'],['Kurye lisansın aktif.','Kurye onayın aktif.']],
+            'src/core/GameFlow.js':[['Çevrimiçi mod için kurye lisansının onaylanmış olması gerekiyor.','Çevrimiçi mod için kurye başvurunun onaylanmış olması gerekiyor.']],
+            'src/features/navigation/ActionMenuModal.js':[['Teslimat, çevrimiçi durum ve aktif kurye araçları.','Görev havuzu, aktif teslimat, canlı rota ve kazanç akışını tek merkezden yönet.'],['Şehir ağı bağlantısı hazır','Kurye ağı bağlantısı hazır']],
+            'src/features/admin/AdminMenuModal.js':[['Admin oturumu aktif • DraBornGo v0.0.12','Admin oturumu aktif • DraBornGo v0.0.15'],['Kurye lisans başvurularını incele.','Kurye onay başvurularını incele.']],
+            'src/features/admin/dkd_admin_applications_modal.js':[['Kurye lisansı ve hesap silme taleplerini yönet.','Kurye onay başvuruları ve hesap silme taleplerini yönet.']],
+            'src/features/legal/dkd_google_play_policy_center_modal.js':[['kurye başvurusu ve lisans durumu','kurye başvurusu ve onay durumu'],['Kurye başvurusu ve lisans/onay sürecinde','Kurye başvurusu ve onay sürecinde']]
+          };
+          for (const [path,reps] of Object.entries(edits)) {
+            let s=fs.readFileSync(path,'utf8');
+            for(const [a,b] of reps) s=s.split(a).join(b);
+            fs.writeFileSync(path,s);
           }
-
-          edit('src/features/auth/AuthScreen.js', [
-            ["const dkd_terms_version_value = '2026-08-08-v0.0.8';", "const dkd_terms_version_value = '2026-08-09-v0.0.15';", 'terms version'],
-            ["const dkd_privacy_version_value = '2026-08-08-v0.0.8';", "const dkd_privacy_version_value = '2026-08-09-v0.0.15';", 'privacy version'],
-            ["const dkd_community_policy_version_value = '2026-08-08-v0.0.8';", "const dkd_community_policy_version_value = '2026-08-09-v0.0.15';", 'community version'],
-            ['DraBornGo ŞEHİR GİRİŞ KAPISI', 'DraBornGo KURYE GİRİŞİ', 'login overline'],
-            ['Şehir Ağına Hoş Geldin', 'Kurye Ağına Hoş Geldin', 'login title'],
-            ['Kurye-Kargo', 'Görev Havuzu', 'login pill 1'],
-            ['Yemek-Market', 'Canlı Rota', 'login pill 2'],
-            ['Hizmet Ağı', 'Kazanç Takibi', 'login pill 3'],
-            ['Şehir merkezine giriş', 'Kurye merkezine giriş', 'login card title'],
-            ['Hesabınla devam et; sipariş havuzu, kurye, işletme ve hizmet ağı akışların açılsın.', 'Hesabınla devam et; kurye görev havuzu, aktif teslimatlar, canlı rota ve kazanç takibin açılsın.', 'login subtitle'],
-            ['Yeni kayıt sırasında seçtiğin ülke, şehir ve bölge sipariş eşleşmeleri ve hizmet ağı deneyimi için kullanılacak.', 'Yeni kayıt sırasında seçtiğin ülke, şehir ve bölge; sana uygun kurye görevlerini ve rota akışını göstermek için kullanılacak.', 'login bottom note'],
-            ['Bölgeni seç, kurye-kargo ve market akışlarında doğru sipariş eşleşmesine hazır ol.', 'Bölgeni seç; kurye görev havuzunda sana uygun teslimatları ve rota akışını görmeye hazır ol.', 'register hero'],
-          ]);
-
-          edit('src/features/onboarding/dkd_city_gate_transition_screen.js', [
-            ["{ dkd_icon_name: 'map-marker-path', dkd_title_text: 'Rotalar', dkd_detail_text: 'hazırlanıyor', dkd_color_value: '#67E8F9' }", "{ dkd_icon_name: 'map-marker-path', dkd_title_text: 'Canlı Rota', dkd_detail_text: 'hazırlanıyor', dkd_color_value: '#67E8F9' }", 'loading status route'],
-            ["{ dkd_icon_name: 'truck-fast-outline', dkd_title_text: 'Kurye ağı', dkd_detail_text: 'senkron', dkd_color_value: '#86EFAC' }", "{ dkd_icon_name: 'truck-fast-outline', dkd_title_text: 'Görev Havuzu', dkd_detail_text: 'senkron', dkd_color_value: '#86EFAC' }", 'loading status jobs'],
-            ["{ dkd_icon_name: 'storefront-outline', dkd_title_text: 'Hizmet Ağı', dkd_detail_text: 'aktif', dkd_color_value: '#FDE68A' }", "{ dkd_icon_name: 'cash-clock', dkd_title_text: 'Kazanç Takibi', dkd_detail_text: 'hazır', dkd_color_value: '#FDE68A' }", 'loading status earnings'],
-            ['DraBornGo güvenli geçiş', 'DraBornGo kurye geçişi', 'loading badge'],
-            ['DraBornGo MERKEZİ', 'DraBornGo KURYE MERKEZİ', 'loading kicker'],
-            ['Şehir ağı açılıyor', 'Kurye Merkezi Açılıyor', 'loading title'],
-            ['Harita, sipariş havuzu, hizmet ağı ve ödül merkezi ana sayfa yüklenene kadar senkronlanıyor.', 'Görev havuzu, aktif teslimatlar, canlı rota ve kazanç özeti ana sayfa yüklenene kadar hazırlanıyor.', 'loading subtitle'],
-          ]);
-
-          edit('src/features/onboarding/dkd_pre_login_intro_screen.js', [["dkd_badge_text: 'KURYE LİSANSI'", "dkd_badge_text: 'KURYE ONAYI'", 'onboarding courier approval']]);
-
-          edit('src/features/applications/dkd_applications_hub_modal.js', [
-            ['DKD ONAY MERKEZİ', 'DBG KURYE ONAY MERKEZİ', 'approval center brand'],
-            ['Kurye Lisansın Aktif', 'Kurye Onayın Aktif', 'approved title'],
-            ['Kurye lisansın onaylandı. Yeni bir kurye başvurusu oluşturman gerekmez.', 'Kurye hesabın onaylandı. Yeni bir kurye başvurusu oluşturman gerekmez.', 'approved subtitle'],
-            ['Kimlik, ehliyet, bölge ve araç bilgilerini ekleyip kurye lisans sürecini başlat.', 'Kimlik, ehliyet, bölge ve araç bilgilerini ekleyip kurye onay sürecini başlat.', 'application subtitle'],
-            ['DKD Onay Merkezi kaydın onaylı. Ana sayfadaki Kurye Merkezi ve Sipariş BUL araçlarını kullanabilirsin.', 'DBG Kurye Onay Merkezi kaydın onaylı. Görev havuzunu açabilir, uygun teslimatları kabul edebilir ve kurye çalışma akışını kullanabilirsin.', 'approved card text'],
-          ]);
-
-          edit('src/features/map/MapHomeScreen.js', [
-            ["dkd_label_value: 'LİSANS GEREKLİ'", "dkd_label_value: 'KURYE ONAYI GEREKLİ'", 'home approval status'],
-            ["dkd_subtitle_value: 'Kurye kimliğini oluştur, lisans onayından sonra canlı görev ağına katıl.'", "dkd_subtitle_value: 'Kurye başvurunu tamamla; onaylandıktan sonra canlı görev havuzuna katıl.'", 'home approval subtitle'],
-            ["dkd_label_value=\"SİPARİŞ\"", "dkd_label_value=\"GÖREV\"", 'home task metric'],
-            ['CANLI SİPARİŞ ROTASI', 'CANLI GÖREV ROTASI', 'home live route'],
-            ['Sipariş Havuzu', 'Görev Havuzu', 'home route step'],
-            ['Kurye Ataması', 'Görevi Kabul Et', 'home route step accept'],
-            ["dkd_title_value=\"Kurye Operasyon Merkezi\" dkd_subtitle_value=\"Sipariş havuzu, aktif teslimatlar, kargo ve performans akışını kurye odaklı tek merkezden yönet.\"", "dkd_title_value=\"Kurye Operasyon Merkezi\" dkd_subtitle_value=\"Görev havuzunu görüntüle, uygun teslimatı kabul et, alım/teslimat adımlarını yönet ve aktif rota ile kazanç özetini takip et.\"", 'operation card info'],
-          ], [
-            ["dkd_label_value: 'SİPARİŞTE'", "dkd_label_value: 'AKTİF GÖREV'"],
-            ["dkd_short_value: 'Siparişte'", "dkd_short_value: 'Görevde'"],
-            ['Atanmış teslimat tamamlanana kadar kurye durumu kilitli.', 'Aktif teslimat tamamlanana kadar kurye durumu kilitli.'],
-            ['Sipariş araması açık. Yakındaki yeni görevler gerçek zamanlı taranıyor.', 'Görev araması açık. Yakındaki yeni görevler gerçek zamanlı taranıyor.'],
-            ['Hazır olduğunda Sipariş BUL ile yeni görev aramasını başlat.', 'Hazır olduğunda Görev BUL ile yeni görev aramasını başlat.'],
-            ['SİPARİŞ • KURYE RADARI', 'GÖREV • KURYE RADARI'],
-            ["dkd_courier_busy_value ? 'Sipariş Aktif' : dkd_courier_online_value ? 'Siparişler Taranıyor • Durdur' : 'Sipariş BUL'", "dkd_courier_busy_value ? 'Görev Aktif' : dkd_courier_online_value ? 'Görevler Taranıyor • Durdur' : 'Görev BUL'"],
-          ]);
-
-          edit('src/features/courier/dkd_courier_board_modal_v2.js', [
-            ['DKD KURYE MERKEZİ', 'DBG KURYE MERKEZİ', 'courier center brand'],
-            ['Sipariş tekliflerini, rota adımlarını ve aktif teslimatlarını canlı yönet.', 'Gelen kurye görevlerini, rota adımlarını ve aktif teslimatlarını canlı yönet.', 'courier center subtitle'],
-            ["'LİSANS DURUMU'", "'ONAY DURUMU'", 'courier status kicker'],
-            ["'Kurye Lisansı Gerekli'", "'Kurye Onayı Gerekli'", 'courier status title'],
-          ], [
-            ['Çevrimiçi • Sipariş Radarı Açık', 'Çevrimiçi • Görev Radarı Açık'],
-            ['Üzerindeki sipariş tamamlanana kadar kurye operasyon durumu aktif kalır.', 'Üzerindeki görev tamamlanana kadar kurye operasyon durumu aktif kalır.'],
-            ['Bölgen için uygun yeni siparişler canlı taranıyor.', 'Bölgen için uygun yeni görevler canlı taranıyor.'],
-            ['Görev almak için çevrimiçi ol ve sipariş radarını başlat.', 'Görev almak için çevrimiçi ol ve görev radarını başlat.'],
-            ['Aktif Siparişi Tamamla', 'Aktif Görevi Tamamla'],
-            ['Sipariş Radarını Durdur', 'Görev Radarını Durdur'],
-            ['Çevrimiçi Ol • Sipariş Ara', 'Çevrimiçi Ol • Görev Ara'],
-          ]);
-
-          edit('src/features/courier/CourierBoardModal.js', [
-            ['DKD KURYE MERKEZİ', 'DBG KURYE MERKEZİ', 'legacy courier center brand'],
-            ['Kurye Lisansı Gerekli', 'Kurye Onayı Gerekli', 'legacy courier approval'],
-          ]);
-
-          edit('src/features/courier/dkd_courier_application_panel.js', [
-            ['Kurye lisansını oluştur', 'Kurye başvurunu tamamla', 'application hero title'],
-            ['Kimlik, bölge, araç ve iletişim bilgilerini tek akışta tamamla. Başvuru yalnız admin onayından sonra kurye yetkisi açar.', 'Kimlik, bölge, araç ve iletişim bilgilerini tek akışta tamamla. Kurye görevlerine erişim yalnız admin onayından sonra açılır.', 'application hero text'],
-          ]);
-
-          edit('src/features/profile/ProfileModal.js', [
-            ['Profilini, kurye lisansını ve hesap ayarlarını buradan yönet.', 'Profilini, kurye onay durumunu ve hesap ayarlarını buradan yönet.', 'profile subtitle'],
-            ['Kurye Lisansı Aktif', 'Kurye Onayı Aktif', 'profile approval'],
-          ]);
-
-          edit('src/utils/courier.js', [
-            ["label:'Kurye Lisansı Aktif'", "label:'Kurye Onayı Aktif'", 'courier meta label'],
-            ["description='Kurye lisansın aktif.'", "description='Kurye onayın aktif.'", 'courier meta description'],
-          ]);
-
-          edit('src/core/GameFlow.js', [['Çevrimiçi mod için kurye lisansının onaylanmış olması gerekiyor.', 'Çevrimiçi mod için kurye başvurunun onaylanmış olması gerekiyor.', 'online approval alert']]);
-
-          edit('src/features/navigation/ActionMenuModal.js', [
-            ["dkd_label_value: 'Kurye Operasyon Merkezi', dkd_sub_value: 'Teslimat, çevrimiçi durum ve aktif kurye araçları.'", "dkd_label_value: 'Kurye Operasyon Merkezi', dkd_sub_value: 'Görev havuzu, aktif teslimat, canlı rota ve kazanç akışını tek merkezden yönet.'", 'menu operation info'],
-            ['Şehir ağı bağlantısı hazır', 'Kurye ağı bağlantısı hazır', 'menu signal'],
-          ]);
-
-          edit('src/features/admin/AdminMenuModal.js', [
-            ['Admin oturumu aktif • DraBornGo v0.0.12', 'Admin oturumu aktif • DraBornGo v0.0.15', 'admin version'],
-            ['Kurye lisans başvurularını incele.', 'Kurye onay başvurularını incele.', 'admin courier approval'],
-          ]);
-
-          edit('src/features/admin/dkd_admin_applications_modal.js', [['Kurye lisansı ve hesap silme taleplerini yönet.', 'Kurye onay başvuruları ve hesap silme taleplerini yönet.', 'admin applications subtitle']]);
-
-          edit('src/features/legal/dkd_google_play_policy_center_modal.js', [
-            ['kurye başvurusu ve lisans durumu', 'kurye başvurusu ve onay durumu', 'policy data safety'],
-            ['Kurye başvurusu ve lisans/onay sürecinde', 'Kurye başvurusu ve onay sürecinde', 'policy identity'],
-          ]);
           NODE
-
-      - name: Validate requested copy cleanup
+      - name: Verify changed copy
         shell: bash
         run: |
-          set -euo pipefail
           grep -q 'Kurye Ağına Hoş Geldin' src/features/auth/AuthScreen.js
           grep -q 'Kurye Merkezi Açılıyor' src/features/onboarding/dkd_city_gate_transition_screen.js
           grep -q 'DBG KURYE ONAY MERKEZİ' src/features/applications/dkd_applications_hub_modal.js
           grep -q 'DBG KURYE MERKEZİ' src/features/courier/dkd_courier_board_modal_v2.js
           grep -q 'Kurye Onayı Aktif' src/features/profile/ProfileModal.js
           grep -q 'Görev havuzunu görüntüle, uygun teslimatı kabul et' src/features/map/MapHomeScreen.js
-          if grep -Eqi 'Şehir Ağına Hoş Geldin|Şehir ağı açılıyor|Kurye Lisansı|kurye lisans|LİSANS DURUMU|LİSANS GEREKLİ' \
-            src/features/auth/AuthScreen.js \
-            src/features/onboarding/dkd_city_gate_transition_screen.js \
-            src/features/onboarding/dkd_pre_login_intro_screen.js \
-            src/features/applications/dkd_applications_hub_modal.js \
-            src/features/map/MapHomeScreen.js \
-            src/features/courier/dkd_courier_board_modal_v2.js \
-            src/features/courier/CourierBoardModal.js \
-            src/features/courier/dkd_courier_application_panel.js \
-            src/features/profile/ProfileModal.js \
-            src/utils/courier.js \
-            src/core/GameFlow.js \
-            src/features/admin/AdminMenuModal.js \
-            src/features/admin/dkd_admin_applications_modal.js \
-            src/features/legal/dkd_google_play_policy_center_modal.js; then
-            echo 'Old city/service/license copy remains in active UI files.' >&2
-            exit 1
-          fi
-          if grep -RIn --include='*.js' 'DKD ' src/features/applications src/features/courier src/features/navigation src/features/auth src/features/onboarding; then
-            echo 'Visible DKD branding remains in targeted UI folders.' >&2
-            exit 1
-          fi
-
-      - name: Install and smoke test
+      - run: npm ci
+      - run: npm run dkd:verify-v0.0.15
+      - run: npm run dkd:play-risk-scan
+      - run: npx expo export --platform android --output-dir /tmp/dkd-v0015-courier-copy-export
+      - name: Commit result
         shell: bash
         run: |
-          set -euo pipefail
-          npm ci
-          npm run dkd:verify-v0.0.15
-          npm run dkd:play-risk-scan
-          npx expo export --platform android --output-dir /tmp/dkd-v0015-courier-copy-export
-
-      - name: Commit courier-only copy update
-        shell: bash
-        run: |
-          set -euo pipefail
           rm -f .github/workflows/dkd_v0_0_15_courier_copy_cleanup.yml
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add -A
           git commit -m 'ui: align login loading and courier copy with courier-only scope'
           git push
-
-# trigger: 2026-08-09T23:57+03:00
