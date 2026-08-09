@@ -81,7 +81,7 @@ function ActionMenuModal({ visible, onClose, isAdmin, canCourier, onCourier, onP
     { dkd_icon_value: 'headset', dkd_label_value: 'DrabornEagle Destek', dkd_sub_value: 'Admin hesabına doğrudan canlı mesaj gönder.', dkd_tone_value: '#703F9B', dkd_on_press_value: () => { onClose?.(); onSupport?.(); } },
     { dkd_icon_value: 'shield-lock-outline', dkd_label_value: 'Gizlilik ve Veri Merkezi', dkd_sub_value: 'Google Play veri güvenliği, izinler ve hesap silme kontrolleri.', dkd_tone_value: '#207E9B', dkd_on_press_value: () => { onClose?.(); onLegalCenter?.(); } },
     { dkd_icon_value: 'cellphone-arrow-down', dkd_label_value: 'Sürüm ve Güncelleme Merkezi', dkd_sub_value: 'Cihazdaki sürümü ve resmi web sürüm bilgisini kontrol et.', dkd_tone_value: '#9A4162', dkd_on_press_value: () => { onClose?.(); dkd_on_app_update_center_value?.(); } },
-    isAdmin ? { dkd_icon_value: 'shield-crown-outline', dkd_label_value: 'Yönetim Merkezi', dkd_sub_value: 'Kullanıcı, kurye, başvuru ve destek operasyonlarını yönet.', dkd_tone_value: '#A56B21', dkd_on_press_value: () => { onClose?.(); onAdmin?.(); } } : null,
+    isAdmin ? { dkd_icon_value: 'shield-crown-outline', dkd_label_value: 'Yönetim Merkezi', dkd_sub_value: 'Kullanıcı, kurye, destek ve operasyon araçlarını yönet.', dkd_tone_value: '#A56B21', dkd_on_press_value: () => { onClose?.(); onAdmin?.(); } } : null,
     { dkd_icon_value: 'logout-variant', dkd_label_value: 'Çıkış Yap', dkd_sub_value: 'Bu cihazdaki DraBornGo oturumunu güvenli biçimde kapat.', dkd_tone_value: '#8B3348', dkd_danger_value: true, dkd_on_press_value: () => { onClose?.(); onLogout?.(); } },
   ].filter(Boolean), [canCourier, isAdmin, onClose, onCourier, onProfile, onSupport, onAdmin, onLegalCenter, dkd_on_app_update_center_value, onLogout]);
 
@@ -98,7 +98,7 @@ function ActionMenuModal({ visible, onClose, isAdmin, canCourier, onCourier, onP
             <View style={styles.dkd_orb_one} /><View style={styles.dkd_orb_two} />
             <View style={styles.dkd_header}>
               <View style={styles.dkd_header_icon}><MaterialCommunityIcons name="routes" size={28} color="#07111C" /></View>
-              <View style={styles.dkd_header_copy}><Text style={styles.dkd_header_kicker}>DraBornGo v0.0.15</Text><Text style={styles.dkd_header_title}>Merkez Menü</Text><Text style={styles.dkd_header_sub}>Kurye ağı, kazanç, destek ve hesap araçlarına hızlı geçiş.</Text></View>
+              <View style={styles.dkd_header_copy}><Text style={styles.dkd_header_kicker}>DraBornGo v0.0.16</Text><Text style={styles.dkd_header_title}>Merkez Menü</Text><Text style={styles.dkd_header_sub}>Kurye ağı, kazanç, destek ve hesap araçlarına hızlı geçiş.</Text></View>
               <Pressable onPress={onClose} style={styles.dkd_close_button}><MaterialCommunityIcons name="close" size={23} color="#FFFFFF" /></Pressable>
             </View>
             <View style={styles.dkd_signal_strip}><View style={styles.dkd_signal_dot} /><Text style={styles.dkd_signal_text}>Kurye ağı bağlantısı hazır</Text><MaterialCommunityIcons name="access-point" size={18} color="#70E7BB" /></View>

@@ -1,4 +1,0 @@
-DraBornGo v0.0.16
-Android versionCode 3
-Requested UI source patch trigger.
-Retry: source-only workflow-safe patch.
