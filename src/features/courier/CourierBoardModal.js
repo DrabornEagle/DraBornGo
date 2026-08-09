@@ -139,7 +139,7 @@ function CourierBoardModal({ visible, onClose, profile, currentLocation, session
       <StatusBar barStyle="light-content" />
       <SafeScreen style={dkd_styles_value.screen}>
         <LinearGradient colors={['#030914', '#071A2E', '#160B2D']} style={dkd_styles_value.screen}>
-          <View style={dkd_styles_value.header}><View style={{ flex: 1 }}><Text style={dkd_styles_value.kicker}>DKD KURYE MERKEZİ</Text><Text style={dkd_styles_value.title}>{dkd_title_value}</Text><Text style={dkd_styles_value.sub}>Kurye, gönderi ve teslimat akışlarını tek merkezden yönet.</Text></View><Pressable onPress={onClose} style={dkd_styles_value.close}><MaterialCommunityIcons name="close" size={22} color="#FFF" /></Pressable></View>
+          <View style={dkd_styles_value.header}><View style={{ flex: 1 }}><Text style={dkd_styles_value.kicker}>DKD KURYE MERKEZİ</Text><Text style={dkd_styles_value.title}>{dkd_title_value}</Text><Text style={dkd_styles_value.sub}>Kurye görevlerini ve aktif teslimat adımlarını tek merkezden yönet.</Text></View><Pressable onPress={onClose} style={dkd_styles_value.close}><MaterialCommunityIcons name="close" size={22} color="#FFF" /></Pressable></View>
 
           {dkd_panel_value === 'application' ? (
             <ScrollView contentContainerStyle={dkd_styles_value.content} keyboardShouldPersistTaps="handled"><Pressable onPress={() => dkd_set_panel_value('jobs')} style={dkd_styles_value.back}><MaterialCommunityIcons name="arrow-left" size={18} color="#031019" /><Text style={dkd_styles_value.backText}>Kurye merkezine dön</Text></Pressable><DkdCourierInlineApplicationForm dkd_profile_value={profile} dkd_set_profile_value={setProfile} /></ScrollView>
