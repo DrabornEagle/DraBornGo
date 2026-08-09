@@ -1,0 +1,26 @@
+name: DKD v0.0.15 Cargo Reference Audit
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/dkd_v015_cargo_ref_audit.yml'
+permissions:
+  contents: write
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Write refs
+        shell: bash
+        run: |
+          mkdir -p audit
+          (grep -R -n --exclude='dkd_cargo_service.js' 'dkd_cargo_service' src || true) > audit/dkd_v0_0_15_cargo_service_refs.txt
+          echo '--- function refs ---' >> audit/dkd_v0_0_15_cargo_service_refs.txt
+          (grep -R -n -E 'dkd_create_cargo_shipment|dkd_fetch_my_cargo_shipments|dkd_upload_cargo_package_art|dkd_emit_cargo_shipment_push_event' src --exclude='dkd_cargo_service.js' || true) >> audit/dkd_v0_0_15_cargo_service_refs.txt
+          rm -f .github/workflows/dkd_v015_cargo_ref_audit.yml
+          git config user.name 'DrabornEagle Release Bot'
+          git config user.email 'release-bot@draborneagle.com'
+          git add -A
+          git commit -m 'audit: locate remaining cargo service references' || exit 0
+          git push origin HEAD:main
