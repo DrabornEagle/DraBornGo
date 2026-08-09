@@ -1,0 +1,59 @@
+name: DKD v0.0.13 Final Validate
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'audit/dkd_v0_0_13_validation_trigger.txt'
+
+permissions:
+  contents: write
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Sync lock metadata with v0.0.13
+        run: npm install --package-lock-only --ignore-scripts
+      - name: Clean install
+        run: npm ci
+      - name: Verify identity
+        run: npm run dkd:verify-v0.0.13
+      - name: Validate retired score runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+          ! grep -R --line-number -E 'courier_score|courier_rating_avg|courier_rating_count|reward_score' src
+          grep -q 'Saatlik Kazanç' src/features/admin/dkd_admin_user_manager_modal.js
+          grep -q 'GOOGLE PLAY HAZIRLIK' src/features/legal/dkd_google_play_policy_center_modal.js
+          grep -q 'Sürüm ve Güncelleme' src/features/legal/dkd_app_update_center_modal.js
+      - name: Android Expo export
+        run: npx expo export --platform android --output-dir /tmp/dkd-v0013-android
+      - name: Write validation marker
+        shell: bash
+        run: |
+          printf '%s\n' \
+            'DraBornGo v0.0.13 final validation: PASS' \
+            'Android versionCode: 13' \
+            'Checks: npm ci, release identity, retired courier score/rating runtime, admin hourly earnings, privacy/update centers, Android Expo export' \
+            "Validated UTC: $(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+            > audit/dkd_v0_0_13_release_validation.txt
+      - name: Commit lock and validation marker
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add package-lock.json audit/dkd_v0_0_13_release_validation.txt
+          if ! git diff --cached --quiet; then
+            git commit -m 'chore: validate DraBornGo v0.0.13 [skip ci]'
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
