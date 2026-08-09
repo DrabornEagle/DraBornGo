@@ -1,15 +1,19 @@
-name: DKD Build Signed APK
+name: DraBornGo Release APK
 
 on:
   workflow_dispatch:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/dkd_release_build_trigger/**'
 
 concurrency:
-  group: dkd-build-signed-apk-${{ github.ref }}
+  group: draborngo-release-apk-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
   dkd_build_signed_apk:
-    name: Dkd build signed APK only
+    name: DraBornGo v0.0.16 code 3 signed APK
     runs-on: ubuntu-latest
     timeout-minutes: 70
     env:
@@ -38,15 +42,12 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: Dkd fast validate android signing secrets
+      - name: Dkd validate Android signing secrets
         shell: bash
         run: |
           mkdir -p dkd_keystore_precheck
           printf '%s' "${DKD_ANDROID_KEYSTORE_BASE64}" | base64 --decode > dkd_keystore_precheck/dkd_release_keystore.jks
-          if [ ! -s dkd_keystore_precheck/dkd_release_keystore.jks ]; then
-            echo "DKD ERROR: DKD_ANDROID_KEYSTORE_BASE64 decoded keystore is empty."
-            exit 1
-          fi
+          test -s dkd_keystore_precheck/dkd_release_keystore.jks
           keytool -list -keystore dkd_keystore_precheck/dkd_release_keystore.jks -storepass "${DKD_ANDROID_KEYSTORE_PASSWORD}" -alias "${DKD_ANDROID_KEY_ALIAS}" >/dev/null
           pushd dkd_keystore_precheck >/dev/null
           printf 'dkd signing precheck\n' > dkd_precheck.txt
@@ -55,7 +56,7 @@ jobs:
           jarsigner -verify dkd_precheck_signed.jar >/dev/null
           popd >/dev/null
           rm -rf dkd_keystore_precheck
-          echo "DKD Android signing secrets verified before long Gradle build."
+          echo 'DKD signing secrets verified.'
 
       - name: Dkd write embedded public env module
         shell: bash
@@ -64,111 +65,68 @@ jobs:
           set -a
           . ./.env
           set +a
-
           dkd_supabase_publishable_key_value="${EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY:-${EXPO_PUBLIC_SUPABASE_ANON_KEY}}"
           export EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY="${dkd_supabase_publishable_key_value}"
-
           for dkd_secret_name in EXPO_PUBLIC_SUPABASE_URL EXPO_PUBLIC_SUPABASE_ANON_KEY EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN DKD_ANDROID_KEYSTORE_BASE64 DKD_ANDROID_KEYSTORE_PASSWORD DKD_ANDROID_KEY_ALIAS DKD_ANDROID_KEY_PASSWORD; do
-            if [ -z "${!dkd_secret_name}" ]; then
-              echo "DKD ERROR: ${dkd_secret_name} secret is empty."
-              exit 1
-            fi
+            if [ -z "${!dkd_secret_name}" ]; then echo "DKD ERROR: ${dkd_secret_name} is empty"; exit 1; fi
           done
-
-          if ! echo "${EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN}" | grep -q '^pk\.'; then
-            echo "DKD ERROR: EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN must start with pk."
-            exit 1
-          fi
-
+          if ! echo "${EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN}" | grep -q '^pk\.'; then echo 'DKD ERROR: Mapbox public token must start with pk.'; exit 1; fi
           printf 'EXPO_PUBLIC_SUPABASE_URL=%s\n' "${EXPO_PUBLIC_SUPABASE_URL}" > .env
           printf 'EXPO_PUBLIC_SUPABASE_ANON_KEY=%s\n' "${EXPO_PUBLIC_SUPABASE_ANON_KEY}" >> .env
           printf 'EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY=%s\n' "${EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY}" >> .env
           printf 'EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN=%s\n' "${EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN}" >> .env
           cp .env .env.local
           cp .env .env.production
-
           node <<'DKD_NODE'
-          const dkd_file_system_module = require('fs');
-          const dkd_required_key_values = [
-            'EXPO_PUBLIC_SUPABASE_URL',
-            'EXPO_PUBLIC_SUPABASE_ANON_KEY',
-            'EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY',
-            'EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN'
-          ];
-          const dkd_generated_env_value = {};
-          for (const dkd_key_name_value of dkd_required_key_values) {
-            const dkd_runtime_value = String(process.env[dkd_key_name_value] || '').trim();
-            if (!dkd_runtime_value) {
-              throw new Error(`DKD ERROR: ${dkd_key_name_value} is empty before bundle generation.`);
-            }
-            dkd_generated_env_value[dkd_key_name_value] = dkd_runtime_value;
-          }
-          const dkd_generated_file_value = `export const dkd_generated_public_env_value = ${JSON.stringify(dkd_generated_env_value, null, 2)};\n`;
-          dkd_file_system_module.writeFileSync('src/lib/dkd_public_env.generated.js', dkd_generated_file_value);
-          console.log('DKD embedded public env module generated for APK build.');
+          const fs=require('fs');
+          const keys=['EXPO_PUBLIC_SUPABASE_URL','EXPO_PUBLIC_SUPABASE_ANON_KEY','EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY','EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN'];
+          const out={}; for(const k of keys){const v=String(process.env[k]||'').trim(); if(!v) throw new Error(`DKD ERROR: ${k} missing`); out[k]=v;}
+          fs.writeFileSync('src/lib/dkd_public_env.generated.js',`export const dkd_generated_public_env_value = ${JSON.stringify(out,null,2)};\n`);
           DKD_NODE
 
-      - name: Dkd install npm packages
+      - name: Dkd install packages
         run: npm install --no-package-lock
 
-      - name: Dkd verify embedded runtime env
+      - name: Dkd verify v0.0.16 code 3 release identity
         shell: bash
         run: |
-          npx expo config --json > dkd_expo_public_env_config.json
           node <<'DKD_NODE'
-          const dkd_file_system_module = require('fs');
-          const dkd_generated_file_value = dkd_file_system_module.readFileSync('src/lib/dkd_public_env.generated.js', 'utf8');
-          const dkd_config_value = JSON.parse(dkd_file_system_module.readFileSync('dkd_expo_public_env_config.json', 'utf8'));
-          const dkd_extra_value = dkd_config_value && dkd_config_value.extra ? dkd_config_value.extra : {};
-          const dkd_public_env_value = dkd_extra_value.dkd_public_env || {};
-          const dkd_required_key_values = [
-            'EXPO_PUBLIC_SUPABASE_URL',
-            'EXPO_PUBLIC_SUPABASE_ANON_KEY',
-            'EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY',
-            'EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN'
-          ];
-          for (const dkd_key_name_value of dkd_required_key_values) {
-            const dkd_config_runtime_value = String(dkd_public_env_value[dkd_key_name_value] || dkd_extra_value[dkd_key_name_value] || '').trim();
-            const dkd_generated_has_key_value = dkd_generated_file_value.includes(dkd_key_name_value);
-            if (!dkd_config_runtime_value || !dkd_generated_has_key_value) {
-              throw new Error(`DKD ERROR: ${dkd_key_name_value} was not embedded into app config and generated module.`);
-            }
-          }
-          console.log('DKD Expo public env config and generated runtime module verified.');
+          const a=require('./app.json').expo; const p=require('./package.json');
+          if(a.version!=='0.0.16'||p.version!=='0.0.16') throw new Error('DKD ERROR: version must be 0.0.16');
+          if(Number(a.android.versionCode)!==3) throw new Error('DKD ERROR: versionCode must be 3');
+          if(a.android.package!=='com.draborneagle.draborngo') throw new Error('DKD ERROR: Android package mismatch');
+          console.log('DKD identity OK: DraBornGo v0.0.16 / code 3');
           DKD_NODE
 
-      - name: Dkd verify foreground service location permission removed
+      - name: Dkd verify Expo runtime and Play permissions
         shell: bash
         run: |
-          npx expo config --json > dkd_expo_policy_config.json
+          npx expo config --json > dkd_expo_config.json
           node <<'DKD_NODE'
-          const dkd_file_system_module = require('fs');
-          const dkd_config_value = JSON.parse(dkd_file_system_module.readFileSync('dkd_expo_policy_config.json', 'utf8'));
-          const dkd_permission_values = Array.isArray(dkd_config_value?.android?.permissions) ? dkd_config_value.android.permissions : [];
-          const dkd_forbidden_permission_value = ['android', 'permission'].join('.') + '.' + ['FOREGROUND', 'SERVICE', 'LOCATION'].join('_');
-          if (dkd_permission_values.includes(dkd_forbidden_permission_value)) {
-            throw new Error('DKD ERROR: Android foreground service location permission is still present in Expo config. Google Play foreground service declaration would be triggered.');
-          }
-          console.log('DKD Android policy config verified: Android foreground service location permission removed.');
+          const fs=require('fs'); const c=JSON.parse(fs.readFileSync('dkd_expo_config.json','utf8'));
+          if(c.version!=='0.0.16'||Number(c.android.versionCode)!==3) throw new Error('DKD ERROR: resolved Expo identity mismatch');
+          const permissions=Array.isArray(c?.android?.permissions)?c.android.permissions:[];
+          const forbidden=['android.permission.ACCESS_BACKGROUND_LOCATION','android.permission.READ_EXTERNAL_STORAGE','android.permission.WRITE_EXTERNAL_STORAGE','android.permission.READ_MEDIA_IMAGES','android.permission.READ_MEDIA_VIDEO','android.permission.RECORD_AUDIO','android.permission.FOREGROUND_SERVICE_LOCATION'];
+          for(const value of forbidden){if(permissions.includes(value)) throw new Error(`DKD ERROR: forbidden permission ${value}`);}
+          const generated=fs.readFileSync('src/lib/dkd_public_env.generated.js','utf8');
+          for(const key of ['EXPO_PUBLIC_SUPABASE_URL','EXPO_PUBLIC_SUPABASE_ANON_KEY','EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY','EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN']) if(!generated.includes(key)) throw new Error(`DKD ERROR: generated env missing ${key}`);
+          console.log('DKD Expo runtime and permission audit OK.');
           DKD_NODE
 
-      - name: Dkd prepare android sdk
+      - name: Dkd prepare Android SDK
         shell: bash
         run: |
-          mkdir -p "$ANDROID_SDK_ROOT/cmdline-tools"
           export PATH="$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$ANDROID_SDK_ROOT/platform-tools:$PATH"
           yes | sdkmanager --licenses || true
-          sdkmanager --install "platform-tools" "platforms;android-36" "build-tools;36.0.0"
+          sdkmanager --install 'platform-tools' 'platforms;android-36' 'build-tools;36.0.0'
 
-      - name: Dkd generate android project
+      - name: Dkd generate Android project
         run: npx expo prebuild --platform android --clean --non-interactive
 
-      - name: Dkd tune gradle release memory
+      - name: Dkd tune Gradle release memory
         shell: bash
         run: |
-          mkdir -p android
           printf '\norg.gradle.jvmargs=-Xmx4g -XX:MaxMetaspaceSize=1g -Dfile.encoding=UTF-8\norg.gradle.daemon=false\norg.gradle.parallel=false\n' >> android/gradle.properties
-          echo "DKD Gradle release memory tuned."
 
       - name: Dkd inject release signing config
         shell: bash
@@ -185,31 +143,31 @@ jobs:
                       keyPassword System.getenv('DKD_ANDROID_KEY_PASSWORD')
                   }
               }
-              buildTypes {
-                  release {
-                      signingConfig signingConfigs.dkdRelease
-                  }
-              }
+              buildTypes { release { signingConfig signingConfigs.dkdRelease } }
           }
           DKD_GRADLE
           printf '\napply from: "dkd_release_signing.gradle"\n' >> android/app/build.gradle
 
-      - name: Dkd build signed release APK
+      - name: Dkd build signed APK
         shell: bash
         run: |
           cd android
           ./gradlew :app:assembleRelease --no-daemon
 
-      - name: Dkd collect signed APK
+      - name: Dkd collect and verify signed APK
         shell: bash
         run: |
           mkdir -p dkd_signed_apk_output
-          cp android/app/build/outputs/apk/release/*.apk dkd_signed_apk_output/DraBornGo-v0.0.6-code6-release.apk
+          dkd_apk_path="$(find android/app/build/outputs/apk/release -type f -name '*.apk' | head -n 1)"
+          test -n "${dkd_apk_path}"
+          cp "${dkd_apk_path}" dkd_signed_apk_output/DraBornGo-v0.0.16-code3-release.apk
+          "$ANDROID_SDK_ROOT/build-tools/36.0.0/apksigner" verify --verbose dkd_signed_apk_output/DraBornGo-v0.0.16-code3-release.apk
+          sha256sum dkd_signed_apk_output/DraBornGo-v0.0.16-code3-release.apk
           ls -lh dkd_signed_apk_output
 
       - name: Dkd upload signed APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: DKD_DraBornGo_v0_0_6_code6_signed_apk
-          path: dkd_signed_apk_output/DraBornGo-v0.0.6-code6-release.apk
+          name: DraBornGo_Release_APK_v0_0_16_code3
+          path: dkd_signed_apk_output/DraBornGo-v0.0.16-code3-release.apk
           retention-days: 14
