@@ -2,7 +2,7 @@ import { supabase } from '../lib/supabase';
 
 const dkd_profile_select_value = [
   'user_id', 'dbg_id', 'social_last_seen_at', 'nickname', 'avatar_emoji', 'avatar_image_url',
-  'courier_status', 'courier_score', 'courier_completed_jobs', 'courier_cancelled_jobs',
+  'courier_status', 'courier_completed_jobs', 'courier_cancelled_jobs',
   'courier_active_days', 'courier_last_completed_at', 'courier_fastest_eta_min',
   'courier_city', 'courier_zone', 'courier_vehicle_type', 'courier_profile_meta',
   'dkd_country', 'dkd_city', 'dkd_region', 'dkd_courier_online',
@@ -32,7 +32,6 @@ export async function fetchProfile(dkd_user_id_value) {
       avatar_emoji: dkd_row_value?.avatar_emoji || '🦅',
       avatar_image_url: String(dkd_row_value?.avatar_image_url || ''),
       courier_status: dkd_row_value?.courier_status || 'none',
-      courier_score: Number(dkd_row_value?.courier_score || 0),
       courier_completed_jobs: Number(dkd_row_value?.courier_completed_jobs || 0),
       courier_cancelled_jobs: Number(dkd_row_value?.courier_cancelled_jobs || 0),
       courier_active_days: Number(dkd_row_value?.courier_active_days || 0),
