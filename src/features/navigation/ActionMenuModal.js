@@ -90,9 +90,10 @@ function ActionMenuModal({ visible, onClose, isAdmin, canCourier, onCourier, onP
 
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose} statusBarTranslucent>
-      <Pressable onPress={onClose} style={styles.dkd_backdrop}>
-        <Animated.View style={[styles.dkd_modal_motion, { opacity: dkd_entry_value, transform: [{ translateY: dkd_translate_value }, { scale: dkd_scale_value }] }]}>
-          <Pressable onPress={() => {}} style={styles.dkd_modal_shell}>
+      <View style={styles.dkd_backdrop}>
+        <Pressable onPress={onClose} style={StyleSheet.absoluteFill} />
+        <Animated.View pointerEvents="box-none" style={[styles.dkd_modal_motion, { opacity: dkd_entry_value, transform: [{ translateY: dkd_translate_value }, { scale: dkd_scale_value }] }]}>
+          <View style={styles.dkd_modal_shell}>
             <LinearGradient colors={['#0A1830', '#10152D', '#170F2B']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={StyleSheet.absoluteFill} />
             <View style={styles.dkd_orb_one} /><View style={styles.dkd_orb_two} />
             <View style={styles.dkd_header}>
@@ -101,13 +102,13 @@ function ActionMenuModal({ visible, onClose, isAdmin, canCourier, onCourier, onP
               <Pressable onPress={onClose} style={styles.dkd_close_button}><MaterialCommunityIcons name="close" size={23} color="#FFFFFF" /></Pressable>
             </View>
             <View style={styles.dkd_signal_strip}><View style={styles.dkd_signal_dot} /><Text style={styles.dkd_signal_text}>Şehir ağı bağlantısı hazır</Text><MaterialCommunityIcons name="access-point" size={18} color="#70E7BB" /></View>
-            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.dkd_list_content}>
+            <ScrollView showsVerticalScrollIndicator={false} nestedScrollEnabled keyboardShouldPersistTaps="handled" scrollEventThrottle={16} contentContainerStyle={styles.dkd_list_content}>
               {canCourier ? <DkdCourierEarningsCategory dkd_visible_value={visible} /> : null}
               {dkd_items_value.map((dkd_item_value) => <DkdMenuRow key={dkd_item_value.dkd_label_value} {...dkd_item_value} />)}
             </ScrollView>
-          </Pressable>
+          </View>
         </Animated.View>
-      </Pressable>
+      </View>
     </Modal>
   );
 }
