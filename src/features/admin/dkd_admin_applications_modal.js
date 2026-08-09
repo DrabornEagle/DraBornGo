@@ -157,7 +157,7 @@ export default function DkdAdminApplicationsModal({ visible, onClose }) {
           <View style={{ flex: 1 }}>
             <Text style={dkd_styles_value.kicker}>ADMIN</Text>
             <Text style={dkd_styles_value.title}>Başvurular</Text>
-            <Text style={dkd_styles_value.sub}>Kurye lisansı ve hesap silme taleplerini yönet.</Text>
+            <Text style={dkd_styles_value.sub}>Kurye onay başvuruları ve hesap silme taleplerini yönet.</Text>
           </View>
           <Pressable onPress={onClose} style={dkd_styles_value.close}><MaterialCommunityIcons name="close" size={22} color="#FFF" /></Pressable>
         </View>

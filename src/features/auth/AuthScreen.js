@@ -24,9 +24,9 @@ const dkd_login_secure_mockup_image_value = require('../../../assets/dkd_login/d
 const dkd_terms_public_url_value = 'https://www.draborneagle.com/draborngo/terms/';
 const dkd_privacy_public_url_value = 'https://www.draborneagle.com/draborngo/privacy/';
 const dkd_community_public_url_value = 'https://www.draborneagle.com/draborngo/community/';
-const dkd_terms_version_value = '2026-08-08-v0.0.8';
-const dkd_privacy_version_value = '2026-08-08-v0.0.8';
-const dkd_community_policy_version_value = '2026-08-08-v0.0.8';
+const dkd_terms_version_value = '2026-08-09-v0.0.15';
+const dkd_privacy_version_value = '2026-08-09-v0.0.15';
+const dkd_community_policy_version_value = '2026-08-09-v0.0.15';
 
 const dkd_region_presets_value = {
   Türkiye: {
@@ -313,17 +313,17 @@ export default function AuthScreen({ mode = 'login', setMode = () => {} }) {
             <View style={dkd_styles.dkd_brand_shell}>
               <View style={dkd_styles.dkd_brand_overline_row}>
                 <MaterialCommunityIcons name="star-four-points" size={15} color="#FDE68A" />
-                <Text style={dkd_styles.dkd_brand_overline}>DraBornGo ŞEHİR GİRİŞ KAPISI</Text>
+                <Text style={dkd_styles.dkd_brand_overline}>DraBornGo KURYE GİRİŞİ</Text>
               </View>
-              <Text style={dkd_styles.dkd_brand_title}>Şehir Ağına Hoş Geldin</Text>
+              <Text style={dkd_styles.dkd_brand_title}>Kurye Ağına Hoş Geldin</Text>
             </View>
 
             <DkdLoginCityPreview dkd_glow_opacity_value={dkd_hero_glow_opacity_value} dkd_hero_glow_scale_value={dkd_hero_glow_scale_value} />
 
             <View style={dkd_styles.dkd_pill_row}>
-              <DkdAuthPill dkd_icon_name="truck-fast-outline" dkd_text="Kurye-Kargo" />
-              <DkdAuthPill dkd_icon_name="food-fork-drink" dkd_text="Yemek-Market" />
-              <DkdAuthPill dkd_icon_name="storefront-outline" dkd_text="Hizmet Ağı" />
+              <DkdAuthPill dkd_icon_name="truck-fast-outline" dkd_text="Görev Havuzu" />
+              <DkdAuthPill dkd_icon_name="food-fork-drink" dkd_text="Canlı Rota" />
+              <DkdAuthPill dkd_icon_name="storefront-outline" dkd_text="Kazanç Takibi" />
             </View>
 
             <View style={dkd_styles.dkd_auth_card}>
@@ -335,10 +335,10 @@ export default function AuthScreen({ mode = 'login', setMode = () => {} }) {
                 </LinearGradient>
                 <View style={dkd_styles.dkd_card_header_copy}>
                   <Text style={dkd_styles.dkd_card_kicker}>GÜVENLİ OTURUM</Text>
-                  <Text style={dkd_styles.dkd_card_title}>Şehir merkezine giriş</Text>
+                  <Text style={dkd_styles.dkd_card_title}>Kurye merkezine giriş</Text>
                 </View>
               </View>
-              <Text style={dkd_styles.dkd_card_subtitle}>Hesabınla devam et; sipariş havuzu, kurye, işletme ve hizmet ağı akışların açılsın.</Text>
+              <Text style={dkd_styles.dkd_card_subtitle}>Hesabınla devam et; kurye görev havuzu, aktif teslimatlar, canlı rota ve kazanç takibin açılsın.</Text>
 
               <View style={dkd_styles.dkd_input_shell}>
                 <MaterialCommunityIcons name="email-outline" size={20} color="#9AF8FF" />
@@ -394,7 +394,7 @@ export default function AuthScreen({ mode = 'login', setMode = () => {} }) {
 
             <View style={dkd_styles.dkd_bottom_note_card}>
               <MaterialCommunityIcons name="crosshairs-gps" size={18} color="#63F1B1" />
-              <Text style={dkd_styles.dkd_bottom_note_text}>Yeni kayıt sırasında seçtiğin ülke, şehir ve bölge sipariş eşleşmeleri ve hizmet ağı deneyimi için kullanılacak.</Text>
+              <Text style={dkd_styles.dkd_bottom_note_text}>Yeni kayıt sırasında seçtiğin ülke, şehir ve bölge; sana uygun kurye görevlerini ve rota akışını göstermek için kullanılacak.</Text>
             </View>
           </ScrollView>
         </KeyboardAvoidingView>
@@ -429,7 +429,7 @@ export default function AuthScreen({ mode = 'login', setMode = () => {} }) {
                 </View>
                 <View style={dkd_styles.dkd_register_hero_copy}>
                   <Text style={dkd_styles.dkd_register_hero_title}>DraBornGo hesabını kur</Text>
-                  <Text style={dkd_styles.dkd_register_hero_text}>Bölgeni seç, kurye-kargo ve market akışlarında doğru sipariş eşleşmesine hazır ol.</Text>
+                  <Text style={dkd_styles.dkd_register_hero_text}>Bölgeni seç; kurye görev havuzunda sana uygun teslimatları ve rota akışını görmeye hazır ol.</Text>
                 </View>
               </View>
 

@@ -26,13 +26,13 @@ const dkd_policy_card_values = [
     dkd_key_value: 'data-safety',
     dkd_icon_value: 'shield-check-outline',
     dkd_title_value: 'Data Safety Özeti',
-    dkd_body_value: 'DraBornGo; hesap ve profil bilgileri, kurye başvurusu ve lisans durumu, kurye görev/teslimat kayıtları, gerekli olduğunda yalnız uygulama açıkken kullanılan konum, kullanıcının seçtiği profil/başvuru görselleri, kullanıcı ile DrabornEagle admin arasındaki destek mesajları, bildirim/teknik güvenlik kimlikleri ile kurye çalışma ve kazanç kayıtlarını uygulamanın temel kurye işlevlerini çalıştırmak ve güvenliğini sağlamak için işler. Kişisel veriler reklam amacıyla satılmaz.',
+    dkd_body_value: 'DraBornGo; hesap ve profil bilgileri, kurye başvurusu ve onay durumu, kurye görev/teslimat kayıtları, gerekli olduğunda yalnız uygulama açıkken kullanılan konum, kullanıcının seçtiği profil/başvuru görselleri, kullanıcı ile DrabornEagle admin arasındaki destek mesajları, bildirim/teknik güvenlik kimlikleri ile kurye çalışma ve kazanç kayıtlarını uygulamanın temel kurye işlevlerini çalıştırmak ve güvenliğini sağlamak için işler. Kişisel veriler reklam amacıyla satılmaz.',
   },
   {
     dkd_key_value: 'identity-contact',
     dkd_icon_value: 'card-account-details-outline',
     dkd_title_value: 'Kurye Kimlik ve Başvuru Bilgileri',
-    dkd_body_value: 'Kurye başvurusu ve lisans/onay sürecinde kullanıcının sunduğu kimlik, iletişim, adres, şehir/bölge, araç/plaka, acil durum iletişim ve gerekli başvuru belgeleri işlenebilir. Telefon bilgisi SMS/OTP veya pazarlama amacıyla kullanılmaz.',
+    dkd_body_value: 'Kurye başvurusu ve onay sürecinde kullanıcının sunduğu kimlik, iletişim, adres, şehir/bölge, araç/plaka, acil durum iletişim ve gerekli başvuru belgeleri işlenebilir. Telefon bilgisi SMS/OTP veya pazarlama amacıyla kullanılmaz.',
   },
   {
     dkd_key_value: 'task-data',

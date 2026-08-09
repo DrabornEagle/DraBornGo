@@ -23,9 +23,9 @@ export default function DkdApplicationsHubModalValue({ dkd_visible_value, dkd_on
               <Pressable onPress={dkd_on_close_value} style={dkd_styles_value.close}>
                 <MaterialCommunityIcons name="close" size={22} color="#FFF" />
               </Pressable>
-              <Text style={dkd_styles_value.kicker}>DKD ONAY MERKEZİ</Text>
-              <Text style={dkd_styles_value.title}>{dkd_courier_approved_flag ? 'Kurye Lisansın Aktif' : 'Kurye Başvurusu'}</Text>
-              <Text style={dkd_styles_value.subtitle}>{dkd_courier_approved_flag ? 'Kurye lisansın onaylandı. Yeni bir kurye başvurusu oluşturman gerekmez.' : 'Kimlik, ehliyet, bölge ve araç bilgilerini ekleyip kurye lisans sürecini başlat.'}</Text>
+              <Text style={dkd_styles_value.kicker}>DBG KURYE ONAY MERKEZİ</Text>
+              <Text style={dkd_styles_value.title}>{dkd_courier_approved_flag ? 'Kurye Onayın Aktif' : 'Kurye Başvurusu'}</Text>
+              <Text style={dkd_styles_value.subtitle}>{dkd_courier_approved_flag ? 'Kurye hesabın onaylandı. Yeni bir kurye başvurusu oluşturman gerekmez.' : 'Kimlik, ehliyet, bölge ve araç bilgilerini ekleyip kurye onay sürecini başlat.'}</Text>
             </View>
 
             {dkd_courier_approved_flag ? (
@@ -33,8 +33,8 @@ export default function DkdApplicationsHubModalValue({ dkd_visible_value, dkd_on
                 <View style={[dkd_styles_value.icon, dkd_styles_value.approvedIcon]}>
                   <MaterialCommunityIcons name="shield-check-outline" size={32} color="#061B14" />
                 </View>
-                <Text style={dkd_styles_value.cardTitle}>Kurye Lisansın Aktif</Text>
-                <Text style={dkd_styles_value.cardText}>DKD Onay Merkezi kaydın onaylı. Ana sayfadaki Kurye Merkezi ve Sipariş BUL araçlarını kullanabilirsin.</Text>
+                <Text style={dkd_styles_value.cardTitle}>Kurye Onayın Aktif</Text>
+                <Text style={dkd_styles_value.cardText}>DBG Kurye Onay Merkezi kaydın onaylı. Görev havuzunu açabilir, uygun teslimatları kabul edebilir ve kurye çalışma akışını kullanabilirsin.</Text>
                 <View style={dkd_styles_value.approvedStatus}>
                   <MaterialCommunityIcons name="check-decagram" size={20} color="#6EF0B2" />
                   <Text style={dkd_styles_value.approvedStatusText}>ONAYLANDI • AKTİF</Text>

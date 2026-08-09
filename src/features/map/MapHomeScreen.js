@@ -120,17 +120,17 @@ function MapHomeScreen({
 
   const dkd_status_value = useMemo(() => {
     if (!dkd_courier_approved_value) return {
-      dkd_label_value: 'LİSANS GEREKLİ',
+      dkd_label_value: 'KURYE ONAYI GEREKLİ',
       dkd_short_value: 'Başvuru',
-      dkd_subtitle_value: 'Kurye kimliğini oluştur, lisans onayından sonra canlı görev ağına katıl.',
+      dkd_subtitle_value: 'Kurye başvurunu tamamla; onaylandıktan sonra canlı görev havuzuna katıl.',
       dkd_accent_value: '#FFD06B',
       dkd_secondary_value: '#FF865E',
       dkd_gradient_value: ['#21130C', '#33203A', '#112A40'],
     };
     if (dkd_courier_busy_value) return {
-      dkd_label_value: 'SİPARİŞTE',
-      dkd_short_value: 'Siparişte',
-      dkd_subtitle_value: 'Atanmış teslimat tamamlanana kadar kurye durumu kilitli.',
+      dkd_label_value: 'AKTİF GÖREV',
+      dkd_short_value: 'Görevde',
+      dkd_subtitle_value: 'Aktif teslimat tamamlanana kadar kurye durumu kilitli.',
       dkd_accent_value: '#FFD166',
       dkd_secondary_value: '#42DFFF',
       dkd_gradient_value: ['#332408', '#17364A', '#20265D'],
@@ -138,7 +138,7 @@ function MapHomeScreen({
     if (dkd_courier_online_value) return {
       dkd_label_value: 'ÇEVRİMİÇİ',
       dkd_short_value: 'Canlı',
-      dkd_subtitle_value: 'Sipariş araması açık. Yakındaki yeni görevler gerçek zamanlı taranıyor.',
+      dkd_subtitle_value: 'Görev araması açık. Yakındaki yeni görevler gerçek zamanlı taranıyor.',
       dkd_accent_value: '#61F2B7',
       dkd_secondary_value: '#42DFFF',
       dkd_gradient_value: ['#052B27', '#06364A', '#172B63'],
@@ -146,7 +146,7 @@ function MapHomeScreen({
     return {
       dkd_label_value: 'ÇEVRİMDIŞI',
       dkd_short_value: 'Beklemede',
-      dkd_subtitle_value: 'Hazır olduğunda Sipariş BUL ile yeni görev aramasını başlat.',
+      dkd_subtitle_value: 'Hazır olduğunda Görev BUL ile yeni görev aramasını başlat.',
       dkd_accent_value: '#FF82A3',
       dkd_secondary_value: '#9B82FF',
       dkd_gradient_value: ['#301524', '#28203E', '#102F46'],
@@ -191,7 +191,7 @@ function MapHomeScreen({
             <Animated.View pointerEvents="none" style={[dkd_styles_value.dkd_route_lane, dkd_styles_value.dkd_route_lane_two, { transform: [{ translateX: Animated.multiply(dkd_lane_translate_value, -0.55) }, { rotate: '-24deg' }] }]} />
 
             <View style={dkd_styles_value.dkd_control_topline}>
-              <View style={dkd_styles_value.dkd_control_brand_pill}><MaterialCommunityIcons name="radar" size={14} color="#A9EEFF" /><Text style={dkd_styles_value.dkd_control_brand_pill_text}>SİPARİŞ • KURYE RADARI</Text></View>
+              <View style={dkd_styles_value.dkd_control_brand_pill}><MaterialCommunityIcons name="radar" size={14} color="#A9EEFF" /><Text style={dkd_styles_value.dkd_control_brand_pill_text}>GÖREV • KURYE RADARI</Text></View>
               <View style={[dkd_styles_value.dkd_network_pill, { borderColor: dkd_status_value.dkd_accent_value + '66' }]}><View style={[dkd_styles_value.dkd_network_dot, { backgroundColor: dkd_status_value.dkd_accent_value }]} /><Text style={dkd_styles_value.dkd_network_pill_text}>{dkd_status_value.dkd_short_value}</Text></View>
             </View>
 
@@ -213,7 +213,7 @@ function MapHomeScreen({
             </View>
 
             <View style={dkd_styles_value.dkd_order_console}>
-              <View style={dkd_styles_value.dkd_order_console_head}><Text style={dkd_styles_value.dkd_order_console_kicker}>CANLI SİPARİŞ ROTASI</Text><View style={dkd_styles_value.dkd_order_signal}><View style={[dkd_styles_value.dkd_order_signal_dot, { backgroundColor: dkd_status_value.dkd_accent_value }]} /><Text style={dkd_styles_value.dkd_order_signal_text}>{dkd_courier_online_value ? 'TARANIYOR' : 'HAZIR'}</Text></View></View>
+              <View style={dkd_styles_value.dkd_order_console_head}><Text style={dkd_styles_value.dkd_order_console_kicker}>CANLI GÖREV ROTASI</Text><View style={dkd_styles_value.dkd_order_signal}><View style={[dkd_styles_value.dkd_order_signal_dot, { backgroundColor: dkd_status_value.dkd_accent_value }]} /><Text style={dkd_styles_value.dkd_order_signal_text}>{dkd_courier_online_value ? 'TARANIYOR' : 'HAZIR'}</Text></View></View>
               <View style={dkd_styles_value.dkd_order_track}>
                 <View style={dkd_styles_value.dkd_order_track_node}><MaterialCommunityIcons name="package-variant-closed" size={16} color="#83E9FF" /></View>
                 <View style={dkd_styles_value.dkd_order_track_line} />
@@ -222,8 +222,8 @@ function MapHomeScreen({
                 <View style={dkd_styles_value.dkd_order_track_node}><MaterialCommunityIcons name="map-marker-check-outline" size={16} color="#6FEAB5" /></View>
               </View>
               <View style={dkd_styles_value.dkd_order_steps_row}>
-                <View style={dkd_styles_value.dkd_order_step}><MaterialCommunityIcons name="package-variant" size={15} color="#79E6FF" /><Text style={dkd_styles_value.dkd_order_step_label}>Sipariş Havuzu</Text></View>
-                <View style={dkd_styles_value.dkd_order_step}><MaterialCommunityIcons name="bike-fast" size={15} color="#B8A1FF" /><Text style={dkd_styles_value.dkd_order_step_label}>Kurye Ataması</Text></View>
+                <View style={dkd_styles_value.dkd_order_step}><MaterialCommunityIcons name="package-variant" size={15} color="#79E6FF" /><Text style={dkd_styles_value.dkd_order_step_label}>Görev Havuzu</Text></View>
+                <View style={dkd_styles_value.dkd_order_step}><MaterialCommunityIcons name="bike-fast" size={15} color="#B8A1FF" /><Text style={dkd_styles_value.dkd_order_step_label}>Görevi Kabul Et</Text></View>
                 <View style={dkd_styles_value.dkd_order_step}><MaterialCommunityIcons name="flag-checkered" size={15} color="#75ECB7" /><Text style={dkd_styles_value.dkd_order_step_label}>Teslimat</Text></View>
               </View>
             </View>
@@ -231,7 +231,7 @@ function MapHomeScreen({
             <View style={dkd_styles_value.dkd_status_metric_row}>
               <DkdStatusMetric dkd_icon_value="map-marker-outline" dkd_label_value="BÖLGE" dkd_value_text={dkd_location_text_value} dkd_accent_value="rgba(43,165,255,0.30)" />
               <DkdStatusMetric dkd_icon_value={dkd_has_location_value ? 'crosshairs-gps' : 'crosshairs-question'} dkd_label_value="GPS" dkd_value_text={dkd_has_location_value ? 'Hazır' : 'Kontrol'} dkd_accent_value={dkd_has_location_value ? 'rgba(48,220,157,0.28)' : 'rgba(255,178,72,0.28)'} />
-              <DkdStatusMetric dkd_icon_value={dkd_courier_busy_value ? 'package-variant-closed-check' : 'access-point'} dkd_label_value="SİPARİŞ" dkd_value_text={dkd_courier_busy_value ? 'Aktif' : dkd_courier_online_value ? 'Aranıyor' : 'Bekliyor'} dkd_accent_value={dkd_courier_busy_value ? 'rgba(255,209,102,0.28)' : 'rgba(156,112,255,0.28)'} />
+              <DkdStatusMetric dkd_icon_value={dkd_courier_busy_value ? 'package-variant-closed-check' : 'access-point'} dkd_label_value="GÖREV" dkd_value_text={dkd_courier_busy_value ? 'Aktif' : dkd_courier_online_value ? 'Aranıyor' : 'Bekliyor'} dkd_accent_value={dkd_courier_busy_value ? 'rgba(255,209,102,0.28)' : 'rgba(156,112,255,0.28)'} />
             </View>
 
             {locationError ? <Pressable onPress={retryLocation} style={dkd_styles_value.dkd_location_warning}><MaterialCommunityIcons name="map-marker-alert-outline" size={19} color="#FFE59A" /><View style={dkd_styles_value.dkd_location_warning_copy}><Text style={dkd_styles_value.dkd_location_warning_title}>Konum bağlantısını yenile</Text><Text style={dkd_styles_value.dkd_location_warning_sub}>Yakın görevler ve rota için GPS durumunu tekrar kontrol et.</Text></View><MaterialCommunityIcons name="reload" size={19} color="#FFE59A" /></Pressable> : null}
@@ -244,7 +244,7 @@ function MapHomeScreen({
                 <LinearGradient colors={[dkd_status_value.dkd_accent_value, dkd_status_value.dkd_secondary_value]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={dkd_styles_value.dkd_control_button}>
                   {dkd_courier_online_value && !dkd_courier_busy_value ? <Animated.View pointerEvents="none" style={{ position: 'absolute', top: -32, bottom: -32, width: 86, backgroundColor: 'rgba(255,255,255,0.20)', transform: [{ translateX: dkd_scan_translate_value }, { rotate: '16deg' }] }} /> : null}
                   <MaterialCommunityIcons name={dkd_courier_approved_value ? (dkd_courier_busy_value ? 'package-variant-closed-check' : dkd_courier_online_value ? 'radar' : 'radar') : 'clipboard-account-outline'} size={22} color="#031019" />
-                  <Text style={dkd_styles_value.dkd_control_button_text}>{dkd_courier_approved_value ? (dkd_courier_busy_value ? 'Sipariş Aktif' : dkd_courier_online_value ? 'Siparişler Taranıyor • Durdur' : 'Sipariş BUL') : 'Kurye Başvurusunu Aç'}</Text>
+                  <Text style={dkd_styles_value.dkd_control_button_text}>{dkd_courier_approved_value ? (dkd_courier_busy_value ? 'Görev Aktif' : dkd_courier_online_value ? 'Görevler Taranıyor • Durdur' : 'Görev BUL') : 'Kurye Başvurusunu Aç'}</Text>
                   <View style={dkd_styles_value.dkd_control_button_arrow}><MaterialCommunityIcons name={dkd_courier_busy_value ? 'lock-outline' : dkd_courier_online_value ? 'pause' : 'arrow-right'} size={20} color="#031019" /></View>
                 </LinearGradient>
               )}
@@ -253,7 +253,7 @@ function MapHomeScreen({
 
           <View style={dkd_styles_value.dkd_section_heading}><View><Text style={dkd_styles_value.dkd_section_kicker}>OPERASYON</Text><Text style={dkd_styles_value.dkd_section_title}>Görev merkezleri</Text></View><View style={dkd_styles_value.dkd_section_icon}><MaterialCommunityIcons name="radar" size={22} color="#79DDFF" /></View></View>
 
-          <DkdActionCard dkd_icon_value="motorbike" dkd_kicker_value="CANLI KURYE AĞI" dkd_title_value="Kurye Operasyon Merkezi" dkd_subtitle_value="Sipariş havuzu, aktif teslimatlar, kargo ve performans akışını kurye odaklı tek merkezden yönet." dkd_badge_value={dkd_courier_busy_value ? 'SİPARİŞTE' : dkd_courier_online_value ? 'CANLI' : 'HAZIR'} dkd_colors_value={['#064E58', '#174A92', '#5A2D91']} dkd_on_press_value={() => onOpenCourierBoard?.('default')} />
+          <DkdActionCard dkd_icon_value="motorbike" dkd_kicker_value="CANLI KURYE AĞI" dkd_title_value="Kurye Operasyon Merkezi" dkd_subtitle_value="Görev havuzunu görüntüle, uygun teslimatı kabul et, alım/teslimat adımlarını yönet ve aktif rota ile kazanç özetini takip et." dkd_badge_value={dkd_courier_busy_value ? 'AKTİF GÖREV' : dkd_courier_online_value ? 'CANLI' : 'HAZIR'} dkd_colors_value={['#064E58', '#174A92', '#5A2D91']} dkd_on_press_value={() => onOpenCourierBoard?.('default')} />
 
           <View style={dkd_styles_value.dkd_section_heading}><View><Text style={dkd_styles_value.dkd_section_kicker}>HIZLI ERİŞİM</Text><Text style={dkd_styles_value.dkd_section_title}>Tek dokunuşla aç</Text></View></View>
           <View style={dkd_styles_value.dkd_quick_grid}>

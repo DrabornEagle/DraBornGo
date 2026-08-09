@@ -76,7 +76,7 @@ export default function GameFlow({ session, onSignedOut, dkd_on_home_ready_value
   const dkd_toggle_courier_online_value = useCallback(async () => {
     if (dkd_online_busy_ref_value.current) return;
     if (String(profile?.courier_status || '').toLowerCase() !== 'approved') {
-      Alert.alert('Kurye', 'Çevrimiçi mod için kurye lisansının onaylanmış olması gerekiyor.');
+      Alert.alert('Kurye', 'Çevrimiçi mod için kurye başvurunun onaylanmış olması gerekiyor.');
       return;
     }
     const dkd_next_online_value = profile?.dkd_courier_online !== true;

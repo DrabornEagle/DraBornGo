@@ -39,7 +39,7 @@ const dkd_intro_step_list_value = [
     dkd_screen_gradient_colors_value: ['#02140D', '#053B2A', '#0F766E', '#13213F'],
   },
   {
-    dkd_badge_text: 'KURYE LİSANSI',
+    dkd_badge_text: 'KURYE ONAYI',
     dkd_title_text: 'Onaylı kurye olarak görev akışına katıl',
     dkd_body_text: 'Kurye başvurun onaylandığında lisans durumun aktif görünür; görev havuzuna erişerek teslimat operasyonuna başlayabilirsin.',
     dkd_art_mode_value: 'license',

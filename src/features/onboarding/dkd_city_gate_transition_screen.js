@@ -6,9 +6,9 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 const dkd_city_network_opening_mockup_image_value = require('../../../assets/dkd_login/dkd_city_network_opening.png');
 
 const dkd_city_status_list_value = [
-  { dkd_icon_name: 'map-marker-path', dkd_title_text: 'Rotalar', dkd_detail_text: 'hazırlanıyor', dkd_color_value: '#67E8F9' },
-  { dkd_icon_name: 'truck-fast-outline', dkd_title_text: 'Kurye ağı', dkd_detail_text: 'senkron', dkd_color_value: '#86EFAC' },
-  { dkd_icon_name: 'storefront-outline', dkd_title_text: 'Hizmet Ağı', dkd_detail_text: 'aktif', dkd_color_value: '#FDE68A' },
+  { dkd_icon_name: 'map-marker-path', dkd_title_text: 'Canlı Rota', dkd_detail_text: 'hazırlanıyor', dkd_color_value: '#67E8F9' },
+  { dkd_icon_name: 'truck-fast-outline', dkd_title_text: 'Görev Havuzu', dkd_detail_text: 'senkron', dkd_color_value: '#86EFAC' },
+  { dkd_icon_name: 'cash-clock', dkd_title_text: 'Kazanç Takibi', dkd_detail_text: 'hazır', dkd_color_value: '#FDE68A' },
 ];
 
 
@@ -59,7 +59,7 @@ export default function DkdCityGateTransitionScreen({ dkd_home_ready_flag = fals
       <View style={dkd_styles.dkd_content_shell}>
         <View style={dkd_styles.dkd_top_badge}>
           <MaterialCommunityIcons name="shield-star-outline" size={16} color="#FDE68A" />
-          <Text style={dkd_styles.dkd_top_badge_text}>DraBornGo güvenli geçiş</Text>
+          <Text style={dkd_styles.dkd_top_badge_text}>DraBornGo kurye geçişi</Text>
         </View>
 
         <View style={dkd_styles.dkd_city_card}>
@@ -79,9 +79,9 @@ export default function DkdCityGateTransitionScreen({ dkd_home_ready_flag = fals
         </View>
 
         <View style={dkd_styles.dkd_copy_shell}>
-          <Text style={dkd_styles.dkd_kicker_text}>DraBornGo MERKEZİ</Text>
-          <Text style={dkd_styles.dkd_title_text}>Şehir ağı açılıyor</Text>
-          <Text style={dkd_styles.dkd_subtitle_text}>Harita, sipariş havuzu, hizmet ağı ve ödül merkezi ana sayfa yüklenene kadar senkronlanıyor.</Text>
+          <Text style={dkd_styles.dkd_kicker_text}>DraBornGo KURYE MERKEZİ</Text>
+          <Text style={dkd_styles.dkd_title_text}>Kurye Merkezi Açılıyor</Text>
+          <Text style={dkd_styles.dkd_subtitle_text}>Görev havuzu, aktif teslimatlar, canlı rota ve kazanç özeti ana sayfa yüklenene kadar hazırlanıyor.</Text>
         </View>
 
         <View style={dkd_styles.dkd_status_row}>

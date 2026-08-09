@@ -202,8 +202,8 @@ export default function DkdCourierApplicationPanelValue({ dkd_profile_value, dkd
           <View style={dkd_styles_value.dkd_hero_badge}><View style={dkd_styles_value.dkd_hero_badge_dot} /><Text style={dkd_styles_value.dkd_hero_badge_text}>COURIER ID</Text></View>
         </View>
         <Text style={dkd_styles_value.dkd_hero_kicker}>DRABORNGO KURYE AĞI</Text>
-        <Text style={dkd_styles_value.dkd_hero_title}>Kurye lisansını oluştur</Text>
-        <Text style={dkd_styles_value.dkd_hero_text}>Kimlik, bölge, araç ve iletişim bilgilerini tek akışta tamamla. Başvuru yalnız admin onayından sonra kurye yetkisi açar.</Text>
+        <Text style={dkd_styles_value.dkd_hero_title}>Kurye başvurunu tamamla</Text>
+        <Text style={dkd_styles_value.dkd_hero_text}>Kimlik, bölge, araç ve iletişim bilgilerini tek akışta tamamla. Kurye görevlerine erişim yalnız admin onayından sonra açılır.</Text>
       </LinearGradient>
 
       {dkd_success_value ? (

@@ -77,7 +77,7 @@ function ActionMenuModal({ visible, onClose, isAdmin, canCourier, onCourier, onP
 
   const dkd_items_value = useMemo(() => [
     { dkd_icon_value: 'account-circle-outline', dkd_label_value: 'Profil ve Hesap', dkd_sub_value: 'Kimlik, profil görseli ve hesap ayarlarını yönet.', dkd_tone_value: '#315EBC', dkd_on_press_value: () => { onClose?.(); onProfile?.(); } },
-    canCourier ? { dkd_icon_value: 'speedometer', dkd_label_value: 'Kurye Operasyon Merkezi', dkd_sub_value: 'Teslimat, çevrimiçi durum ve aktif kurye araçları.', dkd_tone_value: '#087C71', dkd_on_press_value: () => { onClose?.(); onCourier?.(); } } : null,
+    canCourier ? { dkd_icon_value: 'speedometer', dkd_label_value: 'Kurye Operasyon Merkezi', dkd_sub_value: 'Görev havuzu, aktif teslimat, canlı rota ve kazanç akışını tek merkezden yönet.', dkd_tone_value: '#087C71', dkd_on_press_value: () => { onClose?.(); onCourier?.(); } } : null,
     { dkd_icon_value: 'headset', dkd_label_value: 'DrabornEagle Destek', dkd_sub_value: 'Admin hesabına doğrudan canlı mesaj gönder.', dkd_tone_value: '#703F9B', dkd_on_press_value: () => { onClose?.(); onSupport?.(); } },
     { dkd_icon_value: 'shield-lock-outline', dkd_label_value: 'Gizlilik ve Veri Merkezi', dkd_sub_value: 'Google Play veri güvenliği, izinler ve hesap silme kontrolleri.', dkd_tone_value: '#207E9B', dkd_on_press_value: () => { onClose?.(); onLegalCenter?.(); } },
     { dkd_icon_value: 'cellphone-arrow-down', dkd_label_value: 'Sürüm ve Güncelleme Merkezi', dkd_sub_value: 'Cihazdaki sürümü ve resmi web sürüm bilgisini kontrol et.', dkd_tone_value: '#9A4162', dkd_on_press_value: () => { onClose?.(); dkd_on_app_update_center_value?.(); } },
@@ -101,7 +101,7 @@ function ActionMenuModal({ visible, onClose, isAdmin, canCourier, onCourier, onP
               <View style={styles.dkd_header_copy}><Text style={styles.dkd_header_kicker}>DraBornGo v0.0.15</Text><Text style={styles.dkd_header_title}>Merkez Menü</Text><Text style={styles.dkd_header_sub}>Kurye ağı, kazanç, destek ve hesap araçlarına hızlı geçiş.</Text></View>
               <Pressable onPress={onClose} style={styles.dkd_close_button}><MaterialCommunityIcons name="close" size={23} color="#FFFFFF" /></Pressable>
             </View>
-            <View style={styles.dkd_signal_strip}><View style={styles.dkd_signal_dot} /><Text style={styles.dkd_signal_text}>Şehir ağı bağlantısı hazır</Text><MaterialCommunityIcons name="access-point" size={18} color="#70E7BB" /></View>
+            <View style={styles.dkd_signal_strip}><View style={styles.dkd_signal_dot} /><Text style={styles.dkd_signal_text}>Kurye ağı bağlantısı hazır</Text><MaterialCommunityIcons name="access-point" size={18} color="#70E7BB" /></View>
             <ScrollView showsVerticalScrollIndicator={false} nestedScrollEnabled keyboardShouldPersistTaps="handled" scrollEventThrottle={16} contentContainerStyle={styles.dkd_list_content}>
               {canCourier ? <DkdCourierEarningsCategory dkd_visible_value={visible} /> : null}
               {dkd_items_value.map((dkd_item_value) => <DkdMenuRow key={dkd_item_value.dkd_label_value} {...dkd_item_value} />)}

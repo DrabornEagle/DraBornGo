@@ -34,7 +34,7 @@ export default function AdminMenuModal({ visible, onClose, onCourier, onApplicat
               <SecondaryButton label="Kapat" onPress={onClose} size="compact" fullWidth={false} />
             </View>
 
-            <View style={styles.statusStrip}><View style={styles.statusDot} /><Text style={styles.statusText}>Admin oturumu aktif • DraBornGo v0.0.12</Text></View>
+            <View style={styles.statusStrip}><View style={styles.statusDot} /><Text style={styles.statusText}>Admin oturumu aktif • DraBornGo v0.0.15</Text></View>
 
             <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
               <Text style={styles.section}>KULLANICI & DESTEK</Text>
@@ -42,7 +42,7 @@ export default function AdminMenuModal({ visible, onClose, onCourier, onApplicat
               <DkdAction icon="headset" title="Canlı Destek Gelen Kutusu" sub="DrabornEagle destek konuşmalarını görüntüle ve yanıtla." onPress={() => dkd_set_support_open_value(true)} />
               <Text style={styles.section}>KURYE OPERASYONLARI</Text>
               <DkdAction icon="truck-fast-outline" title="Kurye Operasyonları" sub="Kurye ve teslimat merkezini aç." onPress={onCourier} />
-              <DkdAction icon="clipboard-account-outline" title="Kurye Başvuruları" sub="Kurye lisans başvurularını incele." onPress={onApplications} />
+              <DkdAction icon="clipboard-account-outline" title="Kurye Başvuruları" sub="Kurye onay başvurularını incele." onPress={onApplications} />
               <Text style={styles.section}>GÜVENLİK</Text>
               <DkdAction icon="shield-alert-outline" title="Moderasyon Kuyruğu" sub="Sosyal rapor ve şikayetleri incele." onPress={() => setModerationOpen(true)} />
             </ScrollView>
