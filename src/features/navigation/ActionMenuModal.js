@@ -98,7 +98,7 @@ function ActionMenuModal({ visible, onClose, isAdmin, canCourier, onCourier, onP
             <View style={styles.dkd_orb_one} /><View style={styles.dkd_orb_two} />
             <View style={styles.dkd_header}>
               <View style={styles.dkd_header_icon}><MaterialCommunityIcons name="routes" size={28} color="#07111C" /></View>
-              <View style={styles.dkd_header_copy}><Text style={styles.dkd_header_kicker}>DraBornGo v0.0.14</Text><Text style={styles.dkd_header_title}>Merkez Menü</Text><Text style={styles.dkd_header_sub}>Kurye ağı, kazanç, destek ve hesap araçlarına hızlı geçiş.</Text></View>
+              <View style={styles.dkd_header_copy}><Text style={styles.dkd_header_kicker}>DraBornGo v0.0.15</Text><Text style={styles.dkd_header_title}>Merkez Menü</Text><Text style={styles.dkd_header_sub}>Kurye ağı, kazanç, destek ve hesap araçlarına hızlı geçiş.</Text></View>
               <Pressable onPress={onClose} style={styles.dkd_close_button}><MaterialCommunityIcons name="close" size={23} color="#FFFFFF" /></Pressable>
             </View>
             <View style={styles.dkd_signal_strip}><View style={styles.dkd_signal_dot} /><Text style={styles.dkd_signal_text}>Şehir ağı bağlantısı hazır</Text><MaterialCommunityIcons name="access-point" size={18} color="#70E7BB" /></View>

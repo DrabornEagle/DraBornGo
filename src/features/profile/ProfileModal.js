@@ -119,7 +119,7 @@ export default function ProfileModal({ visible, onClose, profile, onSave }) {
         <KeyboardAvoidingView style={dkd_styles_value.screen} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
           <LinearGradient colors={['#050B18', '#091A2A', '#160D2D']} style={dkd_styles_value.screen}>
             <View style={dkd_styles_value.header}>
-              <View style={{ flex: 1 }}><Text style={dkd_styles_value.kicker}>DraBornGo v0.0.14</Text><Text style={dkd_styles_value.title}>Kullanıcı Kimliği</Text><Text style={dkd_styles_value.sub}>Profilini, kurye lisansını ve hesap ayarlarını buradan yönet.</Text></View>
+              <View style={{ flex: 1 }}><Text style={dkd_styles_value.kicker}>DraBornGo v0.0.15</Text><Text style={dkd_styles_value.title}>Kullanıcı Kimliği</Text><Text style={dkd_styles_value.sub}>Profilini, kurye lisansını ve hesap ayarlarını buradan yönet.</Text></View>
               <Pressable onPress={onClose} style={dkd_styles_value.close}><MaterialCommunityIcons name="close" size={22} color="#FFF" /></Pressable>
             </View>
             <ScrollView contentContainerStyle={dkd_styles_value.content} keyboardShouldPersistTaps="handled">

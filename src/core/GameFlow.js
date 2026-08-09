@@ -6,7 +6,7 @@ import { useLocationTracker } from '../hooks/useLocationTracker';
 import { useProfileData } from '../hooks/useProfileData';
 import AppShell from './AppShell';
 import DkdDevicePermissionsGate from '../features/permissions/dkd_device_permissions_gate';
-import { primeNotificationsRuntime, registerDeviceForRemotePush, dkd_start_customer_status_local_notification_poll_value } from '../services/notificationService';
+import { primeNotificationsRuntime, registerDeviceForRemotePush } from '../services/notificationService';
 import { buildHomeProps, buildModalProps, getHasVisibleModal } from './propBuilders';
 
 const dkd_active_delivery_status_values = new Set(['accepted', 'assigned', 'to_pickup', 'picked_up', 'to_customer', 'delivering']);
@@ -66,8 +66,7 @@ export default function GameFlow({ session, onSignedOut, dkd_on_home_ready_value
         console.log('[DraBornGo][push]', dkd_result_value?.reason);
       }
     })();
-    const dkd_stop_poll_value = dkd_start_customer_status_local_notification_poll_value(session.user.id, { dkd_interval_ms_value: 4500 });
-    return () => { dkd_cancelled_value = true; dkd_stop_poll_value?.(); };
+    return () => { dkd_cancelled_value = true; };
   }, [session?.user?.id, dkd_allow_permissions_value, dkd_notification_runtime_enabled_flag]);
 
   const recenterToCurrentLocation = useCallback(() => {

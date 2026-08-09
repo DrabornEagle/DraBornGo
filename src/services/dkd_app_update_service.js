@@ -3,9 +3,9 @@ import { Linking } from 'react-native';
 
 const dkd_update_manifest_url_value = 'https://www.draborneagle.com/DraBornGo/App/dkd_draborngo_update_manifest.json';
 const dkd_play_store_url_value = 'https://play.google.com/store/apps/details?id=com.draborneagle.draborngo';
-const dkd_current_release_name_value = '0.0.14';
+const dkd_current_release_name_value = '0.0.15';
 const dkd_current_release_code_value = 3;
-const dkd_current_release_notes_value = 'DraBornGo v0.0.14: Android versionCode 3 ile Expo Go test hattına geçildi. Aktif kurye lisansı olan kullanıcı DKD Onay Merkezi içinde yeniden başvuru formu yerine lisansının aktif olduğunu görür. Profil, ana sayfa, girişteki Şehir Ağı, Gizlilik ve Veri Merkezi ile web sürüm bilgileri eşitlendi. Kullanılmayan SMS/OTP ve genel kullanıcı DM ifadeleri kaldırıldı. Expo Go aşamasında APK/AAB üretilmez.';
+const dkd_current_release_notes_value = 'DraBornGo v0.0.15: Hizmet Ağı Merkezi, Gönderi Oluştur ve Siparişlerim kullanıcı kaynak kodundan kaldırıldı. Supabase tarafındaki ilgili veri ve sunucu yapıları ileride geri yükleme amacıyla korunuyor. Android versionCode 3 sabit ve test Expo Go üzerinden devam ediyor.';
 
 function dkd_clean_text_value(dkd_value, dkd_fallback = '') {
   const dkd_text_value = String(dkd_value ?? '').trim();

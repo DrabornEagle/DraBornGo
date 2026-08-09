@@ -19,9 +19,9 @@ const dkd_pre_login_role_storage_key_value = 'dkd_dkd_draborngo_pre_login_role_h
 
 const dkd_intro_step_list_value = [
   {
-    dkd_badge_text: 'DraBornGo v0.0.14 • ŞEHİR GİRİŞİ',
+    dkd_badge_text: 'DraBornGo v0.0.15 • ŞEHİR GİRİŞİ',
     dkd_title_text: "DraBornGo'ya hoş geldin — şehir operasyonu tek ekranda",
-    dkd_body_text: 'Kurye, işletme, gönderi/kargo, Hizmet Ağı, destek ve canlı görev akışını modern şehir merkezi mantığıyla tek ekranda buluşturuyoruz.',
+    dkd_body_text: 'Kurye, işletme, destek ve canlı görev akışını modern şehir merkezi mantığıyla tek ekranda buluşturuyoruz.',
     dkd_art_mode_value: 'welcome',
     dkd_art_image_source_value: require('../../../assets/dkd_onboarding/dkd_intro_city_ecosystem.png'),
     dkd_primary_icon_name: 'city-variant-outline',
@@ -31,7 +31,7 @@ const dkd_intro_step_list_value = [
   {
     dkd_badge_text: 'CANLI TESLİMAT MOTORU',
     dkd_title_text: 'Görev gelir, rota açılır, teslimat netleşir',
-    dkd_body_text: 'Kurye görevleri, gönderi/kargo ve işletme bağlantıları güncel kartlar, canlı durum ve teslimat adımlarıyla tek operasyon akışında görünür olur.',
+    dkd_body_text: 'Kurye görevleri ve işletme bağlantıları güncel kartlar, canlı durum ve teslimat adımlarıyla tek operasyon akışında görünür olur.',
     dkd_art_mode_value: 'delivery',
     dkd_art_image_source_value: require('../../../assets/dkd_onboarding/dkd_intro_delivery_route.png'),
     dkd_primary_icon_name: 'bike-fast',
@@ -67,8 +67,8 @@ const dkd_role_option_list_value = [
 
 const dkd_delivery_card_list_value = [
   { dkd_title_text: 'Kurye Merkezi', dkd_body_text: 'Görev havuzu ve teslimat', dkd_icon_name: 'bike-fast', dkd_color_value: '#22C55E' },
-  { dkd_title_text: 'Gönderi & Kargo', dkd_body_text: 'Paket ve rota akışı', dkd_icon_name: 'package-variant-closed', dkd_color_value: '#0EA5E9' },
-  { dkd_title_text: 'Hizmet Ağı', dkd_body_text: 'Şehir içi hizmet akışı', dkd_icon_name: 'tools', dkd_color_value: '#A855F7' },
+  { dkd_title_text: 'Canlı Görevler', dkd_body_text: 'Kurye görevi ve rota akışı', dkd_icon_name: 'map-marker-path', dkd_color_value: '#0EA5E9' },
+  { dkd_title_text: 'Destek Merkezi', dkd_body_text: 'Admin ile doğrudan destek', dkd_icon_name: 'headset', dkd_color_value: '#A855F7' },
   { dkd_title_text: 'İşletme Ağı', dkd_body_text: 'İşletme ve operasyon bağlantısı', dkd_icon_name: 'storefront-outline', dkd_color_value: '#F97316' },
 ];
 
@@ -318,7 +318,7 @@ export default function DkdPreLoginIntroScreen({ dkd_on_continue_value }) {
                 </View>
                 <View style={dkd_styles_value.dkd_control_line}>
                   <MaterialCommunityIcons name="check-circle" size={18} color="#16A34A" />
-                  <Text style={dkd_styles_value.dkd_control_line_text}>Gönderi, kargo ve Hizmet Ağı için canlı durum</Text>
+                  <Text style={dkd_styles_value.dkd_control_line_text}>Kurye görevleri ve işletme akışı için canlı durum</Text>
                 </View>
                 <View style={dkd_styles_value.dkd_control_line}>
                   <MaterialCommunityIcons name="check-circle" size={18} color="#16A34A" />

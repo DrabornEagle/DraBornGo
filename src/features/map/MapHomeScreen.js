@@ -4,7 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Image } from 'expo-image';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-const dkd_version_text_value = 'v0.0.14';
+const dkd_version_text_value = 'v0.0.15';
 const dkd_racing_motorcycle_asset_value = require('../../../assets/icons/dkd_racing_motorcycle.svg');
 
 function DkdAnimatedPressable({ dkd_children_value, dkd_on_press_value, dkd_style_value, dkd_disabled_value = false }) {
@@ -254,7 +254,6 @@ function MapHomeScreen({
           <View style={dkd_styles_value.dkd_section_heading}><View><Text style={dkd_styles_value.dkd_section_kicker}>OPERASYON</Text><Text style={dkd_styles_value.dkd_section_title}>Görev merkezleri</Text></View><View style={dkd_styles_value.dkd_section_icon}><MaterialCommunityIcons name="radar" size={22} color="#79DDFF" /></View></View>
 
           <DkdActionCard dkd_icon_value="motorbike" dkd_kicker_value="CANLI KURYE AĞI" dkd_title_value="Kurye Operasyon Merkezi" dkd_subtitle_value="Sipariş havuzu, aktif teslimatlar, kargo ve performans akışını kurye odaklı tek merkezden yönet." dkd_badge_value={dkd_courier_busy_value ? 'SİPARİŞTE' : dkd_courier_online_value ? 'CANLI' : 'HAZIR'} dkd_colors_value={['#064E58', '#174A92', '#5A2D91']} dkd_on_press_value={() => onOpenCourierBoard?.('default')} />
-          <DkdActionCard dkd_icon_value="map-marker-path" dkd_kicker_value="ŞEHİR SERVİSLERİ" dkd_title_value="Hizmet Ağı Merkezi" dkd_subtitle_value="Gönderi oluştur, siparişlerini takip et ve kurye teslimat akışını tek merkezden yönet." dkd_badge_value="KEŞFET" dkd_colors_value={['#056B57', '#0A637F', '#35369A']} dkd_on_press_value={() => onTabChange?.('serviceNetwork')} />
 
           <View style={dkd_styles_value.dkd_section_heading}><View><Text style={dkd_styles_value.dkd_section_kicker}>HIZLI ERİŞİM</Text><Text style={dkd_styles_value.dkd_section_title}>Tek dokunuşla aç</Text></View></View>
           <View style={dkd_styles_value.dkd_quick_grid}>

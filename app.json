@@ -2,7 +2,7 @@
   "expo": {
     "name": "DraBornGo",
     "slug": "draborngo",
-    "version": "0.0.14",
+    "version": "0.0.15",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "draborngo",
@@ -71,7 +71,7 @@
       [
         "expo-location",
         {
-          "locationWhenInUsePermission": "DraBornGo; kurye, gönderi ve teslimat işlemlerinde adres eşleştirme, rota çizimi ve canlı teslimat takibi için yalnızca uygulama açıkken konumunu kullanır.",
+          "locationWhenInUsePermission": "DraBornGo; kurye görevi, rota ve aktif teslimat takibi için yalnızca uygulama açıkken konumunu kullanır.",
           "isAndroidBackgroundLocationEnabled": false,
           "isAndroidForegroundServiceEnabled": false,
           "isIosBackgroundLocationEnabled": false
@@ -80,8 +80,8 @@
       [
         "expo-image-picker",
         {
-          "photosPermission": "DraBornGo; yalnızca senin seçtiğin paket, profil veya kurye başvurusu görselini eklemek için galerine erişir.",
-          "cameraPermission": "DraBornGo; yalnızca sen başlattığında paket, profil veya kurye başvurusu görseli çekmek için kameranı kullanır.",
+          "photosPermission": "DraBornGo; yalnızca senin seçtiğin profil veya kurye başvurusu görselini eklemek için galerine erişir.",
+          "cameraPermission": "DraBornGo; yalnızca sen başlattığında profil veya kurye başvurusu görseli çekmek için kameranı kullanır.",
           "microphonePermission": false
         }
       ]

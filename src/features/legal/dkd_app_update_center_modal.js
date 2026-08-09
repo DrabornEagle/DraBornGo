@@ -45,7 +45,7 @@ export default function DkdAppUpdateCenterModal({ dkd_visible_value, dkd_on_clos
     if (dkd_visible_value) dkd_load_value();
   }, [dkd_visible_value, dkd_load_value]);
 
-  const dkd_installed_value = dkd_status_value?.dkd_installed_value || { dkd_version_name_value: '0.0.14', dkd_version_code_value: 3 };
+  const dkd_installed_value = dkd_status_value?.dkd_installed_value || { dkd_version_name_value: '0.0.15', dkd_version_code_value: 3 };
   const dkd_update_required_value = Boolean(dkd_status_value?.dkd_update_required_value);
   const dkd_status_title_value = dkd_update_required_value ? 'Zorunlu güncelleme var' : 'Sürüm güncel';
   const dkd_status_body_value = dkd_update_required_value
@@ -94,13 +94,13 @@ export default function DkdAppUpdateCenterModal({ dkd_visible_value, dkd_on_clos
               <DkdUpdateInfoCard
                 dkd_icon_value="cellphone-check"
                 dkd_label_value="Cihazdaki sürüm"
-                dkd_value={`v${String(dkd_installed_value?.dkd_version_name_value || '0.0.14').replace(/^v/i, '')} • Kod ${Number(dkd_installed_value?.dkd_version_code_value || 3)}`}
+                dkd_value={`v${String(dkd_installed_value?.dkd_version_name_value || '0.0.15').replace(/^v/i, '')} • Kod ${Number(dkd_installed_value?.dkd_version_code_value || 3)}`}
                 dkd_tone_value="green"
               />
               <DkdUpdateInfoCard
                 dkd_icon_value="cloud-download-outline"
                 dkd_label_value="Webdeki son sürüm"
-                dkd_value={`v${String(dkd_status_value?.dkd_latest_version_name_value || '0.0.14').replace(/^v/i, '')} • Kod ${Number(dkd_status_value?.dkd_latest_version_code_value || 3)}`}
+                dkd_value={`v${String(dkd_status_value?.dkd_latest_version_name_value || '0.0.15').replace(/^v/i, '')} • Kod ${Number(dkd_status_value?.dkd_latest_version_code_value || 3)}`}
                 dkd_tone_value="pink"
               />
               <DkdUpdateInfoCard
@@ -118,7 +118,7 @@ export default function DkdAppUpdateCenterModal({ dkd_visible_value, dkd_on_clos
 
               <View style={dkd_styles_value.dkd_release_card}>
                 <Text {...dkd_text_scaling_props_value} style={dkd_styles_value.dkd_release_label}>Sürüm notu</Text>
-                <Text {...dkd_text_scaling_props_value} style={dkd_styles_value.dkd_release_text}>{dkd_status_value?.dkd_release_notes_value || 'DraBornGo v0.0.14 güncel sürüm bilgisi yükleniyor.'}</Text>
+                <Text {...dkd_text_scaling_props_value} style={dkd_styles_value.dkd_release_text}>{dkd_status_value?.dkd_release_notes_value || 'DraBornGo v0.0.15 güncel sürüm bilgisi yükleniyor.'}</Text>
               </View>
 
               {dkd_update_required_value && dkd_status_value?.dkd_download_url_value ? (

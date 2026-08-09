@@ -27,7 +27,6 @@ export function getHasVisibleModal({ actionMenuOpen, profileOpen, courierBoardOp
     || adminApplicationsOpen
     || activeTab === 'support'
     || activeTab === 'applications'
-    || activeTab === 'serviceNetwork'
     || activeTab === 'dkd_legal_center'
     || activeTab === 'dkd_app_update_center'
   );
