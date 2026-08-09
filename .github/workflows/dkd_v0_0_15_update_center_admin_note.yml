@@ -1,0 +1,179 @@
+name: DraBornGo v0.0.15 Update Center Admin Note
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/dkd_v0_0_15_update_center_admin_note.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Apply requested UI and release-note changes
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs = require('fs');
+
+          function replaceRequired(path, from, to, label) {
+            let s = fs.readFileSync(path, 'utf8');
+            if (!s.includes(from)) throw new Error(`${path}: missing ${label}`);
+            s = s.replace(from, to);
+            fs.writeFileSync(path, s);
+          }
+
+          function edit(path, fn) {
+            const s = fs.readFileSync(path, 'utf8');
+            const next = fn(s);
+            if (next === s) throw new Error(`${path}: no changes produced`);
+            fs.writeFileSync(path, next);
+          }
+
+          // 1) Privacy center: remove dedicated courier identity/application card,
+          // while keeping the broader Data Safety disclosure accurate.
+          edit('src/features/legal/dkd_google_play_policy_center_modal.js', (s) => {
+            const identityCard = `  {\n    dkd_key_value: 'identity-contact',\n    dkd_icon_value: 'card-account-details-outline',\n    dkd_title_value: 'Kurye Kimlik ve Başvuru Bilgileri',\n    dkd_body_value: 'Kurye başvurusu ve onay sürecinde kullanıcının sunduğu kimlik, iletişim, adres, şehir/bölge, araç/plaka, acil durum iletişim ve gerekli başvuru belgeleri işlenebilir. Telefon bilgisi SMS/OTP veya pazarlama amacıyla kullanılmaz.',\n  },\n`;
+            if (!s.includes(identityCard)) throw new Error('privacy identity card not found');
+            s = s.replace(identityCard, '');
+            const oldMedia = "dkd_body_value: 'Kamera ve görsel seçimi yalnız kullanıcının başlattığı profil veya kurye başvurusu görseli/belgesi işlemlerinde açılır. Mikrofon, arka plan kamera erişimi ve geniş medya/depolama erişimi istenmez.'";
+            const newMedia = "dkd_body_value: 'Kamera ve görsel seçimi yalnız kullanıcının başlattığı profil, görsel veya belge işlemlerinde açılır. Mikrofon, arka plan kamera erişimi ve geniş medya/depolama erişimi istenmez.'";
+            if (!s.includes(oldMedia)) throw new Error('privacy media text not found');
+            return s.replace(oldMedia, newMedia);
+          });
+
+          // 2) Main courier CTA wording.
+          edit('src/features/map/MapHomeScreen.js', (s) => {
+            const oldSubtitle = "dkd_subtitle_value: 'Hazır olduğunda Görev BUL ile yeni görev aramasını başlat.'";
+            const newSubtitle = "dkd_subtitle_value: 'Hazır olduğunda Görevleri Aramaya BAŞLA ile çevrendeki uygun görevleri tara.'";
+            if (!s.includes(oldSubtitle)) throw new Error('home offline subtitle not found');
+            s = s.replace(oldSubtitle, newSubtitle);
+            const oldButton = "dkd_courier_busy_value ? 'Görev Aktif' : dkd_courier_online_value ? 'Görevler Taranıyor • Durdur' : 'Görev BUL'";
+            const newButton = "dkd_courier_busy_value ? 'Görev Aktif' : dkd_courier_online_value ? 'Görevler Taranıyor • Durdur' : 'Görevleri Aramaya BAŞLA'";
+            if (!s.includes(oldButton)) throw new Error('home task button text not found');
+            return s.replace(oldButton, newButton);
+          });
+
+          // 3) App update service: Supabase-backed release note, public read/admin write.
+          edit('src/services/dkd_app_update_service.js', (s) => {
+            const importNeedle = "import { Linking } from 'react-native';\n";
+            if (!s.includes(importNeedle)) throw new Error('update service import anchor missing');
+            s = s.replace(importNeedle, importNeedle + "import { supabase } from '../lib/supabase';\n");
+
+            const compareTail = `function dkd_compare_version_name_value(dkd_left_value, dkd_right_value) {\n  const dkd_left_parts_value = dkd_version_part_list_value(dkd_left_value);\n  const dkd_right_parts_value = dkd_version_part_list_value(dkd_right_value);\n  const dkd_length_value = Math.max(dkd_left_parts_value.length, dkd_right_parts_value.length, 3);\n  for (let dkd_index_value = 0; dkd_index_value < dkd_length_value; dkd_index_value += 1) {\n    const dkd_left_part_value = dkd_left_parts_value[dkd_index_value] || 0;\n    const dkd_right_part_value = dkd_right_parts_value[dkd_index_value] || 0;\n    if (dkd_left_part_value > dkd_right_part_value) return 1;\n    if (dkd_left_part_value < dkd_right_part_value) return -1;\n  }\n  return 0;\n}\n`;
+            if (!s.includes(compareTail)) throw new Error('update service compare function anchor missing');
+            const helpers = `${compareTail}\nasync function dkd_fetch_dynamic_release_note_value() {\n  try {\n    const dkd_result_value = await supabase\n      .from('dkd_app_release_notes')\n      .select('dkd_release_note_value')\n      .eq('dkd_id_value', 1)\n      .maybeSingle();\n    if (dkd_result_value?.error) return '';\n    return dkd_clean_text_value(dkd_result_value?.data?.dkd_release_note_value, '');\n  } catch {\n    return '';\n  }\n}\n\nexport async function dkd_update_app_release_note_value(dkd_release_note_value) {\n  const dkd_clean_release_note_value = dkd_clean_text_value(dkd_release_note_value, '').slice(0, 4000);\n  if (!dkd_clean_release_note_value) {\n    return { data: null, error: new Error('Sürüm notu boş bırakılamaz.') };\n  }\n  try {\n    const dkd_result_value = await supabase\n      .from('dkd_app_release_notes')\n      .upsert({\n        dkd_id_value: 1,\n        dkd_release_note_value: dkd_clean_release_note_value,\n        dkd_version_name_value: dkd_current_release_name_value,\n        dkd_version_code_value: dkd_current_release_code_value,\n        dkd_updated_at_value: new Date().toISOString(),\n      }, { onConflict: 'dkd_id_value' })\n      .select('dkd_release_note_value, dkd_updated_at_value')\n      .single();\n    return { data: dkd_result_value?.data || null, error: dkd_result_value?.error || null };\n  } catch (dkd_error_value) {\n    return { data: null, error: dkd_error_value };\n  }\n}\n`;
+            s = s.replace(compareTail, helpers);
+
+            const fetchStart = "export async function dkd_fetch_app_update_status_value() {\n  const dkd_installed_value = dkd_get_installed_app_identity_value();\n";
+            const fetchStartNext = "export async function dkd_fetch_app_update_status_value() {\n  const dkd_installed_value = dkd_get_installed_app_identity_value();\n  const dkd_dynamic_release_note_value = await dkd_fetch_dynamic_release_note_value();\n";
+            if (!s.includes(fetchStart)) throw new Error('update service fetch start missing');
+            s = s.replace(fetchStart, fetchStartNext);
+
+            const remoteNotes = `dkd_release_notes_value: dkd_remote_is_current_or_newer_value && dkd_remote_release_notes_value\n        ? dkd_remote_release_notes_value\n        : dkd_current_release_notes_value,`;
+            const remoteNotesNext = `dkd_release_notes_value: dkd_dynamic_release_note_value || (dkd_remote_is_current_or_newer_value && dkd_remote_release_notes_value\n        ? dkd_remote_release_notes_value\n        : dkd_current_release_notes_value),`;
+            if (!s.includes(remoteNotes)) throw new Error('update service remote release notes anchor missing');
+            s = s.replace(remoteNotes, remoteNotesNext);
+
+            const fallbackNotes = 'dkd_release_notes_value: dkd_current_release_notes_value,';
+            if (!s.includes(fallbackNotes)) throw new Error('update service fallback release notes anchor missing');
+            s = s.replace(fallbackNotes, 'dkd_release_notes_value: dkd_dynamic_release_note_value || dkd_current_release_notes_value,');
+            return s;
+          });
+
+          // 4) Update center: remove remote-web-version card and add in-place admin editor.
+          edit('src/features/legal/dkd_app_update_center_modal.js', (s) => {
+            s = s.replace(
+              "import { ActivityIndicator, Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';",
+              "import { ActivityIndicator, Alert, Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';"
+            );
+            s = s.replace(
+              "import { dkd_fetch_app_update_status_value, dkd_open_app_update_source_value } from '../../services/dkd_app_update_service';",
+              "import { dkd_fetch_app_update_status_value, dkd_open_app_update_source_value, dkd_update_app_release_note_value } from '../../services/dkd_app_update_service';"
+            );
+            s = s.replace(
+              'export default function DkdAppUpdateCenterModal({ dkd_visible_value, dkd_on_close_value }) {',
+              'export default function DkdAppUpdateCenterModal({ dkd_visible_value, dkd_on_close_value, dkd_is_admin_value = false }) {'
+            );
+            const stateAnchor = `  const [dkd_status_value, dkd_set_status_value] = useState(null);\n  const [dkd_loading_value, dkd_set_loading_value] = useState(false);\n`;
+            if (!s.includes(stateAnchor)) throw new Error('update center state anchor missing');
+            s = s.replace(stateAnchor, stateAnchor + `  const [dkd_release_note_draft_value, dkd_set_release_note_draft_value] = useState('');\n  const [dkd_release_note_saving_value, dkd_set_release_note_saving_value] = useState(false);\n`);
+
+            const loadAnchor = `      const dkd_next_value = await dkd_fetch_app_update_status_value();\n      dkd_set_status_value(dkd_next_value);`;
+            if (!s.includes(loadAnchor)) throw new Error('update center load anchor missing');
+            s = s.replace(loadAnchor, `${loadAnchor}\n      dkd_set_release_note_draft_value(String(dkd_next_value?.dkd_release_notes_value || ''));`);
+
+            s = s.replace(
+              'DraBornGo cihaz sürümü resmi web sürüm kaydıyla uyumlu. Yeni sürüm yayınlandığında bu merkezden tekrar kontrol edebilirsin.',
+              'DraBornGo cihaz sürümü resmi sürüm kaydıyla uyumlu. Yeni sürüm yayınlandığında bu merkezden tekrar kontrol edebilirsin.'
+            );
+
+            const shaAnchor = `  const dkd_sha_text_value = String(dkd_status_value?.dkd_sha256_value || '').trim() || 'APK/AAB build sonrası eklenecek';\n`;
+            if (!s.includes(shaAnchor)) throw new Error('update center sha anchor missing');
+            const saveCallback = `${shaAnchor}\n  const dkd_save_release_note_value = useCallback(async () => {\n    if (!dkd_is_admin_value || dkd_release_note_saving_value) return;\n    const dkd_clean_note_value = String(dkd_release_note_draft_value || '').trim();\n    if (!dkd_clean_note_value) {\n      Alert.alert('Sürüm Notu', 'Sürüm notu boş bırakılamaz.');\n      return;\n    }\n    dkd_set_release_note_saving_value(true);\n    try {\n      const dkd_result_value = await dkd_update_app_release_note_value(dkd_clean_note_value);\n      if (dkd_result_value?.error) throw dkd_result_value.error;\n      const dkd_saved_note_value = String(dkd_result_value?.data?.dkd_release_note_value || dkd_clean_note_value);\n      dkd_set_release_note_draft_value(dkd_saved_note_value);\n      dkd_set_status_value((dkd_previous_value) => ({ ...(dkd_previous_value || {}), dkd_release_notes_value: dkd_saved_note_value }));\n      Alert.alert('Sürüm Notu', 'Sürüm notu güncellendi. Tüm kullanıcılar güncel metni görebilir.');\n    } catch (dkd_error_value) {\n      Alert.alert('Sürüm Notu', dkd_error_value?.message || 'Sürüm notu güncellenemedi.');\n    } finally {\n      dkd_set_release_note_saving_value(false);\n    }\n  }, [dkd_is_admin_value, dkd_release_note_draft_value, dkd_release_note_saving_value]);\n`;
+            s = s.replace(shaAnchor, saveCallback);
+
+            const webCard = `              <DkdUpdateInfoCard\n                dkd_icon_value="cloud-download-outline"\n                dkd_label_value="Webdeki son sürüm"\n                dkd_value={\`v\${String(dkd_status_value?.dkd_latest_version_name_value || '0.0.15').replace(/^v/i, '')} • Kod \${Number(dkd_status_value?.dkd_latest_version_code_value || 3)}\`}\n                dkd_tone_value="pink"\n              />\n`;
+            if (!s.includes(webCard)) throw new Error('web latest version card not found');
+            s = s.replace(webCard, '');
+
+            const releaseCard = `              <View style={dkd_styles_value.dkd_release_card}>\n                <Text {...dkd_text_scaling_props_value} style={dkd_styles_value.dkd_release_label}>Sürüm notu</Text>\n                <Text {...dkd_text_scaling_props_value} style={dkd_styles_value.dkd_release_text}>{dkd_status_value?.dkd_release_notes_value || 'DraBornGo v0.0.15 güncel sürüm bilgisi yükleniyor.'}</Text>\n              </View>`;
+            const releaseCardNext = `              <View style={dkd_styles_value.dkd_release_card}>\n                <View style={dkd_styles_value.dkd_release_header_row}>\n                  <Text {...dkd_text_scaling_props_value} style={dkd_styles_value.dkd_release_label}>Sürüm notu</Text>\n                  {dkd_is_admin_value ? <View style={dkd_styles_value.dkd_admin_badge}><MaterialCommunityIcons name="shield-crown-outline" size={13} color="#07131C" /><Text {...dkd_text_scaling_props_value} style={dkd_styles_value.dkd_admin_badge_text}>ADMIN DÜZENLEME</Text></View> : null}\n                </View>\n                {dkd_is_admin_value ? (\n                  <>\n                    <TextInput\n                      value={dkd_release_note_draft_value}\n                      onChangeText={dkd_set_release_note_draft_value}\n                      multiline\n                      maxLength={4000}\n                      textAlignVertical="top"\n                      placeholder="Tüm kullanıcıların göreceği sürüm notunu yaz..."\n                      placeholderTextColor="rgba(231,241,255,.36)"\n                      style={dkd_styles_value.dkd_release_input}\n                    />\n                    <Pressable disabled={dkd_release_note_saving_value || !String(dkd_release_note_draft_value || '').trim()} onPress={dkd_save_release_note_value} style={({ pressed: dkd_pressed_value }) => [dkd_styles_value.dkd_release_save_button, (dkd_pressed_value || dkd_release_note_saving_value) && { opacity: .72 }]}>\n                      {dkd_release_note_saving_value ? <ActivityIndicator color="#06111B" size="small" /> : <MaterialCommunityIcons name="content-save-edit-outline" size={18} color="#06111B" />}\n                      <Text {...dkd_text_scaling_props_value} style={dkd_styles_value.dkd_release_save_text}>{dkd_release_note_saving_value ? 'Kaydediliyor' : 'Sürüm Notunu Yayınla'}</Text>\n                    </Pressable>\n                  </>\n                ) : (\n                  <Text {...dkd_text_scaling_props_value} style={dkd_styles_value.dkd_release_text}>{dkd_status_value?.dkd_release_notes_value || 'DraBornGo v0.0.15 güncel sürüm bilgisi yükleniyor.'}</Text>\n                )}\n              </View>`;
+            if (!s.includes(releaseCard)) throw new Error('release card anchor missing');
+            s = s.replace(releaseCard, releaseCardNext);
+
+            const styleAnchor = `  dkd_release_card: { borderRadius: 20, padding: 14, backgroundColor: 'rgba(7,43,48,.70)', borderWidth: 1, borderColor: 'rgba(85,232,181,.28)' },\n  dkd_release_label: { color: '#58E5B4', fontSize: 11.5, lineHeight: 14, fontWeight: '900' },\n  dkd_release_text: { color: '#FFFFFF', fontSize: 11.5, lineHeight: 18, fontWeight: '700', marginTop: 7 },\n`;
+            if (!s.includes(styleAnchor)) throw new Error('release styles anchor missing');
+            const styleNext = `${styleAnchor}  dkd_release_header_row: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8 },\n  dkd_admin_badge: { minHeight: 27, borderRadius: 999, paddingHorizontal: 9, flexDirection: 'row', alignItems: 'center', gap: 5, backgroundColor: '#70E9B7' },\n  dkd_admin_badge_text: { color: '#07131C', fontSize: 7.5, fontWeight: '900', letterSpacing: .55 },\n  dkd_release_input: { minHeight: 126, maxHeight: 250, marginTop: 10, borderRadius: 16, paddingHorizontal: 12, paddingVertical: 11, color: '#FFFFFF', fontSize: 11.5, lineHeight: 18, fontWeight: '700', backgroundColor: 'rgba(3,19,28,.72)', borderWidth: 1, borderColor: 'rgba(95,235,187,.25)' },\n  dkd_release_save_button: { minHeight: 48, borderRadius: 16, marginTop: 10, backgroundColor: '#6FEAB5', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingHorizontal: 12 },\n  dkd_release_save_text: { color: '#06111B', fontSize: 11.5, fontWeight: '900' },\n`;
+            return s.replace(styleAnchor, styleNext);
+          });
+
+          // 5) Pass admin capability into Update Center.
+          edit('src/core/ModalHost.js', (s) => {
+            const oldLine = `{(dkd_app_update_center_visible_value || activeTab === 'dkd_app_update_center') ? <DkdAppUpdateCenterModal dkd_visible_value dkd_on_close_value={() => { dkd_set_app_update_center_visible_value(false); setActiveTab('map'); }} /> : null}`;
+            const newLine = `{(dkd_app_update_center_visible_value || activeTab === 'dkd_app_update_center') ? <DkdAppUpdateCenterModal dkd_visible_value dkd_on_close_value={() => { dkd_set_app_update_center_visible_value(false); setActiveTab('map'); }} dkd_is_admin_value={isAdmin} /> : null}`;
+            if (!s.includes(oldLine)) throw new Error('ModalHost update center line missing');
+            return s.replace(oldLine, newLine);
+          });
+          NODE
+
+      - name: Install and validate
+        run: |
+          npm ci
+          npm run dkd:verify-v0.0.15
+          npm run dkd:play-risk-scan
+
+      - name: Validate requested copy and release-note wiring
+        shell: bash
+        run: |
+          set -euo pipefail
+          ! grep -q "Kurye Kimlik ve Başvuru Bilgileri" src/features/legal/dkd_google_play_policy_center_modal.js
+          ! grep -q "profil veya kurye başvurusu görseli" src/features/legal/dkd_google_play_policy_center_modal.js
+          grep -q "Görevleri Aramaya BAŞLA" src/features/map/MapHomeScreen.js
+          ! grep -q "Webdeki son sürüm" src/features/legal/dkd_app_update_center_modal.js
+          grep -q "ADMIN DÜZENLEME" src/features/legal/dkd_app_update_center_modal.js
+          grep -q "dkd_app_release_notes" src/services/dkd_app_update_service.js
+          grep -q "dkd_is_admin_value={isAdmin}" src/core/ModalHost.js
+
+      - name: Commit source changes and cleanup workflow
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f .github/workflows/dkd_v0_0_15_update_center_admin_note.yml
+          git config user.name "DrabornEagle Automation"
+          git config user.email "actions@users.noreply.github.com"
+          git add src/features/legal/dkd_google_play_policy_center_modal.js src/features/map/MapHomeScreen.js src/services/dkd_app_update_service.js src/features/legal/dkd_app_update_center_modal.js src/core/ModalHost.js .github/workflows/dkd_v0_0_15_update_center_admin_note.yml
+          git commit -m "ui: add admin editable release notes and requested cleanup"
+          git push origin HEAD:main
