@@ -15,23 +15,23 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import SafeScreen from '../../components/layout/SafeScreen';
 import { dkd_make_native_axis_point } from '../../utils/dkdNativeAxis';
 
-const dkd_pre_login_role_storage_key_value = 'dkd_dkd_draborngo_pre_login_role_hint_v7';
+const dkd_pre_login_role_storage_key_value = 'dkd_dkd_draborngo_pre_login_role_hint_v8';
 
 const dkd_intro_step_list_value = [
   {
-    dkd_badge_text: 'DraBornGo v0.0.15 • ŞEHİR GİRİŞİ',
-    dkd_title_text: "DraBornGo'ya hoş geldin — şehir operasyonu tek ekranda",
-    dkd_body_text: 'Kurye, işletme, destek ve canlı görev akışını modern şehir merkezi mantığıyla tek ekranda buluşturuyoruz.',
+    dkd_badge_text: 'DraBornGo v0.0.15 • KURYE GİRİŞİ',
+    dkd_title_text: "DraBornGo'ya hoş geldin — kurye operasyonun tek ekranda",
+    dkd_body_text: 'Gelen teslimat görevlerini gör, uygun görevi kabul et, rotanı takip et ve kazancını tek merkezden izle.',
     dkd_art_mode_value: 'welcome',
     dkd_art_image_source_value: require('../../../assets/dkd_onboarding/dkd_intro_city_ecosystem.png'),
-    dkd_primary_icon_name: 'city-variant-outline',
+    dkd_primary_icon_name: 'bike-fast',
     dkd_accent_colors_value: ['#38BDF8', '#A78BFA', '#F472B6'],
     dkd_screen_gradient_colors_value: ['#040617', '#111827', '#32115F', '#0B5C72'],
   },
   {
-    dkd_badge_text: 'CANLI TESLİMAT MOTORU',
+    dkd_badge_text: 'CANLI KURYE GÖREVLERİ',
     dkd_title_text: 'Görev gelir, rota açılır, teslimat netleşir',
-    dkd_body_text: 'Kurye görevleri ve işletme bağlantıları güncel kartlar, canlı durum ve teslimat adımlarıyla tek operasyon akışında görünür olur.',
+    dkd_body_text: 'Görev havuzundaki teslimatları gör; kabul ettiğin görevin alım ve teslimat adımlarını canlı durum ve rota akışıyla yönet.',
     dkd_art_mode_value: 'delivery',
     dkd_art_image_source_value: require('../../../assets/dkd_onboarding/dkd_intro_delivery_route.png'),
     dkd_primary_icon_name: 'bike-fast',
@@ -39,19 +39,19 @@ const dkd_intro_step_list_value = [
     dkd_screen_gradient_colors_value: ['#02140D', '#053B2A', '#0F766E', '#13213F'],
   },
   {
-    dkd_badge_text: 'ROLÜNÜ SEÇ',
-    dkd_title_text: "DraBornGo'yu kendi akışına göre aç",
-    dkd_body_text: 'Kurye veya işletme akışını seç; karşılama ekranı tercihini bu cihazda saklar ve girişe daha anlaşılır bir başlangıç sağlar.',
-    dkd_art_mode_value: 'role',
+    dkd_badge_text: 'KURYE LİSANSI',
+    dkd_title_text: 'Onaylı kurye olarak görev akışına katıl',
+    dkd_body_text: 'Kurye başvurun onaylandığında lisans durumun aktif görünür; görev havuzuna erişerek teslimat operasyonuna başlayabilirsin.',
+    dkd_art_mode_value: 'license',
     dkd_art_image_source_value: require('../../../assets/dkd_onboarding/dkd_intro_role_hub.png'),
-    dkd_primary_icon_name: 'account-switch-outline',
+    dkd_primary_icon_name: 'badge-account-horizontal-outline',
     dkd_accent_colors_value: ['#FB7185', '#A78BFA', '#60A5FA'],
     dkd_screen_gradient_colors_value: ['#16051B', '#35124F', '#1E1B4B', '#0F172A'],
   },
   {
-    dkd_badge_text: 'CANLI TAKİP & BİLDİRİM',
-    dkd_title_text: 'Görev havuzu, canlı rota ve bildirimler aynı ritimde',
-    dkd_body_text: 'Görevi kabul etme, teslim alma, rota ve teslim edildi adımları daha okunur; kurye ve işletme operasyonu girişten önce bile net biçimde tanıtılır.',
+    dkd_badge_text: 'CANLI TAKİP & KAZANÇ',
+    dkd_title_text: 'Teslimat, rota ve kazanç aynı akışta',
+    dkd_body_text: 'Görevi kabul et, teslim al, rotanı tamamla, teslim edildi olarak kapat ve çalışma-kazanç özetlerini tek merkezden takip et.',
     dkd_art_mode_value: 'control',
     dkd_art_image_source_value: require('../../../assets/dkd_onboarding/dkd_intro_live_tracking.png'),
     dkd_primary_icon_name: 'map-marker-path',
@@ -62,14 +62,13 @@ const dkd_intro_step_list_value = [
 
 const dkd_role_option_list_value = [
   { dkd_key_value: 'courier', dkd_label_text: 'Kuryeyim', dkd_icon_name: 'bike-fast' },
-  { dkd_key_value: 'business', dkd_label_text: 'İşletmeyim', dkd_icon_name: 'storefront-outline' },
 ];
 
 const dkd_delivery_card_list_value = [
-  { dkd_title_text: 'Kurye Merkezi', dkd_body_text: 'Görev havuzu ve teslimat', dkd_icon_name: 'bike-fast', dkd_color_value: '#22C55E' },
-  { dkd_title_text: 'Canlı Görevler', dkd_body_text: 'Kurye görevi ve rota akışı', dkd_icon_name: 'map-marker-path', dkd_color_value: '#0EA5E9' },
-  { dkd_title_text: 'Destek Merkezi', dkd_body_text: 'Admin ile doğrudan destek', dkd_icon_name: 'headset', dkd_color_value: '#A855F7' },
-  { dkd_title_text: 'İşletme Ağı', dkd_body_text: 'İşletme ve operasyon bağlantısı', dkd_icon_name: 'storefront-outline', dkd_color_value: '#F97316' },
+  { dkd_title_text: 'Görev Havuzu', dkd_body_text: 'Güncel teslimat görevleri', dkd_icon_name: 'clipboard-text-clock-outline', dkd_color_value: '#22C55E' },
+  { dkd_title_text: 'Canlı Rota', dkd_body_text: 'Alım ve teslimat rotası', dkd_icon_name: 'map-marker-path', dkd_color_value: '#0EA5E9' },
+  { dkd_title_text: 'Teslimat Adımları', dkd_body_text: 'Kabul et, teslim al, teslim et', dkd_icon_name: 'package-variant-closed-check', dkd_color_value: '#A855F7' },
+  { dkd_title_text: 'Kazanç Takibi', dkd_body_text: 'Çalışma ve kazanç özetleri', dkd_icon_name: 'cash-clock', dkd_color_value: '#F97316' },
 ];
 
 function DkdIntroIllustration({ dkd_art_image_source_value, dkd_accent_colors_value }) {
@@ -232,7 +231,7 @@ function DkdDeliveryCards() {
 
 export default function DkdPreLoginIntroScreen({ dkd_on_continue_value }) {
   const [dkd_step_index_value, dkd_set_step_index_value] = useState(0);
-  const [dkd_selected_role_value, dkd_set_selected_role_value] = useState(null);
+  const [dkd_selected_role_value, dkd_set_selected_role_value] = useState('courier');
   const [dkd_saving_flag, dkd_set_saving_flag] = useState(false);
   const dkd_scroll_view_reference_value = useRef(null);
   const dkd_current_step_value = dkd_intro_step_list_value[dkd_step_index_value] || dkd_intro_step_list_value[0];
@@ -314,15 +313,15 @@ export default function DkdPreLoginIntroScreen({ dkd_on_continue_value }) {
               <View style={dkd_styles_value.dkd_control_list}>
                 <View style={dkd_styles_value.dkd_control_line}>
                   <MaterialCommunityIcons name="check-circle" size={18} color="#16A34A" />
-                  <Text style={dkd_styles_value.dkd_control_line_text}>Kurye görev havuzunda güncel teslimat akışı</Text>
+                  <Text style={dkd_styles_value.dkd_control_line_text}>Kurye görev havuzunda güncel teslimat görevleri</Text>
                 </View>
                 <View style={dkd_styles_value.dkd_control_line}>
                   <MaterialCommunityIcons name="check-circle" size={18} color="#16A34A" />
-                  <Text style={dkd_styles_value.dkd_control_line_text}>Kurye görevleri ve işletme akışı için canlı durum</Text>
+                  <Text style={dkd_styles_value.dkd_control_line_text}>Kabul edilen görev için canlı rota ve teslimat durumu</Text>
                 </View>
                 <View style={dkd_styles_value.dkd_control_line}>
                   <MaterialCommunityIcons name="check-circle" size={18} color="#16A34A" />
-                  <Text style={dkd_styles_value.dkd_control_line_text}>Giriş sonrası DraBornGo ana merkezine geçiş</Text>
+                  <Text style={dkd_styles_value.dkd_control_line_text}>Tamamlanan görevler ve çalışma-kazanç özetleri</Text>
                 </View>
               </View>
             ) : null}
