@@ -1,0 +1,4 @@
+DraBornGo v0.0.13 final validation: PASS
+Android versionCode: 13
+Checks: npm ci, release identity, retired courier score/rating runtime, admin hourly earnings, privacy/update centers, Android Expo export
+Validated UTC: 2026-08-09T08:56:06Z
