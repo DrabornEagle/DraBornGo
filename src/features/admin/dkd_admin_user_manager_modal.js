@@ -197,6 +197,7 @@ export default function DkdAdminUserManagerModal({ dkd_visible_value, dkd_on_clo
                 <View style={styles.metricGrid}>{dkd_period_cards_value.map(([dkd_label_value, dkd_period_value, dkd_tone_value]) => <DkdMetric key={dkd_label_value} dkd_label_value={dkd_label_value} dkd_value={dkd_format_earnings_money_value(dkd_period_value?.dkd_earnings_tl)} dkd_icon_value="cash-multiple" dkd_tone_value={dkd_tone_value} />)}</View>
                 <View style={styles.metricGrid}>
                   <DkdMetric dkd_label_value="Bugün Çalışma" dkd_value={dkd_format_work_duration_value(dkd_earnings_value?.daily?.dkd_online_seconds)} dkd_icon_value="timer-outline" dkd_tone_value={['#085D58', '#15405B']} />
+                  <DkdMetric dkd_label_value="Saatlik Kazanç" dkd_value={dkd_format_earnings_money_value(dkd_earnings_value?.daily?.dkd_hourly_tl)} dkd_icon_value="speedometer" dkd_tone_value={['#5B3B87', '#3C356E']} />
                 </View>
 
                 <Text style={styles.sectionTitle}>HESAP VE PROFİL</Text>
