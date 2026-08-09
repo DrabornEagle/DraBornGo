@@ -1124,6 +1124,16 @@ export default function DkdCargoSenderPanel({
           </Pressable>
         </View>
 
+        <LinearGradient colors={['rgba(16,100,121,0.46)', 'rgba(45,61,134,0.38)', 'rgba(100,49,112,0.31)']} style={dkd_styles.dkd_shipmentsOverview}>
+          <View style={dkd_styles.dkd_shipmentsOverviewTop}><View style={dkd_styles.dkd_shipmentsOverviewIcon}><MaterialCommunityIcons name="package-variant-closed-check" size={22} color="#FFFFFF" /></View><View style={{ flex: 1 }}><Text style={dkd_styles.dkd_shipmentsOverviewKicker}>CANLI GÖNDERİ KONTROLÜ</Text><Text style={dkd_styles.dkd_shipmentsOverviewTitle}>Siparişlerinin tüm yolculuğu burada</Text></View><View style={dkd_styles.dkd_shipmentsOverviewLive}><View style={dkd_styles.dkd_shipmentsOverviewLiveDot} /><Text style={dkd_styles.dkd_shipmentsOverviewLiveText}>CANLI</Text></View></View>
+          <View style={dkd_styles.dkd_shipmentsOverviewStats}>
+            <View style={dkd_styles.dkd_shipmentsOverviewStat}><Text style={dkd_styles.dkd_shipmentsOverviewStatValue}>{dkd_shipment_count_map_value.waiting}</Text><Text style={dkd_styles.dkd_shipmentsOverviewStatLabel}>Bekleyen</Text></View>
+            <View style={dkd_styles.dkd_shipmentsOverviewStat}><Text style={dkd_styles.dkd_shipmentsOverviewStatValue}>{dkd_shipment_count_map_value.active}</Text><Text style={dkd_styles.dkd_shipmentsOverviewStatLabel}>Yolda</Text></View>
+            <View style={dkd_styles.dkd_shipmentsOverviewStat}><Text style={dkd_styles.dkd_shipmentsOverviewStatValue}>{dkd_shipment_count_map_value.completed}</Text><Text style={dkd_styles.dkd_shipmentsOverviewStatLabel}>Tamamlanan</Text></View>
+            <View style={dkd_styles.dkd_shipmentsOverviewStat}><Text style={dkd_styles.dkd_shipmentsOverviewStatValue}>{dkd_shipment_count_map_value.all}</Text><Text style={dkd_styles.dkd_shipmentsOverviewStatLabel}>Toplam</Text></View>
+          </View>
+        </LinearGradient>
+
         <View style={dkd_styles.dkd_shipmentFilterRow}>
           <Pressable onPress={() => setDkdShipmentFilterValue('waiting')} style={[dkd_styles.dkd_shipmentFilterChip, dkd_shipment_filter_value === 'waiting' && dkd_styles.dkd_shipmentFilterChipActive]}><Text style={[dkd_styles.dkd_shipmentFilterChipText, dkd_shipment_filter_value === 'waiting' && dkd_styles.dkd_shipmentFilterChipTextActive]}>Bekleyen {dkd_shipment_count_map_value.waiting}</Text></Pressable>
           <Pressable onPress={() => setDkdShipmentFilterValue('active')} style={[dkd_styles.dkd_shipmentFilterChip, dkd_shipment_filter_value === 'active' && dkd_styles.dkd_shipmentFilterChipActive]}><Text style={[dkd_styles.dkd_shipmentFilterChipText, dkd_shipment_filter_value === 'active' && dkd_styles.dkd_shipmentFilterChipTextActive]}>Yolda {dkd_shipment_count_map_value.active}</Text></Pressable>
@@ -1550,6 +1560,18 @@ const dkd_styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: '800',
   },
+  dkd_shipmentsOverview: { minHeight: 132, borderRadius: 23, padding: 12, marginBottom: 12, overflow: 'hidden', borderWidth: 1, borderColor: 'rgba(126,235,255,0.17)' },
+  dkd_shipmentsOverviewTop: { flexDirection: 'row', alignItems: 'center', gap: 9 },
+  dkd_shipmentsOverviewIcon: { width: 44, height: 44, borderRadius: 16, backgroundColor: 'rgba(255,255,255,0.10)', alignItems: 'center', justifyContent: 'center' },
+  dkd_shipmentsOverviewKicker: { color: '#A9EEFF', fontSize: 7.5, fontWeight: '900', letterSpacing: .9 },
+  dkd_shipmentsOverviewTitle: { color: '#FFFFFF', fontSize: 14, fontWeight: '900', marginTop: 2 },
+  dkd_shipmentsOverviewLive: { minHeight: 25, borderRadius: 999, paddingHorizontal: 8, flexDirection: 'row', alignItems: 'center', gap: 5, backgroundColor: 'rgba(65,226,165,0.10)', borderWidth: 1, borderColor: 'rgba(65,226,165,0.17)' },
+  dkd_shipmentsOverviewLiveDot: { width: 6, height: 6, borderRadius: 99, backgroundColor: '#5BE6AD' },
+  dkd_shipmentsOverviewLiveText: { color: '#A6F2D1', fontSize: 7, fontWeight: '900' },
+  dkd_shipmentsOverviewStats: { flexDirection: 'row', gap: 6, marginTop: 12 },
+  dkd_shipmentsOverviewStat: { flex: 1, minHeight: 53, borderRadius: 15, backgroundColor: 'rgba(2,9,20,0.24)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.07)', alignItems: 'center', justifyContent: 'center' },
+  dkd_shipmentsOverviewStatValue: { color: '#FFFFFF', fontSize: 16, fontWeight: '900' },
+  dkd_shipmentsOverviewStatLabel: { color: 'rgba(233,245,255,0.53)', fontSize: 7.2, fontWeight: '800', marginTop: 2, textAlign: 'center' },
   dkd_shipmentFilterRow: {
     flexDirection: 'row',
     flexWrap: 'nowrap',

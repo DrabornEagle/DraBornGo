@@ -191,19 +191,19 @@ function MapHomeScreen({
             <Animated.View pointerEvents="none" style={[dkd_styles_value.dkd_route_lane, dkd_styles_value.dkd_route_lane_two, { transform: [{ translateX: Animated.multiply(dkd_lane_translate_value, -0.55) }, { rotate: '-24deg' }] }]} />
 
             <View style={dkd_styles_value.dkd_control_topline}>
-              <View style={dkd_styles_value.dkd_control_brand_pill}><MaterialCommunityIcons name="satellite-uplink" size={14} color="#A9EEFF" /><Text style={dkd_styles_value.dkd_control_brand_pill_text}>DRABORNGO COURIER GRID</Text></View>
-              <View style={[dkd_styles_value.dkd_network_pill, { borderColor: `${dkd_status_value.dkd_accent_value}66` }]}><View style={[dkd_styles_value.dkd_network_dot, { backgroundColor: dkd_status_value.dkd_accent_value }]} /><Text style={dkd_styles_value.dkd_network_pill_text}>{dkd_status_value.dkd_short_value}</Text></View>
+              <View style={dkd_styles_value.dkd_control_brand_pill}><MaterialCommunityIcons name="radar" size={14} color="#A9EEFF" /><Text style={dkd_styles_value.dkd_control_brand_pill_text}>SİPARİŞ • KURYE RADARI</Text></View>
+              <View style={[dkd_styles_value.dkd_network_pill, { borderColor: dkd_status_value.dkd_accent_value + '66' }]}><View style={[dkd_styles_value.dkd_network_dot, { backgroundColor: dkd_status_value.dkd_accent_value }]} /><Text style={dkd_styles_value.dkd_network_pill_text}>{dkd_status_value.dkd_short_value}</Text></View>
             </View>
 
             <View style={dkd_styles_value.dkd_control_hero}>
               <View style={dkd_styles_value.dkd_gate_icon_stage}>
                 <Animated.View style={[dkd_styles_value.dkd_gate_icon_halo, { opacity: dkd_pulse_opacity_value, transform: [{ scale: dkd_pulse_scale_value }], borderColor: dkd_status_value.dkd_accent_value }]} />
-                <LinearGradient colors={['#07131F', '#0A2537', '#0B172B']} style={dkd_styles_value.dkd_gate_icon_shell}>
+                <LinearGradient colors={['#06121E', '#0A2639', '#121833']} style={dkd_styles_value.dkd_gate_icon_shell}>
                   <Animated.View style={{ transform: [{ translateY: dkd_racing_motorcycle_translate_value }, { rotate: dkd_racing_motorcycle_rotate_value }] }}>
                     <Image source={dkd_racing_motorcycle_asset_value} style={dkd_styles_value.dkd_racing_motorcycle_image} contentFit="contain" transition={0} />
                   </Animated.View>
                 </LinearGradient>
-                <View style={dkd_styles_value.dkd_gate_icon_label}><Text style={dkd_styles_value.dkd_gate_icon_label_text}>RACING</Text></View>
+                <View style={dkd_styles_value.dkd_gate_icon_label}><Text style={dkd_styles_value.dkd_gate_icon_label_text}>DKD RIDER</Text></View>
               </View>
               <View style={dkd_styles_value.dkd_control_copy}>
                 <Text style={dkd_styles_value.dkd_control_kicker}>KURYE KONTROL MERKEZİ</Text>
@@ -212,18 +212,26 @@ function MapHomeScreen({
               </View>
             </View>
 
-            <View style={dkd_styles_value.dkd_route_strip}>
-              <View style={dkd_styles_value.dkd_route_node}><MaterialCommunityIcons name="store-marker-outline" size={16} color="#7DE8FF" /></View>
-              <View style={dkd_styles_value.dkd_route_dashes}><View style={dkd_styles_value.dkd_route_dash} /><View style={dkd_styles_value.dkd_route_dash} /><View style={dkd_styles_value.dkd_route_dash} /><View style={dkd_styles_value.dkd_route_dash} /></View>
-              <View style={dkd_styles_value.dkd_route_moto}><MaterialCommunityIcons name="motorbike" size={19} color="#F8FDFF" /></View>
-              <View style={dkd_styles_value.dkd_route_dashes}><View style={dkd_styles_value.dkd_route_dash} /><View style={dkd_styles_value.dkd_route_dash} /><View style={dkd_styles_value.dkd_route_dash} /><View style={dkd_styles_value.dkd_route_dash} /></View>
-              <View style={dkd_styles_value.dkd_route_node}><MaterialCommunityIcons name="home-map-marker" size={16} color="#68F0B8" /></View>
+            <View style={dkd_styles_value.dkd_order_console}>
+              <View style={dkd_styles_value.dkd_order_console_head}><Text style={dkd_styles_value.dkd_order_console_kicker}>CANLI SİPARİŞ ROTASI</Text><View style={dkd_styles_value.dkd_order_signal}><View style={[dkd_styles_value.dkd_order_signal_dot, { backgroundColor: dkd_status_value.dkd_accent_value }]} /><Text style={dkd_styles_value.dkd_order_signal_text}>{dkd_courier_online_value ? 'TARANIYOR' : 'HAZIR'}</Text></View></View>
+              <View style={dkd_styles_value.dkd_order_track}>
+                <View style={dkd_styles_value.dkd_order_track_node}><MaterialCommunityIcons name="package-variant-closed" size={16} color="#83E9FF" /></View>
+                <View style={dkd_styles_value.dkd_order_track_line} />
+                <Animated.View style={[dkd_styles_value.dkd_order_track_rider, { transform: [{ translateX: dkd_scan_value.interpolate({ inputRange: [0, 1], outputRange: [-28, 28] }) }] }]}><MaterialCommunityIcons name="motorbike" size={19} color="#FFFFFF" /></Animated.View>
+                <View style={dkd_styles_value.dkd_order_track_line} />
+                <View style={dkd_styles_value.dkd_order_track_node}><MaterialCommunityIcons name="map-marker-check-outline" size={16} color="#6FEAB5" /></View>
+              </View>
+              <View style={dkd_styles_value.dkd_order_steps_row}>
+                <View style={dkd_styles_value.dkd_order_step}><MaterialCommunityIcons name="package-variant" size={15} color="#79E6FF" /><Text style={dkd_styles_value.dkd_order_step_label}>Sipariş Havuzu</Text></View>
+                <View style={dkd_styles_value.dkd_order_step}><MaterialCommunityIcons name="bike-fast" size={15} color="#B8A1FF" /><Text style={dkd_styles_value.dkd_order_step_label}>Kurye Ataması</Text></View>
+                <View style={dkd_styles_value.dkd_order_step}><MaterialCommunityIcons name="flag-checkered" size={15} color="#75ECB7" /><Text style={dkd_styles_value.dkd_order_step_label}>Teslimat</Text></View>
+              </View>
             </View>
 
             <View style={dkd_styles_value.dkd_status_metric_row}>
               <DkdStatusMetric dkd_icon_value="map-marker-outline" dkd_label_value="BÖLGE" dkd_value_text={dkd_location_text_value} dkd_accent_value="rgba(43,165,255,0.30)" />
               <DkdStatusMetric dkd_icon_value={dkd_has_location_value ? 'crosshairs-gps' : 'crosshairs-question'} dkd_label_value="GPS" dkd_value_text={dkd_has_location_value ? 'Hazır' : 'Kontrol'} dkd_accent_value={dkd_has_location_value ? 'rgba(48,220,157,0.28)' : 'rgba(255,178,72,0.28)'} />
-              <DkdStatusMetric dkd_icon_value={dkd_courier_busy_value ? 'package-variant-closed-check' : 'access-point'} dkd_label_value="AĞ" dkd_value_text={dkd_courier_busy_value ? 'Siparişte' : dkd_courier_online_value ? 'Canlı' : 'Kapalı'} dkd_accent_value={dkd_courier_busy_value ? 'rgba(255,209,102,0.28)' : 'rgba(156,112,255,0.28)'} />
+              <DkdStatusMetric dkd_icon_value={dkd_courier_busy_value ? 'package-variant-closed-check' : 'access-point'} dkd_label_value="SİPARİŞ" dkd_value_text={dkd_courier_busy_value ? 'Aktif' : dkd_courier_online_value ? 'Aranıyor' : 'Bekliyor'} dkd_accent_value={dkd_courier_busy_value ? 'rgba(255,209,102,0.28)' : 'rgba(156,112,255,0.28)'} />
             </View>
 
             {locationError ? <Pressable onPress={retryLocation} style={dkd_styles_value.dkd_location_warning}><MaterialCommunityIcons name="map-marker-alert-outline" size={19} color="#FFE59A" /><View style={dkd_styles_value.dkd_location_warning_copy}><Text style={dkd_styles_value.dkd_location_warning_title}>Konum bağlantısını yenile</Text><Text style={dkd_styles_value.dkd_location_warning_sub}>Yakın görevler ve rota için GPS durumunu tekrar kontrol et.</Text></View><MaterialCommunityIcons name="reload" size={19} color="#FFE59A" /></Pressable> : null}
@@ -235,7 +243,7 @@ function MapHomeScreen({
               dkd_children_value={(
                 <LinearGradient colors={[dkd_status_value.dkd_accent_value, dkd_status_value.dkd_secondary_value]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={dkd_styles_value.dkd_control_button}>
                   <MaterialCommunityIcons name={dkd_courier_approved_value ? (dkd_courier_busy_value ? 'package-variant-closed-check' : dkd_courier_online_value ? 'pause-circle-outline' : 'radar') : 'clipboard-account-outline'} size={22} color="#031019" />
-                  <Text style={dkd_styles_value.dkd_control_button_text}>{dkd_courier_approved_value ? (dkd_courier_busy_value ? 'Sipariş Aktif' : dkd_courier_online_value ? 'Siparişleri Durdur' : 'Sipariş BUL') : 'Kurye Başvurusunu Aç'}</Text>
+                  <Text style={dkd_styles_value.dkd_control_button_text}>{dkd_courier_approved_value ? (dkd_courier_busy_value ? 'Sipariş Aktif' : dkd_courier_online_value ? 'Sipariş Radarını Durdur' : 'Sipariş BUL') : 'Kurye Başvurusunu Aç'}</Text>
                   <View style={dkd_styles_value.dkd_control_button_arrow}><MaterialCommunityIcons name={dkd_courier_busy_value ? 'lock-outline' : 'arrow-right'} size={20} color="#031019" /></View>
                 </LinearGradient>
               )}
@@ -249,13 +257,12 @@ function MapHomeScreen({
 
           <View style={dkd_styles_value.dkd_section_heading}><View><Text style={dkd_styles_value.dkd_section_kicker}>HIZLI ERİŞİM</Text><Text style={dkd_styles_value.dkd_section_title}>Tek dokunuşla aç</Text></View></View>
           <View style={dkd_styles_value.dkd_quick_grid}>
-            <DkdQuickTile dkd_icon_value="clipboard-text-clock-outline" dkd_title_value="Başvurular" dkd_subtitle_value="Kurye başvuru süreci" dkd_accent_value="#0B8E91" dkd_on_press_value={() => onTabChange?.('applications')} />
-            <DkdQuickTile dkd_icon_value="headset" dkd_title_value="Destek" dkd_subtitle_value="DrabornEagle admin canlı destek" dkd_accent_value="#A33D80" dkd_on_press_value={() => onTabChange?.('support')} />
             <DkdQuickTile dkd_icon_value="account-circle-outline" dkd_title_value="Profil" dkd_subtitle_value="Kimlik ve hesap merkezi" dkd_accent_value="#405FC8" dkd_on_press_value={onOpenProfile} />
+            <DkdQuickTile dkd_icon_value="headset" dkd_title_value="Destek" dkd_subtitle_value="DrabornEagle admin canlı destek" dkd_accent_value="#A33D80" dkd_on_press_value={() => onTabChange?.('support')} />
+            <DkdQuickTile dkd_icon_value="clipboard-text-clock-outline" dkd_title_value="Başvurular" dkd_subtitle_value="Kurye başvuru süreci" dkd_accent_value="#0B8E91" dkd_on_press_value={() => onTabChange?.('applications')} />
             <DkdQuickTile dkd_icon_value="view-dashboard-edit-outline" dkd_title_value="Tüm Menü" dkd_subtitle_value="Diğer DraBornGo araçları" dkd_accent_value="#A6632B" dkd_on_press_value={onOpenActionMenu} />
           </View>
 
-          <View style={dkd_styles_value.dkd_privacy_strip}><View style={dkd_styles_value.dkd_privacy_icon}><MaterialCommunityIcons name="shield-check-outline" size={21} color="#78EDC0" /></View><View style={dkd_styles_value.dkd_privacy_copy}><Text style={dkd_styles_value.dkd_privacy_title}>Kontrollü erişim</Text><Text style={dkd_styles_value.dkd_privacy_sub}>Konum yalnız uygulama açıkken; kamera yalnız sen başlattığında kullanılır.</Text></View></View>
           <View style={dkd_styles_value.dkd_bottom_space} />
         </ScrollView>
       </Animated.View>
@@ -317,6 +324,19 @@ const dkd_styles_value = StyleSheet.create({
   dkd_status_metric_icon: { width: 34, height: 34, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
   dkd_status_metric_label: { color: 'rgba(239,247,255,0.48)', fontSize: 8, fontWeight: '900', letterSpacing: 0.9, marginTop: 7 },
   dkd_status_metric_value: { color: '#FFFFFF', fontSize: 12, fontWeight: '900', marginTop: 2 },
+  dkd_order_console: { minHeight: 126, borderRadius: 21, marginTop: 15, padding: 12, backgroundColor: 'rgba(2,9,20,0.27)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
+  dkd_order_console_head: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8 },
+  dkd_order_console_kicker: { color: '#C9F5FF', fontSize: 8, fontWeight: '900', letterSpacing: 1.05 },
+  dkd_order_signal: { minHeight: 24, borderRadius: 999, paddingHorizontal: 8, flexDirection: 'row', alignItems: 'center', gap: 5, backgroundColor: 'rgba(255,255,255,0.06)' },
+  dkd_order_signal_dot: { width: 6, height: 6, borderRadius: 99 },
+  dkd_order_signal_text: { color: '#FFFFFF', fontSize: 7, fontWeight: '900' },
+  dkd_order_track: { minHeight: 44, marginTop: 9, flexDirection: 'row', alignItems: 'center' },
+  dkd_order_track_node: { width: 34, height: 34, borderRadius: 12, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(255,255,255,0.08)' },
+  dkd_order_track_line: { flex: 1, height: 2, marginHorizontal: 5, backgroundColor: 'rgba(167,230,255,0.22)' },
+  dkd_order_track_rider: { width: 39, height: 34, borderRadius: 12, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(112,225,255,0.13)', borderWidth: 1, borderColor: 'rgba(126,235,255,0.16)' },
+  dkd_order_steps_row: { flexDirection: 'row', gap: 6, marginTop: 8 },
+  dkd_order_step: { flex: 1, minHeight: 36, borderRadius: 12, paddingHorizontal: 7, flexDirection: 'row', alignItems: 'center', gap: 5, backgroundColor: 'rgba(255,255,255,0.05)' },
+  dkd_order_step_label: { flex: 1, color: 'rgba(238,247,255,0.66)', fontSize: 7.5, fontWeight: '800' },
   dkd_location_warning: { minHeight: 65, borderRadius: 19, marginTop: 12, paddingHorizontal: 13, paddingVertical: 10, flexDirection: 'row', alignItems: 'center', gap: 10, borderWidth: 1, borderColor: 'rgba(255,220,120,0.25)', backgroundColor: 'rgba(35,24,5,0.34)' },
   dkd_location_warning_copy: { flex: 1 },
   dkd_location_warning_title: { color: '#FFF1BC', fontSize: 12, fontWeight: '900' },

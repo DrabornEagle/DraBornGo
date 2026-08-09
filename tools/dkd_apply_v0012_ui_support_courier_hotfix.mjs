@@ -50,7 +50,7 @@ function dkd_replace_required_value(dkd_content_value, dkd_search_value, dkd_rep
 
             <View style={dkd_styles_value.dkd_control_topline}>
               <View style={dkd_styles_value.dkd_control_brand_pill}><MaterialCommunityIcons name="radar" size={14} color="#A9EEFF" /><Text style={dkd_styles_value.dkd_control_brand_pill_text}>SİPARİŞ • KURYE RADARI</Text></View>
-              <View style={[dkd_styles_value.dkd_network_pill, { borderColor: \\`\${dkd_status_value.dkd_accent_value}66\\` }]}><View style={[dkd_styles_value.dkd_network_dot, { backgroundColor: dkd_status_value.dkd_accent_value }]} /><Text style={dkd_styles_value.dkd_network_pill_text}>{dkd_status_value.dkd_short_value}</Text></View>
+              <View style={[dkd_styles_value.dkd_network_pill, { borderColor: dkd_status_value.dkd_accent_value + '66' }]}><View style={[dkd_styles_value.dkd_network_dot, { backgroundColor: dkd_status_value.dkd_accent_value }]} /><Text style={dkd_styles_value.dkd_network_pill_text}>{dkd_status_value.dkd_short_value}</Text></View>
             </View>
 
             <View style={dkd_styles_value.dkd_control_hero}>

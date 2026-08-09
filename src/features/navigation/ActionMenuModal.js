@@ -3,6 +3,7 @@ import { ActivityIndicator, Animated, Modal, Pressable, ScrollView, StyleSheet, 
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { dkd_fetch_courier_earnings_summary_value, dkd_format_earnings_money_value, dkd_format_work_duration_value } from '../../services/dkd_courier_earnings_service';
+import DkdCourierEarningsCategory from './dkd_courier_earnings_category';
 
 function DkdMenuRow({ dkd_icon_value, dkd_label_value, dkd_sub_value, dkd_tone_value, dkd_on_press_value, dkd_danger_value = false }) {
   const dkd_scale_value = useRef(new Animated.Value(1)).current;
@@ -100,7 +101,7 @@ function ActionMenuModal({ visible, onClose, isAdmin, canCourier, onCourier, onP
             </View>
             <View style={styles.dkd_signal_strip}><View style={styles.dkd_signal_dot} /><Text style={styles.dkd_signal_text}>Şehir ağı bağlantısı hazır</Text><MaterialCommunityIcons name="access-point" size={18} color="#70E7BB" /></View>
             <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.dkd_list_content}>
-              {canCourier ? <DkdEarningsPanel dkd_loading_value={dkd_earnings_loading_value} dkd_data_value={dkd_earnings_value} dkd_on_refresh_value={dkd_load_earnings_value} /> : null}
+              {canCourier ? <DkdCourierEarningsCategory dkd_visible_value={visible} /> : null}
               {dkd_items_value.map((dkd_item_value) => <DkdMenuRow key={dkd_item_value.dkd_label_value} {...dkd_item_value} />)}
             </ScrollView>
           </Pressable>

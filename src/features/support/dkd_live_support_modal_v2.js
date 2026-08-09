@@ -319,7 +319,7 @@ const dkd_styles_value = StyleSheet.create({
   dkd_message_meta_row: { flexDirection: 'row', justifyContent: 'space-between', gap: 13, marginBottom: 5 },
   dkd_message_sender: { color: '#DDF8FF', fontSize: 8.5, fontWeight: '900' },
   dkd_message_time: { color: 'rgba(235,245,255,.50)', fontSize: 8, fontWeight: '700' },
-  dkd_message_text: { color: '#FFFFFF', fontSize: 12.5, lineHeight: 18, fontWeight: '650' },
+  dkd_message_text: { color: '#FFFFFF', fontSize: 12.5, lineHeight: 18, fontWeight: '700' },
   dkd_composer: { minHeight: 69, paddingVertical: 8, flexDirection: 'row', alignItems: 'flex-end', gap: 8, borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,.07)' },
   dkd_composer_input: { flex: 1, minHeight: 50, maxHeight: 120, borderRadius: 18, paddingHorizontal: 13, paddingVertical: 12, color: '#FFFFFF', backgroundColor: 'rgba(8,24,45,.92)', borderWidth: 1, borderColor: 'rgba(126,235,255,.13)', fontSize: 12 },
   dkd_send_button: { width: 50, height: 50, borderRadius: 18, backgroundColor: '#7EEBFF', alignItems: 'center', justifyContent: 'center' },

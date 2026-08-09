@@ -1,0 +1,5 @@
+DraBornGo v0.0.12 UI/support/courier hotfix validation: PASS
+Android versionCode: 12
+Validated source commit: 2c6134bb1a8e09f8cd1f60a254e753f8c1bda03a
+Validated UTC: 2026-08-09T01:06:14Z
+Checks: UI patch, npm ci, release identity, invalid icon audit, controlled-access removal, Android Expo export
