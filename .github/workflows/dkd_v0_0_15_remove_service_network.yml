@@ -1,0 +1,254 @@
+name: DKD v0.0.15 Remove Service Network
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/dkd_v0_0_15_remove_service_network.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Remove Service Network source and bump v0.0.15
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          node <<'NODE'
+          const fs = require('fs');
+          const path = require('path');
+
+          const read = (p) => fs.readFileSync(p, 'utf8');
+          const write = (p, s) => fs.writeFileSync(p, s);
+          const replaceAllIn = (p, from, to) => {
+            if (!fs.existsSync(p)) return;
+            const before = read(p);
+            const after = before.split(from).join(to);
+            if (after !== before) write(p, after);
+          };
+          const walk = (dir, out = []) => {
+            if (!fs.existsSync(dir)) return out;
+            for (const name of fs.readdirSync(dir)) {
+              const full = path.join(dir, name);
+              const stat = fs.statSync(full);
+              if (stat.isDirectory()) walk(full, out);
+              else out.push(full);
+            }
+            return out;
+          };
+
+          // Release identity: v0.0.15, Android versionCode remains 3.
+          const app = JSON.parse(read('app.json'));
+          app.expo.version = '0.0.15';
+          app.expo.android.versionCode = 3;
+          for (const plugin of app.expo.plugins || []) {
+            if (Array.isArray(plugin) && plugin[0] === 'expo-location' && plugin[1]) {
+              plugin[1].locationWhenInUsePermission = 'DraBornGo; kurye görevi, rota ve aktif teslimat takibi için yalnızca uygulama açıkken konumunu kullanır.';
+            }
+            if (Array.isArray(plugin) && plugin[0] === 'expo-image-picker' && plugin[1]) {
+              plugin[1].photosPermission = 'DraBornGo; yalnızca senin seçtiğin profil veya kurye başvurusu görselini eklemek için galerine erişir.';
+              plugin[1].cameraPermission = 'DraBornGo; yalnızca sen başlattığında profil veya kurye başvurusu görseli çekmek için kameranı kullanır.';
+            }
+          }
+          write('app.json', JSON.stringify(app, null, 2) + '\n');
+
+          const pkg = JSON.parse(read('package.json'));
+          pkg.version = '0.0.15';
+          if (pkg.scripts?.['dkd:verify-v0.0.14']) {
+            delete pkg.scripts['dkd:verify-v0.0.14'];
+          }
+          pkg.scripts = pkg.scripts || {};
+          pkg.scripts['dkd:verify-v0.0.15'] = 'node ./scripts/dkd_verify_release_identity.mjs';
+          write('package.json', JSON.stringify(pkg, null, 2) + '\n');
+
+          const lock = JSON.parse(read('package-lock.json'));
+          lock.version = '0.0.15';
+          if (lock.packages?.['']) lock.packages[''].version = '0.0.15';
+          write('package-lock.json', JSON.stringify(lock, null, 2) + '\n');
+
+          // Current visible source version strings only. Supabase and historical migrations are intentionally untouched.
+          for (const file of walk('src')) {
+            if (!/\.(js|jsx|ts|tsx)$/.test(file)) continue;
+            replaceAllIn(file, 'v0.0.14', 'v0.0.15');
+            replaceAllIn(file, "'0.0.14'", "'0.0.15'");
+            replaceAllIn(file, '"0.0.14"', '"0.0.15"');
+          }
+          replaceAllIn('scripts/dkd_verify_release_identity.mjs', '0.0.14', '0.0.15');
+
+          // Home: completely remove Hizmet Ağı Merkezi entry point.
+          {
+            const p = 'src/features/map/MapHomeScreen.js';
+            let s = read(p);
+            s = s.replace(/^.*dkd_title_value="Hizmet Ağı Merkezi".*\n/m, '');
+            write(p, s);
+          }
+
+          // Modal host: remove Service Network import and render path.
+          {
+            const p = 'src/core/ModalHost.js';
+            let s = read(p);
+            s = s.replace(/^import DkdServiceNetworkModal.*\n/m, '');
+            s = s.replace(/^\s*\{activeTab === 'serviceNetwork'.*\n/m, '');
+            write(p, s);
+          }
+
+          // Modal visibility state no longer includes Service Network.
+          {
+            const p = 'src/core/propBuilders.js';
+            let s = read(p);
+            s = s.replace(/^\s*\|\| activeTab === 'serviceNetwork'\n/m, '');
+            write(p, s);
+          }
+
+          // Customer shipment-status polling belongs to removed Siparişlerim flow.
+          {
+            const p = 'src/core/GameFlow.js';
+            let s = read(p);
+            s = s.replace(
+              "import { primeNotificationsRuntime, registerDeviceForRemotePush, dkd_start_customer_status_local_notification_poll_value } from '../services/notificationService';",
+              "import { primeNotificationsRuntime, registerDeviceForRemotePush } from '../services/notificationService';"
+            );
+            s = s.replace(/\n\s*const dkd_stop_poll_value = dkd_start_customer_status_local_notification_poll_value\([^\n]*\);\n\s*return \(\) => \{ dkd_cancelled_value = true; dkd_stop_poll_value\?\.\(\); \};/, "\n    return () => { dkd_cancelled_value = true; };");
+            write(p, s);
+          }
+
+          // Remove customer-order/local status notification implementation at source level.
+          {
+            const p = 'src/services/notificationService.js';
+            let s = read(p);
+            const marker = "const dkd_customer_status_local_seen_storage_key = 'dkd_customer_status_local_seen_v1';";
+            const idx = s.indexOf(marker);
+            if (idx >= 0) s = s.slice(0, idx).trimEnd() + '\n';
+            write(p, s);
+          }
+
+          // Update onboarding copy so removed sender/service features are not advertised.
+          {
+            const p = 'src/features/onboarding/dkd_pre_login_intro_screen.js';
+            let s = read(p);
+            s = s.replace(
+              'Kurye, işletme, gönderi/kargo, Hizmet Ağı, destek ve canlı görev akışını modern şehir merkezi mantığıyla tek ekranda buluşturuyoruz.',
+              'Kurye, işletme, destek ve canlı görev akışını modern şehir merkezi mantığıyla tek ekranda buluşturuyoruz.'
+            );
+            s = s.replace(
+              'Kurye görevleri, gönderi/kargo ve işletme bağlantıları güncel kartlar, canlı durum ve teslimat adımlarıyla tek operasyon akışında görünür olur.',
+              'Kurye görevleri ve işletme bağlantıları güncel kartlar, canlı durum ve teslimat adımlarıyla tek operasyon akışında görünür olur.'
+            );
+            s = s.replace(
+              "  { dkd_title_text: 'Gönderi & Kargo', dkd_body_text: 'Paket ve rota akışı', dkd_icon_name: 'package-variant-closed', dkd_color_value: '#0EA5E9' },\n  { dkd_title_text: 'Hizmet Ağı', dkd_body_text: 'Şehir içi hizmet akışı', dkd_icon_name: 'tools', dkd_color_value: '#A855F7' },",
+              "  { dkd_title_text: 'Canlı Görevler', dkd_body_text: 'Kurye görevi ve rota akışı', dkd_icon_name: 'map-marker-path', dkd_color_value: '#0EA5E9' },\n  { dkd_title_text: 'Destek Merkezi', dkd_body_text: 'Admin ile doğrudan destek', dkd_icon_name: 'headset', dkd_color_value: '#A855F7' },"
+            );
+            s = s.replace('Gönderi, kargo ve Hizmet Ağı için canlı durum', 'Kurye görevleri ve işletme akışı için canlı durum');
+            write(p, s);
+          }
+
+          // Current privacy center must describe only features present in v0.0.15 source.
+          {
+            const p = 'src/features/legal/dkd_google_play_policy_center_modal.js';
+            let s = read(p);
+            s = s.replace(
+              'DraBornGo; hesap ve profil bilgileri, kurye başvurusu ve lisans durumu, gönderi/teslimat ve hizmet operasyon kayıtları, gerektiğinde yalnız uygulama açıkken kullanılan konum, kullanıcının seçtiği operasyon görselleri, kullanıcı ile DrabornEagle admin arasındaki destek mesajları, bildirim/teknik güvenlik kimlikleri ile kurye çalışma ve kazanç kayıtlarını hizmeti çalıştırmak ve güvenliğini sağlamak için işler. Kişisel veriler reklam amacıyla satılmaz.',
+              'DraBornGo; hesap ve profil bilgileri, kurye başvurusu ve lisans durumu, kurye görev ve teslimat operasyon kayıtları, gerektiğinde yalnız uygulama açıkken kullanılan konum, kullanıcının seçtiği profil/başvuru görselleri, kullanıcı ile DrabornEagle admin arasındaki destek mesajları, bildirim/teknik güvenlik kimlikleri ile kurye çalışma ve kazanç kayıtlarını hizmeti çalıştırmak ve güvenliğini sağlamak için işler. Kişisel veriler reklam amacıyla satılmaz.'
+            );
+            s = s.replace("dkd_title_value: 'Gönderi ve Kurye Kimlik Bilgileri'", "dkd_title_value: 'Kurye Kimlik Bilgileri'");
+            s = s.replace(
+              'Gönderi oluştururken alıcı/teslimat için ad-soyad, telefon, adres, paket ve gerekli akışta T.C. kimlik numarası işlenebilir. Kurye başvurusunda kullanıcının sunduğu kimlik, iletişim, adres, plaka/araç, acil durum iletişim ve başvuru belgeleri lisans/onay süreci için işlenebilir. Telefon bilgisi SMS/OTP veya pazarlama amacıyla kullanılmaz.',
+              'Kurye başvurusunda kullanıcının sunduğu kimlik, iletişim, adres, plaka/araç, acil durum iletişim ve başvuru belgeleri lisans/onay süreci için işlenebilir. Telefon bilgisi SMS/OTP veya pazarlama amacıyla kullanılmaz.'
+            );
+            s = s.replace(
+              'Kamera ve görsel seçimi yalnız kullanıcının başlattığı profil, kurye başvurusu, paket veya gerekli operasyon görseli işlemlerinde açılır. Mikrofon, arka plan kamera erişimi ve geniş medya/depolama erişimi istenmez.',
+              'Kamera ve görsel seçimi yalnız kullanıcının başlattığı profil veya kurye başvurusu görseli işlemlerinde açılır. Mikrofon, arka plan kamera erişimi ve geniş medya/depolama erişimi istenmez.'
+            );
+            // Supabase remote config may still report an older version; v0.0.15 local identity wins.
+            s = s.replace("dkd_version_name_value: String(dkd_remote_value?.dkd_version_name_value || 'v0.0.15'),", "dkd_version_name_value: 'v0.0.15',");
+            s = s.replace("const dkd_name_value = String(dkd_config_value?.dkd_version_name_value || 'v0.0.15');", "const dkd_name_value = 'v0.0.15';");
+            write(p, s);
+          }
+
+          // Update Center local release identity and notes.
+          {
+            const p = 'src/services/dkd_app_update_service.js';
+            let s = read(p);
+            s = s.replace(/const dkd_current_release_notes_value = '.*?';/, "const dkd_current_release_notes_value = 'DraBornGo v0.0.15: Hizmet Ağı Merkezi, Gönderi Oluştur ve Siparişlerim kullanıcı kaynak kodundan kaldırıldı. Supabase tarafındaki ilgili veri ve sunucu yapıları ileride geri yükleme amacıyla korunuyor. Android versionCode 3 sabit ve test Expo Go üzerinden devam ediyor.';");
+            write(p, s);
+          }
+
+          // Delete UI/client source belonging to removed Service Network sender flow.
+          const deletePaths = [
+            'src/features/serviceNetwork/dkd_service_network_modal.js',
+            'src/features/serviceNetwork/dkd_service_network_modal_v2.js',
+            'src/features/courier/dkd_cargo_sender_panel.js',
+          ];
+          for (const p of deletePaths) if (fs.existsSync(p)) fs.rmSync(p, { force: true });
+
+          // These were sender-side helpers. Delete only if nothing else in current source references them.
+          const allSourceText = () => walk('src')
+            .filter((f) => /\.(js|jsx|ts|tsx)$/.test(f))
+            .map((f) => [f, read(f)]);
+
+          const removeIfUnreferenced = (target, token) => {
+            if (!fs.existsSync(target)) return;
+            const refs = allSourceText().filter(([f, s]) => f !== target && s.includes(token));
+            if (refs.length === 0) fs.rmSync(target, { force: true });
+          };
+          removeIfUnreferenced('src/features/courier/dkd_cargo_live_map_modal.js', 'dkd_cargo_live_map_modal');
+          removeIfUnreferenced('src/services/dkd_cargo_service.js', 'dkd_cargo_service');
+
+          // Remove now-empty directory if possible.
+          try { if (fs.existsSync('src/features/serviceNetwork') && fs.readdirSync('src/features/serviceNetwork').length === 0) fs.rmdirSync('src/features/serviceNetwork'); } catch {}
+          NODE
+
+          rm -f .github/workflows/dkd_v0_0_15_remove_service_network.yml
+
+      - name: Validate v0.0.15 cleanup
+        shell: bash
+        run: |
+          set -euo pipefail
+          node ./scripts/dkd_verify_release_identity.mjs
+          node - <<'NODE'
+          const fs = require('fs');
+          const path = require('path');
+          const walk = (d, out=[]) => { if(!fs.existsSync(d)) return out; for(const n of fs.readdirSync(d)){ const p=path.join(d,n); const s=fs.statSync(p); s.isDirectory()?walk(p,out):out.push(p);} return out; };
+          const files = walk('src').filter(f => /\.(js|jsx|ts|tsx)$/.test(f));
+          const text = files.map(f => fs.readFileSync(f,'utf8')).join('\n');
+          const forbidden = [
+            'Hizmet Ağı Merkezi',
+            "activeTab === 'serviceNetwork'",
+            'dkd_service_network_modal',
+            'dkd_cargo_sender_panel',
+            'dkd_start_customer_status_local_notification_poll_value',
+            'dkd_send_customer_order_local_notification_value',
+            'Gönderi Oluştur',
+            'Siparişlerim'
+          ];
+          for (const token of forbidden) {
+            if (text.includes(token)) throw new Error(`Forbidden removed-feature source token remains: ${token}`);
+          }
+          if (fs.existsSync('src/features/serviceNetwork/dkd_service_network_modal.js')) throw new Error('legacy service network modal still exists');
+          if (fs.existsSync('src/features/serviceNetwork/dkd_service_network_modal_v2.js')) throw new Error('service network modal v2 still exists');
+          if (fs.existsSync('src/features/courier/dkd_cargo_sender_panel.js')) throw new Error('cargo sender panel still exists');
+          const app = JSON.parse(fs.readFileSync('app.json','utf8'));
+          if (app.expo.version !== '0.0.15') throw new Error('app version not 0.0.15');
+          if (Number(app.expo.android.versionCode) !== 3) throw new Error('versionCode changed');
+          console.log('v0.0.15 source cleanup validation: PASS');
+          NODE
+
+      - name: Commit v0.0.15 cleanup
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'DrabornEagle Release Bot'
+          git config user.email 'release-bot@draborneagle.com'
+          git add -A
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'release: DraBornGo v0.0.15 remove service network source'
+          git push origin HEAD:main
