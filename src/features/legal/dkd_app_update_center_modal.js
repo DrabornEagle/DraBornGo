@@ -45,7 +45,7 @@ export default function DkdAppUpdateCenterModal({ dkd_visible_value, dkd_on_clos
     if (dkd_visible_value) dkd_load_value();
   }, [dkd_visible_value, dkd_load_value]);
 
-  const dkd_installed_value = dkd_status_value?.dkd_installed_value || { dkd_version_name_value: '0.0.13', dkd_version_code_value: 13 };
+  const dkd_installed_value = dkd_status_value?.dkd_installed_value || { dkd_version_name_value: '0.0.14', dkd_version_code_value: 14 };
   const dkd_update_required_value = Boolean(dkd_status_value?.dkd_update_required_value);
   const dkd_status_title_value = dkd_update_required_value ? 'Zorunlu güncelleme var' : 'Sürüm güncel';
   const dkd_status_body_value = dkd_update_required_value
@@ -54,12 +54,12 @@ export default function DkdAppUpdateCenterModal({ dkd_visible_value, dkd_on_clos
 
   const dkd_source_text_value = useMemo(() => {
     if (dkd_status_value?.dkd_distribution_channel_value === 'expo-go-test') {
-      return 'Expo Go test aşaması • APK/AAB henüz üretilmedi';
+      return 'Google Play sürüm kanalı';
     }
     return String(dkd_status_value?.dkd_source_url_value || 'Google Play');
   }, [dkd_status_value]);
 
-  const dkd_sha_text_value = String(dkd_status_value?.dkd_sha256_value || '').trim() || 'APK/AAB build sonrası eklenecek';
+  const dkd_sha_text_value = String(dkd_status_value?.dkd_sha256_value || '').trim() || 'Resmi build doğrulaması';
 
   return (
     <Modal visible={Boolean(dkd_visible_value)} transparent animationType="slide" onRequestClose={dkd_on_close_value}>
@@ -71,7 +71,7 @@ export default function DkdAppUpdateCenterModal({ dkd_visible_value, dkd_on_clos
               <View style={dkd_styles_value.dkd_header_copy}>
                 <Text {...dkd_text_scaling_props_value} style={dkd_styles_value.dkd_brand}>DraBornGo</Text>
                 <Text {...dkd_text_scaling_props_value} style={dkd_styles_value.dkd_title}>Sürüm ve Güncelleme{`\n`}Merkezi</Text>
-                <Text {...dkd_text_scaling_props_value} style={dkd_styles_value.dkd_subtitle}>Resmi sürüm kaynağını kontrol eder. Yeni sürüm yayınlandığında burada gösterilir. Expo Go test aşamasında APK/AAB üretilmez.</Text>
+                <Text {...dkd_text_scaling_props_value} style={dkd_styles_value.dkd_subtitle}>Resmi DraBornGo sürüm kaynağını kontrol eder. Yeni Google Play sürümü yayınlandığında burada gösterilir.</Text>
               </View>
               <Pressable onPress={dkd_on_close_value} hitSlop={8} style={({ pressed: dkd_pressed_value }) => [dkd_styles_value.dkd_close_button, dkd_pressed_value && { opacity: .72 }]}>
                 <MaterialCommunityIcons name="close" size={23} color="#FFFFFF" />
@@ -94,13 +94,13 @@ export default function DkdAppUpdateCenterModal({ dkd_visible_value, dkd_on_clos
               <DkdUpdateInfoCard
                 dkd_icon_value="cellphone-check"
                 dkd_label_value="Cihazdaki sürüm"
-                dkd_value={`v${String(dkd_installed_value?.dkd_version_name_value || '0.0.13').replace(/^v/i, '')} • Kod ${Number(dkd_installed_value?.dkd_version_code_value || 13)}`}
+                dkd_value={`v${String(dkd_installed_value?.dkd_version_name_value || '0.0.14').replace(/^v/i, '')} • Kod ${Number(dkd_installed_value?.dkd_version_code_value || 14)}`}
                 dkd_tone_value="green"
               />
               <DkdUpdateInfoCard
                 dkd_icon_value="cloud-download-outline"
                 dkd_label_value="Webdeki son sürüm"
-                dkd_value={`v${String(dkd_status_value?.dkd_latest_version_name_value || '0.0.13').replace(/^v/i, '')} • Kod ${Number(dkd_status_value?.dkd_latest_version_code_value || 13)}`}
+                dkd_value={`v${String(dkd_status_value?.dkd_latest_version_name_value || '0.0.14').replace(/^v/i, '')} • Kod ${Number(dkd_status_value?.dkd_latest_version_code_value || 14)}`}
                 dkd_tone_value="pink"
               />
               <DkdUpdateInfoCard
@@ -118,7 +118,7 @@ export default function DkdAppUpdateCenterModal({ dkd_visible_value, dkd_on_clos
 
               <View style={dkd_styles_value.dkd_release_card}>
                 <Text {...dkd_text_scaling_props_value} style={dkd_styles_value.dkd_release_label}>Sürüm notu</Text>
-                <Text {...dkd_text_scaling_props_value} style={dkd_styles_value.dkd_release_text}>{dkd_status_value?.dkd_release_notes_value || 'DraBornGo v0.0.13 güncel sürüm bilgisi yükleniyor.'}</Text>
+                <Text {...dkd_text_scaling_props_value} style={dkd_styles_value.dkd_release_text}>{dkd_status_value?.dkd_release_notes_value || 'DraBornGo v0.0.14 güncel sürüm bilgisi yükleniyor.'}</Text>
               </View>
 
               {dkd_update_required_value && dkd_status_value?.dkd_download_url_value ? (

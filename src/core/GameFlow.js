@@ -121,7 +121,7 @@ export default function GameFlow({ session, onSignedOut, dkd_on_home_ready_value
           setProfile((dkd_previous_value) => dkd_previous_value ? { ...dkd_previous_value, dkd_courier_online: false, dkd_courier_auto_assigned_job_id: dkd_job_value.id } : dkd_previous_value);
         }
       } catch (dkd_error_value) {
-        console.warn('dkd active delivery restore skipped', dkd_error_value?.message || dkd_error_value);
+        console.log('dkd active delivery restore skipped', dkd_error_value?.message || dkd_error_value);
       } finally {
         dkd_restore_busy_ref_value.current = false;
       }

@@ -14,7 +14,7 @@ function dkd_android_permission_value(dkd_permission_suffix_parts_value) {
 const dkd_app_json_value = dkd_read_json_file('app.json');
 const dkd_package_json_value = dkd_read_json_file('package.json');
 const dkd_android_target_sdk_value = 36;
-const dkd_android_version_code_value = 9;
+const dkd_android_version_code_value = 14;
 
 let dkd_public_env_defaults_value = {};
 
