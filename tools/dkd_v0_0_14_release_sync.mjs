@@ -1,0 +1,211 @@
+import fs from 'node:fs';
+import path from 'node:path';
+
+const dkd_read = (dkd_path_value) => fs.readFileSync(dkd_path_value, 'utf8');
+const dkd_write = (dkd_path_value, dkd_content_value) => {
+  fs.mkdirSync(path.dirname(dkd_path_value), { recursive: true });
+  fs.writeFileSync(dkd_path_value, dkd_content_value);
+};
+const dkd_replace = (dkd_path_value, dkd_from_value, dkd_to_value) => {
+  const dkd_before_value = dkd_read(dkd_path_value);
+  if (!dkd_before_value.includes(dkd_from_value)) {
+    throw new Error(`DKD missing expected text in ${dkd_path_value}: ${dkd_from_value}`);
+  }
+  dkd_write(dkd_path_value, dkd_before_value.replace(dkd_from_value, dkd_to_value));
+};
+const dkd_replace_all = (dkd_path_value, dkd_from_value, dkd_to_value) => {
+  const dkd_before_value = dkd_read(dkd_path_value);
+  if (!dkd_before_value.includes(dkd_from_value)) return;
+  dkd_write(dkd_path_value, dkd_before_value.split(dkd_from_value).join(dkd_to_value));
+};
+
+const dkd_app_value = JSON.parse(dkd_read('app.json'));
+dkd_app_value.expo.version = '0.0.14';
+dkd_app_value.expo.android.versionCode = 14;
+dkd_write('app.json', `${JSON.stringify(dkd_app_value, null, 2)}\n`);
+
+const dkd_package_value = JSON.parse(dkd_read('package.json'));
+dkd_package_value.version = '0.0.14';
+dkd_package_value.scripts = dkd_package_value.scripts || {};
+delete dkd_package_value.scripts['dkd:verify-v0.0.12'];
+delete dkd_package_value.scripts['dkd:verify-v0.0.13'];
+dkd_package_value.scripts['dkd:verify-v0.0.14'] = 'node ./scripts/dkd_verify_release_identity.mjs';
+dkd_write('package.json', `${JSON.stringify(dkd_package_value, null, 2)}\n`);
+
+dkd_replace('app.config.js', 'const dkd_android_version_code_value = 9;', 'const dkd_android_version_code_value = 14;');
+
+dkd_write('scripts/dkd_verify_release_identity.mjs', `import fs from 'node:fs';\n\nconst dkd_app_value = JSON.parse(fs.readFileSync('app.json', 'utf8'));\nconst dkd_package_value = JSON.parse(fs.readFileSync('package.json', 'utf8'));\nconst dkd_fail_value = (dkd_message_value) => { throw new Error(\`[DraBornGo release identity] \${dkd_message_value}\`); };\n\nif (dkd_app_value?.expo?.version !== '0.0.14') dkd_fail_value('app.json expo.version must be 0.0.14');\nif (Number(dkd_app_value?.expo?.android?.versionCode) !== 14) dkd_fail_value('Android versionCode must be 14');\nif (dkd_package_value?.version !== '0.0.14') dkd_fail_value('package.json version must be 0.0.14');\nif (dkd_app_value?.expo?.android?.package !== 'com.draborneagle.draborngo') dkd_fail_value('Android package changed unexpectedly');\n\nconsole.log('DraBornGo v0.0.14 / Android versionCode 14 identity: PASS');\n`);
+
+for (const dkd_path_value of ['src/features/profile/ProfileModal.js', 'src/features/navigation/ActionMenuModal.js', 'src/features/map/MapHomeScreen.js']) {
+  let dkd_source_value = dkd_read(dkd_path_value);
+  dkd_source_value = dkd_source_value.replace(/DraBornGo v0\.0\.(?:12|13)/g, 'DraBornGo v0.0.14');
+  dkd_source_value = dkd_source_value.replace(/'v0\.0\.(?:12|13)'/g, "'v0.0.14'");
+  dkd_write(dkd_path_value, dkd_source_value);
+}
+
+dkd_replace_all('src/core/GameFlow.js', "console.warn('dkd active delivery restore skipped'", "console.log('dkd active delivery restore skipped'");
+
+dkd_write('src/features/applications/dkd_applications_hub_modal.js', `import React, { useEffect, useMemo, useState } from 'react';
+import { Modal, Pressable, ScrollView, StatusBar, StyleSheet, Text, View } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import SafeScreen from '../../components/layout/SafeScreen';
+import { DkdCourierInlineApplicationForm } from '../courier/CourierBoardModal';
+
+export default function DkdApplicationsHubModalValue({ dkd_visible_value, dkd_on_close_value, dkd_profile_value, dkd_set_profile_value }) {
+  const [dkd_form_open_value, dkd_set_form_open_value] = useState(false);
+  const dkd_is_courier_approved_value = useMemo(
+    () => String(dkd_profile_value?.courier_status || '').trim().toLowerCase() === 'approved',
+    [dkd_profile_value?.courier_status]
+  );
+
+  useEffect(() => {
+    if (!dkd_visible_value || dkd_is_courier_approved_value) dkd_set_form_open_value(false);
+  }, [dkd_visible_value, dkd_is_courier_approved_value]);
+
+  return (
+    <Modal visible={Boolean(dkd_visible_value)} animationType="slide" onRequestClose={dkd_on_close_value}>
+      <StatusBar barStyle="light-content" />
+      <SafeScreen style={dkd_styles_value.screen}>
+        <LinearGradient colors={['#050B18', '#081527', '#120A24']} style={dkd_styles_value.screen}>
+          <ScrollView contentContainerStyle={dkd_styles_value.content} showsVerticalScrollIndicator={false}>
+            <View style={dkd_styles_value.header}>
+              <Pressable onPress={dkd_on_close_value} style={dkd_styles_value.close}>
+                <MaterialCommunityIcons name="close" size={22} color="#FFF" />
+              </Pressable>
+              <Text style={dkd_styles_value.kicker}>DKD ONAY MERKEZİ</Text>
+              <Text style={dkd_styles_value.title}>{dkd_is_courier_approved_value ? 'Kurye Lisansın Aktif' : 'Kurye Başvurusu'}</Text>
+              <Text style={dkd_styles_value.subtitle}>
+                {dkd_is_courier_approved_value
+                  ? 'Kurye lisansın onaylı ve aktif. Yeni bir kurye başvurusu göndermene gerek yok.'
+                  : 'Kimlik, ehliyet, bölge ve araç bilgilerini ekleyip kurye lisans sürecini başlat.'}
+              </Text>
+            </View>
+
+            {dkd_is_courier_approved_value ? (
+              <View style={[dkd_styles_value.card, dkd_styles_value.approvedCard]}>
+                <View style={[dkd_styles_value.icon, dkd_styles_value.approvedIcon]}>
+                  <MaterialCommunityIcons name="shield-check" size={32} color="#06150F" />
+                </View>
+                <Text style={dkd_styles_value.cardTitle}>Kurye Lisansın Aktif</Text>
+                <Text style={dkd_styles_value.cardText}>DKD Onay Merkezi kayıtlarına göre hesabın kurye olarak onaylı. Ana sayfadaki kurye işlemlerini kullanabilirsin.</Text>
+                <View style={dkd_styles_value.approvedBadge}>
+                  <MaterialCommunityIcons name="check-circle" size={19} color="#62E9B0" />
+                  <Text style={dkd_styles_value.approvedBadgeText}>ONAYLANDI • AKTİF</Text>
+                </View>
+              </View>
+            ) : !dkd_form_open_value ? (
+              <Pressable onPress={() => dkd_set_form_open_value(true)} style={dkd_styles_value.card}>
+                <View style={dkd_styles_value.icon}>
+                  <MaterialCommunityIcons name="card-account-details-outline" size={30} color="#FFF" />
+                </View>
+                <Text style={dkd_styles_value.cardTitle}>Kurye Başvurusu</Text>
+                <Text style={dkd_styles_value.cardText}>Başvuru formunu aç, bilgilerini gönder ve admin onay sürecini takip et.</Text>
+                <View style={dkd_styles_value.action}>
+                  <Text style={dkd_styles_value.actionText}>Başvuru formunu aç</Text>
+                  <MaterialCommunityIcons name="arrow-right-circle" size={20} color="#FFF" />
+                </View>
+              </Pressable>
+            ) : (
+              <View style={dkd_styles_value.form}>
+                <Pressable onPress={() => dkd_set_form_open_value(false)} style={dkd_styles_value.back}>
+                  <MaterialCommunityIcons name="arrow-left" size={18} color="#07131C" />
+                  <Text style={dkd_styles_value.backText}>Başvuru merkezine dön</Text>
+                </Pressable>
+                <DkdCourierInlineApplicationForm dkd_profile_value={dkd_profile_value} dkd_set_profile_value={dkd_set_profile_value} />
+              </View>
+            )}
+          </ScrollView>
+        </LinearGradient>
+      </SafeScreen>
+    </Modal>
+  );
+}
+
+const dkd_styles_value = StyleSheet.create({
+  screen: { flex: 1, backgroundColor: '#050B18' },
+  content: { padding: 18, paddingBottom: 40 },
+  header: { borderRadius: 28, borderWidth: 1, borderColor: 'rgba(255,255,255,0.12)', backgroundColor: 'rgba(255,255,255,0.05)', padding: 18 },
+  close: { position: 'absolute', right: 14, top: 14, width: 40, height: 40, borderRadius: 15, backgroundColor: 'rgba(255,255,255,0.10)', alignItems: 'center', justifyContent: 'center', zIndex: 2 },
+  kicker: { color: '#7EEBFF', fontSize: 11, fontWeight: '900', letterSpacing: 1.2, paddingRight: 50 },
+  title: { color: '#FFF', fontSize: 30, fontWeight: '900', marginTop: 10, paddingRight: 50 },
+  subtitle: { color: 'rgba(231,241,255,0.75)', fontSize: 14, lineHeight: 20, marginTop: 8 },
+  card: { marginTop: 16, minHeight: 220, borderRadius: 28, padding: 18, borderWidth: 1, borderColor: 'rgba(126,235,255,0.25)', backgroundColor: 'rgba(35,72,128,0.38)' },
+  approvedCard: { borderColor: 'rgba(98,233,176,0.38)', backgroundColor: 'rgba(25,92,71,0.28)' },
+  icon: { width: 62, height: 62, borderRadius: 22, backgroundColor: '#7188FF', alignItems: 'center', justifyContent: 'center' },
+  approvedIcon: { backgroundColor: '#62E9B0' },
+  cardTitle: { color: '#FFF', fontSize: 24, fontWeight: '900', marginTop: 18 },
+  cardText: { color: 'rgba(231,241,255,0.76)', fontSize: 14, lineHeight: 21, marginTop: 8 },
+  action: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 24 },
+  actionText: { color: '#FFF', fontSize: 15, fontWeight: '900' },
+  approvedBadge: { alignSelf: 'flex-start', flexDirection: 'row', alignItems: 'center', gap: 7, marginTop: 24, borderRadius: 14, paddingHorizontal: 12, minHeight: 38, borderWidth: 1, borderColor: 'rgba(98,233,176,0.35)', backgroundColor: 'rgba(98,233,176,0.10)' },
+  approvedBadgeText: { color: '#A7F4D2', fontSize: 12, fontWeight: '900', letterSpacing: 0.5 },
+  form: { marginTop: 16 },
+  back: { alignSelf: 'flex-start', minHeight: 44, borderRadius: 15, paddingHorizontal: 13, flexDirection: 'row', alignItems: 'center', gap: 7, backgroundColor: '#7EEBFF', marginBottom: 12 },
+  backText: { color: '#07131C', fontSize: 12, fontWeight: '900' },
+});
+`);
+
+{
+  const dkd_policy_path_value = 'src/features/legal/dkd_google_play_policy_center_modal.js';
+  let dkd_policy_source_value = dkd_read(dkd_policy_path_value);
+  dkd_policy_source_value = dkd_policy_source_value.replace(/v0\.0\.13/g, 'v0.0.14');
+  dkd_policy_source_value = dkd_policy_source_value.replace(/dkd_version_code_value: 13/g, 'dkd_version_code_value: 14');
+  dkd_policy_source_value = dkd_policy_source_value.replace(/dkd_version_code_value \|\| 13/g, 'dkd_version_code_value || 14');
+  dkd_policy_source_value = dkd_policy_source_value.replace(/\/delete-account\//g, '/account-deletion/');
+  dkd_policy_source_value = dkd_policy_source_value.replace('GOOGLE PLAY HAZIRLIK', 'GİZLİLİK VE VERİLER');
+  dkd_policy_source_value = dkd_policy_source_value.replace(
+    'DraBornGo; hesap ve profil bilgileri, telefon/SMS doğrulama kaydı, gönderi ve teslimat verileri, yalnız uygulama açıkken kullanılan konum, kurye çevrimiçi çalışma oturumları ve kazanç kayıtları, destek mesajları ile bildirim kimliği verilerini hizmeti çalıştırmak, güvenliği sağlamak ve kullanıcı isteğini tamamlamak için işler.',
+    'DraBornGo; hesap ve profil bilgileri, kurye başvurusu ve görev kayıtları, gönderi ve teslimat verileri, yalnız uygulama açıkken kullanılan konum, kullanıcının seçtiği veya çektiği gerekli görseller, kurye çalışma ve kazanç kayıtları, destek mesajları ile bildirim ve güvenlik kimliklerini hizmeti çalıştırmak ve kullanıcı isteğini tamamlamak için işler.'
+  );
+  dkd_policy_source_value = dkd_policy_source_value.replace(/\n  \{\n    dkd_key_value: 'otp',[\s\S]*?\n  \},(?=\n  \{\n    dkd_key_value: 'location')/, '');
+  dkd_write(dkd_policy_path_value, dkd_policy_source_value);
+}
+
+dkd_replace_all('src/services/dkd_policy_center_service.js', "'v0.0.13'", "'v0.0.14'");
+dkd_replace_all('src/services/dkd_policy_center_service.js', 'dkd_input_value.dkd_version_code_value || 13', 'dkd_input_value.dkd_version_code_value || 14');
+
+{
+  const dkd_update_path_value = 'src/features/legal/dkd_app_update_center_modal.js';
+  let dkd_update_source_value = dkd_read(dkd_update_path_value);
+  dkd_update_source_value = dkd_update_source_value.replace(/0\.0\.13/g, '0.0.14');
+  dkd_update_source_value = dkd_update_source_value.replace(/dkd_version_code_value: 13/g, 'dkd_version_code_value: 14');
+  dkd_update_source_value = dkd_update_source_value.replace(/dkd_version_code_value \|\| 13/g, 'dkd_version_code_value || 14');
+  dkd_update_source_value = dkd_update_source_value.replace(/dkd_latest_version_code_value \|\| 13/g, 'dkd_latest_version_code_value || 14');
+  dkd_update_source_value = dkd_update_source_value.replace(
+    'Resmi sürüm kaynağını kontrol eder. Yeni sürüm yayınlandığında burada gösterilir. Expo Go test aşamasında APK/AAB üretilmez.',
+    'Resmi DraBornGo sürüm kaynağını kontrol eder. Yeni Google Play sürümü yayınlandığında burada gösterilir.'
+  );
+  dkd_update_source_value = dkd_update_source_value.replace("return 'Expo Go test aşaması • APK/AAB henüz üretilmedi';", "return 'Google Play sürüm kanalı';");
+  dkd_update_source_value = dkd_update_source_value.replace("const dkd_sha_text_value = String(dkd_status_value?.dkd_sha256_value || '').trim() || 'APK/AAB build sonrası eklenecek';", "const dkd_sha_text_value = String(dkd_status_value?.dkd_sha256_value || '').trim() || 'Resmi build doğrulaması';");
+  dkd_write(dkd_update_path_value, dkd_update_source_value);
+}
+
+const dkd_base_css_value = ':root{color-scheme:dark;--bg:#020611;--panel:#091a31;--line:rgba(125,220,255,.16);--text:#f8fcff;--soft:rgba(240,248,255,.74);--cyan:#73e5ff;--green:#65e8b5}*{box-sizing:border-box}body{margin:0;background:linear-gradient(145deg,#020611,#08192f 62%,#120d29);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.68}main{max-width:920px;margin:auto;padding:32px 18px 64px}a{color:var(--cyan);font-weight:850}h1{font-size:clamp(32px,7vw,56px);line-height:1.04;margin:18px 0 10px}h2{margin-top:30px}.card{background:rgba(9,26,49,.92);border:1px solid var(--line);border-radius:24px;padding:19px;margin:17px 0}.muted,p,li{color:var(--soft)}.chip{display:inline-block;padding:7px 11px;border-radius:999px;background:rgba(101,232,181,.09);border:1px solid rgba(101,232,181,.24);color:#c3f8e1;font-weight:900;font-size:12px}.notice{border-left:3px solid var(--green);padding-left:14px}ul,ol{padding-left:22px}';
+
+dkd_write('web/DraBornGo/App/dkd_draborngo_update_manifest.json', `${JSON.stringify({
+  dkd_latest_version_name: '0.0.14',
+  dkd_latest_version_code: 14,
+  dkd_min_supported_version_code: 13,
+  dkd_update_required: false,
+  dkd_distribution_channel: 'google-play-release',
+  dkd_target_android_api: 36,
+  dkd_apk_url: '',
+  dkd_download_page_url: 'https://play.google.com/store/apps/details?id=com.draborneagle.draborngo',
+  dkd_sha256: '',
+  dkd_release_notes: 'DraBornGo v0.0.14: aktif kurye lisansı olan hesaplarda başvuru formu engellendi ve lisans durumu gösterildi; uygulama ve web sürüm kimliği senkronize edildi; Gizlilik ve Veri Merkezi yalnız güncel veri akışlarını gösterecek şekilde sadeleştirildi; aktif teslimat geri yüklemesindeki geçici ağ/RPC hataları kullanıcıya LogBox uyarısı açmadan yönetilir; Google Play gizlilik ve hesap silme kaynakları güncellendi.'
+}, null, 2)}\n`);
+
+dkd_write('web/draborngo/privacy/index.html', `<!doctype html><html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="dark"><title>DraBornGo Gizlilik Politikası</title><meta name="description" content="DraBornGo v0.0.14 gizlilik politikası ve veri güvenliği bilgileri."><style>${dkd_base_css_value}</style></head><body><main><span class="chip">DraBornGo • v0.0.14 • com.draborneagle.draborngo</span><h1>Gizlilik Politikası</h1><p class="muted">Son güncelleme: 9 Ağustos 2026</p><div class="card"><strong>Özet:</strong> DraBornGo yalnız sunduğu kurye, gönderi/teslimat, destek ve hesap işlevleri için gerekli verileri işler. Kişisel veriler reklam amacıyla satılmaz.</div><h2>İşlenebilen veri kategorileri</h2><ul><li>Hesap ve profil bilgileri: kullanıcı kimliği, e-posta/telefon gibi hesap iletişim bilgileri, takma ad, profil görseli ve hesap ayarları.</li><li>Kurye başvurusu ve operasyonu: başvuru alanları, araç/plaka, bölge, kurye onay durumu, görev ve teslimat kayıtları.</li><li>Gönderi ve teslimat: gönderici/alıcı iletişim bilgileri, alım/teslimat adresleri, paket içeriği, ağırlık ve kullanıcı tarafından eklenen gerekli görseller.</li><li>Kurye çalışma ve kazanç kayıtları: çevrimiçi oturum süreleri, tamamlanan görevler ve görev ücretlerinden oluşturulan kazanç özetleri.</li><li>DrabornEagle Destek: kullanıcı ile yetkili admin arasındaki destek mesajları ve görüşmenin işletilmesi için gerekli hesap tanımlayıcıları.</li><li>Kullanıcı izin verdiğinde, yalnız uygulama açıkken rota, adres eşleştirme ve aktif teslimat için ön plan konumu.</li><li>Bildirim kimlikleri ile güvenlik, hata ayıklama ve hizmet sürekliliği için gerekli sınırlı teknik kayıtlar.</li></ul><h2>Kullanılmayan izin ve servisler</h2><p>DraBornGo v0.0.14; arka plan konumu, mikrofon veya geniş medya/depolama izni istemez. Mevcut sürümde SMS/OTP doğrulama servisi ve kullanıcılar arası genel DM sistemi kullanılmaz.</p><h2>Kamera ve fotoğraf seçimi</h2><p>Kamera/fotoğraf erişimi yalnız kullanıcı tarafından başlatılan profil, kurye başvurusu veya gönderi görseli işlemlerinde kullanılır. Uygulama tüm galeriyi sürekli taramaz.</p><h2>Yetkili yönetim erişimi</h2><p>Yetkili DraBornGo admin hesapları; kurye başvurularını yönetmek, teslimat ve destek sorunlarını çözmek, güvenliği sağlamak ve hesap silme taleplerini işlemek için gerekli kayıtlarla sınırlı erişime sahip olabilir.</p><h2>Hizmet sağlayıcıları</h2><p>Hizmetin çalışması için Supabase altyapısı, harita/rota sağlayıcıları, Expo/bildirim altyapısı ve platform mağaza hizmetleri kullanılabilir. Yalnız ilgili işlev için gerekli veriler bu sağlayıcılarla işlenir.</p><h2>Saklama ve güvenlik</h2><p>Veriler hizmeti sunmak, güvenliği korumak, kötüye kullanımı önlemek ve uygulanabilir yasal yükümlülükleri yerine getirmek için gerekli süre boyunca saklanabilir. Yetkilendirme, rol kontrolleri ve satır bazlı erişim politikaları uygulanır.</p><h2>Hesap ve veri silme</h2><p>Kullanıcı uygulamada <strong>Profil → Hesap ve Veriler → Hesabımı Sil</strong> yolundan silme talebi oluşturabilir. Uygulamaya erişemeyen kullanıcılar <a href="../account-deletion/">Hesap ve Veri Silme</a> web sayfasını kullanabilir.</p><div class="card notice">Silme talebi tamamlandığında hesapla ilişkili kişisel uygulama verileri silme sürecine alınır. Yasal veya güvenlik nedeniyle tutulması gereken sınırlı kayıtlar yalnız gerekli saklama süresi boyunca korunabilir.</div><h2>İletişim</h2><p>Uygulama içindeki DrabornEagle Destek veya <a href="mailto:support@draborneagle.com">support@draborneagle.com</a>.</p></main></body></html>`);
+
+dkd_write('web/draborngo/account-deletion/index.html', `<!doctype html><html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="dark"><title>DraBornGo Hesap ve Veri Silme</title><meta name="description" content="DraBornGo hesabı ve ilişkili kişisel veriler için silme talebi yolları."><style>${dkd_base_css_value}</style></head><body><main><span class="chip">DraBornGo • v0.0.14</span><h1>Hesap ve Veri Silme</h1><p class="muted">Son güncelleme: 9 Ağustos 2026</p><div class="card"><strong>Uygulama içinden:</strong> Profil → Hesap ve Veriler → Hesabımı Sil seçeneğini kullan. Talep oturum açmış hesabınla eşleştirilir.</div><h2>Uygulamaya erişemiyorsan</h2><ol><li>DraBornGo hesabında kullandığın e-posta adresinden <a href="mailto:support@draborneagle.com?subject=DraBornGo%20Hesap%20Silme%20Talebi">support@draborneagle.com</a> adresine e-posta gönder.</li><li>Konuya <strong>DraBornGo Hesap Silme Talebi</strong> yaz.</li><li>Hesabı eşleştirmek için kayıtlı e-posta adresini belirt; gereksiz kimlik belgesi veya ek kişisel veri gönderme.</li></ol><h2>Silme kapsamı</h2><p>Uygun talep tamamlandığında hesap/profil, kullanıcıyla ilişkilendirilebilen kurye başvurusu ve görev kayıtları, gönderi/teslimat kayıtları, destek kayıtları, bildirim kimlikleri ve ilgili kullanıcı içeriği silinir veya geri döndürülemez biçimde ayrıştırılır.</p><div class="card notice"><strong>Sınırlı saklama istisnası:</strong> güvenlik, dolandırıcılığın önlenmesi, uyuşmazlıkların çözümü veya yasal zorunluluk nedeniyle tutulması gereken sınırlı kayıtlar yalnız gerekli süre boyunca korunabilir.</div><h2>İşlem süreci</h2><p>Hesap sahipliği doğrulanır; aktif işlemler ve saklama zorunlulukları kontrol edilir; uygun veriler silinir veya anonimleştirilir. Ek doğrulama gerekirse yalnız gerekli bilgi istenir.</p><h2>Gizlilik</h2><p>Veri kategorileri ve izinler için <a href="../privacy/">DraBornGo Gizlilik Politikası</a>.</p></main></body></html>`);
+
+dkd_write('web/draborngo/terms/index.html', `<!doctype html><html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="dark"><title>DraBornGo Kullanım Şartları</title><meta name="description" content="DraBornGo v0.0.14 kullanım şartları."><style>${dkd_base_css_value}</style></head><body><main><span class="chip">DraBornGo • v0.0.14</span><h1>Kullanım Şartları</h1><p class="muted">Son güncelleme: 9 Ağustos 2026</p><div class="card">DraBornGo; kurye, gönderi/teslimat, sipariş takibi ve DrabornEagle destek akışları sunar. Uygulamayı kullanarak bu şartları ve yayımlanan gizlilik politikasını kabul etmiş olursun.</div><h2>Hesap ve güvenlik</h2><p>Hesap bilgilerini doğru tutmak, hesabın güvenliğini korumak ve yetkisiz kullanımı bildirmek kullanıcının sorumluluğundadır. Sahte kimlik, sahte teslimat, dolandırıcılık ve güvenliği zayıflatmaya yönelik kullanım yasaktır.</p><h2>Kurye akışı</h2><p>Kurye işlevleri yalnız gerekli başvuru/onay koşullarını karşılayan hesaplar için kullanılabilir. Onaylı kurye lisansı bulunan hesaplardan yeni kurye başvurusu istenmez. Kurye görev adımlarını gerçeğe uygun güncellemeli ve yürürlükteki trafik/teslimat kurallarına uymalıdır.</p><h2>Gönderi ve teslimat</h2><p>Gönderici adres, iletişim ve paket bilgilerini doğru girmelidir. Yasa dışı, tehlikeli veya taşınması yasak içeriğin gönderilmesi yasaktır. Ücret ve kullanılabilirlik uygulamada gösterilen güncel akışa göre belirlenir.</p><h2>Destek</h2><p>DrabornEagle Destek; hesap, kurye başvurusu, teslimat, güvenlik ve teknik sorunların çözümü içindir. Taciz, tehdit, spam ve yasa dışı içerik yasaktır.</p><h2>Konum ve görsel izinleri</h2><p>Rota ve aktif teslimat için yalnız uygulama açıkken ön plan konumu kullanılabilir. Kamera/fotoğraf erişimi yalnız kullanıcı tarafından başlatılan gerekli görsel işlemlerinde kullanılır.</p><h2>Hizmet değişiklikleri</h2><p>Güvenlik, yasal uyum ve teknik gereklilik nedeniyle özellikler değiştirilebilir veya geçici olarak durdurulabilir. Resmi sürüm bilgileri DraBornGo web kaynağında yayımlanır.</p><h2>Hesap ve veri silme</h2><p>Hesap silme talebi uygulama içinden veya <a href="../account-deletion/">hesap ve veri silme web sayfasından</a> oluşturulabilir. Ayrıntılar için <a href="../privacy/">Gizlilik Politikası</a> geçerlidir.</p><h2>İletişim</h2><p>Uygulama içi DrabornEagle Destek veya <a href="mailto:support@draborneagle.com">support@draborneagle.com</a>.</p></main></body></html>`);
+
+dkd_write('web/DraBornGo/App/dkd_draborngo_release_notes.html', `<!doctype html><html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="dark"><title>DraBornGo v0.0.14 Sürüm Notları</title><style>${dkd_base_css_value}</style></head><body><main><span class="chip">DraBornGo v0.0.14 • Android versionCode 14</span><h1>Sürüm Notları</h1><p><strong>9 Ağustos 2026</strong> tarihli v0.0.14 sürümü Google Play dağıtımına hazırlanmıştır.</p><h2>Kurye Onay Merkezi</h2><ul><li>Kurye lisansı onaylı kullanıcı DKD Onay Merkezi → Başvurular alanına girdiğinde <strong>Kurye Lisansın Aktif</strong> bilgisini görür.</li><li>Aktif lisanslı hesaplarda yeni kurye başvuru formu açılmaz.</li></ul><h2>Sürüm ve arayüz</h2><ul><li>Profil, ana sayfa, menü, Gizlilik ve Veri Merkezi, güncelleme merkezi ve web sürüm kimlikleri v0.0.14 ile eşitlendi.</li><li>Android release kimliği v0.0.14 / versionCode 14 olarak güncellendi.</li><li>Aktif teslimat geri yüklemesindeki geçici ağ/RPC hataları Expo LogBox uyarısı açmadan yönetilir.</li></ul><h2>Gizlilik ve Google Play</h2><ul><li>Gizlilik ve Veri Merkezi yalnız güncel kullanılan veri akışlarını gösterecek şekilde sadeleştirildi.</li><li>Kaldırılmış SMS/OTP doğrulama kartı ve eski servis anlatımları çıkarıldı.</li><li>Arka plan konumu, mikrofon ve geniş medya/depolama izinleri kullanılmaz.</li><li>Uygulama içi ve web üzerinden hesap silme yolları korunur.</li></ul><h2>Dağıtım</h2><p>v0.0.14 için imzalı Release APK ve Release AAB GitHub Actions üzerinden üretilir. Google Play dağıtımı AAB paketiyle yapılır.</p><p><a href="./">DraBornGo sürüm merkezine dön</a></p></main></body></html>`);
+
+dkd_write('web/DraBornGo/App/index.html', `<!doctype html><html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="dark"><title>DraBornGo v0.0.14</title><meta name="description" content="DraBornGo v0.0.14 Android versionCode 14 resmi sürüm merkezi."><style>${dkd_base_css_value}.actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:20px}.btn{padding:12px 15px;border-radius:15px;border:1px solid var(--line);text-decoration:none;font-weight:900}.primary{background:var(--cyan);color:#041019}</style></head><body><main><section class="card"><span class="chip">v0.0.14 • Android code 14 • Target API 36</span><h1>DraBornGo v0.0.14</h1><p>Kurye lisans onayı, gönderi/teslimat, destek, kazanç ve Google Play veri güvenliği akışları tek sürüm kimliğinde güncellendi.</p><div class="card notice"><strong>Release:</strong> imzalı APK ve AAB üretim akışı Google Play dağıtımı için hazırdır.</div><div class="actions"><a class="btn primary" href="./dkd_draborngo_release_notes.html">Sürüm Notları</a><a class="btn" href="./dkd_draborngo_update_manifest.json">Sürüm Manifesti</a><a class="btn" href="../../draborngo/privacy/">Gizlilik</a><a class="btn" href="../../draborngo/terms/">Kullanım Şartları</a><a class="btn" href="../../draborngo/account-deletion/">Hesap Silme</a></div></section></main></body></html>`);
+
+dkd_write('supabase/migrations/20260809161500_dkd_v0_0_14_policy_and_courier_rpc_grants.sql', `-- DraBornGo v0.0.14 / Android versionCode 14\n-- Keep Google Play policy metadata aligned and make courier restore RPC explicit for authenticated users.\n\nrevoke execute on function public.dkd_courier_jobs_for_me() from public, anon;\ngrant execute on function public.dkd_courier_jobs_for_me() to authenticated;\n\nupdate public.dkd_policy_center_config\nset dkd_package_name_value = 'com.draborneagle.draborngo',\n    dkd_version_name_value = 'v0.0.14',\n    dkd_version_code_value = 14,\n    dkd_privacy_policy_doc_url_value = 'https://www.draborneagle.com/draborngo/privacy/',\n    dkd_account_deletion_form_url_value = 'https://www.draborneagle.com/draborngo/account-deletion/',\n    dkd_updated_at_value = now()\nwhere dkd_id_value = 1;\n`);
+
+console.log('DraBornGo v0.0.14 source synchronizer completed.');
