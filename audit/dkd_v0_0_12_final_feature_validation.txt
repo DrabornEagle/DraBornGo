@@ -1,0 +1,5 @@
+DraBornGo v0.0.12 final feature validation: PASS
+Android versionCode: 12
+Validated commit: 1fadaa22d9cd37d33ca05e3340ddde3dcc6643ea
+Validated UTC: 2026-08-09T00:19:47Z
+Checks: npm ci, release identity, runtime scope audit, Android Expo export
