@@ -11,7 +11,6 @@ function dkd_fallback_profile_value(dkd_user_id_value, dkd_row_value = {}) {
     avatar_emoji: dkd_row_value?.avatar_emoji || '🦅',
     avatar_image_url: String(dkd_row_value?.avatar_image_url || ''),
     courier_status: dkd_row_value?.courier_status || 'none',
-    courier_score: Number(dkd_row_value?.courier_score || 0),
     courier_completed_jobs: Number(dkd_row_value?.courier_completed_jobs || 0),
     courier_cancelled_jobs: Number(dkd_row_value?.courier_cancelled_jobs || 0),
     dkd_courier_online: dkd_row_value?.dkd_courier_online === true,
