@@ -1,0 +1,77 @@
+name: DKD v0.0.12 Nav Support Route Hotfix
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  apply-validate:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Apply source hotfix
+        run: node tools/dkd_apply_v0012_nav_support_route_hotfix.mjs
+
+      - name: Install Expo navigation bar package
+        run: npx expo install expo-navigation-bar
+
+      - name: Clean install
+        run: npm ci
+
+      - name: Verify release identity
+        run: npm run dkd:verify-v0.0.12
+
+      - name: Validate hotfix source
+        shell: bash
+        run: |
+          test "$(grep -R --line-number --fixed-strings 'name="route"' src | wc -l)" -eq 0
+          grep -q "dkd_live_support_modal_v2" src/features/admin/AdminMenuModal.js
+          grep -q "edges={\['top', 'bottom'\]}" src/components/layout/SafeScreen.js
+          grep -q "dkd_search_scan_panel" src/features/map/MapHomeScreen.js
+          grep -q "expo-navigation-bar" package.json
+
+      - name: Android Expo export validation
+        run: npx expo export --platform android --output-dir /tmp/dkd-v0012-nav-support-route-export
+
+      - name: Web Expo export validation
+        run: npx expo export --platform web --output-dir /tmp/dkd-v0012-nav-support-route-web
+
+      - name: Write validation marker
+        shell: bash
+        run: |
+          mkdir -p audit
+          printf '%s\n' \
+            'DraBornGo v0.0.12 navigation/support/route hotfix validation: PASS' \
+            'Android versionCode: 12' \
+            "Validated source commit: $GITHUB_SHA" \
+            "Validated UTC: $(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+            'Checks: bottom safe area, navigation bar package/config, Sipariş BUL scanning animation, Admin support v2 routing, invalid route icon audit, Android export, Web export' \
+            > audit/dkd_v0_0_12_nav_support_route_hotfix_validation.txt
+
+      - name: Commit validated changes
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add src app.json package.json package-lock.json audit
+          if git diff --cached --quiet; then
+            echo 'No hotfix changes to commit.'
+          else
+            git commit -m 'fix: complete v0.0.12 navigation support route hotfix [skip ci]'
+            git push origin HEAD:main
+          fi
