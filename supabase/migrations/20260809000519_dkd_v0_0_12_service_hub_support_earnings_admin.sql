@@ -389,7 +389,7 @@ begin
   from (
     select u.id as dkd_user_id,u.email as dkd_email,u.phone as dkd_phone,u.created_at as dkd_created_at,u.last_sign_in_at as dkd_last_sign_in_at,
            p.nickname as dkd_nickname,p.dbg_id as dkd_dbg_id,p.avatar_image_url as dkd_avatar_image_url,p.courier_status as dkd_courier_status,p.dkd_city,p.dkd_region,
-           p.courier_vehicle_type,p.courier_completed_jobs,p.courier_score,p.courier_rating_avg,p.dkd_courier_online,
+           p.courier_vehicle_type,p.courier_completed_jobs,p.dkd_courier_online,
            ca.first_name as dkd_first_name,ca.last_name as dkd_last_name,ca.plate_no as dkd_plate_no,ca.status as dkd_application_status,
            exists(select 1 from public.dkd_admin_users a where a.user_id=u.id) as dkd_is_admin
     from auth.users u
@@ -448,7 +448,7 @@ begin
     dkd_email:=nullif(trim(dkd_patch->>'dkd_email'),'');
     if dkd_email is not null and exists(select 1 from auth.users where lower(email)=lower(dkd_email) and id<>dkd_param_user_id) then raise exception 'dkd_email_already_exists'; end if;
     update auth.users set email=dkd_email,updated_at=now() where id=dkd_param_user_id;
-    update auth.identities set email=dkd_email,identity_data=jsonb_set(coalesce(identity_data,'{}'::jsonb),'{email}',to_jsonb(dkd_email),true),updated_at=now() where user_id=dkd_param_user_id and provider='email';
+    update auth.identities set identity_data=jsonb_set(coalesce(identity_data,'{}'::jsonb),'{email}',to_jsonb(dkd_email),true),updated_at=now() where user_id=dkd_param_user_id and provider='email';
   end if;
   if dkd_patch ? 'dkd_phone' then
     dkd_phone:=nullif(trim(dkd_patch->>'dkd_phone'),'');
@@ -459,7 +459,7 @@ begin
   update public.dkd_profiles set
     nickname=case when dkd_patch ? 'nickname' then nullif(trim(dkd_patch->>'nickname'),'') else nickname end,
     dbg_id=case when dkd_patch ? 'dbg_id' then nullif(trim(dkd_patch->>'dbg_id'),'') else dbg_id end,
-    courier_status=case when dkd_patch ? 'courier_status' then nullif(trim(dkd_patch->>'courier_status'),'') else courier_status end,
+    courier_status=case when dkd_patch ? 'courier_status' then nullif(lower(trim(dkd_patch->>'courier_status')),'') else courier_status end,
     courier_vehicle_type=case when dkd_patch ? 'courier_vehicle_type' then nullif(trim(dkd_patch->>'courier_vehicle_type'),'') else courier_vehicle_type end,
     courier_city=case when dkd_patch ? 'courier_city' then nullif(trim(dkd_patch->>'courier_city'),'') else courier_city end,
     courier_zone=case when dkd_patch ? 'courier_zone' then nullif(trim(dkd_patch->>'courier_zone'),'') else courier_zone end,
@@ -469,9 +469,6 @@ begin
     courier_completed_jobs=case when dkd_patch ? 'courier_completed_jobs' then greatest(0,coalesce((dkd_patch->>'courier_completed_jobs')::int,0)) else courier_completed_jobs end,
     courier_active_days=case when dkd_patch ? 'courier_active_days' then greatest(0,coalesce((dkd_patch->>'courier_active_days')::int,0)) else courier_active_days end,
     courier_cancelled_jobs=case when dkd_patch ? 'courier_cancelled_jobs' then greatest(0,coalesce((dkd_patch->>'courier_cancelled_jobs')::int,0)) else courier_cancelled_jobs end,
-    courier_score=case when dkd_patch ? 'courier_score' then coalesce((dkd_patch->>'courier_score')::int,0) else courier_score end,
-    courier_rating_avg=case when dkd_patch ? 'courier_rating_avg' then greatest(0,least(5,coalesce((dkd_patch->>'courier_rating_avg')::numeric,0))) else courier_rating_avg end,
-    courier_rating_count=case when dkd_patch ? 'courier_rating_count' then greatest(0,coalesce((dkd_patch->>'courier_rating_count')::int,0)) else courier_rating_count end,
     updated_at=now()
   where user_id=dkd_param_user_id;
   if exists(select 1 from public.dkd_courier_license_applications where user_id=dkd_param_user_id) then
@@ -486,7 +483,7 @@ begin
       city=case when dkd_patch ? 'application_city' then nullif(trim(dkd_patch->>'application_city'),'') else city end,
       zone=case when dkd_patch ? 'application_zone' then nullif(trim(dkd_patch->>'application_zone'),'') else zone end,
       vehicle_type=case when dkd_patch ? 'application_vehicle_type' then nullif(trim(dkd_patch->>'application_vehicle_type'),'') else vehicle_type end,
-      status=case when dkd_patch ? 'application_status' then nullif(trim(dkd_patch->>'application_status'),'') else status end,
+      status=case when dkd_patch ? 'application_status' then nullif(lower(trim(dkd_patch->>'application_status')),'') else status end,
       notes=case when dkd_patch ? 'application_notes' then dkd_patch->>'application_notes' else notes end,
       updated_at=now()
     where id=(select id from public.dkd_courier_license_applications where user_id=dkd_param_user_id order by updated_at desc nulls last,created_at desc limit 1);
