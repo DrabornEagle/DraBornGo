@@ -1,0 +1,142 @@
+name: DKD v0.0.13 Courier Menu Hotfix V2
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/dkd_v0_0_13_courier_menu_hotfix_v2.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  dkd_apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Patch courier network state and menu scrolling
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs = require('fs');
+
+          function replaceExact(path, before, after, label) {
+            let text = fs.readFileSync(path, 'utf8');
+            if (!text.includes(before)) throw new Error(`Missing pattern: ${label}`);
+            text = text.replace(before, after);
+            fs.writeFileSync(path, text);
+          }
+
+          const board = 'src/features/courier/dkd_courier_board_modal_v2.js';
+          replaceExact(
+            board,
+            "  const dkd_approved_flag = String(profile?.courier_status || '').toLowerCase() === 'approved';\n  const dkd_online_flag = profile?.dkd_courier_online === true;\n  const dkd_active_count_value = dkd_visible_jobs_value.length;",
+            "  const dkd_approved_flag = String(profile?.courier_status || '').toLowerCase() === 'approved';\n  const dkd_active_owned_job_value = useMemo(() => dkd_visible_jobs_value.find((dkd_job_value) => {\n    if (!dkd_owned_value(dkd_job_value, dkd_user_id_value)) return false;\n    const dkd_status_value = dkd_text_value(dkd_job_value?.status).toLowerCase();\n    const dkd_pickup_value = dkd_text_value(dkd_job_value?.pickup_status).toLowerCase();\n    return !['completed', 'delivered', 'cancelled', 'canceled', 'rejected'].includes(dkd_status_value)\n      && !['delivered', 'cancelled', 'canceled'].includes(dkd_pickup_value);\n  }) || null, [dkd_visible_jobs_value, dkd_user_id_value]);\n  const dkd_has_active_owned_job_flag = Boolean(dkd_active_owned_job_value?.id);\n  const dkd_online_flag = profile?.dkd_courier_online === true;\n  const dkd_network_active_flag = dkd_online_flag || dkd_has_active_owned_job_flag;\n  const dkd_active_count_value = dkd_visible_jobs_value.length;",
+            'courier derived network state'
+          );
+
+          replaceExact(
+            board,
+            "<LinearGradient colors={dkd_online_flag ? ['#075F54', '#095C78', '#25498B'] : ['#252A46', '#153B54', '#35284F']} style={dkd_styles_value.dkd_status_hero}>",
+            "<LinearGradient colors={dkd_network_active_flag ? ['#075F54', '#095C78', '#25498B'] : ['#252A46', '#153B54', '#35284F']} style={dkd_styles_value.dkd_status_hero}>",
+            'courier hero gradient'
+          );
+
+          replaceExact(
+            board,
+            "borderColor: dkd_online_flag ? '#62EBB4' : '#83A7D8'",
+            "borderColor: dkd_network_active_flag ? '#62EBB4' : '#83A7D8'",
+            'courier halo state'
+          );
+          replaceExact(
+            board,
+            "[dkd_styles_value.dkd_status_icon, dkd_online_flag && dkd_styles_value.dkd_status_icon_online]",
+            "[dkd_styles_value.dkd_status_icon, dkd_network_active_flag && dkd_styles_value.dkd_status_icon_online]",
+            'courier icon state'
+          );
+          replaceExact(
+            board,
+            "name={dkd_online_flag ? 'radar' : 'power-standby'} size={27} color={dkd_online_flag ? '#06111B' : '#DDEAFF'}",
+            "name={dkd_has_active_owned_job_flag ? 'bike-fast' : (dkd_online_flag ? 'radar' : 'power-standby')} size={27} color={dkd_network_active_flag ? '#06111B' : '#DDEAFF'}",
+            'courier hero icon'
+          );
+          replaceExact(
+            board,
+            "{dkd_approved_flag ? (dkd_online_flag ? 'Çevrimiçi • Sipariş Radarı Açık' : 'Çevrimdışı • Hazır Bekliyor') : 'Kurye Lisansı Gerekli'}",
+            "{dkd_approved_flag ? (dkd_has_active_owned_job_flag ? 'Aktif Teslimatta • Kurye Ağına Bağlı' : (dkd_online_flag ? 'Çevrimiçi • Sipariş Radarı Açık' : 'Çevrimdışı • Hazır Bekliyor')) : 'Kurye Lisansı Gerekli'}",
+            'courier hero title'
+          );
+          replaceExact(
+            board,
+            "{dkd_approved_flag ? (dkd_online_flag ? 'Bölgen için uygun yeni siparişler canlı taranıyor.' : 'Görev almak için çevrimiçi ol ve sipariş radarını başlat.') : 'Kurye görevlerini kabul etmek için başvurunu tamamla.'}",
+            "{dkd_approved_flag ? (dkd_has_active_owned_job_flag ? 'Üzerindeki sipariş tamamlanana kadar kurye operasyon durumu aktif kalır.' : (dkd_online_flag ? 'Bölgen için uygun yeni siparişler canlı taranıyor.' : 'Görev almak için çevrimiçi ol ve sipariş radarını başlat.')) : 'Kurye görevlerini kabul etmek için başvurunu tamamla.'}",
+            'courier hero subtitle'
+          );
+          replaceExact(
+            board,
+            "onPress={dkd_toggle_online_value} disabled={dkd_online_busy_value} style={dkd_styles_value.dkd_status_button}",
+            "onPress={dkd_toggle_online_value} disabled={dkd_online_busy_value || dkd_has_active_owned_job_flag} style={[dkd_styles_value.dkd_status_button, dkd_has_active_owned_job_flag && { opacity: .82 }]}",
+            'courier toggle disable'
+          );
+          replaceExact(
+            board,
+            "name={dkd_approved_flag ? (dkd_online_flag ? 'pause-circle-outline' : 'radar') : 'clipboard-account-outline'} size={20}",
+            "name={dkd_has_active_owned_job_flag ? 'package-variant-closed-check' : (dkd_approved_flag ? (dkd_online_flag ? 'pause-circle-outline' : 'radar') : 'clipboard-account-outline')} size={20}",
+            'courier toggle icon'
+          );
+          replaceExact(
+            board,
+            "{dkd_approved_flag ? (dkd_online_flag ? 'Sipariş Radarını Durdur' : 'Çevrimiçi Ol • Sipariş Ara') : 'Kurye Başvurusunu Aç'}",
+            "{dkd_has_active_owned_job_flag ? 'Aktif Siparişi Tamamla' : (dkd_approved_flag ? (dkd_online_flag ? 'Sipariş Radarını Durdur' : 'Çevrimiçi Ol • Sipariş Ara') : 'Kurye Başvurusunu Aç')}",
+            'courier toggle label'
+          );
+
+          const menu = 'src/features/navigation/ActionMenuModal.js';
+          replaceExact(
+            menu,
+            "      <Pressable onPress={onClose} style={styles.dkd_backdrop}>\n        <Animated.View style={[styles.dkd_modal_motion, { opacity: dkd_entry_value, transform: [{ translateY: dkd_translate_value }, { scale: dkd_scale_value }] }]}>\n          <Pressable onPress={() => {}} style={styles.dkd_modal_shell}>",
+            "      <View style={styles.dkd_backdrop}>\n        <Pressable onPress={onClose} style={StyleSheet.absoluteFill} />\n        <Animated.View pointerEvents=\"box-none\" style={[styles.dkd_modal_motion, { opacity: dkd_entry_value, transform: [{ translateY: dkd_translate_value }, { scale: dkd_scale_value }] }]}>\n          <View style={styles.dkd_modal_shell}>",
+            'menu backdrop interception'
+          );
+          replaceExact(
+            menu,
+            "<ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.dkd_list_content}>",
+            "<ScrollView showsVerticalScrollIndicator={false} nestedScrollEnabled keyboardShouldPersistTaps=\"handled\" scrollEventThrottle={16} contentContainerStyle={styles.dkd_list_content}>",
+            'menu scroll configuration'
+          );
+          replaceExact(
+            menu,
+            "          </Pressable>\n        </Animated.View>\n      </Pressable>",
+            "          </View>\n        </Animated.View>\n      </View>",
+            'menu closing tags'
+          );
+
+          const boardText = fs.readFileSync(board, 'utf8');
+          const menuText = fs.readFileSync(menu, 'utf8');
+          if (!boardText.includes('dkd_network_active_flag') || !boardText.includes('Aktif Teslimatta • Kurye Ağına Bağlı')) throw new Error('courier validation failed');
+          if (!menuText.includes('nestedScrollEnabled') || !menuText.includes('pointerEvents="box-none"')) throw new Error('menu validation failed');
+          NODE
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - run: npm ci
+      - run: npm run dkd:verify-v0.0.13
+      - run: npx expo export --platform android --output-dir /tmp/dkd-v0-0-13-courier-menu-hotfix
+
+      - name: Commit
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add src/features/courier/dkd_courier_board_modal_v2.js src/features/navigation/ActionMenuModal.js
+          git commit -m 'fix: active courier status and earnings menu scrolling'
+          git push origin HEAD:main
