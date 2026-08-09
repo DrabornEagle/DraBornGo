@@ -20,11 +20,11 @@ function dkd_record_value(dkd_payload_value: Record<string, unknown>): Record<st
 }
 
 function dkd_type_value(dkd_record_data_value: Record<string, unknown>): string {
-  return dkd_string_value(dkd_record_data_value.job_type || dkd_record_data_value.dkd_job_type || dkd_record_data_value.type || 'service_network').toLowerCase();
+  return dkd_string_value(dkd_record_data_value.job_type || dkd_record_data_value.dkd_job_type || dkd_record_data_value.type || 'courier').toLowerCase();
 }
 
 function dkd_supported_type_value(dkd_type_text_value: string): boolean {
-  return ['service_network', 'cargo', 'kargo', 'courier', 'delivery', ''].includes(dkd_type_text_value);
+  return ['cargo', 'kargo', 'courier', 'delivery', ''].includes(dkd_type_text_value);
 }
 
 async function dkd_supabase_json_value(dkd_path_value: string): Promise<unknown> {
