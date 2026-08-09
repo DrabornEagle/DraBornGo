@@ -4,8 +4,15 @@
 <body><main><section class="card">
 <span class="badge">DraBornGo v0.0.13 • Android versionCode 13</span>
 <h1>Sürüm Notları</h1>
-<p><strong>9 Ağustos 2026</strong> tarihli v0.0.13; kurye veri modelini sadeleştiren, Google Play şeffaflık ekranlarını eski kartlı görünüme döndüren ve admin kazanç görünümünü tamamlayan bakım sürümüdür.</p>
+<p><strong>9 Ağustos 2026</strong> tarihli v0.0.13 bakım güncellemesi; kurye veri modelini sadeleştirir, admin kazanç görünümünü tamamlar ve Google Play hazırlık ekranlarını v0.0.5 dönemindeki daha kompakt telefon düzenine geri yaklaştırır.</p>
 <div class="callout">Bu aşamada Expo Go ile test edilir; APK veya AAB üretilmez.</div>
+<h2>Arayüz düzeltmeleri</h2><ul>
+<li>Gizlilik ve Veri Merkezi başlık, ikon, kapatma düğmesi, kart ve metin ölçüleri küçültülerek v0.0.5 dönemindeki kompakt görünüme göre yeniden düzenlendi.</li>
+<li>Sürüm ve Güncelleme Merkezi aynı şekilde daha kompakt boyutlara getirildi; büyük başlık ve kart taşmaları giderildi.</li>
+<li>Android sistem yazı ölçeğinin bu iki merkezi gereksiz büyütmemesi için modal metin ölçekleri sabitlendi.</li>
+<li>Geçersiz <strong>file-document-lock-outline</strong> Material Community icon kullanımı kaldırıldı.</li>
+<li>Sürüm ve Güncelleme Merkezi artık menüden ilk dokunuşta açılır.</li>
+</ul>
 <h2>Kurye sistemi</h2><ul>
 <li>Kurye skor sistemi tamamen kaldırıldı; courier_score, puan ortalaması ve puan sayısı artık kullanılmaz.</li>
 <li>Görevlerdeki reward_score alanı ve görev tamamlandığında skor artırma davranışı kaldırıldı.</li>
@@ -17,17 +24,18 @@
 <li>Kullanıcı listesi beşer kullanıcı halinde açılır; Daha Fazla ile sonraki kayıtlar görüntülenir.</li>
 </ul>
 <h2>Gizlilik ve Veri Merkezi</h2><ul>
-<li>v0.0.5 dönemindeki Google Play hazırlık ekranının renkli başlık ve büyük kart düzeni geri getirildi.</li>
-<li>Metinler v0.0.13 kapsamına göre güncellendi: gönderi/teslimat, konum, destek, kurye çalışma ve kazanç kayıtları açık biçimde belirtilir.</li>
+<li>Google Play hazırlık başlığı, paket/sürüm kimliği ve Data Safety kartları telefon ekranına uygun kompakt ölçülerde gösterilir.</li>
+<li>Metinler v0.0.13 kapsamına göre günceldir: gönderi/teslimat, konum, destek, kurye çalışma ve kazanç kayıtları açık biçimde belirtilir.</li>
 <li>Eski kullanıcılar arası DM/sohbet ve kurye skor/puan sistemi mevcut veri kapsamı olarak gösterilmez.</li>
 </ul>
 <h2>Sürüm ve Güncelleme Merkezi</h2><ul>
-<li>v0.0.5 dönemindeki kartlı güncelleme merkezi görünümü geri getirildi.</li>
 <li>Cihaz sürümü, webdeki son sürüm, dağıtım kaynağı, SHA-256 alanı ve sürüm notu aynı merkezde gösterilir.</li>
+<li>Web tarafında son sürüm <strong>v0.0.13 • Kod 13</strong> olarak tanımlandı ve v0.0.13 sürüm notu yenilendi.</li>
+<li>Canlı web manifesti geçici olarak eski bir sürüm döndürürse uygulama v0.0.13'ten daha eski manifest bilgisini ekranda son sürüm olarak göstermeyecek şekilde korumaya alındı.</li>
 <li>Expo Go test aşamasında APK/AAB olmadığı açıkça belirtilir.</li>
 </ul>
 <h2>Android & sürüm kimliği</h2><ul>
-<li>Sürüm kimliği <strong>0.0.13 / versionCode 13</strong> olarak yükseltildi.</li>
+<li>Sürüm kimliği <strong>0.0.13 / versionCode 13</strong> olarak korunur.</li>
 <li>Android paket adı <strong>com.draborneagle.draborngo</strong> olarak korunur.</li>
 <li>Arka plan konumu, mikrofon ve geniş medya/depolama izinleri engelli kalır.</li>
 </ul>
