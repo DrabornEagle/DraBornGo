@@ -245,12 +245,12 @@ function MapHomeScreen({
           <View style={dkd_styles_value.dkd_section_heading}><View><Text style={dkd_styles_value.dkd_section_kicker}>OPERASYON</Text><Text style={dkd_styles_value.dkd_section_title}>Görev merkezleri</Text></View><View style={dkd_styles_value.dkd_section_icon}><MaterialCommunityIcons name="radar" size={22} color="#79DDFF" /></View></View>
 
           <DkdActionCard dkd_icon_value="motorbike" dkd_kicker_value="CANLI KURYE AĞI" dkd_title_value="Kurye Operasyon Merkezi" dkd_subtitle_value="Sipariş havuzu, aktif teslimatlar, kargo ve performans akışını kurye odaklı tek merkezden yönet." dkd_badge_value={dkd_courier_busy_value ? 'SİPARİŞTE' : dkd_courier_online_value ? 'CANLI' : 'HAZIR'} dkd_colors_value={['#064E58', '#174A92', '#5A2D91']} dkd_on_press_value={() => onOpenCourierBoard?.('default')} />
-          <DkdActionCard dkd_icon_value="map-marker-path" dkd_kicker_value="ŞEHİR SERVİSLERİ" dkd_title_value="Hizmet Ağı Merkezi" dkd_subtitle_value="Kurye, kargo ve şehir içi hizmet taleplerini tek şehir ağı üzerinden keşfet." dkd_badge_value="KEŞFET" dkd_colors_value={['#056B57', '#0A637F', '#35369A']} dkd_on_press_value={() => onTabChange?.('serviceNetwork')} />
+          <DkdActionCard dkd_icon_value="map-marker-path" dkd_kicker_value="ŞEHİR SERVİSLERİ" dkd_title_value="Hizmet Ağı Merkezi" dkd_subtitle_value="Gönderi oluştur, siparişlerini takip et ve kurye teslimat akışını tek merkezden yönet." dkd_badge_value="KEŞFET" dkd_colors_value={['#056B57', '#0A637F', '#35369A']} dkd_on_press_value={() => onTabChange?.('serviceNetwork')} />
 
           <View style={dkd_styles_value.dkd_section_heading}><View><Text style={dkd_styles_value.dkd_section_kicker}>HIZLI ERİŞİM</Text><Text style={dkd_styles_value.dkd_section_title}>Tek dokunuşla aç</Text></View></View>
           <View style={dkd_styles_value.dkd_quick_grid}>
             <DkdQuickTile dkd_icon_value="clipboard-text-clock-outline" dkd_title_value="Başvurular" dkd_subtitle_value="Kurye başvuru süreci" dkd_accent_value="#0B8E91" dkd_on_press_value={() => onTabChange?.('applications')} />
-            <DkdQuickTile dkd_icon_value="message-processing-outline" dkd_title_value="Sohbet" dkd_subtitle_value="DBG mesaj ve ekip alanı" dkd_accent_value="#A33D80" dkd_on_press_value={() => onTabChange?.('dbg')} />
+            <DkdQuickTile dkd_icon_value="headset" dkd_title_value="Destek" dkd_subtitle_value="DrabornEagle admin canlı destek" dkd_accent_value="#A33D80" dkd_on_press_value={() => onTabChange?.('support')} />
             <DkdQuickTile dkd_icon_value="account-circle-outline" dkd_title_value="Profil" dkd_subtitle_value="Kimlik ve hesap merkezi" dkd_accent_value="#405FC8" dkd_on_press_value={onOpenProfile} />
             <DkdQuickTile dkd_icon_value="view-dashboard-edit-outline" dkd_title_value="Tüm Menü" dkd_subtitle_value="Diğer DraBornGo araçları" dkd_accent_value="#A6632B" dkd_on_press_value={onOpenActionMenu} />
           </View>

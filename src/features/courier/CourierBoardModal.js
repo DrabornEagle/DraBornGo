@@ -4,7 +4,6 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import SafeScreen from '../../components/layout/SafeScreen';
 import DkdCourierApplicationPanelValue from './dkd_courier_application_panel';
-import DkdCargoSenderPanelValue from './dkd_cargo_sender_panel';
 import {
   acceptCourierJob,
   completeCourierJob,
@@ -23,7 +22,6 @@ function dkd_text_value(dkd_value) { return String(dkd_value || '').trim(); }
 function dkd_panel_key_value(dkd_value) {
   const dkd_key_value = dkd_text_value(dkd_value).toLowerCase();
   if (['application', 'apply', 'courier_application'].includes(dkd_key_value)) return 'application';
-  if (['cargo', 'cargo_sender', 'sender', 'shipment'].includes(dkd_key_value)) return 'cargo';
   return 'jobs';
 }
 function dkd_owned_value(dkd_job_value, dkd_user_id_value) { return dkd_text_value(dkd_job_value?.assigned_user_id) === dkd_text_value(dkd_user_id_value); }
@@ -134,7 +132,7 @@ function CourierBoardModal({ visible, onClose, profile, currentLocation, session
   const dkd_visible_jobs_value = useMemo(() => dkd_jobs_value.filter((dkd_job_value) => dkd_open_value(dkd_job_value) || dkd_owned_value(dkd_job_value, dkd_user_id_value)), [dkd_jobs_value, dkd_user_id_value]);
   const dkd_approved_flag = String(profile?.courier_status || '').toLowerCase() === 'approved';
   const dkd_online_flag = profile?.dkd_courier_online === true;
-  const dkd_title_value = dkd_panel_value === 'application' ? 'Kurye Başvurusu' : dkd_panel_value === 'cargo' ? 'Gönderi & Kargo' : 'Kurye Görevleri';
+  const dkd_title_value = dkd_panel_value === 'application' ? 'Kurye Başvurusu' : 'Kurye Görevleri';
 
   return (
     <Modal visible={Boolean(visible)} animationType="slide" onRequestClose={onClose}>
@@ -143,15 +141,11 @@ function CourierBoardModal({ visible, onClose, profile, currentLocation, session
         <LinearGradient colors={['#030914', '#071A2E', '#160B2D']} style={dkd_styles_value.screen}>
           <View style={dkd_styles_value.header}><View style={{ flex: 1 }}><Text style={dkd_styles_value.kicker}>DKD KURYE MERKEZİ</Text><Text style={dkd_styles_value.title}>{dkd_title_value}</Text><Text style={dkd_styles_value.sub}>Kurye, gönderi ve teslimat akışlarını tek merkezden yönet.</Text></View><Pressable onPress={onClose} style={dkd_styles_value.close}><MaterialCommunityIcons name="close" size={22} color="#FFF" /></Pressable></View>
 
-          {dkd_panel_value === 'cargo' ? (
-            <View style={dkd_styles_value.panelBody}>
-              <DkdCargoSenderPanelValue dkd_visible_value dkd_panel_mode_value="embedded" dkd_current_location_value={currentLocation} dkd_on_created_value={() => dkd_load_jobs_value(true)} dkd_on_home_return_value={() => dkd_set_panel_value('jobs')} />
-            </View>
-          ) : dkd_panel_value === 'application' ? (
+          {dkd_panel_value === 'application' ? (
             <ScrollView contentContainerStyle={dkd_styles_value.content} keyboardShouldPersistTaps="handled"><Pressable onPress={() => dkd_set_panel_value('jobs')} style={dkd_styles_value.back}><MaterialCommunityIcons name="arrow-left" size={18} color="#031019" /><Text style={dkd_styles_value.backText}>Kurye merkezine dön</Text></Pressable><DkdCourierInlineApplicationForm dkd_profile_value={profile} dkd_set_profile_value={setProfile} /></ScrollView>
           ) : (
             <ScrollView contentContainerStyle={dkd_styles_value.content} refreshControl={<RefreshControl refreshing={dkd_refreshing_value} onRefresh={() => dkd_load_jobs_value(true)} tintColor="#7EEBFF" />}>
-              <View style={dkd_styles_value.shortcutRow}><Pressable onPress={() => dkd_set_panel_value('cargo')} style={dkd_styles_value.shortcut}><MaterialCommunityIcons name="package-variant-closed" size={20} color="#7EEBFF" /><Text style={dkd_styles_value.shortcutText}>Gönderi Oluştur</Text></Pressable><Pressable onPress={() => dkd_set_panel_value('application')} style={dkd_styles_value.shortcut}><MaterialCommunityIcons name="card-account-details-outline" size={20} color="#7EEBFF" /><Text style={dkd_styles_value.shortcutText}>Kurye Başvurusu</Text></Pressable></View>
+              {!dkd_approved_flag ? <View style={dkd_styles_value.shortcutRow}><Pressable onPress={() => dkd_set_panel_value('application')} style={dkd_styles_value.shortcut}><MaterialCommunityIcons name="card-account-details-outline" size={20} color="#7EEBFF" /><Text style={dkd_styles_value.shortcutText}>Kurye Başvurusu</Text></Pressable></View> : null}
               <View style={dkd_styles_value.statusCard}><View style={[dkd_styles_value.statusDot, dkd_online_flag && dkd_styles_value.statusDotOnline]} /><View style={{ flex: 1 }}><Text style={dkd_styles_value.statusTitle}>{dkd_approved_flag ? (dkd_online_flag ? 'Kurye Çevrimiçi' : 'Kurye Çevrimdışı') : 'Kurye Lisansı Gerekli'}</Text><Text style={dkd_styles_value.statusText}>{dkd_approved_flag ? 'Görev havuzundaki uygun teslimatları yönet.' : 'Görev kabul etmek için kurye başvurunu tamamla.'}</Text></View><Pressable onPress={dkd_toggle_online_value} disabled={dkd_online_busy_value} style={dkd_styles_value.statusButton}>{dkd_online_busy_value ? <ActivityIndicator color="#031019" /> : <Text style={dkd_styles_value.statusButtonText}>{dkd_approved_flag ? (dkd_online_flag ? 'Çevrimdışı' : 'Çevrimiçi') : 'Başvur'}</Text>}</Pressable></View>
               <Text style={dkd_styles_value.section}>AKTİF GÖREVLER</Text>
               {dkd_loading_value ? <ActivityIndicator color="#7EEBFF" style={{ marginTop: 24 }} /> : dkd_visible_jobs_value.length ? dkd_visible_jobs_value.map((dkd_job_value) => <DkdJobCardValue key={String(dkd_job_value.id)} dkd_job_value={dkd_job_value} dkd_user_id_value={dkd_user_id_value} dkd_busy_job_id_value={dkd_busy_job_id_value} dkd_on_action_value={dkd_run_action_value} />) : <View style={dkd_styles_value.empty}><MaterialCommunityIcons name="radar" size={30} color="#7EEBFF" /><Text style={dkd_styles_value.emptyTitle}>Aktif görev yok</Text><Text style={dkd_styles_value.emptyText}>Yeni görev geldiğinde bu ekran otomatik güncellenir.</Text></View>}
