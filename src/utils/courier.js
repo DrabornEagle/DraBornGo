@@ -7,7 +7,6 @@ export const COURIER_STATUS_META = {
 };
 export function getCourierMeta(profile={}){
   const status=String(profile?.courier_status||'none').toLowerCase();
-  const score=Math.max(0,Number(profile?.courier_score||0));
   const completed=Math.max(0,Number(profile?.courier_completed_jobs||0));
   const base=COURIER_STATUS_META[status]||COURIER_STATUS_META.none;
   let description='Kurye başvurusu oluşturabilirsin.';
@@ -15,5 +14,5 @@ export function getCourierMeta(profile={}){
   if(status==='approved')description='Kurye lisansın aktif.';
   if(status==='rejected')description='Başvurun reddedildi.';
   if(status==='suspended')description='Kurye hesabın geçici olarak askıda.';
-  return {status,score,completed,label:base.label,shortLabel:base.shortLabel,description,toneBg:base.toneBg,toneText:base.toneText};
+  return {status,completed,label:base.label,shortLabel:base.shortLabel,description,toneBg:base.toneBg,toneText:base.toneText};
 }
