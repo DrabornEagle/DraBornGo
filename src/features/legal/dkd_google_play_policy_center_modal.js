@@ -23,6 +23,12 @@ const dkd_policy_card_values = [
     dkd_body_value: 'DraBornGo; hesap ve profil bilgileri, kurye başvurusu ve lisans durumu, gönderi/teslimat ve hizmet operasyon kayıtları, gerektiğinde yalnız uygulama açıkken kullanılan konum, kullanıcının seçtiği operasyon görselleri, kullanıcı ile DrabornEagle admin arasındaki destek mesajları, bildirim/teknik güvenlik kimlikleri ile kurye çalışma ve kazanç kayıtlarını hizmeti çalıştırmak ve güvenliğini sağlamak için işler. Kişisel veriler reklam amacıyla satılmaz.',
   },
   {
+    dkd_key_value: 'identity-contact',
+    dkd_icon_value: 'card-account-details-outline',
+    dkd_title_value: 'Gönderi ve Kurye Kimlik Bilgileri',
+    dkd_body_value: 'Gönderi oluştururken alıcı/teslimat için ad-soyad, telefon, adres, paket ve gerekli akışta T.C. kimlik numarası işlenebilir. Kurye başvurusunda kullanıcının sunduğu kimlik, iletişim, adres, plaka/araç, acil durum iletişim ve başvuru belgeleri lisans/onay süreci için işlenebilir. Telefon bilgisi SMS/OTP veya pazarlama amacıyla kullanılmaz.',
+  },
+  {
     dkd_key_value: 'support-safety',
     dkd_icon_value: 'message-alert-outline',
     dkd_title_value: 'Destek ve İletişim Güvenliği',
