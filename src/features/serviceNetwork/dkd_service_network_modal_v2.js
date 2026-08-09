@@ -115,7 +115,7 @@ export default function DkdServiceNetworkModalV2({ dkd_visible_value, dkd_on_clo
                 </View>
               </View>
 
-              <View style={dkd_styles_value.dkd_footer_strip}><View style={dkd_styles_value.dkd_footer_icon}><MaterialCommunityIcons name="route" size={20} color="#78EDBC" /></View><View style={{ flex: 1 }}><Text style={dkd_styles_value.dkd_footer_title}>Gönderi akışı tek merkezde</Text><Text style={dkd_styles_value.dkd_footer_text}>Oluştur → Kurye atandı → Paket alındı → Teslim edildi. Her adım Siparişlerim içinde güncellenir.</Text></View></View>
+              <View style={dkd_styles_value.dkd_footer_strip}><View style={dkd_styles_value.dkd_footer_icon}><MaterialCommunityIcons name="map-marker-path" size={20} color="#78EDBC" /></View><View style={{ flex: 1 }}><Text style={dkd_styles_value.dkd_footer_title}>Gönderi akışı tek merkezde</Text><Text style={dkd_styles_value.dkd_footer_text}>Oluştur → Kurye atandı → Paket alındı → Teslim edildi. Her adım Siparişlerim içinde güncellenir.</Text></View></View>
             </ScrollView>
           </Animated.View>
         </LinearGradient>
