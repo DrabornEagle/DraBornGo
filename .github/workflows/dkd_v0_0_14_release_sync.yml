@@ -1,0 +1,153 @@
+name: DKD DraBornGo v0.0.14 Release Sync
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/dkd_v0_0_14_release_sync.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  dkd_release_sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Apply v0.0.14 identity and UI fixes
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs = require('fs');
+
+          function dkd_read(path) {
+            return fs.readFileSync(path, 'utf8');
+          }
+
+          function dkd_write(path, value) {
+            fs.writeFileSync(path, value);
+          }
+
+          function dkd_replace_required(path, before, after, label) {
+            const current = dkd_read(path);
+            if (!current.includes(before)) throw new Error(`Missing pattern: ${label} in ${path}`);
+            dkd_write(path, current.replace(before, after));
+          }
+
+          function dkd_replace_all_required(path, before, after, label) {
+            const current = dkd_read(path);
+            if (!current.includes(before)) throw new Error(`Missing pattern: ${label} in ${path}`);
+            dkd_write(path, current.split(before).join(after));
+          }
+
+          const appPath = 'app.json';
+          const app = JSON.parse(dkd_read(appPath));
+          app.expo.version = '0.0.14';
+          app.expo.android.versionCode = 3;
+          dkd_write(appPath, `${JSON.stringify(app, null, 2)}\n`);
+
+          const packagePath = 'package.json';
+          const packageJson = JSON.parse(dkd_read(packagePath));
+          packageJson.version = '0.0.14';
+          delete packageJson.scripts['dkd:verify-v0.0.13'];
+          packageJson.scripts['dkd:verify-v0.0.14'] = 'node ./scripts/dkd_verify_release_identity.mjs';
+          dkd_write(packagePath, `${JSON.stringify(packageJson, null, 2)}\n`);
+
+          const lockPath = 'package-lock.json';
+          const lockJson = JSON.parse(dkd_read(lockPath));
+          lockJson.version = '0.0.14';
+          if (lockJson.packages && lockJson.packages['']) lockJson.packages[''].version = '0.0.14';
+          dkd_write(lockPath, `${JSON.stringify(lockJson, null, 2)}\n`);
+
+          dkd_replace_required(
+            'App.js',
+            "  'dkd courier online watcher skipped',\n];",
+            "  'dkd courier online watcher skipped',\n  'dkd active delivery restore skipped',\n];",
+            'legacy restore warning filter'
+          );
+          dkd_replace_required(
+            'App.js',
+            '<DkdPreLoginIntroScreen dkd_on_complete_value={dkd_complete_pre_login_intro} />',
+            '<DkdPreLoginIntroScreen dkd_on_continue_value={dkd_complete_pre_login_intro} />',
+            'pre-login continue callback'
+          );
+
+          dkd_replace_required(
+            'src/core/GameFlow.js',
+            "        console.warn('dkd active delivery restore skipped', dkd_error_value?.message || dkd_error_value);",
+            "        console.log('[DraBornGo][active-delivery-restore]', dkd_error_value?.message || dkd_error_value);",
+            'best-effort restore logging'
+          );
+
+          dkd_replace_required(
+            'src/features/map/MapHomeScreen.js',
+            "const dkd_version_text_value = 'v0.0.13';",
+            "const dkd_version_text_value = 'v0.0.14';",
+            'home version badge'
+          );
+
+          dkd_replace_required(
+            'src/features/profile/ProfileModal.js',
+            '<Text style={dkd_styles_value.kicker}>DraBornGo v0.0.12</Text>',
+            '<Text style={dkd_styles_value.kicker}>DraBornGo v0.0.14</Text>',
+            'profile version badge'
+          );
+
+          dkd_replace_required(
+            'src/features/onboarding/dkd_pre_login_intro_screen.js',
+            '<Text style={dkd_styles_value.badgeText}>DraBornGo v0.0.12</Text>',
+            '<Text style={dkd_styles_value.badgeText}>DraBornGo v0.0.14</Text>',
+            'city network intro version badge'
+          );
+
+          const updateCenterPath = 'src/features/legal/dkd_app_update_center_modal.js';
+          dkd_replace_all_required(updateCenterPath, '0.0.13', '0.0.14', 'update center release name');
+          dkd_replace_all_required(updateCenterPath, 'dkd_version_code_value: 13', 'dkd_version_code_value: 3', 'update center object code');
+          dkd_replace_all_required(updateCenterPath, '|| 13', '|| 3', 'update center fallback code');
+
+          const verifyPath = 'scripts/dkd_verify_release_identity.mjs';
+          dkd_write(verifyPath, `import fs from 'node:fs';\n\nconst dkd_app_value = JSON.parse(fs.readFileSync('app.json', 'utf8'));\nconst dkd_package_value = JSON.parse(fs.readFileSync('package.json', 'utf8'));\nconst dkd_fail_value = (dkd_message_value) => { throw new Error(\`[DraBornGo release identity] \${dkd_message_value}\`); };\n\nif (dkd_app_value?.expo?.version !== '0.0.14') dkd_fail_value('app.json expo.version must be 0.0.14');\nif (Number(dkd_app_value?.expo?.android?.versionCode) !== 3) dkd_fail_value('Android versionCode must be 3');\nif (dkd_package_value?.version !== '0.0.14') dkd_fail_value('package.json version must be 0.0.14');\nif (dkd_app_value?.expo?.android?.package !== 'com.draborneagle.draborngo') dkd_fail_value('Android package changed unexpectedly');\n\nconsole.log('DraBornGo v0.0.14 / Android versionCode 3 identity: PASS');\n`);
+
+          const readmePath = 'README_DKD_GOOGLEPLAY_PAGES.md';
+          let readme = dkd_read(readmePath);
+          readme = readme.replace(/- v0\.0\.8 Android izin seti/, '- v0.0.14 Android izin seti');
+          readme = readme.replace(/## v0\.0\.8 test notu[\s\S]*$/m, `## v0.0.14 test notu\n\nDraBornGo v0.0.14 / Android versionCode 3 aşamasında test Expo SDK 57 uyumlu Expo Go üzerinden yürütülür. Google Play'de mevcut yayımlanmış Android versionCode 2 olduğu için bir sonraki üretim AAB kimliği 3 olarak sabit tutulur. AAB oluşturulana kadar versionCode 3 değiştirilmeyecektir. Bu test aşamasında APK/AAB üretilmez veya web üzerinden uygulama paketi dağıtılmaz.\n`);
+          dkd_write(readmePath, readme);
+
+          const checks = [
+            ['app.json', '"version": "0.0.14"'],
+            ['app.json', '"versionCode": 3'],
+            ['package.json', '"version": "0.0.14"'],
+            ['src/features/map/MapHomeScreen.js', "v0.0.14"],
+            ['src/features/profile/ProfileModal.js', 'DraBornGo v0.0.14'],
+            ['src/features/onboarding/dkd_pre_login_intro_screen.js', 'DraBornGo v0.0.14'],
+            ['App.js', 'dkd_on_continue_value={dkd_complete_pre_login_intro}'],
+          ];
+          for (const [path, token] of checks) {
+            if (!dkd_read(path).includes(token)) throw new Error(`Validation failed: ${path} missing ${token}`);
+          }
+          NODE
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - run: npm ci
+      - run: npm run dkd:verify-v0.0.14
+      - run: npm run dkd:play-risk-scan
+
+      - name: Commit v0.0.14 release sync
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add app.json package.json package-lock.json App.js README_DKD_GOOGLEPLAY_PAGES.md scripts/dkd_verify_release_identity.mjs src/core/GameFlow.js src/features/map/MapHomeScreen.js src/features/profile/ProfileModal.js src/features/onboarding/dkd_pre_login_intro_screen.js src/features/legal/dkd_app_update_center_modal.js
+          git commit -m 'release: DraBornGo v0.0.14 code 3 sync'
+          git push origin HEAD:main
