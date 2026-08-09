@@ -8,5 +8,5 @@
   "dkd_apk_url": "",
   "dkd_download_page_url": "https://play.google.com/store/apps/details?id=com.draborneagle.draborngo",
   "dkd_sha256": "",
-  "dkd_release_notes": "DraBornGo v0.0.12: kullanımdan kaldırılan işletme ve büyük taşıma akışları kaldırıldı; Hizmet Ağı güncel kategorilere sadeleştirildi; aktif sipariş ve görev havuzu sıfırlandı; kurye/kargo akışları güncel Supabase şemasıyla eşitlendi; Android izin açıklamaları, gizlilik, hesap silme ve web sürüm kaynakları güncellendi. Expo Go test aşamasında APK/AAB üretilmez."
+  "dkd_release_notes": "DraBornGo v0.0.12: Kurye Görevleri sadeleştirildi; kurye lisansı onaylı kullanıcılar başvuru kartını görmez. Eski kategori tabanlı Hizmet Ağı ve Supabase veri modeli kaldırıldı; Hizmet Ağı artık Gönderi Oluştur + Siparişlerim merkezidir. Merkez Menüye günlük/haftalık/aylık kurye kazanç tablosu, çevrimiçi çalışma süresi ve saatlik kazanç eklendi. Eski sohbet alanı DrabornEagle canlı destek paneliyle değiştirildi. Admin Paneline kullanıcı arama/detay yönetimi, kurye kazanç görünümü ve destek gelen kutusu eklendi. Gizlilik, kullanım şartları ve web sürüm merkezi güncellendi. Expo Go test aşamasında APK/AAB üretilmez."
 }
