@@ -203,7 +203,7 @@ function MapHomeScreen({
                     <Image source={dkd_racing_motorcycle_asset_value} style={dkd_styles_value.dkd_racing_motorcycle_image} contentFit="contain" transition={0} />
                   </Animated.View>
                 </LinearGradient>
-                <View style={dkd_styles_value.dkd_gate_icon_label}><Text style={dkd_styles_value.dkd_gate_icon_label_text}>DKD RIDER</Text></View>
+                <View style={dkd_styles_value.dkd_gate_icon_label}><Text style={dkd_styles_value.dkd_gate_icon_label_text}>DBG RIDER</Text></View>
               </View>
               <View style={dkd_styles_value.dkd_control_copy}>
                 <Text style={dkd_styles_value.dkd_control_kicker}>KURYE KONTROL MERKEZİ</Text>
@@ -217,7 +217,7 @@ function MapHomeScreen({
               <View style={dkd_styles_value.dkd_order_track}>
                 <View style={dkd_styles_value.dkd_order_track_node}><MaterialCommunityIcons name="package-variant-closed" size={16} color="#83E9FF" /></View>
                 <View style={dkd_styles_value.dkd_order_track_line} />
-                <Animated.View style={[dkd_styles_value.dkd_order_track_rider, { transform: [{ translateX: dkd_scan_value.interpolate({ inputRange: [0, 1], outputRange: [-28, 28] }) }] }]}><MaterialCommunityIcons name="motorbike" size={19} color="#FFFFFF" /></Animated.View>
+                <Animated.View style={[dkd_styles_value.dkd_order_track_rider, dkd_courier_approved_value && dkd_courier_online_value ? { transform: [{ translateX: dkd_scan_value.interpolate({ inputRange: [0, 1], outputRange: [-28, 28] }) }] } : null]}><MaterialCommunityIcons name="motorbike" size={19} color="#FFFFFF" /></Animated.View>
                 <View style={dkd_styles_value.dkd_order_track_line} />
                 <View style={dkd_styles_value.dkd_order_track_node}><MaterialCommunityIcons name="map-marker-check-outline" size={16} color="#6FEAB5" /></View>
               </View>

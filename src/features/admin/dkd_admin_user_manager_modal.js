@@ -55,6 +55,7 @@ export default function DkdAdminUserManagerModal({ dkd_visible_value, dkd_on_clo
   const [dkd_form_value, dkd_set_form_value] = useState({});
   const [dkd_loading_value, dkd_set_loading_value] = useState(false);
   const [dkd_saving_value, dkd_set_saving_value] = useState(false);
+  const [dkd_visible_user_count_value, dkd_set_visible_user_count_value] = useState(5);
 
   const dkd_load_users_value = useCallback(async () => {
     dkd_set_loading_value(true);
@@ -62,6 +63,7 @@ export default function DkdAdminUserManagerModal({ dkd_visible_value, dkd_on_clo
       const dkd_result_value = await dkd_admin_search_users_value(dkd_search_value, 100);
       if (dkd_result_value.error) throw dkd_result_value.error;
       dkd_set_rows_value(dkd_result_value.data || []);
+      dkd_set_visible_user_count_value(5);
     } catch (dkd_error_value) {
       Alert.alert('Admin Kullanıcıları', dkd_error_value?.message || 'Kullanıcılar alınamadı.');
     } finally { dkd_set_loading_value(false); }
@@ -90,9 +92,6 @@ export default function DkdAdminUserManagerModal({ dkd_visible_value, dkd_on_clo
         courier_completed_jobs: String(dkd_profile_value.courier_completed_jobs ?? 0),
         courier_active_days: String(dkd_profile_value.courier_active_days ?? 0),
         courier_cancelled_jobs: String(dkd_profile_value.courier_cancelled_jobs ?? 0),
-        courier_score: String(dkd_profile_value.courier_score ?? 0),
-        courier_rating_avg: String(dkd_profile_value.courier_rating_avg ?? 0),
-        courier_rating_count: String(dkd_profile_value.courier_rating_count ?? 0),
         first_name: dkd_application_value.first_name || '',
         last_name: dkd_application_value.last_name || '',
         application_phone: dkd_application_value.phone || '',
@@ -180,7 +179,10 @@ export default function DkdAdminUserManagerModal({ dkd_visible_value, dkd_on_clo
           {!dkd_selected_user_id_value ? (
             <View style={{ flex: 1 }}>
               <View style={styles.searchShell}><MaterialCommunityIcons name="magnify" size={21} color="#8FEAFF" /><TextInput value={dkd_search_value} onChangeText={dkd_set_search_value} placeholder="Ad, e-posta, telefon, plaka, DBG ID veya UUID" placeholderTextColor="rgba(232,242,255,.42)" style={styles.searchInput} /></View>
-              {dkd_loading_value ? <ActivityIndicator color="#7EEBFF" style={{ marginTop: 28 }} /> : <ScrollView contentContainerStyle={styles.listContent} showsVerticalScrollIndicator={false}>{dkd_rows_value.map((dkd_item_value) => <DkdUserRow key={String(dkd_item_value.dkd_user_id)} dkd_item_value={dkd_item_value} dkd_on_press_value={() => { dkd_set_selected_user_id_value(dkd_item_value.dkd_user_id); dkd_load_detail_value(dkd_item_value.dkd_user_id); }} />)}</ScrollView>}
+              {dkd_loading_value ? <ActivityIndicator color="#7EEBFF" style={{ marginTop: 28 }} /> : <ScrollView contentContainerStyle={styles.listContent} showsVerticalScrollIndicator={false}>
+                {dkd_rows_value.slice(0, dkd_visible_user_count_value).map((dkd_item_value) => <DkdUserRow key={String(dkd_item_value.dkd_user_id)} dkd_item_value={dkd_item_value} dkd_on_press_value={() => { dkd_set_selected_user_id_value(dkd_item_value.dkd_user_id); dkd_load_detail_value(dkd_item_value.dkd_user_id); }} />)}
+                {dkd_visible_user_count_value < dkd_rows_value.length ? <Pressable onPress={() => dkd_set_visible_user_count_value((dkd_previous_value) => dkd_previous_value + 5)} style={styles.moreButton}><MaterialCommunityIcons name="chevron-down" size={19} color="#06111B" /><Text style={styles.moreButtonText}>Daha Fazla • {Math.min(5, dkd_rows_value.length - dkd_visible_user_count_value)} kullanıcı daha</Text></Pressable> : null}
+              </ScrollView>}
             </View>
           ) : (
             <ScrollView contentContainerStyle={styles.detailContent} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
@@ -195,7 +197,6 @@ export default function DkdAdminUserManagerModal({ dkd_visible_value, dkd_on_clo
                 <View style={styles.metricGrid}>{dkd_period_cards_value.map(([dkd_label_value, dkd_period_value, dkd_tone_value]) => <DkdMetric key={dkd_label_value} dkd_label_value={dkd_label_value} dkd_value={dkd_format_earnings_money_value(dkd_period_value?.dkd_earnings_tl)} dkd_icon_value="cash-multiple" dkd_tone_value={dkd_tone_value} />)}</View>
                 <View style={styles.metricGrid}>
                   <DkdMetric dkd_label_value="Bugün Çalışma" dkd_value={dkd_format_work_duration_value(dkd_earnings_value?.daily?.dkd_online_seconds)} dkd_icon_value="timer-outline" dkd_tone_value={['#085D58', '#15405B']} />
-                  <DkdMetric dkd_label_value="Saatlik" dkd_value={dkd_format_earnings_money_value(dkd_earnings_value?.daily?.dkd_hourly_tl)} dkd_icon_value="speedometer" dkd_tone_value={['#5B3B87', '#3C356E']} />
                 </View>
 
                 <Text style={styles.sectionTitle}>HESAP VE PROFİL</Text>
@@ -212,8 +213,7 @@ export default function DkdAdminUserManagerModal({ dkd_visible_value, dkd_on_clo
                 <View style={styles.formCard}>
                   <View style={styles.fieldRow}><DkdField dkd_label_value="Kurye Durumu" dkd_value={dkd_form_value.courier_status} dkd_on_change_value={(dkd_value) => dkd_set_field_value('courier_status', dkd_value)} /><DkdField dkd_label_value="Araç" dkd_value={dkd_form_value.courier_vehicle_type} dkd_on_change_value={(dkd_value) => dkd_set_field_value('courier_vehicle_type', dkd_value)} /></View>
                   <View style={styles.fieldRow}><DkdField dkd_label_value="Tamamlanan" dkd_value={dkd_form_value.courier_completed_jobs} dkd_on_change_value={(dkd_value) => dkd_set_field_value('courier_completed_jobs', dkd_value)} dkd_keyboard_type_value="number-pad" /><DkdField dkd_label_value="Aktif Gün" dkd_value={dkd_form_value.courier_active_days} dkd_on_change_value={(dkd_value) => dkd_set_field_value('courier_active_days', dkd_value)} dkd_keyboard_type_value="number-pad" /></View>
-                  <View style={styles.fieldRow}><DkdField dkd_label_value="İptal" dkd_value={dkd_form_value.courier_cancelled_jobs} dkd_on_change_value={(dkd_value) => dkd_set_field_value('courier_cancelled_jobs', dkd_value)} dkd_keyboard_type_value="number-pad" /><DkdField dkd_label_value="Skor" dkd_value={dkd_form_value.courier_score} dkd_on_change_value={(dkd_value) => dkd_set_field_value('courier_score', dkd_value)} dkd_keyboard_type_value="number-pad" /></View>
-                  <View style={styles.fieldRow}><DkdField dkd_label_value="Puan Ort." dkd_value={dkd_form_value.courier_rating_avg} dkd_on_change_value={(dkd_value) => dkd_set_field_value('courier_rating_avg', dkd_value)} dkd_keyboard_type_value="decimal-pad" /><DkdField dkd_label_value="Puan Sayısı" dkd_value={dkd_form_value.courier_rating_count} dkd_on_change_value={(dkd_value) => dkd_set_field_value('courier_rating_count', dkd_value)} dkd_keyboard_type_value="number-pad" /></View>
+                  <DkdField dkd_label_value="İptal" dkd_value={dkd_form_value.courier_cancelled_jobs} dkd_on_change_value={(dkd_value) => dkd_set_field_value('courier_cancelled_jobs', dkd_value)} dkd_keyboard_type_value="number-pad" />
                 </View>
 
                 <Text style={styles.sectionTitle}>KURYE BAŞVURU DETAYLARI</Text>
@@ -250,6 +250,8 @@ const styles = StyleSheet.create({
   searchShell: { margin: 16, minHeight: 56, borderRadius: 19, backgroundColor: 'rgba(8,24,44,.88)', borderWidth: 1, borderColor: 'rgba(126,235,255,.15)', flexDirection: 'row', alignItems: 'center', gap: 9, paddingHorizontal: 13 },
   searchInput: { flex: 1, color: '#FFF', fontSize: 13, fontWeight: '700' },
   listContent: { paddingHorizontal: 16, paddingBottom: 50 },
+  moreButton: { minHeight: 52, borderRadius: 18, marginTop: 3, backgroundColor: '#86E9FF', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 7 },
+  moreButtonText: { color: '#06111B', fontSize: 11, fontWeight: '900' },
   userRow: { minHeight: 96, borderRadius: 23, backgroundColor: 'rgba(8,23,42,.88)', borderWidth: 1, borderColor: 'rgba(255,255,255,.09)', flexDirection: 'row', alignItems: 'center', gap: 11, padding: 13, marginBottom: 10 },
   userAvatar: { width: 52, height: 52, borderRadius: 18, backgroundColor: 'rgba(75,139,233,.25)', alignItems: 'center', justifyContent: 'center' },
   userName: { color: '#FFF', fontSize: 15, fontWeight: '900' },
