@@ -10,7 +10,7 @@ import DkdCityGateTransitionScreen from './src/features/onboarding/dkd_city_gate
 import GameFlow from './src/core/GameFlow';
 import Dkd_modern_alert_provider_value from './src/components/ui/dkd_modern_alert_provider';
 
-const dkd_pre_login_intro_storage_key_value = 'dkd_dkd_draborngo_pre_login_intro_completed_v6';
+const dkd_pre_login_intro_storage_key_value = 'dkd_dkd_draborngo_pre_login_intro_completed_v7';
 const dkd_android_system_bar_background_value = '#000000';
 
 const dkd_ignore_pattern_list_value = [
