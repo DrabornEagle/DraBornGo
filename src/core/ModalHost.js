@@ -1,12 +1,12 @@
 import React, { memo, useCallback, useState } from 'react';
 import ActionMenuModal from '../features/navigation/ActionMenuModal';
 import ProfileModal from '../features/profile/ProfileModal';
-import CourierBoardModal from '../features/courier/CourierBoardModal';
+import CourierBoardModal from '../features/courier/dkd_courier_board_modal_v2';
 import DkdCourierLiveSyncBridge from '../features/courier/dkd_courier_live_sync_bridge';
 import DkdApplicationsHubModalValue from '../features/applications/dkd_applications_hub_modal';
 import DkdAdminApplicationsModal from '../features/admin/dkd_admin_applications_modal';
-import DkdServiceNetworkModal from '../features/serviceNetwork/dkd_service_network_modal';
-import DkdLiveSupportModal from '../features/support/dkd_live_support_modal';
+import DkdServiceNetworkModal from '../features/serviceNetwork/dkd_service_network_modal_v2';
+import DkdLiveSupportModal from '../features/support/dkd_live_support_modal_v2';
 import AdminMenuModal from '../features/admin/AdminMenuModal';
 import DkdGooglePlayPolicyCenterModal from '../features/legal/dkd_google_play_policy_center_modal';
 
