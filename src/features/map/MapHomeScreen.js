@@ -186,7 +186,7 @@ function MapHomeScreen({
           </View>
 
           <LinearGradient colors={dkd_status_value.dkd_gradient_value} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={dkd_styles_value.dkd_control_card}>
-            <Animated.View pointerEvents="none" style={[dkd_styles_value.dkd_scan_light, { transform: [{ translateX: dkd_scan_translate_value }, { rotate: '17deg' }] }]} />
+            <Animated.View pointerEvents="none" style={[dkd_styles_value.dkd_scan_light, dkd_courier_online_value && { width: 118, backgroundColor: 'rgba(107,255,218,0.15)' }, { transform: [{ translateX: dkd_scan_translate_value }, { rotate: '17deg' }] }]} />
             <Animated.View pointerEvents="none" style={[dkd_styles_value.dkd_route_lane, dkd_styles_value.dkd_route_lane_one, { transform: [{ translateX: dkd_lane_translate_value }, { rotate: '-24deg' }] }]} />
             <Animated.View pointerEvents="none" style={[dkd_styles_value.dkd_route_lane, dkd_styles_value.dkd_route_lane_two, { transform: [{ translateX: Animated.multiply(dkd_lane_translate_value, -0.55) }, { rotate: '-24deg' }] }]} />
 
@@ -242,9 +242,10 @@ function MapHomeScreen({
               dkd_style_value={[dkd_styles_value.dkd_control_button_pressable, dkd_courier_busy_value && dkd_styles_value.dkd_control_button_disabled]}
               dkd_children_value={(
                 <LinearGradient colors={[dkd_status_value.dkd_accent_value, dkd_status_value.dkd_secondary_value]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={dkd_styles_value.dkd_control_button}>
-                  <MaterialCommunityIcons name={dkd_courier_approved_value ? (dkd_courier_busy_value ? 'package-variant-closed-check' : dkd_courier_online_value ? 'pause-circle-outline' : 'radar') : 'clipboard-account-outline'} size={22} color="#031019" />
-                  <Text style={dkd_styles_value.dkd_control_button_text}>{dkd_courier_approved_value ? (dkd_courier_busy_value ? 'Sipariş Aktif' : dkd_courier_online_value ? 'Sipariş Radarını Durdur' : 'Sipariş BUL') : 'Kurye Başvurusunu Aç'}</Text>
-                  <View style={dkd_styles_value.dkd_control_button_arrow}><MaterialCommunityIcons name={dkd_courier_busy_value ? 'lock-outline' : 'arrow-right'} size={20} color="#031019" /></View>
+                  {dkd_courier_online_value && !dkd_courier_busy_value ? <Animated.View pointerEvents="none" style={{ position: 'absolute', top: -32, bottom: -32, width: 86, backgroundColor: 'rgba(255,255,255,0.20)', transform: [{ translateX: dkd_scan_translate_value }, { rotate: '16deg' }] }} /> : null}
+                  <MaterialCommunityIcons name={dkd_courier_approved_value ? (dkd_courier_busy_value ? 'package-variant-closed-check' : dkd_courier_online_value ? 'radar' : 'radar') : 'clipboard-account-outline'} size={22} color="#031019" />
+                  <Text style={dkd_styles_value.dkd_control_button_text}>{dkd_courier_approved_value ? (dkd_courier_busy_value ? 'Sipariş Aktif' : dkd_courier_online_value ? 'Siparişler Taranıyor • Durdur' : 'Sipariş BUL') : 'Kurye Başvurusunu Aç'}</Text>
+                  <View style={dkd_styles_value.dkd_control_button_arrow}><MaterialCommunityIcons name={dkd_courier_busy_value ? 'lock-outline' : dkd_courier_online_value ? 'pause' : 'arrow-right'} size={20} color="#031019" /></View>
                 </LinearGradient>
               )}
             />
@@ -343,7 +344,7 @@ const dkd_styles_value = StyleSheet.create({
   dkd_location_warning_sub: { color: 'rgba(255,241,188,0.66)', fontSize: 10, lineHeight: 15, fontWeight: '700', marginTop: 2 },
   dkd_control_button_pressable: { marginTop: 14, borderRadius: 21 },
   dkd_control_button_disabled: { opacity: 0.78 },
-  dkd_control_button: { minHeight: 61, borderRadius: 21, paddingHorizontal: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 9 },
+  dkd_control_button: { minHeight: 61, borderRadius: 21, paddingHorizontal: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 9, overflow: 'hidden' },
   dkd_control_button_text: { flex: 1, textAlign: 'center', color: '#031019', fontSize: 15, fontWeight: '900' },
   dkd_control_button_arrow: { width: 33, height: 33, borderRadius: 12, backgroundColor: 'rgba(255,255,255,0.24)', alignItems: 'center', justifyContent: 'center' },
   dkd_section_heading: { marginTop: 25, marginBottom: 12, flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between' },
