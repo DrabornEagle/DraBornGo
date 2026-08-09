@@ -1,5 +1,6 @@
 import Constants from 'expo-constants';
 import { Linking } from 'react-native';
+import { supabase } from '../lib/supabase';
 
 const dkd_update_manifest_url_value = 'https://www.draborneagle.com/DraBornGo/App/dkd_draborngo_update_manifest.json';
 const dkd_play_store_url_value = 'https://play.google.com/store/apps/details?id=com.draborneagle.draborngo';
@@ -40,6 +41,43 @@ function dkd_compare_version_name_value(dkd_left_value, dkd_right_value) {
   return 0;
 }
 
+async function dkd_fetch_dynamic_release_note_value() {
+  try {
+    const dkd_result_value = await supabase
+      .from('dkd_app_release_notes')
+      .select('dkd_release_note_value')
+      .eq('dkd_id_value', 1)
+      .maybeSingle();
+    if (dkd_result_value?.error) return '';
+    return dkd_clean_text_value(dkd_result_value?.data?.dkd_release_note_value, '');
+  } catch {
+    return '';
+  }
+}
+
+export async function dkd_update_app_release_note_value(dkd_release_note_value) {
+  const dkd_clean_release_note_value = dkd_clean_text_value(dkd_release_note_value, '').slice(0, 4000);
+  if (!dkd_clean_release_note_value) {
+    return { data: null, error: new Error('Sürüm notu boş bırakılamaz.') };
+  }
+  try {
+    const dkd_result_value = await supabase
+      .from('dkd_app_release_notes')
+      .upsert({
+        dkd_id_value: 1,
+        dkd_release_note_value: dkd_clean_release_note_value,
+        dkd_version_name_value: dkd_current_release_name_value,
+        dkd_version_code_value: dkd_current_release_code_value,
+        dkd_updated_at_value: new Date().toISOString(),
+      }, { onConflict: 'dkd_id_value' })
+      .select('dkd_release_note_value, dkd_updated_at_value')
+      .single();
+    return { data: dkd_result_value?.data || null, error: dkd_result_value?.error || null };
+  } catch (dkd_error_value) {
+    return { data: null, error: dkd_error_value };
+  }
+}
+
 export function dkd_get_installed_app_identity_value() {
   const dkd_expo_config_value = Constants?.expoConfig || {};
   const dkd_version_name_value = dkd_clean_text_value(dkd_expo_config_value?.version || Constants?.nativeAppVersion, dkd_current_release_name_value);
@@ -53,6 +91,7 @@ export function dkd_get_installed_app_identity_value() {
 
 export async function dkd_fetch_app_update_status_value() {
   const dkd_installed_value = dkd_get_installed_app_identity_value();
+  const dkd_dynamic_release_note_value = await dkd_fetch_dynamic_release_note_value();
   try {
     const dkd_response_value = await fetch(`${dkd_update_manifest_url_value}?dkd_ts=${Date.now()}`, {
       method: 'GET',
@@ -91,9 +130,9 @@ export async function dkd_fetch_app_update_status_value() {
       dkd_download_url_value: dkd_apk_url_value,
       dkd_source_url_value: dkd_apk_url_value || dkd_download_page_url_value,
       dkd_sha256_value: dkd_clean_text_value(dkd_manifest_value?.dkd_sha256, ''),
-      dkd_release_notes_value: dkd_remote_is_current_or_newer_value && dkd_remote_release_notes_value
+      dkd_release_notes_value: dkd_dynamic_release_note_value || (dkd_remote_is_current_or_newer_value && dkd_remote_release_notes_value
         ? dkd_remote_release_notes_value
-        : dkd_current_release_notes_value,
+        : dkd_current_release_notes_value),
       dkd_error_value: null,
       dkd_remote_manifest_stale_value: !dkd_remote_is_current_or_newer_value,
     };
@@ -109,7 +148,7 @@ export async function dkd_fetch_app_update_status_value() {
       dkd_download_url_value: '',
       dkd_source_url_value: dkd_play_store_url_value,
       dkd_sha256_value: '',
-      dkd_release_notes_value: dkd_current_release_notes_value,
+      dkd_release_notes_value: dkd_dynamic_release_note_value || dkd_current_release_notes_value,
       dkd_error_value,
       dkd_remote_manifest_stale_value: true,
     };

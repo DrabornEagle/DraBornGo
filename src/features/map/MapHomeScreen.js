@@ -146,7 +146,7 @@ function MapHomeScreen({
     return {
       dkd_label_value: 'ÇEVRİMDIŞI',
       dkd_short_value: 'Beklemede',
-      dkd_subtitle_value: 'Hazır olduğunda Görev BUL ile yeni görev aramasını başlat.',
+      dkd_subtitle_value: 'Hazır olduğunda Görevleri Aramaya BAŞLA ile çevrendeki uygun görevleri tara.',
       dkd_accent_value: '#FF82A3',
       dkd_secondary_value: '#9B82FF',
       dkd_gradient_value: ['#301524', '#28203E', '#102F46'],
@@ -244,7 +244,7 @@ function MapHomeScreen({
                 <LinearGradient colors={[dkd_status_value.dkd_accent_value, dkd_status_value.dkd_secondary_value]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={dkd_styles_value.dkd_control_button}>
                   {dkd_courier_online_value && !dkd_courier_busy_value ? <Animated.View pointerEvents="none" style={{ position: 'absolute', top: -32, bottom: -32, width: 86, backgroundColor: 'rgba(255,255,255,0.20)', transform: [{ translateX: dkd_scan_translate_value }, { rotate: '16deg' }] }} /> : null}
                   <MaterialCommunityIcons name={dkd_courier_approved_value ? (dkd_courier_busy_value ? 'package-variant-closed-check' : dkd_courier_online_value ? 'radar' : 'radar') : 'clipboard-account-outline'} size={22} color="#031019" />
-                  <Text style={dkd_styles_value.dkd_control_button_text}>{dkd_courier_approved_value ? (dkd_courier_busy_value ? 'Görev Aktif' : dkd_courier_online_value ? 'Görevler Taranıyor • Durdur' : 'Görev BUL') : 'Kurye Başvurusunu Aç'}</Text>
+                  <Text style={dkd_styles_value.dkd_control_button_text}>{dkd_courier_approved_value ? (dkd_courier_busy_value ? 'Görev Aktif' : dkd_courier_online_value ? 'Görevler Taranıyor • Durdur' : 'Görevleri Aramaya BAŞLA') : 'Kurye Başvurusunu Aç'}</Text>
                   <View style={dkd_styles_value.dkd_control_button_arrow}><MaterialCommunityIcons name={dkd_courier_busy_value ? 'lock-outline' : dkd_courier_online_value ? 'pause' : 'arrow-right'} size={20} color="#031019" /></View>
                 </LinearGradient>
               )}

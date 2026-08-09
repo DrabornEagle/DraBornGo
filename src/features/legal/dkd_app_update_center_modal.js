@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Alert, Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import SafeScreen from '../../components/layout/SafeScreen';
-import { dkd_fetch_app_update_status_value, dkd_open_app_update_source_value } from '../../services/dkd_app_update_service';
+import { dkd_fetch_app_update_status_value, dkd_open_app_update_source_value, dkd_update_app_release_note_value } from '../../services/dkd_app_update_service';
 
 const dkd_text_scaling_props_value = { allowFontScaling: false, maxFontSizeMultiplier: 1 };
 
@@ -27,15 +27,18 @@ function DkdUpdateInfoCard({ dkd_icon_value, dkd_label_value, dkd_value, dkd_ton
   );
 }
 
-export default function DkdAppUpdateCenterModal({ dkd_visible_value, dkd_on_close_value }) {
+export default function DkdAppUpdateCenterModal({ dkd_visible_value, dkd_on_close_value, dkd_is_admin_value = false }) {
   const [dkd_status_value, dkd_set_status_value] = useState(null);
   const [dkd_loading_value, dkd_set_loading_value] = useState(false);
+  const [dkd_release_note_draft_value, dkd_set_release_note_draft_value] = useState('');
+  const [dkd_release_note_saving_value, dkd_set_release_note_saving_value] = useState(false);
 
   const dkd_load_value = useCallback(async () => {
     dkd_set_loading_value(true);
     try {
       const dkd_next_value = await dkd_fetch_app_update_status_value();
       dkd_set_status_value(dkd_next_value);
+      dkd_set_release_note_draft_value(String(dkd_next_value?.dkd_release_notes_value || ''));
     } finally {
       dkd_set_loading_value(false);
     }
@@ -50,7 +53,7 @@ export default function DkdAppUpdateCenterModal({ dkd_visible_value, dkd_on_clos
   const dkd_status_title_value = dkd_update_required_value ? 'Zorunlu güncelleme var' : 'Sürüm güncel';
   const dkd_status_body_value = dkd_update_required_value
     ? 'Uygulama açılışta yeni sürümü kontrol eder; indirme ve kurulum adımı kullanıcı onayıyla tamamlanır.'
-    : 'DraBornGo cihaz sürümü resmi web sürüm kaydıyla uyumlu. Yeni sürüm yayınlandığında bu merkezden tekrar kontrol edebilirsin.';
+    : 'DraBornGo cihaz sürümü resmi sürüm kaydıyla uyumlu. Yeni sürüm yayınlandığında bu merkezden tekrar kontrol edebilirsin.';
 
   const dkd_source_text_value = useMemo(() => {
     if (dkd_status_value?.dkd_distribution_channel_value === 'expo-go-test') {
@@ -60,6 +63,28 @@ export default function DkdAppUpdateCenterModal({ dkd_visible_value, dkd_on_clos
   }, [dkd_status_value]);
 
   const dkd_sha_text_value = String(dkd_status_value?.dkd_sha256_value || '').trim() || 'APK/AAB build sonrası eklenecek';
+
+  const dkd_save_release_note_value = useCallback(async () => {
+    if (!dkd_is_admin_value || dkd_release_note_saving_value) return;
+    const dkd_clean_note_value = String(dkd_release_note_draft_value || '').trim();
+    if (!dkd_clean_note_value) {
+      Alert.alert('Sürüm Notu', 'Sürüm notu boş bırakılamaz.');
+      return;
+    }
+    dkd_set_release_note_saving_value(true);
+    try {
+      const dkd_result_value = await dkd_update_app_release_note_value(dkd_clean_note_value);
+      if (dkd_result_value?.error) throw dkd_result_value.error;
+      const dkd_saved_note_value = String(dkd_result_value?.data?.dkd_release_note_value || dkd_clean_note_value);
+      dkd_set_release_note_draft_value(dkd_saved_note_value);
+      dkd_set_status_value((dkd_previous_value) => ({ ...(dkd_previous_value || {}), dkd_release_notes_value: dkd_saved_note_value }));
+      Alert.alert('Sürüm Notu', 'Sürüm notu güncellendi. Tüm kullanıcılar güncel metni görebilir.');
+    } catch (dkd_error_value) {
+      Alert.alert('Sürüm Notu', dkd_error_value?.message || 'Sürüm notu güncellenemedi.');
+    } finally {
+      dkd_set_release_note_saving_value(false);
+    }
+  }, [dkd_is_admin_value, dkd_release_note_draft_value, dkd_release_note_saving_value]);
 
   return (
     <Modal visible={Boolean(dkd_visible_value)} transparent animationType="slide" onRequestClose={dkd_on_close_value}>
@@ -98,12 +123,6 @@ export default function DkdAppUpdateCenterModal({ dkd_visible_value, dkd_on_clos
                 dkd_tone_value="green"
               />
               <DkdUpdateInfoCard
-                dkd_icon_value="cloud-download-outline"
-                dkd_label_value="Webdeki son sürüm"
-                dkd_value={`v${String(dkd_status_value?.dkd_latest_version_name_value || '0.0.15').replace(/^v/i, '')} • Kod ${Number(dkd_status_value?.dkd_latest_version_code_value || 3)}`}
-                dkd_tone_value="pink"
-              />
-              <DkdUpdateInfoCard
                 dkd_icon_value="shield-key-outline"
                 dkd_label_value="Kaynak"
                 dkd_value={dkd_source_text_value}
@@ -117,8 +136,30 @@ export default function DkdAppUpdateCenterModal({ dkd_visible_value, dkd_on_clos
               />
 
               <View style={dkd_styles_value.dkd_release_card}>
-                <Text {...dkd_text_scaling_props_value} style={dkd_styles_value.dkd_release_label}>Sürüm notu</Text>
-                <Text {...dkd_text_scaling_props_value} style={dkd_styles_value.dkd_release_text}>{dkd_status_value?.dkd_release_notes_value || 'DraBornGo v0.0.15 güncel sürüm bilgisi yükleniyor.'}</Text>
+                <View style={dkd_styles_value.dkd_release_header_row}>
+                  <Text {...dkd_text_scaling_props_value} style={dkd_styles_value.dkd_release_label}>Sürüm notu</Text>
+                  {dkd_is_admin_value ? <View style={dkd_styles_value.dkd_admin_badge}><MaterialCommunityIcons name="shield-crown-outline" size={13} color="#07131C" /><Text {...dkd_text_scaling_props_value} style={dkd_styles_value.dkd_admin_badge_text}>ADMIN DÜZENLEME</Text></View> : null}
+                </View>
+                {dkd_is_admin_value ? (
+                  <>
+                    <TextInput
+                      value={dkd_release_note_draft_value}
+                      onChangeText={dkd_set_release_note_draft_value}
+                      multiline
+                      maxLength={4000}
+                      textAlignVertical="top"
+                      placeholder="Tüm kullanıcıların göreceği sürüm notunu yaz..."
+                      placeholderTextColor="rgba(231,241,255,.36)"
+                      style={dkd_styles_value.dkd_release_input}
+                    />
+                    <Pressable disabled={dkd_release_note_saving_value || !String(dkd_release_note_draft_value || '').trim()} onPress={dkd_save_release_note_value} style={({ pressed: dkd_pressed_value }) => [dkd_styles_value.dkd_release_save_button, (dkd_pressed_value || dkd_release_note_saving_value) && { opacity: .72 }]}>
+                      {dkd_release_note_saving_value ? <ActivityIndicator color="#06111B" size="small" /> : <MaterialCommunityIcons name="content-save-edit-outline" size={18} color="#06111B" />}
+                      <Text {...dkd_text_scaling_props_value} style={dkd_styles_value.dkd_release_save_text}>{dkd_release_note_saving_value ? 'Kaydediliyor' : 'Sürüm Notunu Yayınla'}</Text>
+                    </Pressable>
+                  </>
+                ) : (
+                  <Text {...dkd_text_scaling_props_value} style={dkd_styles_value.dkd_release_text}>{dkd_status_value?.dkd_release_notes_value || 'DraBornGo v0.0.15 güncel sürüm bilgisi yükleniyor.'}</Text>
+                )}
               </View>
 
               {dkd_update_required_value && dkd_status_value?.dkd_download_url_value ? (
@@ -170,6 +211,12 @@ const dkd_styles_value = StyleSheet.create({
   dkd_release_card: { borderRadius: 20, padding: 14, backgroundColor: 'rgba(7,43,48,.70)', borderWidth: 1, borderColor: 'rgba(85,232,181,.28)' },
   dkd_release_label: { color: '#58E5B4', fontSize: 11.5, lineHeight: 14, fontWeight: '900' },
   dkd_release_text: { color: '#FFFFFF', fontSize: 11.5, lineHeight: 18, fontWeight: '700', marginTop: 7 },
+  dkd_release_header_row: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8 },
+  dkd_admin_badge: { minHeight: 27, borderRadius: 999, paddingHorizontal: 9, flexDirection: 'row', alignItems: 'center', gap: 5, backgroundColor: '#70E9B7' },
+  dkd_admin_badge_text: { color: '#07131C', fontSize: 7.5, fontWeight: '900', letterSpacing: .55 },
+  dkd_release_input: { minHeight: 126, maxHeight: 250, marginTop: 10, borderRadius: 16, paddingHorizontal: 12, paddingVertical: 11, color: '#FFFFFF', fontSize: 11.5, lineHeight: 18, fontWeight: '700', backgroundColor: 'rgba(3,19,28,.72)', borderWidth: 1, borderColor: 'rgba(95,235,187,.25)' },
+  dkd_release_save_button: { minHeight: 48, borderRadius: 16, marginTop: 10, backgroundColor: '#6FEAB5', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingHorizontal: 12 },
+  dkd_release_save_text: { color: '#06111B', fontSize: 11.5, fontWeight: '900' },
   dkd_download_button: { minHeight: 48, borderRadius: 17, backgroundColor: '#7FEAFF', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingHorizontal: 14 },
   dkd_download_text: { flex: 1, color: '#06111B', fontSize: 12, fontWeight: '900', textAlign: 'center' },
   dkd_check_button: { minHeight: 52, borderRadius: 18, backgroundColor: 'rgba(255,255,255,.06)', borderWidth: 1, borderColor: 'rgba(255,255,255,.12)', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 9 },
