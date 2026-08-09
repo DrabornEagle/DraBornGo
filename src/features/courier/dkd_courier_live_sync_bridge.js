@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { AppState } from 'react-native';
 import { useThrottledLocation } from '../../hooks/useThrottledLocation';
 import { fetchCourierJobs } from '../../services/courierService';
-import { dkd_upsert_courier_live_location } from '../../services/dkd_cargo_service';
+import { dkd_upsert_courier_live_location } from '../../services/dkd_courier_live_location_service';
 
 function dkd_safe_number_value(dkd_value) {
   const dkd_numeric_value = Number(dkd_value);
