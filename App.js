@@ -18,6 +18,7 @@ const dkd_ignore_pattern_list_value = [
   'expo-notifications: Android Push notifications',
   '`expo-notifications` functionality is not fully supported in Expo Go',
   'dkd courier online watcher skipped',
+  'dkd active delivery restore skipped',
 ];
 
 LogBox.ignoreLogs(dkd_ignore_pattern_list_value);
@@ -180,7 +181,7 @@ export default function App() {
       </View>
     );
   } else if (dkd_session_ready_flag && dkd_pre_login_intro_ready_flag && dkd_pre_login_intro_visible_flag) {
-    dkd_root_content_node = <DkdPreLoginIntroScreen dkd_on_complete_value={dkd_complete_pre_login_intro} />;
+    dkd_root_content_node = <DkdPreLoginIntroScreen dkd_on_continue_value={dkd_complete_pre_login_intro} />;
   } else if (dkd_session_ready_flag && dkd_pre_login_intro_ready_flag) {
     dkd_root_content_node = <AuthScreen mode={dkd_auth_mode_value} setMode={dkd_set_auth_mode_value} />;
   }

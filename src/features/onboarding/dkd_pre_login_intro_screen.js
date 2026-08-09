@@ -33,7 +33,7 @@ export default function DkdPreLoginIntroScreen({ dkd_on_continue_value, dkd_init
     <View style={dkd_styles_value.screen}>
       <LinearGradient colors={['#02050B', '#07182A', '#14103A', '#050713']} style={StyleSheet.absoluteFill} />
       <ScrollView contentContainerStyle={dkd_styles_value.content} showsVerticalScrollIndicator={false}>
-        <View style={dkd_styles_value.badge}><View style={dkd_styles_value.badgeDot} /><Text style={dkd_styles_value.badgeText}>DraBornGo v0.0.12</Text></View>
+        <View style={dkd_styles_value.badge}><View style={dkd_styles_value.badgeDot} /><Text style={dkd_styles_value.badgeText}>DraBornGo v0.0.14</Text></View>
         <Text style={[dkd_styles_value.title, dkd_compact_flag && { fontSize: 37 }]}>Şehrin teslimat ve hizmet ağı.</Text>
         <Text style={dkd_styles_value.subtitle}>Kurye, kargo, Hizmet Ağı ve canlı görev akışını tek merkezde buluştur.</Text>
 

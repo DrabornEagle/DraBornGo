@@ -23,9 +23,9 @@ Bu mobil repodaki `web/draborngo/` ve `web/DraBornGo/App/` dosyaları uygulama/p
 - Kullanıcı içerikli iletişim alanları için raporlama, engelleme ve moderasyon kuralları belgelenir.
 - Google Play sürümündeki uygulama webden APK indirerek kendini güncellemez; üretim güncellemeleri Google Play üzerinden yapılır.
 - Web hesap silme yolu giriş yapmadan erişilebilir olmalıdır; kullanıcıdan parola veya doğrulama kodu istenmez.
-- v0.0.8 Android izin seti ön plan hassas/yaklaşık konum ve kamera ile sınırlandırılmıştır; arka plan konum, mikrofon, geniş medya/depolama, overlay ve paket kurma izinleri engellenir.
+- v0.0.14 Android izin seti ön plan hassas/yaklaşık konum ve kamera ile sınırlandırılmıştır; arka plan konum, mikrofon, geniş medya/depolama, overlay ve paket kurma izinleri engellenir.
 - Hedef Android API 36 olarak tutulur.
 
-## v0.0.8 test notu
+## v0.0.14 test notu
 
-DraBornGo v0.0.8 / Android versionCode 8 aşamasında test Expo SDK 57 uyumlu Expo Go üzerinden yürütülür. Bu test aşamasında APK/AAB üretilmez veya web üzerinden uygulama paketi dağıtılmaz.
+DraBornGo v0.0.14 / Android versionCode 3 aşamasında test Expo SDK 57 uyumlu Expo Go üzerinden yürütülür. Google Play'de mevcut yayımlanmış Android versionCode 2 olduğu için bir sonraki üretim AAB kimliği 3 olarak sabit tutulur. AAB oluşturulana kadar versionCode 3 değiştirilmeyecektir. Bu test aşamasında APK/AAB üretilmez veya web üzerinden uygulama paketi dağıtılmaz.
