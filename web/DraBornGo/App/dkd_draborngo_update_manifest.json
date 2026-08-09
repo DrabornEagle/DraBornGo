@@ -8,5 +8,5 @@
   "dkd_apk_url": "",
   "dkd_download_page_url": "https://play.google.com/store/apps/details?id=com.draborneagle.draborngo",
   "dkd_sha256": "",
-  "dkd_release_notes": "DraBornGo v0.0.13: Admin Kullanıcı Yönetimindeki Saatlik Kazanç kartı geri getirildi. Kurye skor, puan ortalaması, puan sayısı ve görev reward_score sistemi uygulama kodundan ve Supabase şemasından kaldırıldı. Gizlilik ve Veri Merkezi ile Sürüm ve Güncelleme Merkezi v0.0.5 dönemindeki kartlı Google Play hazırlık görünümüne döndürüldü ve güncel v0.0.13 veri kapsamına uyarlandı. Expo Go test aşamasında APK/AAB üretilmez."
+  "dkd_release_notes": "DraBornGo v0.0.13: Gizlilik ve Veri Merkezi ile Sürüm ve Güncelleme Merkezi v0.0.5 dönemindeki kompakt kart ölçülerine göre yeniden düzenlendi. Sürüm ve Güncelleme Merkezi artık ilk dokunuşta açılır. Geçersiz Material Community icon uyarısı giderildi. Admin Kullanıcı Yönetimindeki Saatlik Kazanç kartı korunur; kurye skor, puan ortalaması, puan sayısı ve reward_score sistemi kaldırılmış olarak kalır. Expo Go test aşamasında APK/AAB üretilmez."
 }
