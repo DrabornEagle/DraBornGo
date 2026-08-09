@@ -17,46 +17,64 @@ const dkd_default_config_value = {
 
 const dkd_policy_card_values = [
   {
+    dkd_key_value: 'play-scope',
+    dkd_icon_value: 'motorbike',
+    dkd_title_value: 'Google Play Sürümü: Yalnız Kurye',
+    dkd_body_value: 'DraBornGo Google Play sürümü, onaylı kuryelerin kendilerine veya kurye görev havuzuna sunulan teslimat görevlerini görmesi, uygun görevi kabul etmesi, teslim alma/teslim etme adımlarını yönetmesi, aktif görev rotasını kullanması ve çalışma-kazanç özetlerini takip etmesi için tasarlanmıştır. Bu uygulamada müşteriye sipariş oluşturma, işletme paneli, mağaza/marketplace, ödeme alma, cüzdan, banka, kredi veya yatırım hizmeti sunulmaz.',
+  },
+  {
     dkd_key_value: 'data-safety',
     dkd_icon_value: 'shield-check-outline',
     dkd_title_value: 'Data Safety Özeti',
-    dkd_body_value: 'DraBornGo; hesap ve profil bilgileri, kurye başvurusu ve lisans durumu, kurye görev ve teslimat operasyon kayıtları, gerektiğinde yalnız uygulama açıkken kullanılan konum, kullanıcının seçtiği profil/başvuru görselleri, kullanıcı ile DrabornEagle admin arasındaki destek mesajları, bildirim/teknik güvenlik kimlikleri ile kurye çalışma ve kazanç kayıtlarını hizmeti çalıştırmak ve güvenliğini sağlamak için işler. Kişisel veriler reklam amacıyla satılmaz.',
+    dkd_body_value: 'DraBornGo; hesap ve profil bilgileri, kurye başvurusu ve lisans durumu, kurye görev/teslimat kayıtları, gerekli olduğunda yalnız uygulama açıkken kullanılan konum, kullanıcının seçtiği profil/başvuru görselleri, kullanıcı ile DrabornEagle admin arasındaki destek mesajları, bildirim/teknik güvenlik kimlikleri ile kurye çalışma ve kazanç kayıtlarını uygulamanın temel kurye işlevlerini çalıştırmak ve güvenliğini sağlamak için işler. Kişisel veriler reklam amacıyla satılmaz.',
   },
   {
     dkd_key_value: 'identity-contact',
     dkd_icon_value: 'card-account-details-outline',
-    dkd_title_value: 'Kurye Kimlik Bilgileri',
-    dkd_body_value: 'Kurye başvurusunda kullanıcının sunduğu kimlik, iletişim, adres, plaka/araç, acil durum iletişim ve başvuru belgeleri lisans/onay süreci için işlenebilir. Telefon bilgisi SMS/OTP veya pazarlama amacıyla kullanılmaz.',
+    dkd_title_value: 'Kurye Kimlik ve Başvuru Bilgileri',
+    dkd_body_value: 'Kurye başvurusu ve lisans/onay sürecinde kullanıcının sunduğu kimlik, iletişim, adres, şehir/bölge, araç/plaka, acil durum iletişim ve gerekli başvuru belgeleri işlenebilir. Telefon bilgisi SMS/OTP veya pazarlama amacıyla kullanılmaz.',
   },
   {
-    dkd_key_value: 'support-safety',
-    dkd_icon_value: 'message-alert-outline',
-    dkd_title_value: 'Destek ve İletişim Güvenliği',
-    dkd_body_value: 'Destek alanı kullanıcı ile DrabornEagle admin hesabı arasındaki destek iletişimidir. Destek mesajları talebi yanıtlamak, güvenliği sağlamak ve kötüye kullanımı incelemek için gerektiği ölçüde saklanabilir. Bu sürümde kullanıcılar arası genel DM/sohbet sistemi kullanılmaz.',
+    dkd_key_value: 'task-data',
+    dkd_icon_value: 'clipboard-text-clock-outline',
+    dkd_title_value: 'Kurye Görev ve Teslimat Kayıtları',
+    dkd_body_value: 'Kurye; kendisine sunulan veya kabul ettiği görevlerde görev kimliği, alım/teslim noktası, görev durumu, teslim alma ve teslim edilme adımları, zaman kayıtları, rota/mesafe ve ilgili operasyon ücretini görebilir. DraBornGo Google Play sürümü bu görevleri kurye adına oluşturmaz; yalnız kurye tarafındaki operasyonu yürütür.',
   },
   {
     dkd_key_value: 'location',
     dkd_icon_value: 'map-marker-radius-outline',
     dkd_title_value: 'Konum Kullanımı',
-    dkd_body_value: 'Konum; adres eşleştirme, kurye görevi, rota ve aktif teslimat takibi için yalnız gerekli olduğunda ve uygulama açıkken kullanılır. Arka plan konum izni kullanılmaz.',
+    dkd_body_value: 'Konum; kurye görevi, rota, aktif teslimat ve gerekli canlı kurye operasyonu için yalnız gerekli olduğunda ve uygulama açıkken kullanılır. Arka plan konum izni kullanılmaz ve uygulama kapalıyken sürekli konum takibi yapılmaz.',
   },
   {
     dkd_key_value: 'media',
     dkd_icon_value: 'image-multiple-outline',
     dkd_title_value: 'Kamera / Görsel Seçimi',
-    dkd_body_value: 'Kamera ve görsel seçimi yalnız kullanıcının başlattığı profil veya kurye başvurusu görseli işlemlerinde açılır. Mikrofon, arka plan kamera erişimi ve geniş medya/depolama erişimi istenmez.',
+    dkd_body_value: 'Kamera ve görsel seçimi yalnız kullanıcının başlattığı profil veya kurye başvurusu görseli/belgesi işlemlerinde açılır. Mikrofon, arka plan kamera erişimi ve geniş medya/depolama erişimi istenmez.',
+  },
+  {
+    dkd_key_value: 'support-safety',
+    dkd_icon_value: 'message-alert-outline',
+    dkd_title_value: 'Destek ve İletişim Güvenliği',
+    dkd_body_value: 'Destek alanı kullanıcı ile DrabornEagle admin hesabı arasındaki destek iletişimidir. Destek mesajları talebi yanıtlamak, güvenliği sağlamak ve kötüye kullanımı incelemek için gerektiği ölçüde saklanabilir. Kullanıcılar arası genel DM/sohbet sistemi kullanılmaz.',
   },
   {
     dkd_key_value: 'earnings',
     dkd_icon_value: 'cash-clock',
     dkd_title_value: 'Kurye Çalışma ve Kazanç Verileri',
-    dkd_body_value: 'Kurye çevrimiçi çalışma oturumları ve tamamlanan teslimatlardan oluşan kazanç kayıtları günlük, haftalık, aylık ve saatlik operasyon özetlerini oluşturmak için kullanılabilir. Kurye skor, puan ortalaması ve puan sayısı sistemi kullanılmaz.',
+    dkd_body_value: 'Çevrimiçi çalışma oturumları, tamamlanan teslimatlar ve bunlarla ilişkili kazanç kayıtları günlük, haftalık, aylık ve saatlik operasyon özetleri oluşturmak için kullanılabilir. Bu alan yalnız kurye çalışma/kazanç takibidir; DraBornGo banka hesabı, ödeme hesabı, cüzdan, kredi, yatırım veya para transferi hizmeti sunmaz.',
+  },
+  {
+    dkd_key_value: 'providers',
+    dkd_icon_value: 'server-security',
+    dkd_title_value: 'Hizmet Sağlayıcıları ve Güvenlik',
+    dkd_body_value: 'Uygulamanın çalışması için Supabase altyapısı, harita/rota servisleri, bildirim altyapısı ve uygulama dağıtım hizmetleri kullanılabilir. Bu sağlayıcılara yalnız ilgili işlev için gerekli veriler aktarılır. Erişim yetkilendirmesi ve sunucu tarafı kontrolleriyle veri erişimi sınırlandırılır.',
   },
   {
     dkd_key_value: 'delete',
     dkd_icon_value: 'account-remove-outline',
     dkd_title_value: 'Hesap ve Veri Silme',
-    dkd_body_value: 'Kullanıcı Profil ekranından veya resmi hesap silme web sayfasından hesabının ve ilişkili kişisel verilerinin silinmesini talep edebilir. Güvenlik veya yasal saklama zorunluluğu bulunan sınırlı kayıtlar yalnız gerekli süre boyunca korunabilir.',
+    dkd_body_value: 'Kullanıcı Profil ekranından veya resmi hesap silme web sayfasından hesabının ve ilişkili kişisel verilerinin silinmesini talep edebilir. Hesap silme yalnız hesabı dondurmak anlamına gelmez. Güvenlik veya uygulanabilir yasal saklama zorunluluğu bulunan sınırlı kayıtlar yalnız gerekli süre boyunca korunabilir.',
   },
 ];
 
@@ -84,7 +102,7 @@ export default function DkdGooglePlayPolicyCenterModal({ dkd_visible_value, dkd_
       ...dkd_default_config_value,
       ...dkd_remote_value,
       dkd_version_name_value: 'v0.0.15',
-      dkd_version_code_value: Number(dkd_remote_value?.dkd_version_code_value || 3),
+      dkd_version_code_value: 3,
     });
   }, []);
 
@@ -95,8 +113,8 @@ export default function DkdGooglePlayPolicyCenterModal({ dkd_visible_value, dkd_
   const dkd_version_text_value = useMemo(() => {
     const dkd_name_value = 'v0.0.15';
     const dkd_normalized_name_value = dkd_name_value.startsWith('v') ? dkd_name_value : `v${dkd_name_value}`;
-    return `${dkd_normalized_name_value} • Kod: ${Number(dkd_config_value?.dkd_version_code_value || 3)}`;
-  }, [dkd_config_value]);
+    return `${dkd_normalized_name_value} • Kod: 3`;
+  }, []);
 
   const dkd_open_url_value = useCallback(async (dkd_url_value) => {
     const dkd_clean_url_value = String(dkd_url_value || '').trim();
@@ -118,7 +136,7 @@ export default function DkdGooglePlayPolicyCenterModal({ dkd_visible_value, dkd_
                 <MaterialCommunityIcons name="google-play" size={34} color="#06131B" />
               </View>
               <View style={dkd_styles_value.dkd_header_copy}>
-                <Text {...dkd_text_scaling_props_value} style={dkd_styles_value.dkd_kicker}>GOOGLE PLAY HAZIRLIK</Text>
+                <Text {...dkd_text_scaling_props_value} style={dkd_styles_value.dkd_kicker}>GOOGLE PLAY • KURYE UYGULAMASI</Text>
                 <Text {...dkd_text_scaling_props_value} style={dkd_styles_value.dkd_title}>Gizlilik ve Veri{`\n`}Merkezi</Text>
                 <Text {...dkd_text_scaling_props_value} style={dkd_styles_value.dkd_package_text}>Paket adı:{`\n`}{dkd_config_value?.dkd_package_name_value || dkd_default_config_value.dkd_package_name_value} • Sürüm: {dkd_version_text_value}</Text>
               </View>
