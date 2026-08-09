@@ -1,0 +1,42 @@
+name: DBG v0.0.15 Apply Courier Copy
+on:
+  pull_request_target:
+    types: [opened]
+permissions:
+  contents: write
+jobs:
+  apply:
+    if: github.event.pull_request.head.ref == 'chore/trigger-v0015-courier-copy'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: node scripts/dkd_apply_courier_only_copy_v0015.mjs
+      - name: Verify requested copy
+        run: |
+          grep -q 'Kurye Ağına Hoş Geldin' src/features/auth/AuthScreen.js
+          grep -q 'Kurye Merkezi Açılıyor' src/features/onboarding/dkd_city_gate_transition_screen.js
+          grep -q 'DBG KURYE ONAY MERKEZİ' src/features/applications/dkd_applications_hub_modal.js
+          grep -q 'DBG KURYE MERKEZİ' src/features/courier/dkd_courier_board_modal_v2.js
+          grep -q 'Kurye Onayı Aktif' src/features/profile/ProfileModal.js
+          grep -q 'Görev havuzunu görüntüle, uygun teslimatı kabul et' src/features/map/MapHomeScreen.js
+      - run: npm ci
+      - run: npm run dkd:verify-v0.0.15
+      - run: npm run dkd:play-risk-scan
+      - run: npx expo export --platform android --output-dir /tmp/dbg-v0015-courier-copy-export
+      - name: Commit to main
+        run: |
+          rm -f .github/workflows/dkd_v0_0_15_courier_copy_cleanup.yml
+          rm -f .github/workflows/dkd_v0015_pr_apply_courier_copy.yml
+          rm -f scripts/dkd_apply_courier_only_copy_v0015.mjs
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'ui: align login loading and courier copy with courier-only scope'
+          git push origin main
