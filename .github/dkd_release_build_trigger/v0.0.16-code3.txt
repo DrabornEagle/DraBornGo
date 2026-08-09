@@ -1,0 +1,5 @@
+DraBornGo release build
+version: 0.0.16
+android versionCode: 3
+package: com.draborneagle.draborngo
+outputs: signed APK + signed AAB
