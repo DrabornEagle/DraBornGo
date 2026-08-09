@@ -1,0 +1,66 @@
+name: DKD v0.0.12 Sync Live Migrations
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/dkd_v0_0_12_sync_live_migrations.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      DKD_SUPABASE_PROJECT_REF: ${{ secrets.DKD_SUPABASE_PROJECT_REF }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Export exact applied migration statements
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs = require('fs');
+          const path = require('path');
+          const token = process.env.SUPABASE_ACCESS_TOKEN;
+          const ref = process.env.DKD_SUPABASE_PROJECT_REF;
+          if (!token || !ref) throw new Error('Supabase management secrets unavailable');
+
+          const versions = ['20260809000519', '20260809001252'];
+          const query = `select version,name,statements from supabase_migrations.schema_migrations where version in (${versions.map(v => `'${v}'`).join(',')}) order by version`;
+          const response = await fetch(`https://api.supabase.com/v1/projects/${ref}/database/query`, {
+            method: 'POST',
+            headers: { authorization: `Bearer ${token}`, 'content-type': 'application/json' },
+            body: JSON.stringify({ query }),
+          });
+          if (!response.ok) throw new Error(`Management query failed: ${response.status} ${await response.text()}`);
+          const payload = await response.json();
+          const rows = Array.isArray(payload) ? payload : Array.isArray(payload?.result) ? payload.result : [];
+          if (rows.length !== versions.length) throw new Error(`Expected ${versions.length} migration rows, got ${rows.length}`);
+          fs.mkdirSync('supabase/migrations', { recursive: true });
+          for (const row of rows) {
+            const version = String(row.version || '');
+            const name = String(row.name || 'migration').replace(/[^a-zA-Z0-9_]+/g, '_');
+            const statements = Array.isArray(row.statements) ? row.statements : [];
+            if (!versions.includes(version) || !statements.length) throw new Error(`Invalid migration row ${version}`);
+            const file = path.join('supabase/migrations', `${version}_${name}.sql`);
+            fs.writeFileSync(file, `${statements.join('\n\n')}\n`, 'utf8');
+            console.log(`Wrote ${file}`);
+          }
+          NODE
+      - name: Commit migration mirror
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add supabase/migrations
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'db: mirror applied v0.0.12 service support migrations'
+          git push origin HEAD:main
