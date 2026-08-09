@@ -84,6 +84,13 @@
           "cameraPermission": "DraBornGo; yalnızca sen başlattığında profil görseli çekmek için kameranı kullanır.",
           "microphonePermission": false
         }
+      ],
+      [
+        "expo-navigation-bar",
+        {
+          "enforceContrast": false,
+          "style": "dark"
+        }
       ]
     ],
     "experiments": {
@@ -99,6 +106,10 @@
       "backgroundColor": "#02050B",
       "barStyle": "light-content",
       "translucent": false
+    },
+    "androidNavigationBar": {
+      "barStyle": "light-content",
+      "enforceContrast": false
     }
   }
 }

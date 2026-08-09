@@ -3,6 +3,7 @@ import { LogBox, View } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import * as dkd_system_ui_module from 'expo-system-ui';
+import { NavigationBar } from 'expo-navigation-bar';
 import { getCurrentSession, onSessionChange } from './src/services/authService';
 import AuthScreen from './src/features/auth/AuthScreen';
 import DkdPreLoginIntroScreen from './src/features/onboarding/dkd_pre_login_intro_screen';
@@ -190,6 +191,7 @@ export default function App() {
 
   return (
     <SafeAreaProvider>
+      <NavigationBar style="dark" />
       <View style={{ flex: 1, backgroundColor: dkd_android_system_bar_background_value }}>
         {dkd_root_with_alerts_node}
       </View>
