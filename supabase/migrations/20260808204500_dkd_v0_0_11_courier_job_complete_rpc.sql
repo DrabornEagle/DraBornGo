@@ -10,7 +10,6 @@ as $function$
 declare
   dkd_user_id_value uuid := auth.uid();
   dkd_cargo_shipment_id_value bigint := null;
-  dkd_reward_score_value numeric := 0;
   dkd_existing_completed_value boolean := false;
 begin
   if dkd_user_id_value is null then
@@ -30,9 +29,9 @@ begin
   where dkd_job_row.id = dkd_param_job_id
     and dkd_job_row.assigned_user_id = dkd_user_id_value
     and coalesce(dkd_job_row.is_active, true) = true
-    and lower(coalesce(dkd_job_row.status, '')) in ('accepted', 'assigned', 'to_business', 'picked_up', 'to_customer', 'delivering')
-  returning dkd_job_row.cargo_shipment_id, coalesce(dkd_job_row.reward_score, 0)
-  into dkd_cargo_shipment_id_value, dkd_reward_score_value;
+    and lower(coalesce(dkd_job_row.status, '')) in ('accepted', 'assigned', 'to_pickup', 'picked_up', 'to_customer', 'delivering')
+  returning dkd_job_row.cargo_shipment_id
+  into dkd_cargo_shipment_id_value;
 
   if not found then
     select exists (
@@ -74,8 +73,7 @@ begin
       dkd_courier_auto_assigned_job_id = null,
       dkd_courier_last_online_at = now(),
       courier_completed_jobs = coalesce(courier_completed_jobs, 0) + 1,
-      courier_last_completed_at = now(),
-      courier_score = coalesce(courier_score, 0) + greatest(0, coalesce(dkd_reward_score_value, 0)::integer)
+      courier_last_completed_at = now()
   where user_id = dkd_user_id_value;
 
   return jsonb_build_object(
