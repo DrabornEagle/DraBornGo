@@ -6,7 +6,7 @@ import SecondaryButton from '../../components/ui/SecondaryButton';
 import { cityLootTheme } from '../../theme/cityLootTheme';
 import dkd_social_moderation_admin_modal from './dkd_social_moderation_admin_modal';
 import DkdAdminUserManagerModal from './dkd_admin_user_manager_modal';
-import DkdLiveSupportModal from '../support/dkd_live_support_modal';
+import DkdLiveSupportModal from '../support/dkd_live_support_modal_v2';
 
 function DkdAction({ icon, title, sub, onPress }) {
   return (
