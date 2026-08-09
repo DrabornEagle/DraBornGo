@@ -18,7 +18,7 @@ function DkdAction({ icon, title, sub, onPress }) {
   );
 }
 
-export default function AdminMenuModal({ visible, onClose, onCourier, onApplications }) {
+export default function AdminMenuModal({ visible, onClose, onCourier }) {
   const [moderationOpen, setModerationOpen] = useState(false);
   const [dkd_user_manager_open_value, dkd_set_user_manager_open_value] = useState(false);
   const [dkd_support_open_value, dkd_set_support_open_value] = useState(false);
@@ -30,11 +30,11 @@ export default function AdminMenuModal({ visible, onClose, onCourier, onApplicat
           <LinearGradient colors={['#04101A', '#0B1426', '#160E2A']} style={styles.card}>
             <View style={styles.header}>
               <View style={styles.headerIcon}><MaterialCommunityIcons name="shield-crown-outline" size={26} color="#06111B" /></View>
-              <View style={{ flex: 1 }}><Text style={styles.kicker}>DRABORNGO CONTROL TOWER</Text><Text style={styles.title}>Admin Komuta Güvertesi</Text><Text style={styles.sub}>Kullanıcı, kurye, destek, başvuru ve moderasyon operasyonlarını tek merkezden yönet.</Text></View>
+              <View style={{ flex: 1 }}><Text style={styles.kicker}>DRABORNGO CONTROL TOWER</Text><Text style={styles.title}>Admin Komuta Güvertesi</Text><Text style={styles.sub}>Kullanıcı, kurye, destek ve moderasyon operasyonlarını tek merkezden yönet.</Text></View>
               <SecondaryButton label="Kapat" onPress={onClose} size="compact" fullWidth={false} />
             </View>
 
-            <View style={styles.statusStrip}><View style={styles.statusDot} /><Text style={styles.statusText}>Admin oturumu aktif • DraBornGo v0.0.15</Text></View>
+            <View style={styles.statusStrip}><View style={styles.statusDot} /><Text style={styles.statusText}>Admin oturumu aktif • DraBornGo v0.0.16</Text></View>
 
             <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
               <Text style={styles.section}>KULLANICI & DESTEK</Text>
@@ -42,7 +42,6 @@ export default function AdminMenuModal({ visible, onClose, onCourier, onApplicat
               <DkdAction icon="headset" title="Canlı Destek Gelen Kutusu" sub="DrabornEagle destek konuşmalarını görüntüle ve yanıtla." onPress={() => dkd_set_support_open_value(true)} />
               <Text style={styles.section}>KURYE OPERASYONLARI</Text>
               <DkdAction icon="truck-fast-outline" title="Kurye Operasyonları" sub="Kurye ve teslimat merkezini aç." onPress={onCourier} />
-              <DkdAction icon="clipboard-account-outline" title="Kurye Başvuruları" sub="Kurye onay başvurularını incele." onPress={onApplications} />
               <Text style={styles.section}>GÜVENLİK</Text>
               <DkdAction icon="shield-alert-outline" title="Moderasyon Kuyruğu" sub="Sosyal rapor ve şikayetleri incele." onPress={() => setModerationOpen(true)} />
             </ScrollView>

@@ -18,15 +18,13 @@ export function buildModalProps(dkd_input_value) {
   return { ...dkd_input_value };
 }
 
-export function getHasVisibleModal({ actionMenuOpen, profileOpen, courierBoardOpen, activeTab, adminMenuOpen, adminApplicationsOpen }) {
+export function getHasVisibleModal({ actionMenuOpen, profileOpen, courierBoardOpen, activeTab, adminMenuOpen }) {
   return Boolean(
     actionMenuOpen
     || profileOpen
     || courierBoardOpen
     || adminMenuOpen
-    || adminApplicationsOpen
     || activeTab === 'support'
-    || activeTab === 'applications'
     || activeTab === 'dkd_legal_center'
     || activeTab === 'dkd_app_update_center'
   );

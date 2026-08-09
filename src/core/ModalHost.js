@@ -3,8 +3,6 @@ import ActionMenuModal from '../features/navigation/ActionMenuModal';
 import ProfileModal from '../features/profile/ProfileModal';
 import CourierBoardModal from '../features/courier/dkd_courier_board_modal_v2';
 import DkdCourierLiveSyncBridge from '../features/courier/dkd_courier_live_sync_bridge';
-import DkdApplicationsHubModalValue from '../features/applications/dkd_applications_hub_modal';
-import DkdAdminApplicationsModal from '../features/admin/dkd_admin_applications_modal';
 import DkdLiveSupportModal from '../features/support/dkd_live_support_modal_v2';
 import AdminMenuModal from '../features/admin/AdminMenuModal';
 import DkdGooglePlayPolicyCenterModal from '../features/legal/dkd_google_play_policy_center_modal';
@@ -15,7 +13,7 @@ function ModalHost(props) {
     actionMenuOpen, setActionMenuOpen, isAdmin, courierBoardOpen, setCourierBoardOpen,
     setProfile, setProfileOpen, logout, profileOpen, profile, refreshProfile, saveProfileNick,
     activeTab, setActiveTab, sessionUserId, loc, adminMenuOpen, setAdminMenuOpen,
-    adminApplicationsOpen, setAdminApplicationsOpen, dkd_courier_initial_panel_value,
+    dkd_courier_initial_panel_value,
     dkd_set_courier_initial_panel_value,
   } = props;
   const [dkd_policy_center_visible_value, dkd_set_policy_center_visible_value] = useState(false);
@@ -34,11 +32,9 @@ function ModalHost(props) {
     <DkdCourierLiveSyncBridge dkd_profile_value={profile} dkd_current_location_value={loc} dkd_session_user_id_value={sessionUserId} />
     {courierBoardOpen ? <CourierBoardModal visible onClose={() => { dkd_set_courier_initial_panel_value?.('default'); setCourierBoardOpen(false); }} profile={profile} currentLocation={loc} sessionUserId={sessionUserId} isAdmin={isAdmin} setProfile={setProfile} dkd_initial_panel_value={dkd_courier_initial_panel_value} /> : null}
     {activeTab === 'support' ? <DkdLiveSupportModal dkd_visible_value dkd_on_close_value={() => setActiveTab('map')} dkd_is_admin_value={isAdmin} /> : null}
-    {activeTab === 'applications' ? <DkdApplicationsHubModalValue dkd_visible_value dkd_on_close_value={() => setActiveTab('map')} dkd_profile_value={profile} dkd_set_profile_value={setProfile} /> : null}
     {(dkd_policy_center_visible_value || activeTab === 'dkd_legal_center') ? <DkdGooglePlayPolicyCenterModal dkd_visible_value dkd_on_close_value={() => { dkd_set_policy_center_visible_value(false); setActiveTab('map'); }} dkd_is_admin_value={isAdmin} /> : null}
     {(dkd_app_update_center_visible_value || activeTab === 'dkd_app_update_center') ? <DkdAppUpdateCenterModal dkd_visible_value dkd_on_close_value={() => { dkd_set_app_update_center_visible_value(false); setActiveTab('map'); }} dkd_is_admin_value={isAdmin} /> : null}
-    {adminMenuOpen ? <AdminMenuModal visible onClose={() => setAdminMenuOpen(false)} onCourier={() => { setAdminMenuOpen(false); dkd_set_courier_initial_panel_value?.('default'); setCourierBoardOpen(true); }} onApplications={() => { setAdminMenuOpen(false); setAdminApplicationsOpen?.(true); }} /> : null}
-    {adminApplicationsOpen ? <DkdAdminApplicationsModal visible onClose={() => setAdminApplicationsOpen?.(false)} /> : null}
+    {adminMenuOpen ? <AdminMenuModal visible onClose={() => setAdminMenuOpen(false)} onCourier={() => { setAdminMenuOpen(false); dkd_set_courier_initial_panel_value?.('default'); setCourierBoardOpen(true); }} /> : null}
   </>;
 }
 

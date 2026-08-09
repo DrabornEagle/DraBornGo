@@ -77,7 +77,6 @@ export default function DkdAdminUserManagerModal({ dkd_visible_value, dkd_on_clo
       if (dkd_result_value.error) throw dkd_result_value.error;
       const dkd_data_value = dkd_result_value.data || {};
       const dkd_profile_value = dkd_data_value.dkd_profile || {};
-      const dkd_application_value = dkd_data_value.dkd_courier_application || {};
       dkd_set_detail_value(dkd_data_value);
       dkd_set_form_value({
         dkd_email: dkd_data_value.dkd_email || '',
@@ -92,18 +91,6 @@ export default function DkdAdminUserManagerModal({ dkd_visible_value, dkd_on_clo
         courier_completed_jobs: String(dkd_profile_value.courier_completed_jobs ?? 0),
         courier_active_days: String(dkd_profile_value.courier_active_days ?? 0),
         courier_cancelled_jobs: String(dkd_profile_value.courier_cancelled_jobs ?? 0),
-        first_name: dkd_application_value.first_name || '',
-        last_name: dkd_application_value.last_name || '',
-        application_phone: dkd_application_value.phone || '',
-        application_email: dkd_application_value.email || '',
-        national_id: dkd_application_value.national_id || '',
-        plate_no: dkd_application_value.plate_no || '',
-        address_text: dkd_application_value.address_text || '',
-        application_city: dkd_application_value.city || '',
-        application_zone: dkd_application_value.zone || '',
-        application_vehicle_type: dkd_application_value.vehicle_type || '',
-        application_status: dkd_application_value.status || '',
-        application_notes: dkd_application_value.notes || '',
       });
     } catch (dkd_error_value) {
       Alert.alert('Kullanıcı', dkd_error_value?.message || 'Kullanıcı detayı alınamadı.');
@@ -190,7 +177,7 @@ export default function DkdAdminUserManagerModal({ dkd_visible_value, dkd_on_clo
               {dkd_loading_value && !dkd_detail_value ? <ActivityIndicator color="#7EEBFF" style={{ marginTop: 24 }} /> : <>
                 <LinearGradient colors={['#0C3B5B', '#30245F', '#512A5B']} style={styles.identityCard}>
                   <View style={styles.identityIcon}><MaterialCommunityIcons name={dkd_detail_value?.dkd_is_admin ? 'shield-crown-outline' : 'account-star-outline'} size={28} color="#FFF" /></View>
-                  <View style={{ flex: 1 }}><Text style={styles.identityName}>{dkd_form_value.nickname || dkd_form_value.first_name || 'Kullanıcı'}</Text><Text style={styles.identityId}>{dkd_selected_user_id_value}</Text><Text style={styles.identityMeta}>{dkd_detail_value?.dkd_email || '-'} • {dkd_detail_value?.dkd_phone || '-'}</Text></View>
+                  <View style={{ flex: 1 }}><Text style={styles.identityName}>{dkd_form_value.nickname || 'Kullanıcı'}</Text><Text style={styles.identityId}>{dkd_selected_user_id_value}</Text><Text style={styles.identityMeta}>{dkd_detail_value?.dkd_email || '-'} • {dkd_detail_value?.dkd_phone || '-'}</Text></View>
                 </LinearGradient>
 
                 <Text style={styles.sectionTitle}>KURYE KAZANÇ TABLOSU</Text>
@@ -215,16 +202,6 @@ export default function DkdAdminUserManagerModal({ dkd_visible_value, dkd_on_clo
                   <View style={styles.fieldRow}><DkdField dkd_label_value="Kurye Durumu" dkd_value={dkd_form_value.courier_status} dkd_on_change_value={(dkd_value) => dkd_set_field_value('courier_status', dkd_value)} /><DkdField dkd_label_value="Araç" dkd_value={dkd_form_value.courier_vehicle_type} dkd_on_change_value={(dkd_value) => dkd_set_field_value('courier_vehicle_type', dkd_value)} /></View>
                   <View style={styles.fieldRow}><DkdField dkd_label_value="Tamamlanan" dkd_value={dkd_form_value.courier_completed_jobs} dkd_on_change_value={(dkd_value) => dkd_set_field_value('courier_completed_jobs', dkd_value)} dkd_keyboard_type_value="number-pad" /><DkdField dkd_label_value="Aktif Gün" dkd_value={dkd_form_value.courier_active_days} dkd_on_change_value={(dkd_value) => dkd_set_field_value('courier_active_days', dkd_value)} dkd_keyboard_type_value="number-pad" /></View>
                   <DkdField dkd_label_value="İptal" dkd_value={dkd_form_value.courier_cancelled_jobs} dkd_on_change_value={(dkd_value) => dkd_set_field_value('courier_cancelled_jobs', dkd_value)} dkd_keyboard_type_value="number-pad" />
-                </View>
-
-                <Text style={styles.sectionTitle}>KURYE BAŞVURU DETAYLARI</Text>
-                <View style={styles.formCard}>
-                  <View style={styles.fieldRow}><DkdField dkd_label_value="Ad" dkd_value={dkd_form_value.first_name} dkd_on_change_value={(dkd_value) => dkd_set_field_value('first_name', dkd_value)} /><DkdField dkd_label_value="Soyad" dkd_value={dkd_form_value.last_name} dkd_on_change_value={(dkd_value) => dkd_set_field_value('last_name', dkd_value)} /></View>
-                  <DkdField dkd_label_value="TC Kimlik" dkd_value={dkd_form_value.national_id} dkd_on_change_value={(dkd_value) => dkd_set_field_value('national_id', dkd_value)} dkd_keyboard_type_value="number-pad" />
-                  <DkdField dkd_label_value="Plaka" dkd_value={dkd_form_value.plate_no} dkd_on_change_value={(dkd_value) => dkd_set_field_value('plate_no', dkd_value)} />
-                  <DkdField dkd_label_value="Başvuru Durumu" dkd_value={dkd_form_value.application_status} dkd_on_change_value={(dkd_value) => dkd_set_field_value('application_status', dkd_value)} />
-                  <DkdField dkd_label_value="Başvuru Notu" dkd_value={dkd_form_value.application_notes} dkd_on_change_value={(dkd_value) => dkd_set_field_value('application_notes', dkd_value)} dkd_multiline_value />
-                  <DkdField dkd_label_value="Adres" dkd_value={dkd_form_value.address_text} dkd_on_change_value={(dkd_value) => dkd_set_field_value('address_text', dkd_value)} dkd_multiline_value />
                 </View>
 
                 <View style={styles.actionRow}>

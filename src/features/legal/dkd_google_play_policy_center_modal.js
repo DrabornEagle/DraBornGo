@@ -9,7 +9,7 @@ const dkd_text_scaling_props_value = { allowFontScaling: false, maxFontSizeMulti
 
 const dkd_default_config_value = {
   dkd_package_name_value: 'com.draborneagle.draborngo',
-  dkd_version_name_value: 'v0.0.15',
+  dkd_version_name_value: 'v0.0.16',
   dkd_version_code_value: 3,
   dkd_privacy_policy_doc_url_value: 'https://www.draborneagle.com/draborngo/privacy/',
   dkd_account_deletion_form_url_value: 'https://www.draborneagle.com/draborngo/account-deletion/',
@@ -26,7 +26,7 @@ const dkd_policy_card_values = [
     dkd_key_value: 'data-safety',
     dkd_icon_value: 'shield-check-outline',
     dkd_title_value: 'Data Safety Özeti',
-    dkd_body_value: 'DraBornGo; hesap ve profil bilgileri, kurye başvurusu ve onay durumu, kurye görev/teslimat kayıtları, gerekli olduğunda yalnız uygulama açıkken kullanılan konum, kullanıcının seçtiği profil/başvuru görselleri, kullanıcı ile DrabornEagle admin arasındaki destek mesajları, bildirim/teknik güvenlik kimlikleri ile kurye çalışma ve kazanç kayıtlarını uygulamanın temel kurye işlevlerini çalıştırmak ve güvenliğini sağlamak için işler. Kişisel veriler reklam amacıyla satılmaz.',
+    dkd_body_value: 'DraBornGo; hesap ve profil bilgileri, kurye erişim durumu, kurye görev/teslimat kayıtları, gerekli olduğunda yalnız uygulama açıkken kullanılan konum, kullanıcının seçtiği profil görseli, kullanıcı ile DrabornEagle admin arasındaki destek mesajları, bildirim/teknik güvenlik kimlikleri ile kurye çalışma ve kazanç kayıtlarını temel kurye işlevlerini çalıştırmak ve güvenliğini sağlamak için işler. Kişisel veriler reklam amacıyla satılmaz.',
   },
   {
     dkd_key_value: 'task-data',
@@ -44,7 +44,7 @@ const dkd_policy_card_values = [
     dkd_key_value: 'media',
     dkd_icon_value: 'image-multiple-outline',
     dkd_title_value: 'Kamera / Görsel Seçimi',
-    dkd_body_value: 'Kamera ve görsel seçimi yalnız kullanıcının başlattığı profil, görsel veya belge işlemlerinde açılır. Mikrofon, arka plan kamera erişimi ve geniş medya/depolama erişimi istenmez.',
+    dkd_body_value: 'Kamera ve sistem görsel seçicisi yalnız kullanıcının başlattığı profil görseli işleminde açılır. Mikrofon, arka plan kamera erişimi ve geniş medya/depolama erişimi istenmez.',
   },
   {
     dkd_key_value: 'support-safety',
@@ -95,7 +95,7 @@ export default function DkdGooglePlayPolicyCenterModal({ dkd_visible_value, dkd_
     dkd_set_config_value({
       ...dkd_default_config_value,
       ...dkd_remote_value,
-      dkd_version_name_value: 'v0.0.15',
+      dkd_version_name_value: 'v0.0.16',
       dkd_version_code_value: 3,
     });
   }, []);
@@ -105,7 +105,7 @@ export default function DkdGooglePlayPolicyCenterModal({ dkd_visible_value, dkd_
   }, [dkd_visible_value, dkd_load_value]);
 
   const dkd_version_text_value = useMemo(() => {
-    const dkd_name_value = 'v0.0.15';
+    const dkd_name_value = 'v0.0.16';
     const dkd_normalized_name_value = dkd_name_value.startsWith('v') ? dkd_name_value : `v${dkd_name_value}`;
     return `${dkd_normalized_name_value} • Kod: 3`;
   }, []);

@@ -1,7 +1,7 @@
 {
   "name": "draborngo",
   "main": "expo/AppEntry",
-  "version": "0.0.15",
+  "version": "0.0.16",
   "scripts": {
     "start": "node ./node_modules/expo/bin/cli start",
     "web": "node ./node_modules/expo/bin/cli start --web",
@@ -31,7 +31,7 @@
     "preandroid": "npm run env:restore",
     "prebuild": "npm run env:restore",
     "preexport": "npm run env:restore",
-    "dkd:verify-v0.0.15": "node ./scripts/dkd_verify_release_identity.mjs"
+    "dkd:verify-v0.0.16": "node ./scripts/dkd_verify_release_identity.mjs"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.1.1",

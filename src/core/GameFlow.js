@@ -30,7 +30,6 @@ export default function GameFlow({ session, onSignedOut, dkd_on_home_ready_value
   const [profileOpen, setProfileOpen] = useState(false);
   const [courierBoardOpen, setCourierBoardOpen] = useState(false);
   const [adminMenuOpen, setAdminMenuOpen] = useState(false);
-  const [adminApplicationsOpen, setAdminApplicationsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('map');
   const [dkd_courier_initial_panel_value, dkd_set_courier_initial_panel_value] = useState('default');
   const [dkd_permission_gate_ready_flag, dkd_set_permission_gate_ready_flag] = useState(false);
@@ -76,7 +75,7 @@ export default function GameFlow({ session, onSignedOut, dkd_on_home_ready_value
   const dkd_toggle_courier_online_value = useCallback(async () => {
     if (dkd_online_busy_ref_value.current) return;
     if (String(profile?.courier_status || '').toLowerCase() !== 'approved') {
-      Alert.alert('Kurye', 'Çevrimiçi mod için kurye başvurunun onaylanmış olması gerekiyor.');
+      Alert.alert('Kurye', 'Çevrimiçi mod için kurye erişiminin aktif olması gerekiyor.');
       return;
     }
     const dkd_next_online_value = profile?.dkd_courier_online !== true;
@@ -134,14 +133,13 @@ export default function GameFlow({ session, onSignedOut, dkd_on_home_ready_value
   const openCourierBoard = useCallback((dkd_panel_value = 'default') => { setActionMenuOpen(false); setActiveTab('map'); dkd_set_courier_initial_panel_value(String(dkd_panel_value || 'default')); setCourierBoardOpen(true); }, []);
 
   const dkd_handle_back_value = useCallback(() => {
-    if (adminApplicationsOpen) { setAdminApplicationsOpen(false); return true; }
     if (adminMenuOpen) { setAdminMenuOpen(false); return true; }
     if (courierBoardOpen) { setCourierBoardOpen(false); return true; }
     if (profileOpen) { setProfileOpen(false); return true; }
     if (actionMenuOpen) { setActionMenuOpen(false); return true; }
     if (activeTab !== 'map') { setActiveTab('map'); return true; }
     return false;
-  }, [activeTab, actionMenuOpen, profileOpen, courierBoardOpen, adminMenuOpen, adminApplicationsOpen]);
+  }, [activeTab, actionMenuOpen, profileOpen, courierBoardOpen, adminMenuOpen]);
 
   useEffect(() => {
     const dkd_subscription_value = BackHandler.addEventListener('hardwareBackPress', dkd_handle_back_value);
@@ -149,8 +147,8 @@ export default function GameFlow({ session, onSignedOut, dkd_on_home_ready_value
   }, [dkd_handle_back_value]);
 
   const homeProps = useMemo(() => buildHomeProps({ profile, loc, locationError, retryLocation, recenterToCurrentLocation, activeTab, setActiveTab, openActionMenu, openCourierBoard, openProfile, dkd_on_toggle_courier_online_value: dkd_toggle_courier_online_value }), [profile, loc, locationError, retryLocation, recenterToCurrentLocation, activeTab, openActionMenu, openCourierBoard, openProfile, dkd_toggle_courier_online_value]);
-  const modalProps = useMemo(() => buildModalProps({ actionMenuOpen, setActionMenuOpen, isAdmin, courierBoardOpen, setCourierBoardOpen, setProfile, setProfileOpen, logout, profileOpen, profile, refreshProfile, saveProfileNick, activeTab, setActiveTab, sessionUserId: session?.user?.id, loc, adminMenuOpen, setAdminMenuOpen, adminApplicationsOpen, setAdminApplicationsOpen, dkd_courier_initial_panel_value, dkd_set_courier_initial_panel_value }), [actionMenuOpen, isAdmin, courierBoardOpen, profileOpen, profile, refreshProfile, saveProfileNick, activeTab, session?.user?.id, loc, adminMenuOpen, adminApplicationsOpen, dkd_courier_initial_panel_value, logout]);
-  const hasVisibleModal = useMemo(() => getHasVisibleModal({ actionMenuOpen, profileOpen, courierBoardOpen, activeTab, adminMenuOpen, adminApplicationsOpen }), [actionMenuOpen, profileOpen, courierBoardOpen, activeTab, adminMenuOpen, adminApplicationsOpen]);
+  const modalProps = useMemo(() => buildModalProps({ actionMenuOpen, setActionMenuOpen, isAdmin, courierBoardOpen, setCourierBoardOpen, setProfile, setProfileOpen, logout, profileOpen, profile, refreshProfile, saveProfileNick, activeTab, setActiveTab, sessionUserId: session?.user?.id, loc, adminMenuOpen, setAdminMenuOpen, dkd_courier_initial_panel_value, dkd_set_courier_initial_panel_value }), [actionMenuOpen, isAdmin, courierBoardOpen, profileOpen, profile, refreshProfile, saveProfileNick, activeTab, session?.user?.id, loc, adminMenuOpen, dkd_courier_initial_panel_value, logout]);
+  const hasVisibleModal = useMemo(() => getHasVisibleModal({ actionMenuOpen, profileOpen, courierBoardOpen, activeTab, adminMenuOpen }), [actionMenuOpen, profileOpen, courierBoardOpen, activeTab, adminMenuOpen, adminApplicationsOpen]);
   const dkd_courier_online_watcher_props = useMemo(() => ({ dkd_profile_value: profile, dkd_set_profile_value: setProfile, dkd_current_location_value: loc || null, dkd_courier_board_open_value: courierBoardOpen, dkd_on_open_courier_board_value: () => openCourierBoard('default') }), [profile, loc, courierBoardOpen, openCourierBoard]);
 
   return (

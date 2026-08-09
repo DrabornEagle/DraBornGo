@@ -4,7 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Image } from 'expo-image';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-const dkd_version_text_value = 'v0.0.15';
+const dkd_version_text_value = 'v0.0.16';
 const dkd_racing_motorcycle_asset_value = require('../../../assets/icons/dkd_racing_motorcycle.svg');
 
 function DkdAnimatedPressable({ dkd_children_value, dkd_on_press_value, dkd_style_value, dkd_disabled_value = false }) {
@@ -120,9 +120,9 @@ function MapHomeScreen({
 
   const dkd_status_value = useMemo(() => {
     if (!dkd_courier_approved_value) return {
-      dkd_label_value: 'KURYE ONAYI GEREKLİ',
-      dkd_short_value: 'Başvuru',
-      dkd_subtitle_value: 'Kurye başvurunu tamamla; onaylandıktan sonra canlı görev havuzuna katıl.',
+      dkd_label_value: 'KURYE ERİŞİMİ GEREKLİ',
+      dkd_short_value: 'Yetki',
+      dkd_subtitle_value: 'Kurye operasyon erişimi hesabında aktif değil. Erişim aktif olduğunda canlı görev havuzuna katılabilirsin.',
       dkd_accent_value: '#FFD06B',
       dkd_secondary_value: '#FF865E',
       dkd_gradient_value: ['#21130C', '#33203A', '#112A40'],
@@ -244,7 +244,7 @@ function MapHomeScreen({
                 <LinearGradient colors={[dkd_status_value.dkd_accent_value, dkd_status_value.dkd_secondary_value]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={dkd_styles_value.dkd_control_button}>
                   {dkd_courier_online_value && !dkd_courier_busy_value ? <Animated.View pointerEvents="none" style={{ position: 'absolute', top: -32, bottom: -32, width: 86, backgroundColor: 'rgba(255,255,255,0.20)', transform: [{ translateX: dkd_scan_translate_value }, { rotate: '16deg' }] }} /> : null}
                   <MaterialCommunityIcons name={dkd_courier_approved_value ? (dkd_courier_busy_value ? 'package-variant-closed-check' : dkd_courier_online_value ? 'radar' : 'radar') : 'clipboard-account-outline'} size={22} color="#031019" />
-                  <Text style={dkd_styles_value.dkd_control_button_text}>{dkd_courier_approved_value ? (dkd_courier_busy_value ? 'Görev Aktif' : dkd_courier_online_value ? 'Görevler Taranıyor • Durdur' : 'Görevleri Aramaya BAŞLA') : 'Kurye Başvurusunu Aç'}</Text>
+                  <Text style={dkd_styles_value.dkd_control_button_text}>{dkd_courier_approved_value ? (dkd_courier_busy_value ? 'Görev Aktif' : dkd_courier_online_value ? 'Görevler Taranıyor • Durdur' : 'Görevleri Aramaya BAŞLA') : 'Kurye Yetkisunu Aç'}</Text>
                   <View style={dkd_styles_value.dkd_control_button_arrow}><MaterialCommunityIcons name={dkd_courier_busy_value ? 'lock-outline' : dkd_courier_online_value ? 'pause' : 'arrow-right'} size={20} color="#031019" /></View>
                 </LinearGradient>
               )}
@@ -259,7 +259,6 @@ function MapHomeScreen({
           <View style={dkd_styles_value.dkd_quick_grid}>
             <DkdQuickTile dkd_icon_value="account-circle-outline" dkd_title_value="Profil" dkd_subtitle_value="Kimlik ve hesap merkezi" dkd_accent_value="#405FC8" dkd_on_press_value={onOpenProfile} />
             <DkdQuickTile dkd_icon_value="headset" dkd_title_value="Destek" dkd_subtitle_value="DrabornEagle admin canlı destek" dkd_accent_value="#A33D80" dkd_on_press_value={() => onTabChange?.('support')} />
-            <DkdQuickTile dkd_icon_value="clipboard-text-clock-outline" dkd_title_value="Başvurular" dkd_subtitle_value="Kurye başvuru süreci" dkd_accent_value="#0B8E91" dkd_on_press_value={() => onTabChange?.('applications')} />
             <DkdQuickTile dkd_icon_value="view-dashboard-edit-outline" dkd_title_value="Tüm Menü" dkd_subtitle_value="Diğer DraBornGo araçları" dkd_accent_value="#A6632B" dkd_on_press_value={onOpenActionMenu} />
           </View>
 
