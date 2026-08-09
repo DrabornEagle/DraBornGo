@@ -1,6 +1,6 @@
 -- DraBornGo - Hesap silme talebi durum takibi ve e-posta düzeltmesi
 -- Kullanıcı Profil penceresini kapatıp açınca bekleyen talep tekrar okunur.
--- Admin Başvurular > Hesap Silme Talepleri kartında auth e-posta fallback gösterilir.
+-- Admin > Hesap Silme Talepleri kartında auth e-posta fallback gösterilir.
 
 insert into public.dkd_policy_center_config (
   dkd_id_value,

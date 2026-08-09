@@ -1,6 +1,6 @@
 -- DraBornGo Play Console alanları + hesap/veri silme başvuru akışı
 -- Kullanıcı Profil > Hesabımı Sil alanından talep oluşturur.
--- Admin > Başvurular > Hesap Silme Talepleri sekmesinden onaylayınca kullanıcıya bağlı uygulama verileri temizlenir.
+-- Admin > Hesap Silme Talepleri sekmesinden onaylayınca kullanıcıya bağlı uygulama verileri temizlenir.
 
 create table if not exists public.dkd_policy_center_config (
   dkd_id_value smallint primary key default 1,

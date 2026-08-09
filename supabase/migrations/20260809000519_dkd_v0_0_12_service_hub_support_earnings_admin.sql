@@ -390,19 +390,15 @@ begin
     select u.id as dkd_user_id,u.email as dkd_email,u.phone as dkd_phone,u.created_at as dkd_created_at,u.last_sign_in_at as dkd_last_sign_in_at,
            p.nickname as dkd_nickname,p.dbg_id as dkd_dbg_id,p.avatar_image_url as dkd_avatar_image_url,p.courier_status as dkd_courier_status,p.dkd_city,p.dkd_region,
            p.courier_vehicle_type,p.courier_completed_jobs,p.dkd_courier_online,
-           ca.first_name as dkd_first_name,ca.last_name as dkd_last_name,ca.plate_no as dkd_plate_no,ca.status as dkd_application_status,
            exists(select 1 from public.dkd_admin_users a where a.user_id=u.id) as dkd_is_admin
     from auth.users u
     left join public.dkd_profiles p on p.user_id=u.id
-    left join lateral (select a.* from public.dkd_courier_license_applications a where a.user_id=u.id order by a.updated_at desc nulls last,a.created_at desc limit 1) ca on true
     where trim(coalesce(dkd_param_search,''))=''
        or u.id::text ilike '%'||trim(dkd_param_search)||'%'
        or coalesce(u.email,'') ilike '%'||trim(dkd_param_search)||'%'
        or coalesce(u.phone,'') ilike '%'||trim(dkd_param_search)||'%'
        or coalesce(p.nickname,'') ilike '%'||trim(dkd_param_search)||'%'
        or coalesce(p.dbg_id,'') ilike '%'||trim(dkd_param_search)||'%'
-       or coalesce(ca.first_name||' '||ca.last_name,'') ilike '%'||trim(dkd_param_search)||'%'
-       or coalesce(ca.plate_no,'') ilike '%'||trim(dkd_param_search)||'%'
     order by u.created_at desc
     limit least(greatest(coalesce(dkd_param_limit,50),1),150)
   ) x;
@@ -424,7 +420,6 @@ begin
     'dkd_user_id',u.id,'dkd_email',u.email,'dkd_phone',u.phone,'dkd_created_at',u.created_at,'dkd_updated_at',u.updated_at,'dkd_last_sign_in_at',u.last_sign_in_at,
     'dkd_email_confirmed_at',u.email_confirmed_at,'dkd_phone_confirmed_at',u.phone_confirmed_at,'dkd_raw_user_meta_data',u.raw_user_meta_data,
     'dkd_profile',coalesce(to_jsonb(p),'{}'::jsonb),
-    'dkd_courier_application',coalesce((select to_jsonb(a) from public.dkd_courier_license_applications a where a.user_id=u.id order by a.updated_at desc nulls last,a.created_at desc limit 1),'{}'::jsonb),
     'dkd_is_admin',exists(select 1 from public.dkd_admin_users ad where ad.user_id=u.id)
   ) into dkd_result
   from auth.users u left join public.dkd_profiles p on p.user_id=u.id where u.id=dkd_param_user_id;
@@ -471,23 +466,6 @@ begin
     courier_cancelled_jobs=case when dkd_patch ? 'courier_cancelled_jobs' then greatest(0,coalesce((dkd_patch->>'courier_cancelled_jobs')::int,0)) else courier_cancelled_jobs end,
     updated_at=now()
   where user_id=dkd_param_user_id;
-  if exists(select 1 from public.dkd_courier_license_applications where user_id=dkd_param_user_id) then
-    update public.dkd_courier_license_applications set
-      first_name=case when dkd_patch ? 'first_name' then nullif(trim(dkd_patch->>'first_name'),'') else first_name end,
-      last_name=case when dkd_patch ? 'last_name' then nullif(trim(dkd_patch->>'last_name'),'') else last_name end,
-      phone=case when dkd_patch ? 'application_phone' then nullif(trim(dkd_patch->>'application_phone'),'') else phone end,
-      email=case when dkd_patch ? 'application_email' then nullif(trim(dkd_patch->>'application_email'),'') else email end,
-      national_id=case when dkd_patch ? 'national_id' then nullif(trim(dkd_patch->>'national_id'),'') else national_id end,
-      plate_no=case when dkd_patch ? 'plate_no' then nullif(trim(dkd_patch->>'plate_no'),'') else plate_no end,
-      address_text=case when dkd_patch ? 'address_text' then nullif(trim(dkd_patch->>'address_text'),'') else address_text end,
-      city=case when dkd_patch ? 'application_city' then nullif(trim(dkd_patch->>'application_city'),'') else city end,
-      zone=case when dkd_patch ? 'application_zone' then nullif(trim(dkd_patch->>'application_zone'),'') else zone end,
-      vehicle_type=case when dkd_patch ? 'application_vehicle_type' then nullif(trim(dkd_patch->>'application_vehicle_type'),'') else vehicle_type end,
-      status=case when dkd_patch ? 'application_status' then nullif(lower(trim(dkd_patch->>'application_status')),'') else status end,
-      notes=case when dkd_patch ? 'application_notes' then dkd_patch->>'application_notes' else notes end,
-      updated_at=now()
-    where id=(select id from public.dkd_courier_license_applications where user_id=dkd_param_user_id order by updated_at desc nulls last,created_at desc limit 1);
-  end if;
   return public.dkd_admin_user_detail_dkd(dkd_param_user_id);
 end;
 $function$;
@@ -508,7 +486,6 @@ begin
   delete from public.dkd_support_admin_queue where dkd_user_id=dkd_param_user_id;
   delete from public.dkd_courier_online_sessions where dkd_user_id=dkd_param_user_id;
   delete from public.dkd_courier_live_locations where user_id=dkd_param_user_id;
-  delete from public.dkd_courier_license_applications where user_id=dkd_param_user_id;
   delete from public.dkd_courier_jobs where customer_user_id=dkd_param_user_id or assigned_user_id=dkd_param_user_id;
   delete from public.dkd_cargo_shipments where customer_user_id=dkd_param_user_id or assigned_courier_user_id=dkd_param_user_id;
   delete from public.dkd_admin_users where user_id=dkd_param_user_id;

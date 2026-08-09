@@ -66,12 +66,3 @@ export async function updateProfileNicknameDirect(dkd_user_id_value, dkd_nicknam
   if (dkd_avatar_image_url_value !== undefined) dkd_patch_value.avatar_image_url = String(dkd_avatar_image_url_value || '').trim() || null;
   return supabase.from('dkd_profiles').update(dkd_patch_value).eq('user_id', dkd_user_id_value);
 }
-
-export async function applyCourierLicenseRequest() {
-  const dkd_rpc_result_value = await supabase.rpc('dkd_apply_courier_license');
-  if (!dkd_rpc_result_value?.error) return dkd_rpc_result_value;
-  const dkd_auth_value = await supabase.auth.getUser();
-  const dkd_user_id_value = dkd_auth_value?.data?.user?.id;
-  if (!dkd_user_id_value) return dkd_rpc_result_value;
-  return supabase.from('dkd_profiles').update({ courier_status: 'pending' }).eq('user_id', dkd_user_id_value).select('courier_status').single();
-}
