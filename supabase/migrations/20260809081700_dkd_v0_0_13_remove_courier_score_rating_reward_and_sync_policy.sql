@@ -28,28 +28,15 @@ begin
            dkd_profile_row.courier_vehicle_type,
            dkd_profile_row.courier_completed_jobs,
            dkd_profile_row.dkd_courier_online,
-           dkd_application_row.first_name as dkd_first_name,
-           dkd_application_row.last_name as dkd_last_name,
-           dkd_application_row.plate_no as dkd_plate_no,
-           dkd_application_row.status as dkd_application_status,
            exists(select 1 from public.dkd_admin_users dkd_admin_row where dkd_admin_row.user_id=dkd_user_row.id) as dkd_is_admin
     from auth.users dkd_user_row
     left join public.dkd_profiles dkd_profile_row on dkd_profile_row.user_id=dkd_user_row.id
-    left join lateral (
-      select dkd_application_source.*
-      from public.dkd_courier_license_applications dkd_application_source
-      where dkd_application_source.user_id=dkd_user_row.id
-      order by dkd_application_source.updated_at desc nulls last, dkd_application_source.created_at desc
-      limit 1
-    ) dkd_application_row on true
     where trim(coalesce(dkd_param_search,''))=''
        or dkd_user_row.id::text ilike '%'||trim(dkd_param_search)||'%'
        or coalesce(dkd_user_row.email,'') ilike '%'||trim(dkd_param_search)||'%'
        or coalesce(dkd_user_row.phone,'') ilike '%'||trim(dkd_param_search)||'%'
        or coalesce(dkd_profile_row.nickname,'') ilike '%'||trim(dkd_param_search)||'%'
        or coalesce(dkd_profile_row.dbg_id,'') ilike '%'||trim(dkd_param_search)||'%'
-       or coalesce(dkd_application_row.first_name||' '||dkd_application_row.last_name,'') ilike '%'||trim(dkd_param_search)||'%'
-       or coalesce(dkd_application_row.plate_no,'') ilike '%'||trim(dkd_param_search)||'%'
     order by dkd_user_row.created_at desc
     limit least(greatest(coalesce(dkd_param_limit,50),1),150)
   ) dkd_row_value;
