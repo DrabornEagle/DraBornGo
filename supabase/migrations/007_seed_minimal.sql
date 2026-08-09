@@ -66,7 +66,6 @@ insert into public.dkd_courier_jobs (
   title,
   pickup,
   dropoff,
-  reward_score,
   distance_km,
   eta_min,
   job_type,
@@ -76,10 +75,10 @@ insert into public.dkd_courier_jobs (
 select *
 from (
   values
-    ('Hizli Paket • Eryaman', 'Eryaman Metro', 'Goksu Park Girisi', 12, 1.4, 16, 'food', true, 'open'),
-    ('Loot Teslim • Merkez', 'Batikent AVM', 'Demetevler Meydan', 18, 2.6, 24, 'loot', true, 'open'),
-    ('VIP Evrak • Kule Hatti', 'Koru Metro', 'Umitkoy Plaza', 25, 4.1, 32, 'express', true, 'open')
-) as seed(title, pickup, dropoff, reward_score, distance_km, eta_min, job_type, is_active, status)
+    ('Hizli Paket • Eryaman', 'Eryaman Metro', 'Goksu Park Girisi', 1.4, 16, 'food', true, 'open'),
+    ('Loot Teslim • Merkez', 'Batikent AVM', 'Demetevler Meydan', 2.6, 24, 'loot', true, 'open'),
+    ('VIP Evrak • Kule Hatti', 'Koru Metro', 'Umitkoy Plaza', 4.1, 32, 'express', true, 'open')
+) as seed(title, pickup, dropoff, distance_km, eta_min, job_type, is_active, status)
 where not exists (
   select 1 from public.dkd_courier_jobs
 );
