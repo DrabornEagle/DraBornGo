@@ -2,7 +2,7 @@
   "expo": {
     "name": "DraBornGo",
     "slug": "draborngo",
-    "version": "0.0.12",
+    "version": "0.0.13",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "draborngo",
@@ -27,7 +27,7 @@
           "apiKey": "AIzaSyDznPFvHQMVOqdJhPPyJ4jkqQINUUymcpY"
         }
       },
-      "versionCode": 12,
+      "versionCode": 13,
       "permissions": [
         "android.permission.ACCESS_COARSE_LOCATION",
         "android.permission.ACCESS_FINE_LOCATION",
@@ -71,7 +71,7 @@
       [
         "expo-location",
         {
-          "locationWhenInUsePermission": "DraBornGo; kurye, gönderi ve Hizmet Ağı işlemlerinde adres eşleştirme, rota çizimi ve canlı teslimat takibi için yalnızca uygulama açıkken konumunu kullanır.",
+          "locationWhenInUsePermission": "DraBornGo; kurye, gönderi ve teslimat işlemlerinde adres eşleştirme, rota çizimi ve canlı teslimat takibi için yalnızca uygulama açıkken konumunu kullanır.",
           "isAndroidBackgroundLocationEnabled": false,
           "isAndroidForegroundServiceEnabled": false,
           "isIosBackgroundLocationEnabled": false
