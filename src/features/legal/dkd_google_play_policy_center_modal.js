@@ -9,10 +9,10 @@ const dkd_text_scaling_props_value = { allowFontScaling: false, maxFontSizeMulti
 
 const dkd_default_config_value = {
   dkd_package_name_value: 'com.draborneagle.draborngo',
-  dkd_version_name_value: 'v0.0.13',
-  dkd_version_code_value: 13,
+  dkd_version_name_value: 'v0.0.14',
+  dkd_version_code_value: 3,
   dkd_privacy_policy_doc_url_value: 'https://www.draborneagle.com/draborngo/privacy/',
-  dkd_account_deletion_form_url_value: 'https://www.draborneagle.com/draborngo/delete-account/',
+  dkd_account_deletion_form_url_value: 'https://www.draborneagle.com/draborngo/account-deletion/',
 };
 
 const dkd_policy_card_values = [
@@ -20,43 +20,37 @@ const dkd_policy_card_values = [
     dkd_key_value: 'data-safety',
     dkd_icon_value: 'shield-check-outline',
     dkd_title_value: 'Data Safety Özeti',
-    dkd_body_value: 'DraBornGo; hesap ve profil bilgileri, telefon/SMS doğrulama kaydı, gönderi ve teslimat verileri, yalnız uygulama açıkken kullanılan konum, kurye çevrimiçi çalışma oturumları ve kazanç kayıtları, destek mesajları ile bildirim kimliği verilerini hizmeti çalıştırmak, güvenliği sağlamak ve kullanıcı isteğini tamamlamak için işler.',
+    dkd_body_value: 'DraBornGo; hesap ve profil bilgileri, kurye başvurusu ve lisans durumu, gönderi/teslimat ve hizmet operasyon kayıtları, gerektiğinde yalnız uygulama açıkken kullanılan konum, kullanıcının seçtiği operasyon görselleri, kullanıcı ile DrabornEagle admin arasındaki destek mesajları, bildirim/teknik güvenlik kimlikleri ile kurye çalışma ve kazanç kayıtlarını hizmeti çalıştırmak ve güvenliğini sağlamak için işler. Kişisel veriler reklam amacıyla satılmaz.',
   },
   {
     dkd_key_value: 'support-safety',
     dkd_icon_value: 'message-alert-outline',
     dkd_title_value: 'Destek ve İletişim Güvenliği',
-    dkd_body_value: 'Destek alanı kullanıcı ile DrabornEagle admin hesabı arasındaki canlı destek iletişimidir. Destek mesajları talebi yanıtlamak, güvenliği sağlamak ve kötüye kullanımı incelemek için saklanabilir. Kullanıcılar arası genel DM/sohbet sistemi bu sürümde kullanılmaz.',
-  },
-  {
-    dkd_key_value: 'otp',
-    dkd_icon_value: 'cellphone-key',
-    dkd_title_value: 'SMS / OTP Doğrulama',
-    dkd_body_value: 'Telefon numarası giriş güvenliği, hesap doğrulama, hesap kurtarma ve sipariş güvenliği için kullanılabilir. Doğrulama mesajları pazarlama amacıyla kullanılmaz.',
+    dkd_body_value: 'Destek alanı kullanıcı ile DrabornEagle admin hesabı arasındaki destek iletişimidir. Destek mesajları talebi yanıtlamak, güvenliği sağlamak ve kötüye kullanımı incelemek için gerektiği ölçüde saklanabilir. Bu sürümde kullanıcılar arası genel DM/sohbet sistemi kullanılmaz.',
   },
   {
     dkd_key_value: 'location',
     dkd_icon_value: 'map-marker-radius-outline',
     dkd_title_value: 'Konum Kullanımı',
-    dkd_body_value: 'Konum; gönderi adresi eşleştirme, kurye görevi, rota ve canlı teslimat takibi için yalnız gerekli olduğunda ve uygulama açıkken kullanılır. Arka plan konum izni kullanılmaz.',
+    dkd_body_value: 'Konum; adres eşleştirme, kurye görevi, rota ve aktif teslimat takibi için yalnız gerekli olduğunda ve uygulama açıkken kullanılır. Arka plan konum izni kullanılmaz.',
   },
   {
     dkd_key_value: 'media',
     dkd_icon_value: 'image-multiple-outline',
-    dkd_title_value: 'Kamera / Galeri',
-    dkd_body_value: 'Kamera ve fotoğraf seçimi yalnız kullanıcının başlattığı profil, kurye başvurusu, paket veya gerekli operasyon görseli işlemlerinde açılır. Mikrofon ve geniş medya erişimi istenmez.',
+    dkd_title_value: 'Kamera / Görsel Seçimi',
+    dkd_body_value: 'Kamera ve görsel seçimi yalnız kullanıcının başlattığı profil, kurye başvurusu, paket veya gerekli operasyon görseli işlemlerinde açılır. Mikrofon, arka plan kamera erişimi ve geniş medya/depolama erişimi istenmez.',
   },
   {
     dkd_key_value: 'earnings',
     dkd_icon_value: 'cash-clock',
     dkd_title_value: 'Kurye Çalışma ve Kazanç Verileri',
-    dkd_body_value: 'Kurye çevrimiçi oturum başlangıç/bitiş zamanları ve tamamlanan teslimatlardan oluşan kazanç kayıtları günlük, haftalık, aylık ve saatlik performans özetlerini oluşturmak için kullanılır. Skor, puan ortalaması ve puan sayısı sistemi kullanılmaz.',
+    dkd_body_value: 'Kurye çevrimiçi çalışma oturumları ve tamamlanan teslimatlardan oluşan kazanç kayıtları günlük, haftalık, aylık ve saatlik operasyon özetlerini oluşturmak için kullanılabilir. Kurye skor, puan ortalaması ve puan sayısı sistemi kullanılmaz.',
   },
   {
     dkd_key_value: 'delete',
     dkd_icon_value: 'account-remove-outline',
     dkd_title_value: 'Hesap ve Veri Silme',
-    dkd_body_value: 'Kullanıcı Profil ekranından veya resmi hesap silme sayfasından hesabının ve ilişkili kişisel verilerinin silinmesini talep edebilir. Yasal saklama zorunluluğu bulunan sınırlı kayıtlar ilgili süre boyunca korunabilir.',
+    dkd_body_value: 'Kullanıcı Profil ekranından veya resmi hesap silme web sayfasından hesabının ve ilişkili kişisel verilerinin silinmesini talep edebilir. Güvenlik veya yasal saklama zorunluluğu bulunan sınırlı kayıtlar yalnız gerekli süre boyunca korunabilir.',
   },
 ];
 
@@ -83,8 +77,8 @@ export default function DkdGooglePlayPolicyCenterModal({ dkd_visible_value, dkd_
     dkd_set_config_value({
       ...dkd_default_config_value,
       ...dkd_remote_value,
-      dkd_version_name_value: String(dkd_remote_value?.dkd_version_name_value || 'v0.0.13'),
-      dkd_version_code_value: Number(dkd_remote_value?.dkd_version_code_value || 13),
+      dkd_version_name_value: String(dkd_remote_value?.dkd_version_name_value || 'v0.0.14'),
+      dkd_version_code_value: Number(dkd_remote_value?.dkd_version_code_value || 3),
     });
   }, []);
 
@@ -93,9 +87,9 @@ export default function DkdGooglePlayPolicyCenterModal({ dkd_visible_value, dkd_
   }, [dkd_visible_value, dkd_load_value]);
 
   const dkd_version_text_value = useMemo(() => {
-    const dkd_name_value = String(dkd_config_value?.dkd_version_name_value || 'v0.0.13');
+    const dkd_name_value = String(dkd_config_value?.dkd_version_name_value || 'v0.0.14');
     const dkd_normalized_name_value = dkd_name_value.startsWith('v') ? dkd_name_value : `v${dkd_name_value}`;
-    return `${dkd_normalized_name_value} • Kod: ${Number(dkd_config_value?.dkd_version_code_value || 13)}`;
+    return `${dkd_normalized_name_value} • Kod: ${Number(dkd_config_value?.dkd_version_code_value || 3)}`;
   }, [dkd_config_value]);
 
   const dkd_open_url_value = useCallback(async (dkd_url_value) => {
