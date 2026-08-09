@@ -1,0 +1,99 @@
+name: DKD v0.0.16 Application Source Purge Final
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, reopened, synchronize]
+
+permissions:
+  contents: write
+
+jobs:
+  dkd_purge_and_verify:
+    if: github.head_ref == 'release/v0.0.16-supabase-source-cleanup'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout cleanup branch
+        uses: actions/checkout@v4
+        with:
+          ref: release/v0.0.16-supabase-source-cleanup
+          fetch-depth: 0
+
+      - name: Purge remaining retired courier application references
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          path = Path('supabase/migrations/20260809000519_dkd_v0_0_12_service_hub_support_earnings_admin.sql')
+          text = path.read_text()
+          text = re.sub(r"\n\s*ca\.first_name as dkd_first_name,ca\.last_name as dkd_last_name,ca\.plate_no as dkd_plate_no,ca\.status as dkd_application_status,", "", text)
+          text = re.sub(r"\n\s*left join lateral \(select a\.\* from public\.dkd_courier_license_applications a where a\.user_id=u\.id order by a\.updated_at desc nulls last,a\.created_at desc limit 1\) ca on true", "", text)
+          text = re.sub(r"\n\s*or coalesce\(ca\.first_name\|\|' '\|\|ca\.last_name,''\) ilike '%'\|\|trim\(dkd_param_search\)\|\|'%'", "", text)
+          text = re.sub(r"\n\s*or coalesce\(ca\.plate_no,''\) ilike '%'\|\|trim\(dkd_param_search\)\|\|'%'", "", text)
+          text = re.sub(r"\n\s*'dkd_courier_application',coalesce\(\(select to_jsonb\(a\) from public\.dkd_courier_license_applications a where a\.user_id=u\.id order by a\.updated_at desc nulls last,a\.created_at desc limit 1\),'\{\}'::jsonb\),", "", text)
+          text = re.sub(
+              r"\n\s*if exists\(select 1 from public\.dkd_courier_license_applications where user_id=dkd_param_user_id\) then\n[\s\S]*?\n\s*end if;(?=\n\s*return public\.dkd_admin_user_detail_dkd)",
+              "",
+              text,
+              count=1,
+          )
+          text = re.sub(r"\n\s*delete from public\.dkd_courier_license_applications where user_id=dkd_param_user_id;", "", text)
+          path.write_text(text)
+
+          for filename in [
+              'supabase/migrations/099_dkd_policy_account_deletion.sql',
+              'supabase/migrations/101_dkd_account_deletion_status_email.sql',
+          ]:
+              file_path = Path(filename)
+              value = file_path.read_text()
+              value = value.replace('Admin > Başvurular > Hesap Silme Talepleri', 'Admin > Hesap Silme Talepleri')
+              value = value.replace('Admin Başvurular > Hesap Silme Talepleri', 'Admin > Hesap Silme Talepleri')
+              file_path.write_text(value)
+          PY
+
+      - name: Validate retired application source is absent
+        shell: bash
+        run: |
+          set -euo pipefail
+          PATTERN='dkd_courier_license_applications|dkd_apply_courier_license|dkd_admin_courier_application|courier_application|application_status|application_phone|application_email|application_vehicle_type|application_zone|application_city|Kurye Başvuru|kurye başvuru|Başvurular|başvurular'
+          if grep -RniE "$PATTERN" src supabase --exclude-dir=node_modules; then
+            echo 'DKD ERROR: retired courier application source still exists.'
+            exit 1
+          fi
+          test ! -e src/features/applications/dkd_applications_hub_modal.js
+          test ! -e src/features/admin/dkd_admin_applications_modal.js
+          test ! -e src/features/courier/dkd_courier_application_panel.js
+          test ! -e src/services/courierApplicationService.js
+          test ! -e supabase/sql/dkd_admin_courier_application_delete_current.sql
+          test ! -e supabase/migrations/20260512_dkd_admin_courier_application_delete_initial.sql
+          test ! -e supabase/migrations/20260512_dkd_admin_courier_application_delete_status.sql
+          git diff --check
+
+      - name: Validate v0.0.16 identity without producing a build
+        shell: bash
+        run: |
+          node - <<'NODE'
+          const fs = require('fs');
+          const app = JSON.parse(fs.readFileSync('app.json','utf8')).expo;
+          const pkg = JSON.parse(fs.readFileSync('package.json','utf8'));
+          if (app.version !== '0.0.16') throw new Error('version must remain 0.0.16');
+          if (Number(app.android?.versionCode) !== 3) throw new Error('versionCode must remain 3');
+          if (app.android?.package !== 'com.draborneagle.draborngo') throw new Error('package mismatch');
+          if (pkg.version !== '0.0.16') throw new Error('package version mismatch');
+          console.log('DKD v0.0.16 / Android code 3 identity: PASS');
+          NODE
+
+      - name: Commit purge and remove temporary workflows
+        shell: bash
+        run: |
+          rm -f .github/workflows/dkd_v0_0_16_application_source_purge.yml
+          rm -f .github/workflows/dkd_v0_0_16_application_source_purge_v2.yml
+          git config user.name 'DraBornGo Release Bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add -A
+          git diff --cached --check
+          git commit -m 'cleanup: purge courier application source from repository'
+          git push origin release/v0.0.16-supabase-source-cleanup
