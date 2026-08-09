@@ -3,7 +3,6 @@ import { ActivityIndicator, Alert, Animated, Easing, Modal, Pressable, RefreshCo
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import SafeScreen from '../../components/layout/SafeScreen';
-import DkdCourierApplicationPanelValue from './dkd_courier_application_panel';
 import {
   acceptCourierJob,
   completeCourierJob,
@@ -110,8 +109,7 @@ function DkdJobCardValue({ dkd_job_value, dkd_user_id_value, dkd_busy_job_id_val
   );
 }
 
-function DkdCourierBoardModalV2({ visible, onClose, profile, currentLocation, sessionUserId, setProfile, dkd_initial_panel_value = 'default' }) {
-  const [dkd_panel_value, dkd_set_panel_value] = useState(() => String(dkd_initial_panel_value || '').toLowerCase().includes('application') ? 'application' : 'jobs');
+function DkdCourierBoardModalV2({ visible, onClose, profile, currentLocation, sessionUserId, setProfile }) {
   const [dkd_jobs_value, dkd_set_jobs_value] = useState([]);
   const [dkd_loading_value, dkd_set_loading_value] = useState(false);
   const [dkd_refreshing_value, dkd_set_refreshing_value] = useState(false);
@@ -123,7 +121,6 @@ function DkdCourierBoardModalV2({ visible, onClose, profile, currentLocation, se
 
   useEffect(() => {
     if (!visible) return undefined;
-    dkd_set_panel_value(String(dkd_initial_panel_value || '').toLowerCase().includes('application') ? 'application' : 'jobs');
     dkd_entry_value.setValue(0);
     Animated.timing(dkd_entry_value, { toValue: 1, duration: 430, easing: Easing.out(Easing.cubic), useNativeDriver: true }).start();
     const dkd_pulse_loop_value = Animated.loop(Animated.sequence([
@@ -134,7 +131,7 @@ function DkdCourierBoardModalV2({ visible, onClose, profile, currentLocation, se
     dkd_pulse_loop_value.start();
     dkd_scan_loop_value.start();
     return () => { dkd_pulse_loop_value.stop(); dkd_scan_loop_value.stop(); };
-  }, [visible, dkd_initial_panel_value, dkd_entry_value, dkd_pulse_value, dkd_scan_value]);
+  }, [visible, dkd_entry_value, dkd_pulse_value, dkd_scan_value]);
 
   const dkd_load_jobs_value = useCallback(async (dkd_force_value = false) => {
     dkd_force_value ? dkd_set_refreshing_value(true) : dkd_set_loading_value(true);
@@ -177,7 +174,7 @@ function DkdCourierBoardModalV2({ visible, onClose, profile, currentLocation, se
 
   const dkd_toggle_online_value = useCallback(async () => {
     if (dkd_online_busy_value) return;
-    if (String(profile?.courier_status || '').toLowerCase() !== 'approved') { dkd_set_panel_value('application'); return; }
+    if (String(profile?.courier_status || '').toLowerCase() !== 'approved') { Alert.alert('Kurye', 'Kurye operasyon erişimi hesabında aktif değil.'); return; }
     dkd_set_online_busy_value(true);
     try {
       const dkd_next_value = profile?.dkd_courier_online !== true;
@@ -219,35 +216,25 @@ function DkdCourierBoardModalV2({ visible, onClose, profile, currentLocation, se
           <Animated.View style={[dkd_styles_value.dkd_page, { opacity: dkd_entry_value, transform: [{ translateY: dkd_translate_value }] }]}>
             <View style={dkd_styles_value.dkd_header}>
               <View style={dkd_styles_value.dkd_header_icon_stage}><Animated.View style={[dkd_styles_value.dkd_header_halo, { opacity: dkd_pulse_opacity_value, transform: [{ scale: dkd_pulse_scale_value }] }]} /><LinearGradient colors={['#73E9FF', '#6D8CFF']} style={dkd_styles_value.dkd_header_icon}><MaterialCommunityIcons name="bike-fast" size={28} color="#06111B" /></LinearGradient></View>
-              <View style={{ flex: 1 }}><Text style={dkd_styles_value.dkd_kicker}>DBG KURYE MERKEZİ</Text><Text style={dkd_styles_value.dkd_title}>{dkd_panel_value === 'application' ? 'Kurye Başvurusu' : 'Kurye Görevleri'}</Text><Text style={dkd_styles_value.dkd_sub}>Gelen kurye görevlerini, rota adımlarını ve aktif teslimatlarını canlı yönet.</Text></View>
+              <View style={{ flex: 1 }}><Text style={dkd_styles_value.dkd_kicker}>DBG KURYE MERKEZİ</Text><Text style={dkd_styles_value.dkd_title}>Kurye Görevleri</Text><Text style={dkd_styles_value.dkd_sub}>Gelen kurye görevlerini, rota adımlarını ve aktif teslimatlarını canlı yönet.</Text></View>
               <Pressable onPress={onClose} style={dkd_styles_value.dkd_close}><MaterialCommunityIcons name="close" size={24} color="#FFFFFF" /></Pressable>
             </View>
-
-            {dkd_panel_value === 'application' ? (
-              <ScrollView contentContainerStyle={dkd_styles_value.dkd_content} keyboardShouldPersistTaps="handled">
-                <Pressable onPress={() => dkd_set_panel_value('jobs')} style={dkd_styles_value.dkd_back}><MaterialCommunityIcons name="arrow-left" size={18} color="#06111B" /><Text style={dkd_styles_value.dkd_back_text}>Kurye merkezine dön</Text></Pressable>
-                <DkdCourierApplicationPanelValue dkd_profile_value={profile} dkd_set_profile_value={setProfile} />
-              </ScrollView>
-            ) : (
               <ScrollView contentContainerStyle={dkd_styles_value.dkd_content} refreshControl={<RefreshControl refreshing={dkd_refreshing_value} onRefresh={() => dkd_load_jobs_value(true)} tintColor="#7EEBFF" />}>
                 <LinearGradient colors={dkd_network_active_flag ? ['#075F54', '#095C78', '#25498B'] : ['#252A46', '#153B54', '#35284F']} style={dkd_styles_value.dkd_status_hero}>
                   <Animated.View pointerEvents="none" style={[dkd_styles_value.dkd_scan_light, { transform: [{ translateX: dkd_scan_translate_value }, { rotate: '18deg' }] }]} />
                   <View style={dkd_styles_value.dkd_status_top}>
                     <View style={dkd_styles_value.dkd_status_icon_stage}><Animated.View style={[dkd_styles_value.dkd_status_halo, { opacity: dkd_pulse_opacity_value, transform: [{ scale: dkd_pulse_scale_value }], borderColor: dkd_network_active_flag ? '#62EBB4' : '#83A7D8' }]} /><View style={[dkd_styles_value.dkd_status_icon, dkd_network_active_flag && dkd_styles_value.dkd_status_icon_online]}><MaterialCommunityIcons name={dkd_has_active_owned_job_flag ? 'bike-fast' : (dkd_online_flag ? 'radar' : 'power-standby')} size={27} color={dkd_network_active_flag ? '#06111B' : '#DDEAFF'} /></View></View>
-                    <View style={{ flex: 1 }}><Text style={dkd_styles_value.dkd_status_kicker}>{dkd_approved_flag ? 'KURYE AĞ DURUMU' : 'ONAY DURUMU'}</Text><Text style={dkd_styles_value.dkd_status_title}>{dkd_approved_flag ? (dkd_has_active_owned_job_flag ? 'Aktif Teslimatta • Kurye Ağına Bağlı' : (dkd_online_flag ? 'Çevrimiçi • Görev Radarı Açık' : 'Çevrimdışı • Hazır Bekliyor')) : 'Kurye Onayı Gerekli'}</Text><Text style={dkd_styles_value.dkd_status_sub}>{dkd_approved_flag ? (dkd_has_active_owned_job_flag ? 'Üzerindeki görev tamamlanana kadar kurye operasyon durumu aktif kalır.' : (dkd_online_flag ? 'Bölgen için uygun yeni görevler canlı taranıyor.' : 'Görev almak için çevrimiçi ol ve görev radarını başlat.')) : 'Kurye görevlerini kabul etmek için başvurunu tamamla.'}</Text></View>
+                    <View style={{ flex: 1 }}><Text style={dkd_styles_value.dkd_status_kicker}>{dkd_approved_flag ? 'KURYE AĞ DURUMU' : 'ONAY DURUMU'}</Text><Text style={dkd_styles_value.dkd_status_title}>{dkd_approved_flag ? (dkd_has_active_owned_job_flag ? 'Aktif Teslimatta • Kurye Ağına Bağlı' : (dkd_online_flag ? 'Çevrimiçi • Görev Radarı Açık' : 'Çevrimdışı • Hazır Bekliyor')) : 'Kurye Erişimi Kapalı'}</Text><Text style={dkd_styles_value.dkd_status_sub}>{dkd_approved_flag ? (dkd_has_active_owned_job_flag ? 'Üzerindeki görev tamamlanana kadar kurye operasyon durumu aktif kalır.' : (dkd_online_flag ? 'Bölgen için uygun yeni görevler canlı taranıyor.' : 'Görev almak için çevrimiçi ol ve görev radarını başlat.')) : 'Kurye operasyon erişimi hesabında aktif değil.'}</Text></View>
                   </View>
                   <View style={dkd_styles_value.dkd_status_metrics}><View style={dkd_styles_value.dkd_metric}><Text style={dkd_styles_value.dkd_metric_label}>GÖREV</Text><Text style={dkd_styles_value.dkd_metric_value}>{dkd_active_count_value}</Text></View><View style={dkd_styles_value.dkd_metric}><Text style={dkd_styles_value.dkd_metric_label}>BÖLGE</Text><Text style={dkd_styles_value.dkd_metric_value} numberOfLines={1}>{profile?.dkd_region || profile?.courier_zone || profile?.dkd_city || profile?.courier_city || 'Türkiye'}</Text></View><View style={dkd_styles_value.dkd_metric}><Text style={dkd_styles_value.dkd_metric_label}>GPS</Text><Text style={dkd_styles_value.dkd_metric_value}>{currentLocation?.lat ? 'Hazır' : 'Bekliyor'}</Text></View></View>
-                  <Pressable onPress={dkd_toggle_online_value} disabled={dkd_online_busy_value || dkd_has_active_owned_job_flag} style={[dkd_styles_value.dkd_status_button, dkd_has_active_owned_job_flag && { opacity: .82 }]}>{dkd_online_busy_value ? <ActivityIndicator color="#06111B" /> : <><MaterialCommunityIcons name={dkd_has_active_owned_job_flag ? 'package-variant-closed-check' : (dkd_approved_flag ? (dkd_online_flag ? 'pause-circle-outline' : 'radar') : 'clipboard-account-outline')} size={20} color="#06111B" /><Text style={dkd_styles_value.dkd_status_button_text}>{dkd_has_active_owned_job_flag ? 'Aktif Görevi Tamamla' : (dkd_approved_flag ? (dkd_online_flag ? 'Görev Radarını Durdur' : 'Çevrimiçi Ol • Görev Ara') : 'Kurye Başvurusunu Aç')}</Text></>}</Pressable>
+                  <Pressable onPress={dkd_toggle_online_value} disabled={dkd_online_busy_value || dkd_has_active_owned_job_flag || !dkd_approved_flag} style={[dkd_styles_value.dkd_status_button, dkd_has_active_owned_job_flag && { opacity: .82 }]}>{dkd_online_busy_value ? <ActivityIndicator color="#06111B" /> : <><MaterialCommunityIcons name={dkd_has_active_owned_job_flag ? 'package-variant-closed-check' : (dkd_approved_flag ? (dkd_online_flag ? 'pause-circle-outline' : 'radar') : 'lock-outline')} size={20} color="#06111B" /><Text style={dkd_styles_value.dkd_status_button_text}>{dkd_has_active_owned_job_flag ? 'Aktif Görevi Tamamla' : (dkd_approved_flag ? (dkd_online_flag ? 'Görev Radarını Durdur' : 'Çevrimiçi Ol • Görev Ara') : 'Kurye Erişimi Gerekli')}</Text></>}</Pressable>
                 </LinearGradient>
-
-                {!dkd_approved_flag ? <Pressable onPress={() => dkd_set_panel_value('application')} style={dkd_styles_value.dkd_application_card}><View style={dkd_styles_value.dkd_application_icon}><MaterialCommunityIcons name="card-account-details-outline" size={22} color="#FFE29A" /></View><View style={{ flex: 1 }}><Text style={dkd_styles_value.dkd_application_title}>Kurye Başvurusu</Text><Text style={dkd_styles_value.dkd_application_sub}>Belgelerini tamamla ve görev ağına katıl.</Text></View><MaterialCommunityIcons name="chevron-right" size={21} color="#FFE29A" /></Pressable> : null}
 
                 <View style={dkd_styles_value.dkd_section_header}><View><Text style={dkd_styles_value.dkd_section_kicker}>CANLI OPERASYON</Text><Text style={dkd_styles_value.dkd_section_title}>Aktif Görevler</Text></View><View style={dkd_styles_value.dkd_count_badge}><Text style={dkd_styles_value.dkd_count_badge_text}>{dkd_active_count_value}</Text></View></View>
                 <View style={dkd_styles_value.dkd_help_strip}><MaterialCommunityIcons name="gesture-tap" size={17} color="#7EEBFF" /><Text style={dkd_styles_value.dkd_help_text}>Yeni görev geldiğinde kart otomatik görünür. Kabul → Alım → Teslim adımlarını sırayla tamamla.</Text></View>
 
                 {dkd_loading_value ? <ActivityIndicator color="#7EEBFF" style={{ marginTop: 28 }} /> : dkd_visible_jobs_value.length ? dkd_visible_jobs_value.map((dkd_job_value) => <DkdJobCardValue key={String(dkd_job_value.id)} dkd_job_value={dkd_job_value} dkd_user_id_value={dkd_user_id_value} dkd_busy_job_id_value={dkd_busy_job_id_value} dkd_on_action_value={dkd_run_action_value} />) : <View style={dkd_styles_value.dkd_empty}><View style={dkd_styles_value.dkd_empty_icon_stage}><Animated.View style={[dkd_styles_value.dkd_empty_halo, { opacity: dkd_pulse_opacity_value, transform: [{ scale: dkd_pulse_scale_value }] }]} /><MaterialCommunityIcons name="radar" size={36} color="#7EEBFF" /></View><Text style={dkd_styles_value.dkd_empty_title}>Şu anda aktif görev yok</Text><Text style={dkd_styles_value.dkd_empty_text}>{dkd_online_flag ? 'Sipariş radarı açık. Uygun yeni görev geldiğinde bu ekran otomatik güncellenir.' : 'Çevrimiçi olduğunda bölgedeki uygun siparişler burada görünür.'}</Text></View>}
               </ScrollView>
-            )}
           </Animated.View>
         </LinearGradient>
       </SafeScreen>
@@ -267,8 +254,6 @@ const dkd_styles_value = StyleSheet.create({
   dkd_sub: { color: 'rgba(235,244,255,.60)', fontSize: 10.5, lineHeight: 15, fontWeight: '700', marginTop: 3 },
   dkd_close: { width: 46, height: 46, borderRadius: 17, backgroundColor: 'rgba(255,255,255,.07)', borderWidth: 1, borderColor: 'rgba(255,255,255,.11)', alignItems: 'center', justifyContent: 'center' },
   dkd_content: { padding: 15, paddingBottom: 55 },
-  dkd_back: { alignSelf: 'flex-start', minHeight: 46, borderRadius: 16, paddingHorizontal: 13, flexDirection: 'row', alignItems: 'center', gap: 7, backgroundColor: '#7EEBFF', marginBottom: 12 },
-  dkd_back_text: { color: '#06111B', fontSize: 11, fontWeight: '900' },
   dkd_status_hero: { minHeight: 272, borderRadius: 29, padding: 16, overflow: 'hidden', borderWidth: 1, borderColor: 'rgba(137,230,255,.20)' },
   dkd_scan_light: { position: 'absolute', top: -100, bottom: -100, width: 65, backgroundColor: 'rgba(255,255,255,.055)' },
   dkd_status_top: { flexDirection: 'row', gap: 12, alignItems: 'center' },
@@ -285,10 +270,6 @@ const dkd_styles_value = StyleSheet.create({
   dkd_metric_value: { color: '#FFFFFF', fontSize: 12, fontWeight: '900', marginTop: 7 },
   dkd_status_button: { minHeight: 55, borderRadius: 19, marginTop: 14, paddingHorizontal: 13, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: '#7EEBFF' },
   dkd_status_button_text: { color: '#06111B', fontSize: 12, fontWeight: '900' },
-  dkd_application_card: { minHeight: 82, borderRadius: 22, marginTop: 11, padding: 13, flexDirection: 'row', alignItems: 'center', gap: 11, backgroundColor: 'rgba(78,53,35,.42)', borderWidth: 1, borderColor: 'rgba(255,218,139,.18)' },
-  dkd_application_icon: { width: 48, height: 48, borderRadius: 17, backgroundColor: 'rgba(255,218,139,.10)', alignItems: 'center', justifyContent: 'center' },
-  dkd_application_title: { color: '#FFF2C6', fontSize: 14, fontWeight: '900' },
-  dkd_application_sub: { color: 'rgba(255,239,196,.58)', fontSize: 9.5, lineHeight: 14, fontWeight: '700', marginTop: 3 },
   dkd_section_header: { marginTop: 22, marginBottom: 9, flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between' },
   dkd_section_kicker: { color: '#83E9FF', fontSize: 9, fontWeight: '900', letterSpacing: 1.2 },
   dkd_section_title: { color: '#FFFFFF', fontSize: 24, fontWeight: '900', marginTop: 2 },

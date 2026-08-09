@@ -4,9 +4,9 @@ import { supabase } from '../lib/supabase';
 
 const dkd_update_manifest_url_value = 'https://www.draborneagle.com/DraBornGo/App/dkd_draborngo_update_manifest.json';
 const dkd_play_store_url_value = 'https://play.google.com/store/apps/details?id=com.draborneagle.draborngo';
-const dkd_current_release_name_value = '0.0.15';
+const dkd_current_release_name_value = '0.0.16';
 const dkd_current_release_code_value = 3;
-const dkd_current_release_notes_value = 'DraBornGo v0.0.15: Hizmet Ağı Merkezi, Gönderi Oluştur ve Siparişlerim kullanıcı kaynak kodundan kaldırıldı. Supabase tarafındaki ilgili veri ve sunucu yapıları ileride geri yükleme amacıyla korunuyor. Android versionCode 3 sabit ve test Expo Go üzerinden devam ediyor.';
+const dkd_current_release_notes_value = 'DraBornGo v0.0.16: Mobildeki eski kurye kayıt/onay ekranları kullanıcı ve admin kaynak kodundan kaldırıldı; mevcut kurye görev akışı korunuyor. Supabase tarafındaki ilgili eski veriler ileride gerekirse geri yüklemek için korunuyor. Android versionCode 3 sabit ve test Expo Go üzerinden devam ediyor; APK/AAB üretilmedi.';
 
 function dkd_clean_text_value(dkd_value, dkd_fallback = '') {
   const dkd_text_value = String(dkd_value ?? '').trim();

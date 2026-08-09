@@ -19,7 +19,7 @@ const dkd_pre_login_role_storage_key_value = 'dkd_dkd_draborngo_pre_login_role_h
 
 const dkd_intro_step_list_value = [
   {
-    dkd_badge_text: 'DraBornGo v0.0.15 • KURYE GİRİŞİ',
+    dkd_badge_text: 'DraBornGo v0.0.16 • KURYE GİRİŞİ',
     dkd_title_text: "DraBornGo'ya hoş geldin — kurye operasyonun tek ekranda",
     dkd_body_text: 'Gelen teslimat görevlerini gör, uygun görevi kabul et, rotanı takip et ve kazancını tek merkezden izle.',
     dkd_art_mode_value: 'welcome',
@@ -41,7 +41,7 @@ const dkd_intro_step_list_value = [
   {
     dkd_badge_text: 'KURYE ONAYI',
     dkd_title_text: 'Onaylı kurye olarak görev akışına katıl',
-    dkd_body_text: 'Kurye başvurun onaylandığında lisans durumun aktif görünür; görev havuzuna erişerek teslimat operasyonuna başlayabilirsin.',
+    dkd_body_text: 'Kurye erişimin hesabında aktif olduğunda görev havuzuna erişebilir ve teslimat operasyonuna başlayabilirsin.',
     dkd_art_mode_value: 'license',
     dkd_art_image_source_value: require('../../../assets/dkd_onboarding/dkd_intro_role_hub.png'),
     dkd_primary_icon_name: 'badge-account-horizontal-outline',
