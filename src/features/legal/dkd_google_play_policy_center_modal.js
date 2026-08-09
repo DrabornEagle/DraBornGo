@@ -5,6 +5,8 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import SafeScreen from '../../components/layout/SafeScreen';
 import { dkd_fetch_policy_center_config_value } from '../../services/dkd_policy_center_service';
 
+const dkd_text_scaling_props_value = { allowFontScaling: false, maxFontSizeMultiplier: 1 };
+
 const dkd_default_config_value = {
   dkd_package_name_value: 'com.draborneagle.draborngo',
   dkd_version_name_value: 'v0.0.13',
@@ -62,11 +64,11 @@ function DkdPolicyCard({ dkd_icon_value, dkd_title_value, dkd_body_value }) {
   return (
     <View style={dkd_styles_value.dkd_policy_card}>
       <View style={dkd_styles_value.dkd_policy_icon_shell}>
-        <MaterialCommunityIcons name={dkd_icon_value} size={27} color="#58E5FF" />
+        <MaterialCommunityIcons name={dkd_icon_value} size={19} color="#58E5FF" />
       </View>
       <View style={dkd_styles_value.dkd_policy_copy}>
-        <Text style={dkd_styles_value.dkd_policy_title}>{dkd_title_value}</Text>
-        <Text style={dkd_styles_value.dkd_policy_body}>{dkd_body_value}</Text>
+        <Text {...dkd_text_scaling_props_value} style={dkd_styles_value.dkd_policy_title}>{dkd_title_value}</Text>
+        <Text {...dkd_text_scaling_props_value} style={dkd_styles_value.dkd_policy_body}>{dkd_body_value}</Text>
       </View>
     </View>
   );
@@ -113,15 +115,15 @@ export default function DkdGooglePlayPolicyCenterModal({ dkd_visible_value, dkd_
             <LinearGradient colors={['#06A7E6', '#3964E8', '#5C33D3', '#0A1730']} locations={[0, 0.34, 0.66, 1]} style={dkd_styles_value.dkd_header}>
               <View style={dkd_styles_value.dkd_play_icon_shell}>
                 <LinearGradient colors={['#B8F5DD', '#86EDB5']} style={StyleSheet.absoluteFill} />
-                <MaterialCommunityIcons name="google-play" size={57} color="#06131B" />
+                <MaterialCommunityIcons name="google-play" size={34} color="#06131B" />
               </View>
               <View style={dkd_styles_value.dkd_header_copy}>
-                <Text style={dkd_styles_value.dkd_kicker}>GOOGLE PLAY HAZIRLIK</Text>
-                <Text style={dkd_styles_value.dkd_title}>Gizlilik ve Veri{`\n`}Merkezi</Text>
-                <Text style={dkd_styles_value.dkd_package_text}>Paket adı:{`\n`}{dkd_config_value?.dkd_package_name_value || dkd_default_config_value.dkd_package_name_value} • Sürüm:{`\n`}{dkd_version_text_value}</Text>
+                <Text {...dkd_text_scaling_props_value} style={dkd_styles_value.dkd_kicker}>GOOGLE PLAY HAZIRLIK</Text>
+                <Text {...dkd_text_scaling_props_value} style={dkd_styles_value.dkd_title}>Gizlilik ve Veri{`\n`}Merkezi</Text>
+                <Text {...dkd_text_scaling_props_value} style={dkd_styles_value.dkd_package_text}>Paket adı:{`\n`}{dkd_config_value?.dkd_package_name_value || dkd_default_config_value.dkd_package_name_value} • Sürüm: {dkd_version_text_value}</Text>
               </View>
-              <Pressable onPress={dkd_on_close_value} style={({ pressed: dkd_pressed_value }) => [dkd_styles_value.dkd_close_button, dkd_pressed_value && { opacity: 0.72 }]}>
-                <MaterialCommunityIcons name="close" size={34} color="#FFFFFF" />
+              <Pressable onPress={dkd_on_close_value} hitSlop={8} style={({ pressed: dkd_pressed_value }) => [dkd_styles_value.dkd_close_button, dkd_pressed_value && { opacity: 0.72 }]}>
+                <MaterialCommunityIcons name="close" size={23} color="#FFFFFF" />
               </Pressable>
             </LinearGradient>
 
@@ -132,14 +134,14 @@ export default function DkdGooglePlayPolicyCenterModal({ dkd_visible_value, dkd_
 
               <View style={dkd_styles_value.dkd_link_group}>
                 <Pressable onPress={() => dkd_open_url_value(dkd_config_value?.dkd_privacy_policy_doc_url_value)} style={dkd_styles_value.dkd_link_button}>
-                  <MaterialCommunityIcons name="file-document-lock-outline" size={22} color="#06111B" />
-                  <Text style={dkd_styles_value.dkd_link_button_text}>Gizlilik Politikasını Aç</Text>
-                  <MaterialCommunityIcons name="arrow-top-right" size={20} color="#06111B" />
+                  <MaterialCommunityIcons name="file-lock-outline" size={18} color="#06111B" />
+                  <Text {...dkd_text_scaling_props_value} style={dkd_styles_value.dkd_link_button_text}>Gizlilik Politikasını Aç</Text>
+                  <MaterialCommunityIcons name="arrow-top-right" size={17} color="#06111B" />
                 </Pressable>
                 <Pressable onPress={() => dkd_open_url_value(dkd_config_value?.dkd_account_deletion_form_url_value)} style={[dkd_styles_value.dkd_link_button, dkd_styles_value.dkd_delete_link_button]}>
-                  <MaterialCommunityIcons name="account-remove-outline" size={22} color="#FFE4EA" />
-                  <Text style={[dkd_styles_value.dkd_link_button_text, { color: '#FFE4EA' }]}>Hesap Silme Sayfasını Aç</Text>
-                  <MaterialCommunityIcons name="arrow-top-right" size={20} color="#FFE4EA" />
+                  <MaterialCommunityIcons name="account-remove-outline" size={18} color="#FFE4EA" />
+                  <Text {...dkd_text_scaling_props_value} style={[dkd_styles_value.dkd_link_button_text, { color: '#FFE4EA' }]}>Hesap Silme Sayfasını Aç</Text>
+                  <MaterialCommunityIcons name="arrow-top-right" size={17} color="#FFE4EA" />
                 </Pressable>
               </View>
             </ScrollView>
@@ -153,22 +155,22 @@ export default function DkdGooglePlayPolicyCenterModal({ dkd_visible_value, dkd_
 const dkd_styles_value = StyleSheet.create({
   dkd_safe_screen: { flex: 1, backgroundColor: 'transparent' },
   dkd_overlay: { flex: 1, backgroundColor: 'rgba(0,3,10,0.82)', paddingHorizontal: 12, paddingVertical: 10 },
-  dkd_shell: { flex: 1, borderRadius: 30, overflow: 'hidden', borderWidth: 1, borderColor: 'rgba(112,226,255,0.24)' },
-  dkd_header: { minHeight: 285, paddingHorizontal: 28, paddingTop: 28, paddingBottom: 24, flexDirection: 'row', alignItems: 'center', gap: 20, borderBottomWidth: 1, borderBottomColor: 'rgba(126,235,255,0.23)' },
-  dkd_play_icon_shell: { width: 102, height: 102, borderRadius: 28, overflow: 'hidden', alignItems: 'center', justifyContent: 'center' },
+  dkd_shell: { flex: 1, borderRadius: 27, overflow: 'hidden', borderWidth: 1, borderColor: 'rgba(112,226,255,0.24)' },
+  dkd_header: { minHeight: 162, paddingHorizontal: 16, paddingTop: 16, paddingBottom: 15, flexDirection: 'row', alignItems: 'center', gap: 12, borderBottomWidth: 1, borderBottomColor: 'rgba(126,235,255,0.23)' },
+  dkd_play_icon_shell: { width: 58, height: 58, borderRadius: 17, overflow: 'hidden', alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
   dkd_header_copy: { flex: 1, minWidth: 0 },
-  dkd_kicker: { color: 'rgba(229,248,255,0.88)', fontSize: 13, fontWeight: '900', letterSpacing: 1.8 },
-  dkd_title: { color: '#FFFFFF', fontSize: 32, lineHeight: 38, fontWeight: '900', marginTop: 10 },
-  dkd_package_text: { color: 'rgba(235,241,255,0.72)', fontSize: 15, lineHeight: 23, fontWeight: '800', marginTop: 12 },
-  dkd_close_button: { width: 74, height: 74, borderRadius: 23, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(9,20,47,0.66)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.15)' },
-  dkd_content: { padding: 25, paddingBottom: 46, gap: 18 },
-  dkd_policy_card: { borderRadius: 30, padding: 24, flexDirection: 'row', gap: 20, backgroundColor: 'rgba(13,24,43,0.94)', borderWidth: 1, borderColor: 'rgba(178,211,255,0.20)' },
-  dkd_policy_icon_shell: { width: 74, height: 74, borderRadius: 24, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(7,70,91,0.50)', borderWidth: 1, borderColor: 'rgba(64,218,255,0.28)' },
+  dkd_kicker: { color: 'rgba(229,248,255,0.88)', fontSize: 10.5, lineHeight: 13, fontWeight: '900', letterSpacing: 1.2 },
+  dkd_title: { color: '#FFFFFF', fontSize: 20, lineHeight: 24, fontWeight: '900', marginTop: 6 },
+  dkd_package_text: { color: 'rgba(235,241,255,0.72)', fontSize: 11.5, lineHeight: 16, fontWeight: '800', marginTop: 7 },
+  dkd_close_button: { width: 43, height: 43, borderRadius: 15, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(9,20,47,0.66)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.15)', flexShrink: 0 },
+  dkd_content: { padding: 14, paddingBottom: 28, gap: 10 },
+  dkd_policy_card: { borderRadius: 21, padding: 14, flexDirection: 'row', gap: 12, backgroundColor: 'rgba(13,24,43,0.94)', borderWidth: 1, borderColor: 'rgba(178,211,255,0.20)' },
+  dkd_policy_icon_shell: { width: 43, height: 43, borderRadius: 15, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(7,70,91,0.50)', borderWidth: 1, borderColor: 'rgba(64,218,255,0.28)', flexShrink: 0 },
   dkd_policy_copy: { flex: 1, minWidth: 0 },
-  dkd_policy_title: { color: '#FFFFFF', fontSize: 21, fontWeight: '900' },
-  dkd_policy_body: { color: 'rgba(230,239,255,0.74)', fontSize: 16, lineHeight: 26, fontWeight: '700', marginTop: 9 },
-  dkd_link_group: { gap: 12, marginTop: 4 },
-  dkd_link_button: { minHeight: 62, borderRadius: 20, backgroundColor: '#88EBFF', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10, paddingHorizontal: 18 },
+  dkd_policy_title: { color: '#FFFFFF', fontSize: 14.5, lineHeight: 18, fontWeight: '900' },
+  dkd_policy_body: { color: 'rgba(230,239,255,0.74)', fontSize: 12, lineHeight: 18.5, fontWeight: '700', marginTop: 5 },
+  dkd_link_group: { gap: 9, marginTop: 2 },
+  dkd_link_button: { minHeight: 48, borderRadius: 16, backgroundColor: '#88EBFF', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingHorizontal: 14 },
   dkd_delete_link_button: { backgroundColor: 'rgba(126,39,65,0.65)', borderWidth: 1, borderColor: 'rgba(255,122,158,0.28)' },
-  dkd_link_button_text: { flex: 1, color: '#06111B', fontSize: 14, fontWeight: '900' },
+  dkd_link_button_text: { flex: 1, color: '#06111B', fontSize: 12, fontWeight: '900' },
 });
