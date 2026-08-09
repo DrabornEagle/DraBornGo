@@ -3,9 +3,9 @@ import { Linking } from 'react-native';
 
 const dkd_update_manifest_url_value = 'https://www.draborneagle.com/DraBornGo/App/dkd_draborngo_update_manifest.json';
 const dkd_play_store_url_value = 'https://play.google.com/store/apps/details?id=com.draborneagle.draborngo';
-const dkd_current_release_name_value = '0.0.13';
-const dkd_current_release_code_value = 13;
-const dkd_current_release_notes_value = 'DraBornGo v0.0.13: Gizlilik ve Veri Merkezi ile Sürüm ve Güncelleme Merkezi v0.0.5 dönemindeki kompakt kart ölçülerine göre yeniden düzenlendi. Sürüm ve Güncelleme Merkezi artık ilk dokunuşta açılır. Geçersiz Material Community icon uyarısı giderildi. Admin Kullanıcı Yönetimindeki Saatlik Kazanç kartı korunur; kurye skor, puan ortalaması, puan sayısı ve reward_score sistemi kaldırılmış olarak kalır. Expo Go test aşamasında APK/AAB üretilmez.';
+const dkd_current_release_name_value = '0.0.14';
+const dkd_current_release_code_value = 3;
+const dkd_current_release_notes_value = 'DraBornGo v0.0.14: Android versionCode 3 ile Expo Go test hattına geçildi. Aktif kurye lisansı olan kullanıcı DKD Onay Merkezi içinde yeniden başvuru formu yerine lisansının aktif olduğunu görür. Profil, ana sayfa, girişteki Şehir Ağı, Gizlilik ve Veri Merkezi ile web sürüm bilgileri eşitlendi. Kullanılmayan SMS/OTP ve genel kullanıcı DM ifadeleri kaldırıldı. Expo Go aşamasında APK/AAB üretilmez.';
 
 function dkd_clean_text_value(dkd_value, dkd_fallback = '') {
   const dkd_text_value = String(dkd_value ?? '').trim();
@@ -15,6 +15,29 @@ function dkd_clean_text_value(dkd_value, dkd_fallback = '') {
 function dkd_clean_number_value(dkd_value, dkd_fallback = 0) {
   const dkd_number_value = Number(dkd_value);
   return Number.isFinite(dkd_number_value) ? Math.trunc(dkd_number_value) : dkd_fallback;
+}
+
+function dkd_version_part_list_value(dkd_version_value) {
+  return String(dkd_version_value || '')
+    .replace(/^v/i, '')
+    .split('.')
+    .map((dkd_part_value) => {
+      const dkd_numeric_value = Number.parseInt(String(dkd_part_value || '0').replace(/\D.*$/, ''), 10);
+      return Number.isFinite(dkd_numeric_value) ? dkd_numeric_value : 0;
+    });
+}
+
+function dkd_compare_version_name_value(dkd_left_value, dkd_right_value) {
+  const dkd_left_parts_value = dkd_version_part_list_value(dkd_left_value);
+  const dkd_right_parts_value = dkd_version_part_list_value(dkd_right_value);
+  const dkd_length_value = Math.max(dkd_left_parts_value.length, dkd_right_parts_value.length, 3);
+  for (let dkd_index_value = 0; dkd_index_value < dkd_length_value; dkd_index_value += 1) {
+    const dkd_left_part_value = dkd_left_parts_value[dkd_index_value] || 0;
+    const dkd_right_part_value = dkd_right_parts_value[dkd_index_value] || 0;
+    if (dkd_left_part_value > dkd_right_part_value) return 1;
+    if (dkd_left_part_value < dkd_right_part_value) return -1;
+  }
+  return 0;
 }
 
 export function dkd_get_installed_app_identity_value() {
@@ -40,14 +63,24 @@ export async function dkd_fetch_app_update_status_value() {
     const dkd_manifest_value = await dkd_response_value.json();
     const dkd_remote_latest_code_value = dkd_clean_number_value(dkd_manifest_value?.dkd_latest_version_code, 0);
     const dkd_remote_latest_name_value = dkd_clean_text_value(dkd_manifest_value?.dkd_latest_version_name, '');
-    const dkd_remote_is_current_or_newer_value = dkd_remote_latest_code_value >= dkd_current_release_code_value;
-    const dkd_latest_code_value = Math.max(dkd_remote_latest_code_value, dkd_current_release_code_value);
+    const dkd_remote_name_compare_value = dkd_remote_latest_name_value
+      ? dkd_compare_version_name_value(dkd_remote_latest_name_value, dkd_current_release_name_value)
+      : 0;
+    const dkd_remote_is_current_or_newer_value = dkd_remote_latest_name_value
+      ? dkd_remote_name_compare_value >= 0
+      : dkd_remote_latest_code_value >= dkd_current_release_code_value;
     const dkd_latest_name_value = dkd_remote_is_current_or_newer_value
       ? (dkd_remote_latest_name_value || dkd_current_release_name_value)
       : dkd_current_release_name_value;
-    const dkd_update_required_value = dkd_latest_code_value > dkd_installed_value.dkd_version_code_value
+    const dkd_latest_code_value = dkd_remote_is_current_or_newer_value && dkd_remote_latest_code_value > 0
+      ? dkd_remote_latest_code_value
+      : dkd_current_release_code_value;
+    const dkd_installed_name_compare_value = dkd_compare_version_name_value(dkd_latest_name_value, dkd_installed_value.dkd_version_name_value);
+    const dkd_update_required_value = dkd_installed_name_compare_value > 0
+      || (dkd_installed_name_compare_value === 0 && dkd_latest_code_value > dkd_installed_value.dkd_version_code_value)
       || Boolean(dkd_manifest_value?.dkd_update_required && dkd_remote_is_current_or_newer_value);
-    const dkd_download_url_value = dkd_clean_text_value(dkd_manifest_value?.dkd_apk_url, '');
+    const dkd_apk_url_value = dkd_clean_text_value(dkd_manifest_value?.dkd_apk_url, '');
+    const dkd_download_page_url_value = dkd_clean_text_value(dkd_manifest_value?.dkd_download_page_url, dkd_play_store_url_value);
     const dkd_remote_release_notes_value = dkd_clean_text_value(dkd_manifest_value?.dkd_release_notes, '');
     return {
       dkd_installed_value,
@@ -55,8 +88,8 @@ export async function dkd_fetch_app_update_status_value() {
       dkd_latest_version_code_value: dkd_latest_code_value,
       dkd_update_required_value,
       dkd_distribution_channel_value: dkd_clean_text_value(dkd_manifest_value?.dkd_distribution_channel, 'expo-go-test'),
-      dkd_download_url_value,
-      dkd_source_url_value: dkd_download_url_value || dkd_play_store_url_value,
+      dkd_download_url_value: dkd_apk_url_value,
+      dkd_source_url_value: dkd_apk_url_value || dkd_download_page_url_value,
       dkd_sha256_value: dkd_clean_text_value(dkd_manifest_value?.dkd_sha256, ''),
       dkd_release_notes_value: dkd_remote_is_current_or_newer_value && dkd_remote_release_notes_value
         ? dkd_remote_release_notes_value
@@ -65,11 +98,13 @@ export async function dkd_fetch_app_update_status_value() {
       dkd_remote_manifest_stale_value: !dkd_remote_is_current_or_newer_value,
     };
   } catch (dkd_error_value) {
+    const dkd_installed_name_compare_value = dkd_compare_version_name_value(dkd_current_release_name_value, dkd_installed_value.dkd_version_name_value);
     return {
       dkd_installed_value,
       dkd_latest_version_name_value: dkd_current_release_name_value,
       dkd_latest_version_code_value: dkd_current_release_code_value,
-      dkd_update_required_value: dkd_current_release_code_value > dkd_installed_value.dkd_version_code_value,
+      dkd_update_required_value: dkd_installed_name_compare_value > 0
+        || (dkd_installed_name_compare_value === 0 && dkd_current_release_code_value > dkd_installed_value.dkd_version_code_value),
       dkd_distribution_channel_value: 'expo-go-test',
       dkd_download_url_value: '',
       dkd_source_url_value: dkd_play_store_url_value,
