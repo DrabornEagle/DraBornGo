@@ -1,193 +1,155 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, Alert, Modal, Pressable, ScrollView, StatusBar, StyleSheet, Text, TextInput, View } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { Animated, Modal, Pressable, ScrollView, StatusBar, StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import SafeScreen from '../../components/layout/SafeScreen';
-import {
-  dkd_create_service_network_request_value,
-  dkd_delete_completed_service_network_order_value,
-  dkd_fetch_service_network_my_orders_value,
-} from '../../services/dkd_service_network_service';
+import DkdCargoSenderPanelValue from '../courier/dkd_cargo_sender_panel';
 
-export const dkd_service_network_category_groups_value = [
-  { dkd_key_value: 'home', dkd_title_value: 'Ev & Yaşam', dkd_icon_value: 'home-heart', dkd_categories_value: ['Ev İçi Yardım', 'Temizlik', 'Montaj', 'Günlük Yardım'] },
-  { dkd_key_value: 'technical', dkd_title_value: 'Tamir & Teknik', dkd_icon_value: 'tools', dkd_categories_value: ['Elektrik', 'Su Tesisatı', 'Beyaz Eşya', 'Teknik Servis'] },
-  { dkd_key_value: 'vehicle', dkd_title_value: 'Araç Destek', dkd_icon_value: 'car-wrench', dkd_categories_value: ['Akü Desteği', 'Lastik Desteği', 'Yol Yardımı', 'Araç Kontrolü'] },
-  { dkd_key_value: 'special', dkd_title_value: 'Özel Teslimat', dkd_icon_value: 'package-variant-closed', dkd_categories_value: ['Belge Teslimatı', 'Paket Teslimatı', 'Emanet Teslimatı', 'Özel Görev'] },
-];
-
-const dkd_terminal_status_values = new Set(['completed', 'delivered', 'done', 'finished', 'cancelled', 'canceled', 'rejected', 'closed']);
-function dkd_text_value(dkd_value) { return String(dkd_value || '').trim(); }
-function dkd_slug_value(dkd_value) {
-  return dkd_text_value(dkd_value).toLocaleLowerCase('tr-TR').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
+function DkdHubTab({ dkd_active_value, dkd_icon_value, dkd_title_value, dkd_sub_value, dkd_badge_value, dkd_colors_value, dkd_on_press_value }) {
+  const dkd_scale_value = useRef(new Animated.Value(1)).current;
+  return (
+    <Pressable
+      onPress={dkd_on_press_value}
+      onPressIn={() => Animated.spring(dkd_scale_value, { toValue: .975, speed: 34, bounciness: 2, useNativeDriver: true }).start()}
+      onPressOut={() => Animated.spring(dkd_scale_value, { toValue: 1, speed: 30, bounciness: 4, useNativeDriver: true }).start()}
+      style={styles.tabPressable}
+    >
+      <Animated.View style={{ transform: [{ scale: dkd_scale_value }] }}>
+        <LinearGradient colors={dkd_colors_value} style={[styles.tabCard, dkd_active_value && styles.tabCardActive]}>
+          <View style={styles.tabTop}>
+            <View style={styles.tabIcon}><MaterialCommunityIcons name={dkd_icon_value} size={26} color="#FFF" /></View>
+            <View style={styles.tabBadge}><Text style={styles.tabBadgeText}>{dkd_badge_value}</Text></View>
+          </View>
+          <Text style={styles.tabTitle}>{dkd_title_value}</Text>
+          <Text style={styles.tabSub}>{dkd_sub_value}</Text>
+          <View style={styles.tabFooter}><Text style={styles.tabFooterText}>{dkd_active_value ? 'AÇIK' : 'MERKEZİ AÇ'}</Text><MaterialCommunityIcons name={dkd_active_value ? 'check-circle' : 'arrow-top-right'} size={18} color="#DFFAFF" /></View>
+        </LinearGradient>
+      </Animated.View>
+    </Pressable>
+  );
 }
 
-export default function DkdServiceNetworkModal({ dkd_visible_value, dkd_on_close_value, dkd_current_location_value, dkd_on_profile_press_value }) {
-  const [dkd_selected_group_value, dkd_set_selected_group_value] = useState(null);
-  const [dkd_selected_category_value, dkd_set_selected_category_value] = useState('');
-  const [dkd_address_value, dkd_set_address_value] = useState('');
-  const [dkd_note_value, dkd_set_note_value] = useState('');
-  const [dkd_schedule_value, dkd_set_schedule_value] = useState('');
-  const [dkd_budget_value, dkd_set_budget_value] = useState('');
-  const [dkd_contact_value, dkd_set_contact_value] = useState('');
-  const [dkd_rows_value, dkd_set_rows_value] = useState([]);
-  const [dkd_loading_value, dkd_set_loading_value] = useState(false);
-  const [dkd_busy_value, dkd_set_busy_value] = useState(false);
-
-  const dkd_can_submit_value = Boolean(dkd_selected_group_value && dkd_selected_category_value && dkd_address_value.trim().length >= 6 && dkd_note_value.trim().length >= 3);
-  const dkd_group_title_value = useMemo(() => dkd_selected_group_value?.dkd_title_value || 'Kategori seç', [dkd_selected_group_value]);
-
-  const dkd_load_value = useCallback(async () => {
-    dkd_set_loading_value(true);
-    const dkd_result_value = await dkd_fetch_service_network_my_orders_value(40);
-    if (!dkd_result_value?.error) dkd_set_rows_value(dkd_result_value.data || []);
-    dkd_set_loading_value(false);
-  }, []);
+export default function DkdServiceNetworkModal({ dkd_visible_value, dkd_on_close_value, dkd_current_location_value }) {
+  const [dkd_tab_value, dkd_set_tab_value] = useState('create');
+  const dkd_entry_value = useRef(new Animated.Value(0)).current;
+  const dkd_float_value = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    if (dkd_visible_value) dkd_load_value();
-  }, [dkd_visible_value, dkd_load_value]);
+    if (!dkd_visible_value) { dkd_entry_value.setValue(0); return undefined; }
+    Animated.timing(dkd_entry_value, { toValue: 1, duration: 420, useNativeDriver: true }).start();
+    const dkd_loop_value = Animated.loop(Animated.sequence([
+      Animated.timing(dkd_float_value, { toValue: 1, duration: 2200, useNativeDriver: true }),
+      Animated.timing(dkd_float_value, { toValue: 0, duration: 2200, useNativeDriver: true }),
+    ]));
+    dkd_loop_value.start();
+    return () => dkd_loop_value.stop();
+  }, [dkd_visible_value, dkd_entry_value, dkd_float_value]);
 
-  const dkd_submit_value = useCallback(async () => {
-    if (!dkd_can_submit_value || dkd_busy_value) return;
-    dkd_set_busy_value(true);
-    try {
-      const dkd_result_value = await dkd_create_service_network_request_value({
-        dkd_group_key: dkd_selected_group_value.dkd_key_value,
-        dkd_group_title: dkd_selected_group_value.dkd_title_value,
-        dkd_category_key: dkd_slug_value(dkd_selected_category_value),
-        dkd_category_title: dkd_selected_category_value,
-        dkd_address_text: dkd_address_value,
-        dkd_delivery_text: dkd_address_value,
-        dkd_note_text: dkd_note_value,
-        dkd_schedule_text: dkd_schedule_value,
-        dkd_budget_text: dkd_budget_value,
-        dkd_contact_text: dkd_contact_value,
-        dkd_lat: dkd_current_location_value?.lat,
-        dkd_lng: dkd_current_location_value?.lng,
-      });
-      if (dkd_result_value?.error) throw dkd_result_value.error;
-      dkd_set_note_value('');
-      dkd_set_schedule_value('');
-      dkd_set_budget_value('');
-      Alert.alert('Hizmet Ağı', 'Talebin oluşturuldu ve görev akışına gönderildi.');
-      await dkd_load_value();
-    } catch (dkd_error_value) {
-      Alert.alert('Hizmet Ağı', dkd_error_value?.message || 'Talep oluşturulamadı.');
-    } finally {
-      dkd_set_busy_value(false);
-    }
-  }, [dkd_address_value, dkd_budget_value, dkd_busy_value, dkd_can_submit_value, dkd_contact_value, dkd_current_location_value?.lat, dkd_current_location_value?.lng, dkd_load_value, dkd_note_value, dkd_schedule_value, dkd_selected_category_value, dkd_selected_group_value]);
-
-  const dkd_delete_value = useCallback(async (dkd_row_value) => {
-    const dkd_status_value = dkd_text_value(dkd_row_value?.dkd_status).toLowerCase();
-    if (!dkd_terminal_status_values.has(dkd_status_value)) return;
-    const dkd_result_value = await dkd_delete_completed_service_network_order_value({
-      dkd_source_type: dkd_row_value?.dkd_source_type,
-      dkd_source_id: dkd_row_value?.dkd_source_id,
-    });
-    if (dkd_result_value?.error) Alert.alert('Hizmet Ağı', dkd_result_value.error.message || 'Kayıt silinemedi.');
-    else dkd_load_value();
-  }, [dkd_load_value]);
+  const dkd_translate_value = dkd_entry_value.interpolate({ inputRange: [0, 1], outputRange: [22, 0] });
+  const dkd_orb_translate_value = dkd_float_value.interpolate({ inputRange: [0, 1], outputRange: [0, -10] });
 
   return (
-    <Modal visible={Boolean(dkd_visible_value)} animationType="slide" onRequestClose={dkd_on_close_value}>
+    <Modal visible={Boolean(dkd_visible_value)} animationType="fade" onRequestClose={dkd_on_close_value}>
       <StatusBar barStyle="light-content" />
-      <SafeScreen style={dkd_styles_value.screen}>
-        <LinearGradient colors={['#030914', '#071D2F', '#151035']} style={dkd_styles_value.screen}>
-          <View style={dkd_styles_value.header}>
-            <View style={{ flex: 1 }}>
-              <Text style={dkd_styles_value.kicker}>DKD ŞEHİR SERVİSLERİ</Text>
-              <Text style={dkd_styles_value.title}>Hizmet Ağı</Text>
-              <Text style={dkd_styles_value.sub}>Şehir içi hizmet ve özel teslimat talebini tek merkezden oluştur.</Text>
-            </View>
-            <Pressable onPress={dkd_on_close_value} style={dkd_styles_value.close}><MaterialCommunityIcons name="close" size={22} color="#FFF" /></Pressable>
-          </View>
-
-          <ScrollView contentContainerStyle={dkd_styles_value.content} keyboardShouldPersistTaps="handled">
-            <Text style={dkd_styles_value.section}>HİZMET GRUPLARI</Text>
-            <View style={dkd_styles_value.grid}>
-              {dkd_service_network_category_groups_value.map((dkd_group_value) => (
-                <Pressable key={dkd_group_value.dkd_key_value} onPress={() => { dkd_set_selected_group_value(dkd_group_value); dkd_set_selected_category_value(''); }} style={[dkd_styles_value.group, dkd_selected_group_value?.dkd_key_value === dkd_group_value.dkd_key_value && dkd_styles_value.groupActive]}>
-                  <MaterialCommunityIcons name={dkd_group_value.dkd_icon_value} size={24} color="#7EEBFF" />
-                  <Text style={dkd_styles_value.groupTitle}>{dkd_group_value.dkd_title_value}</Text>
-                </Pressable>
-              ))}
-            </View>
-
-            {dkd_selected_group_value ? (
-              <View style={dkd_styles_value.card}>
-                <Text style={dkd_styles_value.cardTitle}>{dkd_group_title_value}</Text>
-                <View style={dkd_styles_value.chips}>
-                  {dkd_selected_group_value.dkd_categories_value.map((dkd_category_value) => (
-                    <Pressable key={dkd_category_value} onPress={() => dkd_set_selected_category_value(dkd_category_value)} style={[dkd_styles_value.chip, dkd_selected_category_value === dkd_category_value && dkd_styles_value.chipActive]}>
-                      <Text style={[dkd_styles_value.chipText, dkd_selected_category_value === dkd_category_value && { color: '#031019' }]}>{dkd_category_value}</Text>
-                    </Pressable>
-                  ))}
-                </View>
-                <TextInput value={dkd_address_value} onChangeText={dkd_set_address_value} placeholder="Hizmet / alım adresi" placeholderTextColor="rgba(230,240,255,.42)" style={dkd_styles_value.input} />
-                <TextInput value={dkd_note_value} onChangeText={dkd_set_note_value} placeholder="Talep detayı" placeholderTextColor="rgba(230,240,255,.42)" multiline style={[dkd_styles_value.input, { minHeight: 90, textAlignVertical: 'top' }]} />
-                <TextInput value={dkd_schedule_value} onChangeText={dkd_set_schedule_value} placeholder="Zaman / randevu (opsiyonel)" placeholderTextColor="rgba(230,240,255,.42)" style={dkd_styles_value.input} />
-                <TextInput value={dkd_budget_value} onChangeText={dkd_set_budget_value} placeholder="Bütçe (opsiyonel)" placeholderTextColor="rgba(230,240,255,.42)" style={dkd_styles_value.input} />
-                <TextInput value={dkd_contact_value} onChangeText={dkd_set_contact_value} placeholder="İletişim notu (opsiyonel)" placeholderTextColor="rgba(230,240,255,.42)" style={dkd_styles_value.input} />
-                <Pressable disabled={!dkd_can_submit_value || dkd_busy_value} onPress={dkd_submit_value} style={[dkd_styles_value.submit, (!dkd_can_submit_value || dkd_busy_value) && { opacity: 0.45 }]}>
-                  {dkd_busy_value ? <ActivityIndicator color="#031019" /> : <><MaterialCommunityIcons name="send" size={19} color="#031019" /><Text style={dkd_styles_value.submitText}>Talebi Oluştur</Text></>}
-                </Pressable>
+      <SafeScreen style={styles.screen}>
+        <LinearGradient colors={['#020611', '#07182A', '#171033', '#080714']} style={styles.screen}>
+          <Animated.View pointerEvents="none" style={[styles.orbOne, { transform: [{ translateY: dkd_orb_translate_value }] }]} />
+          <Animated.View pointerEvents="none" style={[styles.orbTwo, { transform: [{ translateY: Animated.multiply(dkd_orb_translate_value, -0.8) }] }]} />
+          <Animated.View style={[styles.page, { opacity: dkd_entry_value, transform: [{ translateY: dkd_translate_value }] }]}> 
+            <View style={styles.header}>
+              <View style={styles.headerIcon}><MaterialCommunityIcons name="city-variant-outline" size={29} color="#05111B" /></View>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.kicker}>DRABORNGO ŞEHİR AĞI</Text>
+                <Text style={styles.title}>Hizmet Ağı</Text>
+                <Text style={styles.sub}>Gönderini oluştur, kurye siparişlerini tek merkezde takip et ve canlı teslimat akışını yönet.</Text>
               </View>
-            ) : null}
-
-            <View style={dkd_styles_value.row}>
-              <Text style={dkd_styles_value.section}>TALEPLERİM</Text>
-              {dkd_on_profile_press_value ? <Pressable onPress={dkd_on_profile_press_value}><Text style={dkd_styles_value.link}>Profil</Text></Pressable> : null}
+              <Pressable onPress={dkd_on_close_value} style={styles.close}><MaterialCommunityIcons name="close" size={24} color="#FFF" /></Pressable>
             </View>
-            {dkd_loading_value ? <ActivityIndicator color="#7EEBFF" style={{ marginTop: 18 }} /> : dkd_rows_value.length ? dkd_rows_value.map((dkd_row_value) => {
-              const dkd_terminal_value = dkd_terminal_status_values.has(dkd_text_value(dkd_row_value?.dkd_status).toLowerCase());
-              return (
-                <View key={dkd_row_value.dkd_order_key || dkd_row_value.dkd_source_id} style={dkd_styles_value.order}>
-                  <View style={{ flex: 1 }}>
-                    <Text style={dkd_styles_value.orderTitle}>{dkd_row_value.dkd_title || 'Hizmet Talebi'}</Text>
-                    <Text style={dkd_styles_value.orderSub}>{dkd_row_value.dkd_status || 'pending'} • {dkd_row_value.dkd_address_text || 'Adres bekleniyor'}</Text>
-                  </View>
-                  {dkd_terminal_value ? <Pressable onPress={() => dkd_delete_value(dkd_row_value)} style={dkd_styles_value.delete}><MaterialCommunityIcons name="delete-outline" size={19} color="#FFD7E0" /></Pressable> : null}
+
+            <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
+              <LinearGradient colors={['rgba(26,126,154,.28)', 'rgba(83,72,181,.23)', 'rgba(117,47,124,.18)']} style={styles.hero}>
+                <View style={styles.heroLineOne} />
+                <View style={styles.heroLineTwo} />
+                <View style={styles.heroTop}><View><Text style={styles.heroKicker}>GÖNDERİ OPERASYON MERKEZİ</Text><Text style={styles.heroTitle}>Paketini gönder. Siparişini izle.</Text></View><View style={styles.livePill}><View style={styles.liveDot} /><Text style={styles.liveText}>CANLI</Text></View></View>
+                <Text style={styles.heroText}>Eski şehir hizmet kategorileri kaldırıldı. Hizmet Ağı artık yalnızca gönderi oluşturma ve kullanıcı siparişlerini takip etme merkezidir.</Text>
+                <View style={styles.routeStrip}><View style={styles.routeNode}><MaterialCommunityIcons name="account-arrow-right-outline" size={19} color="#83E9FF" /></View><View style={styles.routeDash} /><View style={styles.routeBike}><MaterialCommunityIcons name="motorbike" size={20} color="#FFF" /></View><View style={styles.routeDash} /><View style={styles.routeNode}><MaterialCommunityIcons name="map-marker-check-outline" size={19} color="#7DF0B6" /></View></View>
+              </LinearGradient>
+
+              <Text style={styles.sectionKicker}>HIZLI MERKEZLER</Text>
+              <View style={styles.tabGrid}>
+                <DkdHubTab dkd_active_value={dkd_tab_value === 'create'} dkd_icon_value="cube-send" dkd_title_value="Gönderi Oluştur" dkd_sub_value="Gönderici, paket ve teslimat bilgilerini gir. Kurye havuzuna anında gönder." dkd_badge_value="YENİ" dkd_colors_value={['#075C70', '#16508C', '#49348F']} dkd_on_press_value={() => dkd_set_tab_value('create')} />
+                <DkdHubTab dkd_active_value={dkd_tab_value === 'orders'} dkd_icon_value="clipboard-text-clock-outline" dkd_title_value="Siparişlerim" dkd_sub_value="Bekleyen, aktif ve tamamlanan gönderilerini canlı durumlarıyla görüntüle." dkd_badge_value="CANLI" dkd_colors_value={['#096853', '#2C5A70', '#66345F']} dkd_on_press_value={() => dkd_set_tab_value('orders')} />
+              </View>
+
+              <View style={styles.panelShell}>
+                <View style={styles.panelHeader}>
+                  <View style={[styles.panelHeaderIcon, { backgroundColor: dkd_tab_value === 'create' ? 'rgba(91,221,255,.14)' : 'rgba(94,236,178,.14)' }]}><MaterialCommunityIcons name={dkd_tab_value === 'create' ? 'package-variant-plus' : 'clipboard-list-outline'} size={22} color={dkd_tab_value === 'create' ? '#83E9FF' : '#7DF0B6'} /></View>
+                  <View style={{ flex: 1 }}><Text style={styles.panelTitle}>{dkd_tab_value === 'create' ? 'Yeni Gönderi' : 'Siparişlerim'}</Text><Text style={styles.panelSub}>{dkd_tab_value === 'create' ? 'Sipariş bilgilerini tamamla ve uygun kuryelere yayınla.' : 'Gönderi siparişlerin otomatik olarak burada güncellenir.'}</Text></View>
                 </View>
-              );
-            }) : <View style={dkd_styles_value.empty}><Text style={dkd_styles_value.emptyTitle}>Aktif talep yok</Text><Text style={dkd_styles_value.emptyText}>Yeni talebin burada görünecek.</Text></View>}
-          </ScrollView>
+                <DkdCargoSenderPanelValue
+                  dkd_visible_value={Boolean(dkd_visible_value)}
+                  dkd_panel_mode_value={dkd_tab_value === 'create' ? 'create_only' : 'shipments_only'}
+                  dkd_current_location_value={dkd_current_location_value}
+                  dkd_on_created_value={() => dkd_set_tab_value('orders')}
+                  dkd_on_home_return_value={() => dkd_set_tab_value('orders')}
+                />
+              </View>
+
+              <View style={styles.securityStrip}><View style={styles.securityIcon}><MaterialCommunityIcons name="shield-check-outline" size={21} color="#7DF0B6" /></View><View style={{ flex: 1 }}><Text style={styles.securityTitle}>Gönderi akışı tek yerde</Text><Text style={styles.securityText}>Sipariş oluşturma, kurye ataması, canlı takip ve teslimat durumu aynı Hizmet Ağı merkezi üzerinden yönetilir.</Text></View></View>
+            </ScrollView>
+          </Animated.View>
         </LinearGradient>
       </SafeScreen>
     </Modal>
   );
 }
 
-const dkd_styles_value = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: '#030914' },
-  header: { padding: 18, flexDirection: 'row', gap: 12, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,.1)' },
-  kicker: { color: '#7EEBFF', fontSize: 10, fontWeight: '900', letterSpacing: 1.2 },
-  title: { color: '#FFF', fontSize: 30, fontWeight: '900', marginTop: 4 },
-  sub: { color: 'rgba(231,241,255,.68)', fontSize: 13, lineHeight: 19, marginTop: 5 },
-  close: { width: 44, height: 44, borderRadius: 16, backgroundColor: 'rgba(255,255,255,.08)', alignItems: 'center', justifyContent: 'center' },
-  content: { padding: 16, paddingBottom: 50 },
-  section: { color: '#A9EEFF', fontSize: 10, fontWeight: '900', letterSpacing: 1.2, marginTop: 10, marginBottom: 10 },
-  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
-  group: { width: '48%', minHeight: 92, borderRadius: 22, padding: 14, backgroundColor: 'rgba(255,255,255,.055)', borderWidth: 1, borderColor: 'rgba(255,255,255,.1)' },
-  groupActive: { borderColor: 'rgba(126,235,255,.55)', backgroundColor: 'rgba(28,105,150,.25)' },
-  groupTitle: { color: '#FFF', fontSize: 14, fontWeight: '900', marginTop: 9 },
-  card: { marginTop: 16, borderRadius: 26, padding: 16, backgroundColor: 'rgba(8,24,48,.88)', borderWidth: 1, borderColor: 'rgba(126,235,255,.16)' },
-  cardTitle: { color: '#FFF', fontSize: 21, fontWeight: '900' },
-  chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginVertical: 12 },
-  chip: { borderRadius: 999, paddingHorizontal: 11, paddingVertical: 8, backgroundColor: 'rgba(255,255,255,.07)', borderWidth: 1, borderColor: 'rgba(255,255,255,.12)' },
-  chipActive: { backgroundColor: '#7EEBFF' },
-  chipText: { color: '#FFF', fontSize: 11, fontWeight: '800' },
-  input: { marginTop: 9, minHeight: 50, borderRadius: 16, paddingHorizontal: 13, paddingVertical: 12, color: '#FFF', backgroundColor: 'rgba(255,255,255,.055)', borderWidth: 1, borderColor: 'rgba(255,255,255,.10)' },
-  submit: { marginTop: 14, minHeight: 56, borderRadius: 18, backgroundColor: '#7EEBFF', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 },
-  submitText: { color: '#031019', fontSize: 14, fontWeight: '900' },
-  row: { marginTop: 18, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  link: { color: '#7EEBFF', fontSize: 12, fontWeight: '900' },
-  order: { marginTop: 9, borderRadius: 20, padding: 14, backgroundColor: 'rgba(255,255,255,.05)', borderWidth: 1, borderColor: 'rgba(255,255,255,.10)', flexDirection: 'row', alignItems: 'center', gap: 9 },
-  orderTitle: { color: '#FFF', fontSize: 15, fontWeight: '900' },
-  orderSub: { color: 'rgba(231,241,255,.62)', fontSize: 11, marginTop: 4 },
-  delete: { width: 40, height: 40, borderRadius: 14, backgroundColor: 'rgba(255,100,120,.1)', alignItems: 'center', justifyContent: 'center' },
-  empty: { marginTop: 9, borderRadius: 20, padding: 18, backgroundColor: 'rgba(255,255,255,.04)' },
-  emptyTitle: { color: '#FFF', fontSize: 16, fontWeight: '900' },
-  emptyText: { color: 'rgba(231,241,255,.58)', fontSize: 12, marginTop: 4 },
+const styles = StyleSheet.create({
+  screen: { flex: 1, backgroundColor: '#020611' },
+  page: { flex: 1 },
+  orbOne: { position: 'absolute', width: 320, height: 320, borderRadius: 999, right: -190, top: 70, backgroundColor: 'rgba(47,119,255,.12)' },
+  orbTwo: { position: 'absolute', width: 350, height: 350, borderRadius: 999, left: -220, top: 600, backgroundColor: 'rgba(166,66,255,.10)' },
+  header: { minHeight: 112, paddingHorizontal: 16, paddingVertical: 14, flexDirection: 'row', alignItems: 'center', gap: 12, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,.08)' },
+  headerIcon: { width: 58, height: 58, borderRadius: 20, backgroundColor: '#83E9FF', alignItems: 'center', justifyContent: 'center' },
+  kicker: { color: '#83E9FF', fontSize: 9, fontWeight: '900', letterSpacing: 1.4 },
+  title: { color: '#FFF', fontSize: 29, fontWeight: '900', marginTop: 2 },
+  sub: { color: 'rgba(232,242,255,.62)', fontSize: 10.5, lineHeight: 15, fontWeight: '700', marginTop: 3 },
+  close: { width: 46, height: 46, borderRadius: 17, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(255,255,255,.07)', borderWidth: 1, borderColor: 'rgba(255,255,255,.11)' },
+  content: { padding: 16, paddingBottom: 60 },
+  hero: { minHeight: 205, borderRadius: 29, padding: 17, overflow: 'hidden', borderWidth: 1, borderColor: 'rgba(126,235,255,.16)' },
+  heroLineOne: { position: 'absolute', width: 260, height: 1, right: -50, top: 85, backgroundColor: 'rgba(255,255,255,.12)', transform: [{ rotate: '-22deg' }] },
+  heroLineTwo: { position: 'absolute', width: 260, height: 1, right: -25, top: 126, backgroundColor: 'rgba(255,255,255,.07)', transform: [{ rotate: '-22deg' }] },
+  heroTop: { flexDirection: 'row', justifyContent: 'space-between', gap: 10 },
+  heroKicker: { color: '#A9EEFF', fontSize: 8.5, fontWeight: '900', letterSpacing: 1.2 },
+  heroTitle: { color: '#FFF', fontSize: 23, fontWeight: '900', marginTop: 4, maxWidth: 250 },
+  heroText: { color: 'rgba(235,245,255,.66)', fontSize: 11, lineHeight: 17, fontWeight: '700', marginTop: 9, maxWidth: 330 },
+  livePill: { height: 31, paddingHorizontal: 10, borderRadius: 999, flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: 'rgba(76,230,173,.12)', borderWidth: 1, borderColor: 'rgba(76,230,173,.22)' },
+  liveDot: { width: 7, height: 7, borderRadius: 99, backgroundColor: '#55E6AC' },
+  liveText: { color: '#A7F4D4', fontSize: 8, fontWeight: '900' },
+  routeStrip: { minHeight: 48, borderRadius: 16, backgroundColor: 'rgba(2,8,18,.26)', flexDirection: 'row', alignItems: 'center', paddingHorizontal: 10, marginTop: 15, borderWidth: 1, borderColor: 'rgba(255,255,255,.07)' },
+  routeNode: { width: 34, height: 34, borderRadius: 12, backgroundColor: 'rgba(255,255,255,.08)', alignItems: 'center', justifyContent: 'center' },
+  routeBike: { width: 38, height: 34, borderRadius: 12, backgroundColor: 'rgba(126,235,255,.10)', alignItems: 'center', justifyContent: 'center' },
+  routeDash: { flex: 1, height: 2, marginHorizontal: 8, backgroundColor: 'rgba(174,231,255,.22)' },
+  sectionKicker: { color: '#A9EEFF', fontSize: 10, fontWeight: '900', letterSpacing: 1.3, marginTop: 22, marginBottom: 10 },
+  tabGrid: { gap: 11 },
+  tabPressable: { borderRadius: 25 },
+  tabCard: { minHeight: 165, borderRadius: 25, padding: 15, borderWidth: 1, borderColor: 'rgba(255,255,255,.10)', overflow: 'hidden' },
+  tabCardActive: { borderColor: 'rgba(145,237,255,.48)' },
+  tabTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  tabIcon: { width: 48, height: 48, borderRadius: 17, backgroundColor: 'rgba(255,255,255,.12)', alignItems: 'center', justifyContent: 'center' },
+  tabBadge: { minHeight: 28, borderRadius: 999, paddingHorizontal: 9, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(3,10,20,.28)', borderWidth: 1, borderColor: 'rgba(255,255,255,.13)' },
+  tabBadgeText: { color: '#FFF', fontSize: 8, fontWeight: '900' },
+  tabTitle: { color: '#FFF', fontSize: 20, fontWeight: '900', marginTop: 11 },
+  tabSub: { color: 'rgba(239,247,255,.65)', fontSize: 10.5, lineHeight: 16, fontWeight: '700', marginTop: 4 },
+  tabFooter: { marginTop: 12, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  tabFooterText: { color: '#DFFAFF', fontSize: 9, fontWeight: '900', letterSpacing: .8 },
+  panelShell: { marginTop: 16, borderRadius: 29, padding: 12, backgroundColor: 'rgba(6,19,38,.82)', borderWidth: 1, borderColor: 'rgba(126,235,255,.11)' },
+  panelHeader: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 7, paddingHorizontal: 2 },
+  panelHeaderIcon: { width: 44, height: 44, borderRadius: 15, alignItems: 'center', justifyContent: 'center' },
+  panelTitle: { color: '#FFF', fontSize: 16, fontWeight: '900' },
+  panelSub: { color: 'rgba(232,242,255,.58)', fontSize: 10, lineHeight: 14, marginTop: 2 },
+  securityStrip: { marginTop: 16, minHeight: 82, borderRadius: 22, backgroundColor: 'rgba(11,55,52,.35)', borderWidth: 1, borderColor: 'rgba(91,232,177,.16)', flexDirection: 'row', alignItems: 'center', gap: 11, padding: 13 },
+  securityIcon: { width: 45, height: 45, borderRadius: 16, backgroundColor: 'rgba(91,232,177,.10)', alignItems: 'center', justifyContent: 'center' },
+  securityTitle: { color: '#E2FFF3', fontSize: 13, fontWeight: '900' },
+  securityText: { color: 'rgba(226,255,244,.62)', fontSize: 10, lineHeight: 15, marginTop: 3 },
 });
