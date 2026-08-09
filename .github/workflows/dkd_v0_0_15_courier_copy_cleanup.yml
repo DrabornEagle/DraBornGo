@@ -34,9 +34,7 @@ jobs:
               if (!s.includes(from)) throw new Error(`${path}: missing expected text for ${label || from}`);
               s = s.split(from).join(to);
             }
-            for (const [from, to] of optionalReplacements) {
-              s = s.split(from).join(to);
-            }
+            for (const [from, to] of optionalReplacements) s = s.split(from).join(to);
             fs.writeFileSync(path, s);
           }
 
@@ -65,9 +63,7 @@ jobs:
             ['Harita, sipariş havuzu, hizmet ağı ve ödül merkezi ana sayfa yüklenene kadar senkronlanıyor.', 'Görev havuzu, aktif teslimatlar, canlı rota ve kazanç özeti ana sayfa yüklenene kadar hazırlanıyor.', 'loading subtitle'],
           ]);
 
-          edit('src/features/onboarding/dkd_pre_login_intro_screen.js', [
-            ["dkd_badge_text: 'KURYE LİSANSI'", "dkd_badge_text: 'KURYE ONAYI'", 'onboarding courier approval'],
-          ]);
+          edit('src/features/onboarding/dkd_pre_login_intro_screen.js', [["dkd_badge_text: 'KURYE LİSANSI'", "dkd_badge_text: 'KURYE ONAYI'", 'onboarding courier approval']]);
 
           edit('src/features/applications/dkd_applications_hub_modal.js', [
             ['DKD ONAY MERKEZİ', 'DBG KURYE ONAY MERKEZİ', 'approval center brand'],
@@ -80,7 +76,7 @@ jobs:
           edit('src/features/map/MapHomeScreen.js', [
             ["dkd_label_value: 'LİSANS GEREKLİ'", "dkd_label_value: 'KURYE ONAYI GEREKLİ'", 'home approval status'],
             ["dkd_subtitle_value: 'Kurye kimliğini oluştur, lisans onayından sonra canlı görev ağına katıl.'", "dkd_subtitle_value: 'Kurye başvurunu tamamla; onaylandıktan sonra canlı görev havuzuna katıl.'", 'home approval subtitle'],
-            ["dkd_label_value: 'SİPARİŞ'", "dkd_label_value: 'GÖREV'", 'home task metric'],
+            ["dkd_label_value=\"SİPARİŞ\"", "dkd_label_value=\"GÖREV\"", 'home task metric'],
             ['CANLI SİPARİŞ ROTASI', 'CANLI GÖREV ROTASI', 'home live route'],
             ['Sipariş Havuzu', 'Görev Havuzu', 'home route step'],
             ['Kurye Ataması', 'Görevi Kabul Et', 'home route step accept'],
@@ -101,7 +97,6 @@ jobs:
             ["'LİSANS DURUMU'", "'ONAY DURUMU'", 'courier status kicker'],
             ["'Kurye Lisansı Gerekli'", "'Kurye Onayı Gerekli'", 'courier status title'],
           ], [
-            ['Aktif Teslimatta • Kurye Ağına Bağlı', 'Aktif Teslimatta • Kurye Ağına Bağlı'],
             ['Çevrimiçi • Sipariş Radarı Açık', 'Çevrimiçi • Görev Radarı Açık'],
             ['Üzerindeki sipariş tamamlanana kadar kurye operasyon durumu aktif kalır.', 'Üzerindeki görev tamamlanana kadar kurye operasyon durumu aktif kalır.'],
             ['Bölgen için uygun yeni siparişler canlı taranıyor.', 'Bölgen için uygun yeni görevler canlı taranıyor.'],
@@ -131,9 +126,7 @@ jobs:
             ["description='Kurye lisansın aktif.'", "description='Kurye onayın aktif.'", 'courier meta description'],
           ]);
 
-          edit('src/core/GameFlow.js', [
-            ['Çevrimiçi mod için kurye lisansının onaylanmış olması gerekiyor.', 'Çevrimiçi mod için kurye başvurunun onaylanmış olması gerekiyor.', 'online approval alert'],
-          ]);
+          edit('src/core/GameFlow.js', [['Çevrimiçi mod için kurye lisansının onaylanmış olması gerekiyor.', 'Çevrimiçi mod için kurye başvurunun onaylanmış olması gerekiyor.', 'online approval alert']]);
 
           edit('src/features/navigation/ActionMenuModal.js', [
             ["dkd_label_value: 'Kurye Operasyon Merkezi', dkd_sub_value: 'Teslimat, çevrimiçi durum ve aktif kurye araçları.'", "dkd_label_value: 'Kurye Operasyon Merkezi', dkd_sub_value: 'Görev havuzu, aktif teslimat, canlı rota ve kazanç akışını tek merkezden yönet.'", 'menu operation info'],
@@ -145,9 +138,7 @@ jobs:
             ['Kurye lisans başvurularını incele.', 'Kurye onay başvurularını incele.', 'admin courier approval'],
           ]);
 
-          edit('src/features/admin/dkd_admin_applications_modal.js', [
-            ['Kurye lisansı ve hesap silme taleplerini yönet.', 'Kurye onay başvuruları ve hesap silme taleplerini yönet.', 'admin applications subtitle'],
-          ]);
+          edit('src/features/admin/dkd_admin_applications_modal.js', [['Kurye lisansı ve hesap silme taleplerini yönet.', 'Kurye onay başvuruları ve hesap silme taleplerini yönet.', 'admin applications subtitle']]);
 
           edit('src/features/legal/dkd_google_play_policy_center_modal.js', [
             ['kurye başvurusu ve lisans durumu', 'kurye başvurusu ve onay durumu', 'policy data safety'],
@@ -207,3 +198,5 @@ jobs:
           git add -A
           git commit -m 'ui: align login loading and courier copy with courier-only scope'
           git push
+
+# trigger: 2026-08-09T23:57+03:00
