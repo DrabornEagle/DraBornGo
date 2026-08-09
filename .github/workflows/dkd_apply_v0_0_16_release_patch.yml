@@ -1,0 +1,198 @@
+name: DKD Apply v0.0.16 Release Patch
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/dkd_apply_v0_0_16_release_patch.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  dkd_apply_release_patch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      CI: '1'
+      EXPO_NO_TELEMETRY: '1'
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Apply requested UI and Android system navigation changes
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+
+          def replace_required(path, old, new, label):
+              p = Path(path)
+              text = p.read_text()
+              if old not in text:
+                  raise SystemExit(f'DKD ERROR: pattern missing for {label} in {path}')
+              p.write_text(text.replace(old, new))
+
+          # Ana Sayfa: Hızlı Erişim alanında Destek kartını kaldır; Profil + Tüm Menü kalsın.
+          home = Path('src/features/map/MapHomeScreen.js')
+          home_text = home.read_text()
+          support_line = '            <DkdQuickTile dkd_icon_value="headset" dkd_title_value="Destek" dkd_subtitle_value="DrabornEagle admin canlı destek" dkd_accent_value="#A33D80" dkd_on_press_value={() => onTabChange?.(\'support\')} />\n'
+          if support_line not in home_text:
+              raise SystemExit('DKD ERROR: quick support tile pattern missing')
+          home.write_text(home_text.replace(support_line, ''))
+
+          # Merkez Menü: eski görünür sürümü düzelt, eski başvuru ifadesini kaldır.
+          replace_required('src/features/navigation/ActionMenuModal.js', 'DraBornGo v0.0.15', 'DraBornGo v0.0.16', 'center menu version')
+          replace_required('src/features/navigation/ActionMenuModal.js', 'Kullanıcı, kurye, başvuru ve destek operasyonlarını yönet.', 'Kullanıcı, kurye, destek ve operasyon araçlarını yönet.', 'admin menu retired application wording')
+
+          # Kurye Ağ Durumu kartındaki metinleri okunaklı biçimde büyüt.
+          board = Path('src/features/courier/dkd_courier_board_modal_v2.js')
+          board_text = board.read_text()
+          replacements = {
+              "dkd_status_hero: { minHeight: 272,": "dkd_status_hero: { minHeight: 300,",
+              "dkd_status_kicker: { color: 'rgba(226,245,255,.62)', fontSize: 8.5, fontWeight: '900', letterSpacing: 1.1 },": "dkd_status_kicker: { color: 'rgba(226,245,255,.72)', fontSize: 11, fontWeight: '900', letterSpacing: 1.2 },",
+              "dkd_status_title: { color: '#FFFFFF', fontSize: 17, lineHeight: 21, fontWeight: '900', marginTop: 3 },": "dkd_status_title: { color: '#FFFFFF', fontSize: 21, lineHeight: 26, fontWeight: '900', marginTop: 4 },",
+              "dkd_status_sub: { color: 'rgba(235,245,255,.64)', fontSize: 10, lineHeight: 15, fontWeight: '700', marginTop: 4 },": "dkd_status_sub: { color: 'rgba(235,245,255,.72)', fontSize: 12.5, lineHeight: 18, fontWeight: '700', marginTop: 5 },",
+              "dkd_metric: { flex: 1, minHeight: 64,": "dkd_metric: { flex: 1, minHeight: 72,",
+              "dkd_metric_label: { color: 'rgba(229,243,255,.45)', fontSize: 7.5, fontWeight: '900', letterSpacing: .7 },": "dkd_metric_label: { color: 'rgba(229,243,255,.58)', fontSize: 9.5, fontWeight: '900', letterSpacing: .75 },",
+              "dkd_metric_value: { color: '#FFFFFF', fontSize: 12, fontWeight: '900', marginTop: 7 },": "dkd_metric_value: { color: '#FFFFFF', fontSize: 15, fontWeight: '900', marginTop: 6 },",
+              "dkd_status_button: { minHeight: 55,": "dkd_status_button: { minHeight: 58,",
+              "dkd_status_button_text: { color: '#06111B', fontSize: 12, fontWeight: '900' },": "dkd_status_button_text: { color: '#06111B', fontSize: 14, fontWeight: '900' },",
+          }
+          for old, new in replacements.items():
+              if old not in board_text:
+                  raise SystemExit(f'DKD ERROR: courier network style pattern missing: {old[:60]}')
+              board_text = board_text.replace(old, new)
+          board.write_text(board_text)
+
+          # Expo NavigationBar: Android edge-to-edge şeffaf navigation alanı + açık renk sistem butonları.
+          package_path = Path('package.json')
+          package_data = json.loads(package_path.read_text())
+          package_data.setdefault('dependencies', {})['expo-navigation-bar'] = '~57.0.2'
+          package_path.write_text(json.dumps(package_data, ensure_ascii=False, indent=2) + '\n')
+
+          app_path = Path('app.json')
+          app_data = json.loads(app_path.read_text())
+          expo = app_data['expo']
+          expo['androidNavigationBar'] = {
+              'barStyle': 'light-content',
+              'enforceContrast': False
+          }
+          plugins = expo.setdefault('plugins', [])
+          plugins = [plugin for plugin in plugins if not (isinstance(plugin, list) and plugin and plugin[0] == 'expo-navigation-bar') and plugin != 'expo-navigation-bar']
+          plugins.append(['expo-navigation-bar', {'enforceContrast': False, 'style': 'dark'}])
+          expo['plugins'] = plugins
+          app_path.write_text(json.dumps(app_data, ensure_ascii=False, indent=2) + '\n')
+
+          app_js = Path('App.js')
+          app_js_text = app_js.read_text()
+          import_old = "import * as dkd_system_ui_module from 'expo-system-ui';\n"
+          import_new = import_old + "import { NavigationBar } from 'expo-navigation-bar';\n"
+          if "from 'expo-navigation-bar'" not in app_js_text:
+              if import_old not in app_js_text:
+                  raise SystemExit('DKD ERROR: App.js system-ui import pattern missing')
+              app_js_text = app_js_text.replace(import_old, import_new)
+          safe_old = "    <SafeAreaProvider>\n      <View style={{ flex: 1, backgroundColor: dkd_android_system_bar_background_value }}>"
+          safe_new = "    <SafeAreaProvider>\n      <NavigationBar style=\"dark\" />\n      <View style={{ flex: 1, backgroundColor: dkd_android_system_bar_background_value }}>"
+          if '<NavigationBar style="dark" />' not in app_js_text:
+              if safe_old not in app_js_text:
+                  raise SystemExit('DKD ERROR: App.js SafeAreaProvider pattern missing')
+              app_js_text = app_js_text.replace(safe_old, safe_new)
+          app_js.write_text(app_js_text)
+          PY
+
+      - name: Update release APK and AAB workflows for v0.0.16 code 3
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          workflows = [
+              (Path('.github/workflows/dkd_build_signed_apk.yml'), 'APK'),
+              (Path('.github/workflows/dkd_build_signed_aab.yml'), 'AAB'),
+          ]
+          for path, kind in workflows:
+              text = path.read_text()
+              old_name = f'name: DKD Build Signed {kind}'
+              new_name = f'name: DraBornGo Release {kind}'
+              if old_name not in text:
+                  raise SystemExit(f'DKD ERROR: old {kind} workflow name missing')
+              text = text.replace(old_name, new_name, 1)
+              old_trigger = "on:\n  workflow_dispatch:\n"
+              new_trigger = "on:\n  workflow_dispatch:\n  pull_request:\n    branches: [main]\n    paths:\n      - '.github/dkd_release_build_trigger/**'\n"
+              if old_trigger not in text:
+                  raise SystemExit(f'DKD ERROR: {kind} workflow trigger pattern missing')
+              text = text.replace(old_trigger, new_trigger, 1)
+              text = text.replace('DraBornGo-v0.0.6-code6-release.apk', 'DraBornGo-v0.0.16-code3-release.apk')
+              text = text.replace('DraBornGo-v0.0.6-code6-release.aab', 'DraBornGo-v0.0.16-code3-release.aab')
+              text = text.replace('DKD_DraBornGo_v0_0_6_code6_signed_apk', 'DraBornGo_Release_APK_v0_0_16_code3')
+              text = text.replace('DKD_DraBornGo_v0_0_6_code6_signed_aab', 'DraBornGo_Release_AAB_v0_0_16_code3')
+
+              anchor = "      - name: Dkd verify embedded runtime env\n"
+              identity_step = """      - name: Dkd verify DraBornGo v0.0.16 code 3 identity\n        shell: bash\n        run: |\n          node <<'DKD_NODE'\n          const dkd_app_value = require('./app.json').expo;\n          const dkd_package_value = require('./package.json');\n          if (dkd_app_value.version !== '0.0.16' || dkd_package_value.version !== '0.0.16') throw new Error('DKD ERROR: release version must be 0.0.16');\n          if (Number(dkd_app_value.android.versionCode) !== 3) throw new Error('DKD ERROR: Android versionCode must be 3');\n          if (dkd_app_value.android.package !== 'com.draborneagle.draborngo') throw new Error('DKD ERROR: Android package mismatch');\n          console.log('DKD release identity verified: DraBornGo v0.0.16 / Android code 3.');\n          DKD_NODE\n\n"""
+              if identity_step.strip() not in text:
+                  if anchor not in text:
+                      raise SystemExit(f'DKD ERROR: {kind} identity insertion anchor missing')
+                  text = text.replace(anchor, identity_step + anchor, 1)
+
+              if kind == 'APK':
+                  upload_anchor = "      - name: Dkd upload signed APK artifact\n"
+                  verify_step = """      - name: Dkd verify signed APK output\n        shell: bash\n        run: |\n          \"$ANDROID_SDK_ROOT/build-tools/36.0.0/apksigner\" verify --verbose dkd_signed_apk_output/DraBornGo-v0.0.16-code3-release.apk\n          sha256sum dkd_signed_apk_output/DraBornGo-v0.0.16-code3-release.apk\n\n"""
+              else:
+                  upload_anchor = "      - name: Dkd upload signed AAB artifact\n"
+                  verify_step = """      - name: Dkd verify signed AAB output\n        shell: bash\n        run: |\n          jarsigner -verify -strict dkd_signed_aab_output/DraBornGo-v0.0.16-code3-release.aab\n          sha256sum dkd_signed_aab_output/DraBornGo-v0.0.16-code3-release.aab\n\n"""
+              if verify_step.strip() not in text:
+                  if upload_anchor not in text:
+                      raise SystemExit(f'DKD ERROR: {kind} verify insertion anchor missing')
+                  text = text.replace(upload_anchor, verify_step + upload_anchor, 1)
+              path.write_text(text)
+          PY
+
+      - name: Synchronize package lock
+        run: npm install --package-lock-only --ignore-scripts
+
+      - name: Validate requested release state
+        shell: bash
+        run: |
+          node <<'DKD_NODE'
+          const fs = require('fs');
+          const app = require('./app.json').expo;
+          const pkg = require('./package.json');
+          if (app.version !== '0.0.16' || pkg.version !== '0.0.16' || Number(app.android.versionCode) !== 3) throw new Error('DKD release identity mismatch');
+          if (pkg.dependencies['expo-navigation-bar'] !== '~57.0.2') throw new Error('DKD navigation bar dependency missing');
+          const home = fs.readFileSync('src/features/map/MapHomeScreen.js','utf8');
+          const menu = fs.readFileSync('src/features/navigation/ActionMenuModal.js','utf8');
+          const board = fs.readFileSync('src/features/courier/dkd_courier_board_modal_v2.js','utf8');
+          if (home.includes('dkd_title_value="Destek"')) throw new Error('DKD quick access support tile still present');
+          if (!home.includes('dkd_title_value="Tüm Menü"')) throw new Error('DKD quick access menu tile missing');
+          if (menu.includes('DraBornGo v0.0.15')) throw new Error('DKD center menu old version remains');
+          if (!menu.includes('DraBornGo v0.0.16')) throw new Error('DKD center menu v0.0.16 missing');
+          if (!board.includes('fontSize: 21, lineHeight: 26')) throw new Error('DKD courier network text enlargement missing');
+          console.log('DKD v0.0.16 requested UI/release state verified.');
+          DKD_NODE
+          npx expo config --json > /tmp/dkd_expo_config.json
+          node <<'DKD_NODE'
+          const cfg = JSON.parse(require('fs').readFileSync('/tmp/dkd_expo_config.json','utf8'));
+          if (cfg.version !== '0.0.16' || Number(cfg.android.versionCode) !== 3) throw new Error('DKD resolved Expo identity mismatch');
+          console.log('DKD resolved Expo config verified.');
+          DKD_NODE
+          git diff --check
+
+      - name: Remove one-shot patch workflow and commit
+        shell: bash
+        run: |
+          rm -f .github/workflows/dkd_apply_v0_0_16_release_patch.yml
+          git config user.name "DraBornGo Release Bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add App.js app.json package.json package-lock.json src/features/map/MapHomeScreen.js src/features/navigation/ActionMenuModal.js src/features/courier/dkd_courier_board_modal_v2.js .github/workflows/dkd_build_signed_apk.yml .github/workflows/dkd_build_signed_aab.yml .github/workflows/dkd_apply_v0_0_16_release_patch.yml
+          git commit -m "release: finalize DraBornGo v0.0.16 code 3 UI and build workflows"
+          git pull --rebase origin main
+          git push origin HEAD:main
