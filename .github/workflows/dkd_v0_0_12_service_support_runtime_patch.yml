@@ -1,0 +1,95 @@
+name: DKD v0.0.12 Service Support Runtime Patch
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/dkd_v0_0_12_service_support_runtime_patch.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  dkd_patch_runtime:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Apply targeted runtime changes
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+
+          def replace_required(path, old, new, label):
+              p = Path(path)
+              text = p.read_text(encoding='utf-8')
+              if old not in text:
+                  raise SystemExit(f'Missing expected pattern for {label} in {path}')
+              p.write_text(text.replace(old, new, 1), encoding='utf-8')
+
+          # Courier center: shipment creation belongs to Hizmet Ağı, and approved couriers never see application shortcut.
+          p = Path('src/features/courier/CourierBoardModal.js')
+          text = p.read_text(encoding='utf-8')
+          text = text.replace("import DkdCargoSenderPanelValue from './dkd_cargo_sender_panel';\n", '')
+          text = text.replace("  if (['cargo', 'cargo_sender', 'sender', 'shipment'].includes(dkd_key_value)) return 'cargo';\n", '')
+          text = text.replace("  const dkd_title_value = dkd_panel_value === 'application' ? 'Kurye Başvurusu' : dkd_panel_value === 'cargo' ? 'Gönderi & Kargo' : 'Kurye Görevleri';", "  const dkd_title_value = dkd_panel_value === 'application' ? 'Kurye Başvurusu' : 'Kurye Görevleri';")
+          old_branch = '''          {dkd_panel_value === 'cargo' ? (\n            <View style={dkd_styles_value.panelBody}>\n              <DkdCargoSenderPanelValue dkd_visible_value dkd_panel_mode_value="embedded" dkd_current_location_value={currentLocation} dkd_on_created_value={() => dkd_load_jobs_value(true)} dkd_on_home_return_value={() => dkd_set_panel_value('jobs')} />\n            </View>\n          ) : dkd_panel_value === 'application' ? ('''
+          if old_branch not in text:
+              raise SystemExit('Missing courier cargo render branch')
+          text = text.replace(old_branch, "          {dkd_panel_value === 'application' ? (", 1)
+          old_shortcuts = '''              <View style={dkd_styles_value.shortcutRow}><Pressable onPress={() => dkd_set_panel_value('cargo')} style={dkd_styles_value.shortcut}><MaterialCommunityIcons name="package-variant-closed" size={20} color="#7EEBFF" /><Text style={dkd_styles_value.shortcutText}>Gönderi Oluştur</Text></Pressable><Pressable onPress={() => dkd_set_panel_value('application')} style={dkd_styles_value.shortcut}><MaterialCommunityIcons name="card-account-details-outline" size={20} color="#7EEBFF" /><Text style={dkd_styles_value.shortcutText}>Kurye Başvurusu</Text></Pressable></View>'''
+          new_shortcuts = '''              {!dkd_approved_flag ? <View style={dkd_styles_value.shortcutRow}><Pressable onPress={() => dkd_set_panel_value('application')} style={dkd_styles_value.shortcut}><MaterialCommunityIcons name="card-account-details-outline" size={20} color="#7EEBFF" /><Text style={dkd_styles_value.shortcutText}>Kurye Başvurusu</Text></Pressable></View> : null}'''
+          if old_shortcuts not in text:
+              raise SystemExit('Missing courier shortcut row')
+          text = text.replace(old_shortcuts, new_shortcuts, 1)
+          p.write_text(text, encoding='utf-8')
+
+          # App modal host: user-facing social chat route becomes direct support.
+          replace_required('src/core/ModalHost.js', "import DBGHubModal from '../features/social/DBGHubModal';", "import DkdLiveSupportModal from '../features/support/dkd_live_support_modal';", 'support import')
+          replace_required('src/core/ModalHost.js', "onDBGHub={() => { setActionMenuOpen(false); setActiveTab('dbg'); }}", "onSupport={() => { setActionMenuOpen(false); setActiveTab('support'); }}", 'support menu route')
+          replace_required('src/core/ModalHost.js', "{activeTab === 'dbg' ? <DBGHubModal visible onClose={() => setActiveTab('map')} sessionUserId={sessionUserId} profile={profile} refreshProfile={refreshProfile} /> : null}", "{activeTab === 'support' ? <DkdLiveSupportModal dkd_visible_value dkd_on_close_value={() => setActiveTab('map')} dkd_is_admin_value={isAdmin} /> : null}", 'support modal render')
+
+          replace_required('src/core/propBuilders.js', "    || activeTab === 'dbg'", "    || activeTab === 'support'", 'support visibility')
+
+          # Rich home design stays intact; only wording/routes change.
+          replace_required('src/features/map/MapHomeScreen.js', 'Kurye, kargo ve şehir içi hizmet taleplerini tek şehir ağı üzerinden keşfet.', 'Gönderi oluştur, siparişlerini takip et ve kurye teslimat akışını tek merkezden yönet.', 'Hizmet Ağı description')
+          replace_required('src/features/map/MapHomeScreen.js', '<DkdQuickTile dkd_icon_value="message-processing-outline" dkd_title_value="Sohbet" dkd_subtitle_value="DBG mesaj ve ekip alanı" dkd_accent_value="#A33D80" dkd_on_press_value={() => onTabChange?.(\'dbg\')} />', '<DkdQuickTile dkd_icon_value="headset" dkd_title_value="Destek" dkd_subtitle_value="DrabornEagle admin canlı destek" dkd_accent_value="#A33D80" dkd_on_press_value={() => onTabChange?.(\'support\')} />', 'home support tile')
+
+          # Legacy service-network client and old user-facing social chat screen are retired.
+          Path('src/services/dkd_service_network_service.js').unlink(missing_ok=True)
+          Path('src/features/social/DBGHubModal.js').unlink(missing_ok=True)
+          PY
+
+      - name: Install dependencies
+        run: npm ci
+      - name: Verify release identity
+        run: npm run dkd:verify-v0.0.12
+      - name: Verify Android Expo bundle
+        run: npx expo export --platform android --output-dir /tmp/dkd-v0-0-12-feature-export
+      - name: Guard retired runtime residue
+        shell: bash
+        run: |
+          set -euo pipefail
+          ! grep -RniE "dkd_create_service_network_request_value|dkd_fetch_service_network_my_orders_value|onDBGHub|activeTab === 'dbg'|Gönderi Oluştur.*Kurye Başvurusu" src --exclude-dir=node_modules
+          ! grep -Rni "DraBornGo v0.0.11" src/features/navigation/ActionMenuModal.js
+      - name: Commit runtime patch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          if git diff --cached --quiet; then
+            echo 'No changes required.'
+            exit 0
+          fi
+          git commit -m 'feat: complete v0.0.12 shipment support earnings admin runtime'
+          git push origin HEAD:main
