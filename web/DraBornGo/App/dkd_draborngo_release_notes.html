@@ -4,21 +4,41 @@
 <body><main><section class="card">
 <span class="badge">DraBornGo v0.0.12 • Android versionCode 12</span>
 <h1>Sürüm Notları</h1>
-<p><strong>9 Ağustos 2026</strong> tarihli v0.0.12, ürün kapsamını kurye, kargo ve genel Hizmet Ağı üzerinde sadeleştiren temizlik ve politika sürümüdür.</p>
+<p><strong>9 Ağustos 2026</strong> tarihli v0.0.12; kurye operasyonu, gönderi/kargo, canlı destek ve kazanç analizi üzerine odaklanan kapsamlı temizlik ve operasyon sürümüdür.</p>
 <div class="callout">Bu aşamada Expo Go ile test edilir; APK veya AAB üretilmez.</div>
-<h2>Temizlik</h2><ul>
-<li>Kullanımdan kaldırılan başvuru kartları, ekranlar, servisler, veri modelleri ve bildirim köprüleri güncel çalışma ağacından çıkarıldı.</li>
-<li>Aktif kurye, kargo, hızlı görev ve Hizmet Ağı sipariş havuzu temiz başlangıç için sıfırlandı.</li>
-<li>Genel Hizmet Ağı; Ev & Yaşam, Tamir & Teknik, Araç Destek ve Özel Teslimat gruplarıyla devam eder.</li>
-<li>Kurye görev akışı “alım noktası → teslimat noktası” terminolojisine geçirildi.</li>
+<h2>Kurye Merkezi</h2><ul>
+<li>Kurye Görevleri ekranından Gönderi Oluştur kaldırıldı; gönderi akışı Hizmet Ağı merkezine taşındı.</li>
+<li>Kurye lisansı onaylı kullanıcılar Kurye Başvurusu kartını artık görmez.</li>
+<li>Kurye görev akışı “alım noktası → teslimat noktası” terminolojisiyle devam eder.</li>
 </ul>
-<h2>Android & Google Play</h2><ul>
-<li>Sürüm kimliği <strong>0.0.12 / versionCode 12</strong> olarak eşitlendi.</li>
+<h2>Hizmet Ağı</h2><ul>
+<li>Eski kategori tabanlı Hizmet Ağı talep sistemi ve canlı Supabase veri modeli kaldırıldı.</li>
+<li>Hizmet Ağı artık modern <strong>Gönderi Oluştur</strong> ve <strong>Siparişlerim</strong> merkezlerinden oluşur.</li>
+<li>Kullanıcının bekleyen, aktif ve tamamlanan gönderileri Siparişlerim alanında canlı durumlarıyla görüntülenir.</li>
+</ul>
+<h2>DrabornEagle Destek</h2><ul>
+<li>Eski kullanıcı sohbet ekranı DrabornEagle Destek paneliyle değiştirildi.</li>
+<li>Mevcut kullanıcıların destek görüşmeleri otomatik oluşturuldu; yeni kullanıcı profilleri için destek görüşmesi otomatik açılır.</li>
+<li>Destek mesajları Realtime üzerinden güncellenir ve yalnız görüşme sahibi ile yetkili admin erişebilir.</li>
+</ul>
+<h2>Kurye Kazanç Tablosu</h2><ul>
+<li>Merkez Menüye günlük, haftalık ve aylık kazanç analizi eklendi.</li>
+<li>Çevrimiçi çalışma süresi, saatlik kazanç, teslimat sayısı ve toplam kazanç hesaplanır.</li>
+<li>Kurye çevrimiçi oturumları sunucu tarafında zaman damgalarıyla takip edilir.</li>
+</ul>
+<h2>Admin</h2><ul>
+<li>Kullanıcı arama ve detay merkezi eklendi.</li>
+<li>Yetkili admin; kullanıcı, profil ve kurye başvuru bilgilerini inceleyip yönetebilir.</li>
+<li>Her kurye kullanıcısının günlük/haftalık/aylık kazanç tablosu admin görünümüne eklendi.</li>
+<li>DrabornEagle canlı destek gelen kutusu Admin Paneline bağlandı.</li>
+</ul>
+<h2>Android & Veri Şeffaflığı</h2><ul>
+<li>Sürüm kimliği <strong>0.0.12 / versionCode 12</strong> olarak korunur.</li>
 <li>Expo SDK 57 ve Android API 36 hattı korunur.</li>
 <li>Arka plan konumu, mikrofon ve geniş depolama/medya izinleri engelli kalır.</li>
-<li>Ön plan konumu rota ve teslimat için; kamera/fotoğraf erişimi yalnız kullanıcı tarafından başlatılan gönderi, profil veya kurye başvurusu görselleri için açıklanır.</li>
-<li>Gizlilik, kullanım şartları, hesap silme ve sürüm merkezi güncel ürün kapsamıyla eşleştirildi.</li>
+<li>Gizlilik ve kullanım şartları; destek mesajları, çevrimiçi çalışma süresi, kazanç analizi ve yeni Hizmet Ağı kapsamıyla eşleştirildi.</li>
 </ul>
+<h2>Doğrulama</h2><p>Kaynak doğrulama, sürüm kimliği kontrolü ve Android Expo export testi başarıyla tamamlandı.</p>
 <h2>Dağıtım</h2><p>v0.0.12 şu anda kaynak kodu + Expo Go test sürümüdür. Üretim paketi hazır olduğunda resmi dağıtım kanalı Google Play olacaktır.</p>
 <p><a href="./">v0.0.12 sürüm merkezine dön</a></p>
 </section></main></body></html>
