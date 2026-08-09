@@ -8,6 +8,106 @@ import {
   dkd_reject_account_deletion_request_value,
 } from '../../services/dkd_account_deletion_service';
 
+function dkd_clean_text_value(dkd_value, dkd_fallback_value = '') {
+  const dkd_text_value = String(dkd_value ?? '').trim();
+  return dkd_text_value || dkd_fallback_value;
+}
+
+function dkd_mask_national_id_value(dkd_value) {
+  const dkd_digits_value = String(dkd_value || '').replace(/\D/g, '');
+  if (dkd_digits_value.length < 7) return dkd_digits_value || 'Belirtilmedi';
+  return `${dkd_digits_value.slice(0, 3)}••••${dkd_digits_value.slice(-4)}`;
+}
+
+function dkd_format_date_value(dkd_value) {
+  if (!dkd_value) return 'Tarih yok';
+  try {
+    return new Date(dkd_value).toLocaleString('tr-TR');
+  } catch {
+    return String(dkd_value);
+  }
+}
+
+function DkdCourierApplicationCard({ dkd_row_value, dkd_on_review_value }) {
+  const dkd_payload_value = dkd_row_value?.payload && typeof dkd_row_value.payload === 'object' ? dkd_row_value.payload : {};
+  const dkd_first_name_value = dkd_clean_text_value(dkd_row_value?.first_name || dkd_payload_value?.firstName);
+  const dkd_last_name_value = dkd_clean_text_value(dkd_row_value?.last_name || dkd_payload_value?.lastName);
+  const dkd_full_name_value = `${dkd_first_name_value} ${dkd_last_name_value}`.trim()
+    || dkd_clean_text_value(dkd_row_value?.full_name || dkd_row_value?.name, 'Kurye Adayı');
+  const dkd_email_value = dkd_clean_text_value(dkd_row_value?.email || dkd_payload_value?.email, 'E-posta belirtilmedi');
+  const dkd_phone_value = dkd_clean_text_value(dkd_row_value?.phone || dkd_payload_value?.phone, 'Telefon belirtilmedi');
+  const dkd_country_value = dkd_clean_text_value(dkd_row_value?.dkd_country || dkd_payload_value?.dkd_country, 'Türkiye');
+  const dkd_city_value = dkd_clean_text_value(dkd_row_value?.city || dkd_payload_value?.city);
+  const dkd_zone_value = dkd_clean_text_value(dkd_row_value?.zone || dkd_payload_value?.zone);
+  const dkd_vehicle_value = dkd_clean_text_value(dkd_row_value?.vehicle_type || dkd_payload_value?.vehicleType, 'Araç belirtilmedi');
+  const dkd_plate_value = dkd_clean_text_value(dkd_row_value?.plate_no || dkd_payload_value?.plateNo, 'Plaka belirtilmedi');
+  const dkd_national_id_value = dkd_mask_national_id_value(dkd_row_value?.national_id || dkd_payload_value?.nationalId);
+  const dkd_address_value = dkd_clean_text_value(dkd_row_value?.address_text || dkd_payload_value?.addressText);
+  const dkd_emergency_name_value = dkd_clean_text_value(dkd_row_value?.emergency_name || dkd_payload_value?.emergencyName);
+  const dkd_emergency_phone_value = dkd_clean_text_value(dkd_row_value?.emergency_phone || dkd_payload_value?.emergencyPhone);
+  const dkd_user_id_value = dkd_clean_text_value(dkd_row_value?.user_id || dkd_row_value?.applicant_user_id || dkd_row_value?.dkd_user_id, '—');
+  const dkd_status_value = dkd_clean_text_value(dkd_row_value?.status, 'pending');
+  const dkd_region_text_value = [dkd_country_value, dkd_city_value, dkd_zone_value].filter(Boolean).join(' / ');
+
+  return (
+    <View style={dkd_styles_value.card}>
+      <View style={dkd_styles_value.courierHead}>
+        <View style={dkd_styles_value.courierAvatar}>
+          <Text style={dkd_styles_value.courierAvatarText}>{dkd_full_name_value.slice(0, 1).toUpperCase()}</Text>
+        </View>
+        <View style={{ flex: 1, minWidth: 0 }}>
+          <Text style={dkd_styles_value.cardTitle} numberOfLines={2}>{dkd_full_name_value}</Text>
+          <Text style={dkd_styles_value.courierEmail} numberOfLines={1}>{dkd_email_value}</Text>
+        </View>
+        <View style={[dkd_styles_value.statusPill, dkd_status_value === 'approved' && dkd_styles_value.statusPillApproved, dkd_status_value === 'rejected' && dkd_styles_value.statusPillRejected]}>
+          <Text style={dkd_styles_value.statusPillText}>{dkd_status_value.toUpperCase()}</Text>
+        </View>
+      </View>
+
+      <View style={dkd_styles_value.detailGrid}>
+        <View style={dkd_styles_value.detailCell}>
+          <Text style={dkd_styles_value.detailLabel}>TELEFON</Text>
+          <Text style={dkd_styles_value.detailValue}>{dkd_phone_value}</Text>
+        </View>
+        <View style={dkd_styles_value.detailCell}>
+          <Text style={dkd_styles_value.detailLabel}>TC KİMLİK</Text>
+          <Text style={dkd_styles_value.detailValue}>{dkd_national_id_value}</Text>
+        </View>
+        <View style={dkd_styles_value.detailCell}>
+          <Text style={dkd_styles_value.detailLabel}>BÖLGE</Text>
+          <Text style={dkd_styles_value.detailValue}>{dkd_region_text_value || 'Belirtilmedi'}</Text>
+        </View>
+        <View style={dkd_styles_value.detailCell}>
+          <Text style={dkd_styles_value.detailLabel}>ARAÇ / PLAKA</Text>
+          <Text style={dkd_styles_value.detailValue}>{dkd_vehicle_value} • {dkd_plate_value}</Text>
+        </View>
+      </View>
+
+      {dkd_address_value ? (
+        <View style={dkd_styles_value.fullDetailRow}>
+          <MaterialCommunityIcons name="map-marker-outline" size={15} color="#7EEBFF" />
+          <View style={{ flex: 1 }}><Text style={dkd_styles_value.detailLabel}>ADRES</Text><Text style={dkd_styles_value.fullDetailText}>{dkd_address_value}</Text></View>
+        </View>
+      ) : null}
+
+      {dkd_emergency_name_value || dkd_emergency_phone_value ? (
+        <View style={dkd_styles_value.fullDetailRow}>
+          <MaterialCommunityIcons name="phone-alert-outline" size={15} color="#FFD782" />
+          <View style={{ flex: 1 }}><Text style={dkd_styles_value.detailLabel}>ACİL DURUM</Text><Text style={dkd_styles_value.fullDetailText}>{[dkd_emergency_name_value, dkd_emergency_phone_value].filter(Boolean).join(' • ')}</Text></View>
+        </View>
+      ) : null}
+
+      <Text style={dkd_styles_value.cardSub}>Kullanıcı ID: {dkd_user_id_value}</Text>
+      <Text style={dkd_styles_value.cardSub}>Başvuru: {dkd_format_date_value(dkd_row_value?.created_at)}</Text>
+
+      <View style={dkd_styles_value.actions}>
+        <Pressable onPress={() => dkd_on_review_value(dkd_row_value, 'approved')} style={dkd_styles_value.approve}><Text style={dkd_styles_value.approveText}>Onayla</Text></Pressable>
+        <Pressable onPress={() => dkd_on_review_value(dkd_row_value, 'rejected')} style={dkd_styles_value.reject}><Text style={dkd_styles_value.rejectText}>Reddet</Text></Pressable>
+      </View>
+    </View>
+  );
+}
+
 export default function DkdAdminApplicationsModal({ visible, onClose }) {
   const [dkd_courier_rows_value, dkd_set_courier_rows_value] = useState([]);
   const [dkd_delete_rows_value, dkd_set_delete_rows_value] = useState([]);
@@ -65,14 +165,7 @@ export default function DkdAdminApplicationsModal({ visible, onClose }) {
           {dkd_loading_value ? <ActivityIndicator color="#7EEBFF" /> : null}
           <Text style={dkd_styles_value.section}>KURYE BAŞVURULARI</Text>
           {dkd_courier_rows_value.length ? dkd_courier_rows_value.map((dkd_row_value) => (
-            <View key={String(dkd_row_value.id)} style={dkd_styles_value.card}>
-              <Text style={dkd_styles_value.cardTitle}>{dkd_row_value.full_name || dkd_row_value.name || dkd_row_value.user_id || 'Kurye Adayı'}</Text>
-              <Text style={dkd_styles_value.cardSub}>Durum: {dkd_row_value.status || 'pending'}</Text>
-              <View style={dkd_styles_value.actions}>
-                <Pressable onPress={() => dkd_review_courier_value(dkd_row_value, 'approved')} style={dkd_styles_value.approve}><Text style={dkd_styles_value.approveText}>Onayla</Text></Pressable>
-                <Pressable onPress={() => dkd_review_courier_value(dkd_row_value, 'rejected')} style={dkd_styles_value.reject}><Text style={dkd_styles_value.rejectText}>Reddet</Text></Pressable>
-              </View>
-            </View>
+            <DkdCourierApplicationCard key={String(dkd_row_value.id)} dkd_row_value={dkd_row_value} dkd_on_review_value={dkd_review_courier_value} />
           )) : <Text style={dkd_styles_value.empty}>Kurye başvurusu yok.</Text>}
 
           <Text style={dkd_styles_value.section}>HESAP SİLME TALEPLERİ</Text>
@@ -103,7 +196,21 @@ const dkd_styles_value = StyleSheet.create({
   section: { color: '#A9EEFF', fontSize: 10, fontWeight: '900', letterSpacing: 1.1, marginTop: 12, marginBottom: 7 },
   card: { marginBottom: 10, borderRadius: 20, padding: 14, backgroundColor: 'rgba(255,255,255,.055)', borderWidth: 1, borderColor: 'rgba(255,255,255,.10)' },
   cardTitle: { color: '#FFF', fontSize: 15, fontWeight: '900' },
-  cardSub: { color: 'rgba(231,241,255,.60)', fontSize: 11, marginTop: 5 },
+  cardSub: { color: 'rgba(231,241,255,.60)', fontSize: 9.5, lineHeight: 14, marginTop: 5 },
+  courierHead: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  courierAvatar: { width: 44, height: 44, borderRadius: 15, backgroundColor: 'rgba(126,235,255,.14)', borderWidth: 1, borderColor: 'rgba(126,235,255,.20)', alignItems: 'center', justifyContent: 'center' },
+  courierAvatarText: { color: '#BDF5FF', fontSize: 18, fontWeight: '900' },
+  courierEmail: { color: '#8BEAFF', fontSize: 10.5, fontWeight: '800', marginTop: 3 },
+  statusPill: { borderRadius: 999, paddingHorizontal: 9, paddingVertical: 6, backgroundColor: 'rgba(255,210,116,.10)', borderWidth: 1, borderColor: 'rgba(255,210,116,.20)' },
+  statusPillApproved: { backgroundColor: 'rgba(99,231,177,.10)', borderColor: 'rgba(99,231,177,.20)' },
+  statusPillRejected: { backgroundColor: 'rgba(255,108,136,.10)', borderColor: 'rgba(255,108,136,.20)' },
+  statusPillText: { color: '#DFF8FF', fontSize: 8, fontWeight: '900', letterSpacing: .7 },
+  detailGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 12 },
+  detailCell: { width: '48%', minHeight: 62, borderRadius: 14, padding: 9, backgroundColor: 'rgba(4,16,31,.42)', borderWidth: 1, borderColor: 'rgba(255,255,255,.07)' },
+  detailLabel: { color: 'rgba(218,238,255,.45)', fontSize: 7.5, fontWeight: '900', letterSpacing: .7 },
+  detailValue: { color: '#FFFFFF', fontSize: 10, lineHeight: 14, fontWeight: '800', marginTop: 5 },
+  fullDetailRow: { minHeight: 50, borderRadius: 14, padding: 10, marginTop: 8, flexDirection: 'row', alignItems: 'flex-start', gap: 8, backgroundColor: 'rgba(4,16,31,.32)', borderWidth: 1, borderColor: 'rgba(255,255,255,.06)' },
+  fullDetailText: { color: '#FFFFFF', fontSize: 9.8, lineHeight: 14, fontWeight: '700', marginTop: 4 },
   actions: { flexDirection: 'row', gap: 8, marginTop: 12 },
   approve: { flex: 1, minHeight: 43, borderRadius: 14, backgroundColor: '#75E9B5', alignItems: 'center', justifyContent: 'center' },
   approveText: { color: '#031019', fontWeight: '900' },
