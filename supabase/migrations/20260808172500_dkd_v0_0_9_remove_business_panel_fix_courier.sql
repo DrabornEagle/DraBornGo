@@ -1,12 +1,5 @@
 begin;
 
--- v0.0.9 backward compatibility: older cached clients selected reward_score.
-alter table if exists public.dkd_courier_jobs
-  add column if not exists reward_score numeric not null default 0;
-
-comment on column public.dkd_courier_jobs.reward_score is
-  'v0.0.9 backward-compatibility field. Current clients do not require this column.';
-
 -- Remove Business Panel / Merchant management functions while preserving
 -- customer-facing read-only Service Network catalog and courier order flow.
 do $$
