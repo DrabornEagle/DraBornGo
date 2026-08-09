@@ -1,0 +1,108 @@
+name: DKD Apply v0.0.16 Cleanup
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/dkd_apply_v0_0_16_cleanup.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  dkd_apply_v0_0_16_cleanup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Prepare one-shot applier
+        shell: bash
+        run: |
+          cp scripts/dkd_apply_v0_0_16_cleanup.mjs /tmp/dkd_apply_v0_0_16_cleanup.mjs
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('/tmp/dkd_apply_v0_0_16_cleanup.mjs')
+          s = p.read_text()
+          start = s.index('// Release verifier and package script name.')
+          end = s.index('// Auth consent versions use the release date of v0.0.16.')
+          s = s[:start] + s[end:]
+          s = s.replace(
+              "DraBornGo v0.0.16: Kurye Başvuruları kullanıcı ve admin kaynak kodundan kaldırıldı; mevcut kurye görev akışı korunuyor. Supabase tarafındaki eski başvuru verileri ileride gerekirse geri yüklemek için korunuyor. Android versionCode 3 sabit ve test Expo Go üzerinden devam ediyor; APK/AAB üretilmedi.",
+              "DraBornGo v0.0.16: Mobildeki eski kurye kayıt/onay ekranları kullanıcı ve admin kaynak kodundan kaldırıldı; mevcut kurye görev akışı korunuyor. Supabase tarafındaki ilgili eski veriler ileride gerekirse geri yüklemek için korunuyor. Android versionCode 3 sabit ve test Expo Go üzerinden devam ediyor; APK/AAB üretilmedi."
+          )
+          p.write_text(s)
+          PY
+          node /tmp/dkd_apply_v0_0_16_cleanup.mjs
+
+      - name: Install dependencies for validation
+        run: npm install --no-package-lock
+
+      - name: Validate release identity and Expo config
+        shell: bash
+        run: |
+          npm run dkd:verify-v0.0.16
+          npx expo config --json > /tmp/dkd_expo_config.json
+          node - <<'NODE'
+          const fs = require('fs');
+          const c = JSON.parse(fs.readFileSync('/tmp/dkd_expo_config.json','utf8'));
+          if (c.version !== '0.0.16') throw new Error('Expo version mismatch');
+          if (Number(c.android?.versionCode) !== 3) throw new Error('Android versionCode must stay 3');
+          if (c.android?.package !== 'com.draborneagle.draborngo') throw new Error('Android package mismatch');
+          const permissions = Array.isArray(c.android?.permissions) ? c.android.permissions : [];
+          for (const blocked of [
+            'android.permission.ACCESS_BACKGROUND_LOCATION',
+            'android.permission.READ_EXTERNAL_STORAGE',
+            'android.permission.WRITE_EXTERNAL_STORAGE',
+            'android.permission.READ_MEDIA_IMAGES',
+            'android.permission.READ_MEDIA_VIDEO',
+            'android.permission.RECORD_AUDIO'
+          ]) {
+            if (permissions.includes(blocked)) throw new Error(`Forbidden permission present: ${blocked}`);
+          }
+          console.log('DKD Expo config v0.0.16/code3 and permission set: PASS');
+          NODE
+
+      - name: Source integrity checks
+        shell: bash
+        run: |
+          test ! -e src/features/applications/dkd_applications_hub_modal.js
+          test ! -e src/features/admin/dkd_admin_applications_modal.js
+          test ! -e src/features/courier/dkd_courier_application_panel.js
+          test ! -e src/features/courier/CourierBoardModal.js
+          test ! -e src/services/courierApplicationService.js
+          if grep -RniE 'kurye başvuru|başvurular|başvurunu|başvurun\b' src app.json --exclude-dir=node_modules; then
+            echo 'DKD ERROR: courier application wording remains in active mobile source.'
+            exit 1
+          fi
+          if grep -RniE 'dkd_applications_hub_modal|dkd_admin_applications_modal|dkd_courier_application_panel|courierApplicationService' src --exclude-dir=node_modules; then
+            echo 'DKD ERROR: deleted application module reference remains.'
+            exit 1
+          fi
+          git diff --check
+
+      - name: Remove one-shot maintenance files
+        shell: bash
+        run: |
+          rm -f scripts/dkd_apply_v0_0_16_cleanup.mjs
+          rm -f .github/workflows/dkd_apply_v0_0_16_cleanup.yml
+
+      - name: Commit v0.0.16 source state
+        shell: bash
+        run: |
+          git config user.name 'DraBornGo Release Bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add -A
+          git status --short
+          git diff --cached --check
+          git commit -m 'release: DraBornGo v0.0.16 remove courier application source'
+          git push origin main
