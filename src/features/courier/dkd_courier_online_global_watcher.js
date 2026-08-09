@@ -132,7 +132,6 @@ function dkd_find_active_job_value(dkd_rows_value, dkd_profile_value) {
 function DkdCourierAssignedOfferModal({ dkd_offer_job_value, dkd_action_busy_value, dkd_on_accept_value, dkd_on_reject_value, dkd_on_open_courier_board_value }) {
   const dkd_fee_text_value = dkd_offer_fee_text_value(dkd_offer_job_value);
   const dkd_distance_text_value = dkd_offer_distance_text_value(dkd_offer_job_value);
-  const dkd_reward_text_value = Number(dkd_offer_job_value?.reward_score || 0) > 0 ? `+${Number(dkd_offer_job_value?.reward_score || 0)} skor` : '';
   const dkd_busy_accept_value = dkd_action_busy_value === 'accept';
   const dkd_busy_reject_value = dkd_action_busy_value === 'reject';
   const dkd_action_locked_value = dkd_busy_accept_value || dkd_busy_reject_value;
@@ -177,7 +176,6 @@ function DkdCourierAssignedOfferModal({ dkd_offer_job_value, dkd_action_busy_val
               </LinearGradient>
               <View style={dkd_styles.dkd_offer_meta_row}>
                 {dkd_distance_text_value ? <View style={dkd_styles.dkd_offer_meta_chip}><MaterialCommunityIcons name="map-marker-distance" size={15} color="#7EEBFF" /><Text numberOfLines={1} style={dkd_styles.dkd_offer_meta_text}>{dkd_distance_text_value}</Text></View> : null}
-                {dkd_reward_text_value ? <View style={dkd_styles.dkd_offer_meta_chip}><MaterialCommunityIcons name="star-four-points-outline" size={15} color="#FFD166" /><Text style={dkd_styles.dkd_offer_meta_text}>{dkd_reward_text_value}</Text></View> : null}
               </View>
             </LinearGradient>
             <View style={dkd_styles.dkd_route_panel}>
