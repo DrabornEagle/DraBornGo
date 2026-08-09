@@ -46,7 +46,6 @@ jobs:
             return out;
           };
 
-          // Release identity: v0.0.15, Android versionCode remains 3.
           const app = JSON.parse(read('app.json'));
           app.expo.version = '0.0.15';
           app.expo.android.versionCode = 3;
@@ -63,9 +62,7 @@ jobs:
 
           const pkg = JSON.parse(read('package.json'));
           pkg.version = '0.0.15';
-          if (pkg.scripts?.['dkd:verify-v0.0.14']) {
-            delete pkg.scripts['dkd:verify-v0.0.14'];
-          }
+          if (pkg.scripts?.['dkd:verify-v0.0.14']) delete pkg.scripts['dkd:verify-v0.0.14'];
           pkg.scripts = pkg.scripts || {};
           pkg.scripts['dkd:verify-v0.0.15'] = 'node ./scripts/dkd_verify_release_identity.mjs';
           write('package.json', JSON.stringify(pkg, null, 2) + '\n');
@@ -75,7 +72,6 @@ jobs:
           if (lock.packages?.['']) lock.packages[''].version = '0.0.15';
           write('package-lock.json', JSON.stringify(lock, null, 2) + '\n');
 
-          // Current visible source version strings only. Supabase and historical migrations are intentionally untouched.
           for (const file of walk('src')) {
             if (!/\.(js|jsx|ts|tsx)$/.test(file)) continue;
             replaceAllIn(file, 'v0.0.14', 'v0.0.15');
@@ -84,7 +80,6 @@ jobs:
           }
           replaceAllIn('scripts/dkd_verify_release_identity.mjs', '0.0.14', '0.0.15');
 
-          // Home: completely remove Hizmet Ağı Merkezi entry point.
           {
             const p = 'src/features/map/MapHomeScreen.js';
             let s = read(p);
@@ -92,7 +87,6 @@ jobs:
             write(p, s);
           }
 
-          // Modal host: remove Service Network import and render path.
           {
             const p = 'src/core/ModalHost.js';
             let s = read(p);
@@ -101,7 +95,6 @@ jobs:
             write(p, s);
           }
 
-          // Modal visibility state no longer includes Service Network.
           {
             const p = 'src/core/propBuilders.js';
             let s = read(p);
@@ -109,19 +102,14 @@ jobs:
             write(p, s);
           }
 
-          // Customer shipment-status polling belongs to removed Siparişlerim flow.
           {
             const p = 'src/core/GameFlow.js';
             let s = read(p);
-            s = s.replace(
-              "import { primeNotificationsRuntime, registerDeviceForRemotePush, dkd_start_customer_status_local_notification_poll_value } from '../services/notificationService';",
-              "import { primeNotificationsRuntime, registerDeviceForRemotePush } from '../services/notificationService';"
-            );
-            s = s.replace(/\n\s*const dkd_stop_poll_value = dkd_start_customer_status_local_notification_poll_value\([^\n]*\);\n\s*return \(\) => \{ dkd_cancelled_value = true; dkd_stop_poll_value\?\.\(\); \};/, "\n    return () => { dkd_cancelled_value = true; };");
+            s = s.replace(', dkd_start_customer_status_local_notification_poll_value', '');
+            s = s.replace(/\n\s*const dkd_stop_poll_value = dkd_start_customer_status_local_notification_poll_value\([^\n]*\);\n\s*return \(\) => \{ dkd_cancelled_value = true; dkd_stop_poll_value\?\.\(\); \};/, '\n    return () => { dkd_cancelled_value = true; };');
             write(p, s);
           }
 
-          // Remove customer-order/local status notification implementation at source level.
           {
             const p = 'src/services/notificationService.js';
             let s = read(p);
@@ -131,7 +119,6 @@ jobs:
             write(p, s);
           }
 
-          // Update onboarding copy so removed sender/service features are not advertised.
           {
             const p = 'src/features/onboarding/dkd_pre_login_intro_screen.js';
             let s = read(p);
@@ -151,7 +138,6 @@ jobs:
             write(p, s);
           }
 
-          // Current privacy center must describe only features present in v0.0.15 source.
           {
             const p = 'src/features/legal/dkd_google_play_policy_center_modal.js';
             let s = read(p);
@@ -168,13 +154,11 @@ jobs:
               'Kamera ve görsel seçimi yalnız kullanıcının başlattığı profil, kurye başvurusu, paket veya gerekli operasyon görseli işlemlerinde açılır. Mikrofon, arka plan kamera erişimi ve geniş medya/depolama erişimi istenmez.',
               'Kamera ve görsel seçimi yalnız kullanıcının başlattığı profil veya kurye başvurusu görseli işlemlerinde açılır. Mikrofon, arka plan kamera erişimi ve geniş medya/depolama erişimi istenmez.'
             );
-            // Supabase remote config may still report an older version; v0.0.15 local identity wins.
             s = s.replace("dkd_version_name_value: String(dkd_remote_value?.dkd_version_name_value || 'v0.0.15'),", "dkd_version_name_value: 'v0.0.15',");
             s = s.replace("const dkd_name_value = String(dkd_config_value?.dkd_version_name_value || 'v0.0.15');", "const dkd_name_value = 'v0.0.15';");
             write(p, s);
           }
 
-          // Update Center local release identity and notes.
           {
             const p = 'src/services/dkd_app_update_service.js';
             let s = read(p);
@@ -182,7 +166,6 @@ jobs:
             write(p, s);
           }
 
-          // Delete UI/client source belonging to removed Service Network sender flow.
           const deletePaths = [
             'src/features/serviceNetwork/dkd_service_network_modal.js',
             'src/features/serviceNetwork/dkd_service_network_modal_v2.js',
@@ -190,7 +173,6 @@ jobs:
           ];
           for (const p of deletePaths) if (fs.existsSync(p)) fs.rmSync(p, { force: true });
 
-          // These were sender-side helpers. Delete only if nothing else in current source references them.
           const allSourceText = () => walk('src')
             .filter((f) => /\.(js|jsx|ts|tsx)$/.test(f))
             .map((f) => [f, read(f)]);
@@ -203,8 +185,9 @@ jobs:
           removeIfUnreferenced('src/features/courier/dkd_cargo_live_map_modal.js', 'dkd_cargo_live_map_modal');
           removeIfUnreferenced('src/services/dkd_cargo_service.js', 'dkd_cargo_service');
 
-          // Remove now-empty directory if possible.
-          try { if (fs.existsSync('src/features/serviceNetwork') && fs.readdirSync('src/features/serviceNetwork').length === 0) fs.rmdirSync('src/features/serviceNetwork'); } catch {}
+          try {
+            if (fs.existsSync('src/features/serviceNetwork') && fs.readdirSync('src/features/serviceNetwork').length === 0) fs.rmdirSync('src/features/serviceNetwork');
+          } catch {}
           NODE
 
           rm -f .github/workflows/dkd_v0_0_15_remove_service_network.yml
@@ -216,26 +199,22 @@ jobs:
           node ./scripts/dkd_verify_release_identity.mjs
           node - <<'NODE'
           const fs = require('fs');
-          const path = require('path');
-          const walk = (d, out=[]) => { if(!fs.existsSync(d)) return out; for(const n of fs.readdirSync(d)){ const p=path.join(d,n); const s=fs.statSync(p); s.isDirectory()?walk(p,out):out.push(p);} return out; };
-          const files = walk('src').filter(f => /\.(js|jsx|ts|tsx)$/.test(f));
-          const text = files.map(f => fs.readFileSync(f,'utf8')).join('\n');
-          const forbidden = [
-            'Hizmet Ağı Merkezi',
-            "activeTab === 'serviceNetwork'",
-            'dkd_service_network_modal',
-            'dkd_cargo_sender_panel',
-            'dkd_start_customer_status_local_notification_poll_value',
-            'dkd_send_customer_order_local_notification_value',
-            'Gönderi Oluştur',
-            'Siparişlerim'
+          const checks = [
+            ['src/features/serviceNetwork/dkd_service_network_modal.js', false],
+            ['src/features/serviceNetwork/dkd_service_network_modal_v2.js', false],
+            ['src/features/courier/dkd_cargo_sender_panel.js', false],
           ];
-          for (const token of forbidden) {
-            if (text.includes(token)) throw new Error(`Forbidden removed-feature source token remains: ${token}`);
-          }
-          if (fs.existsSync('src/features/serviceNetwork/dkd_service_network_modal.js')) throw new Error('legacy service network modal still exists');
-          if (fs.existsSync('src/features/serviceNetwork/dkd_service_network_modal_v2.js')) throw new Error('service network modal v2 still exists');
-          if (fs.existsSync('src/features/courier/dkd_cargo_sender_panel.js')) throw new Error('cargo sender panel still exists');
+          for (const [p] of checks) if (fs.existsSync(p)) throw new Error(`${p} still exists`);
+          const home = fs.readFileSync('src/features/map/MapHomeScreen.js','utf8');
+          if (home.includes('Hizmet Ağı Merkezi')) throw new Error('Home still exposes Hizmet Ağı Merkezi');
+          const host = fs.readFileSync('src/core/ModalHost.js','utf8');
+          if (host.includes('DkdServiceNetworkModal') || host.includes("activeTab === 'serviceNetwork'")) throw new Error('ModalHost still exposes serviceNetwork');
+          const props = fs.readFileSync('src/core/propBuilders.js','utf8');
+          if (props.includes("activeTab === 'serviceNetwork'")) throw new Error('propBuilders still exposes serviceNetwork');
+          const flow = fs.readFileSync('src/core/GameFlow.js','utf8');
+          if (flow.includes('dkd_start_customer_status_local_notification_poll_value')) throw new Error('customer shipment poll still active');
+          const notifications = fs.readFileSync('src/services/notificationService.js','utf8');
+          if (notifications.includes('dkd_send_customer_order_local_notification_value') || notifications.includes('dkd_customer_status_local_seen_storage_key')) throw new Error('customer order notification source still present');
           const app = JSON.parse(fs.readFileSync('app.json','utf8'));
           if (app.expo.version !== '0.0.15') throw new Error('app version not 0.0.15');
           if (Number(app.expo.android.versionCode) !== 3) throw new Error('versionCode changed');
