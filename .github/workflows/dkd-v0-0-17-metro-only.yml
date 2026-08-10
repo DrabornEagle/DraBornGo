@@ -1,0 +1,40 @@
+name: DraBornGo v0.0.17 Metro bundle validation
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/dkd-v0-0-17-metro-only.yml'
+permissions:
+  contents: write
+jobs:
+  metro:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Android Metro export with result record
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          set +e
+          npx expo export --platform android --output-dir dist-ci > /tmp/dkd-metro.log 2>&1
+          dkd_code=$?
+          set -e
+          if [ "$dkd_code" -ne 0 ]; then
+            tail -n 300 /tmp/dkd-metro.log > .github/dkd-v0.0.17-metro-failure.log
+            git add .github/dkd-v0.0.17-metro-failure.log
+            git commit -m 'ci: record v0.0.17 Metro failure'
+            git push
+            exit "$dkd_code"
+          fi
+          rm -f .github/dkd-v0.0.17-metro-failure.log
+          printf 'DraBornGo v0.0.17 Android Metro export passed. No APK/AAB built.\n' > .github/dkd-v0.0.17-metro-success.txt
+          git add -A .github/dkd-v0.0.17-metro-failure.log .github/dkd-v0.0.17-metro-success.txt
+          git commit -m 'ci: v0.0.17 Android Metro export passed'
+          git push
