@@ -6,6 +6,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import {
   acceptCourierJob,
   dkd_reject_courier_job,
+  dkd_courier_online_heartbeat,
   dkd_set_courier_online_status,
   dkd_lock_courier_delivery_state_value,
   fetchCourierJobs,
@@ -291,8 +292,7 @@ export default function DkdCourierOnlineGlobalWatcher({
 
       const dkd_live_lat_value = Number(dkd_current_location_value?.lat);
       const dkd_live_lng_value = Number(dkd_current_location_value?.lng);
-      const dkd_online_result_value = await dkd_set_courier_online_status({
-        dkd_online: true,
+      const dkd_online_result_value = await dkd_courier_online_heartbeat({
         dkd_country: dkd_region_value.dkd_country_value,
         dkd_city: dkd_region_value.dkd_city_value,
         dkd_region: dkd_region_value.dkd_zone_value,
@@ -300,6 +300,18 @@ export default function DkdCourierOnlineGlobalWatcher({
         dkd_live_lng: Number.isFinite(dkd_live_lng_value) ? dkd_live_lng_value : null,
       });
       if (dkd_online_result_value?.error) throw dkd_online_result_value.error;
+      if (dkd_online_result_value?.data?.dkd_online_value === false) {
+        dkd_online_ref_value.current = false;
+        dkd_scan_token_ref_value.current += 1;
+        setDkdOfferJobValue(null);
+        setDkdHasActiveJobStateValue(false);
+        dkd_set_profile_value?.((dkd_previous_profile_value) => (dkd_previous_profile_value ? {
+          ...dkd_previous_profile_value,
+          dkd_courier_online: false,
+          dkd_courier_auto_assigned_job_id: null,
+        } : dkd_previous_profile_value));
+        return;
+      }
       if (!dkd_online_ref_value.current || dkd_scan_token_ref_value.current !== dkd_scan_token_value) {
         try {
           await dkd_set_courier_online_status({

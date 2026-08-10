@@ -166,6 +166,18 @@ export async function dkd_set_courier_online_status(dkd_input_value = {}) {
   });
 }
 
+export async function dkd_courier_online_heartbeat(dkd_input_value = {}) {
+  const dkd_live_lat_value = Number(dkd_input_value?.dkd_live_lat);
+  const dkd_live_lng_value = Number(dkd_input_value?.dkd_live_lng);
+  return supabase.rpc('dkd_courier_online_heartbeat_dkd', {
+    dkd_param_country: String(dkd_input_value?.dkd_country || 'Türkiye').trim() || 'Türkiye',
+    dkd_param_city: String(dkd_input_value?.dkd_city || 'Ankara').trim() || 'Ankara',
+    dkd_param_region: String(dkd_input_value?.dkd_region || '').trim(),
+    dkd_param_live_lat: Number.isFinite(dkd_live_lat_value) ? dkd_live_lat_value : null,
+    dkd_param_live_lng: Number.isFinite(dkd_live_lng_value) ? dkd_live_lng_value : null,
+  });
+}
+
 export async function dkd_reject_courier_job(dkd_job_id_value) {
   const dkd_numeric_job_id_value = Number(dkd_job_id_value);
   const dkd_result_value = await dkd_run_rpc_with_fallback('dkd_courier_job_reject_dkd', [{ dkd_param_job_id: dkd_numeric_job_id_value }, { dkd_job_id: dkd_numeric_job_id_value }]);
