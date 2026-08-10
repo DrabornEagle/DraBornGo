@@ -1,0 +1,11 @@
+{
+  "dkd_status": "dispatch_failed",
+  "dkd_run_id": null,
+  "dkd_dispatch_exit": 1,
+  "dkd_dispatch_output": "{\"message\":\"Workflow does not have 'workflow_dispatch' trigger\",\"documentation_url\":\"https://docs.github.com/rest/actions/workflows#create-a-workflow-dispatch-event\",\"status\":\"422\"}gh: Workflow does not have 'workflow_dispatch' trigger (HTTP 422)",
+  "dkd_query_output": "",
+  "dkd_workflow": "DraBornGo Release AAB",
+  "dkd_ref": "main",
+  "dkd_version_name": "0.0.16",
+  "dkd_version_code": 3
+}
