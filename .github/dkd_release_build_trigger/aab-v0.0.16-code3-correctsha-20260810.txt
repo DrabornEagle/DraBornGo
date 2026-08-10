@@ -1,0 +1,4 @@
+DraBornGo signed AAB build with verified APK SHA
+version=0.0.16
+versionCode=3
+apk_sha256=f6214c8a1e9d48b7e0cc5718a9172cce88dd2620a48c1debbbaffca1549accba
