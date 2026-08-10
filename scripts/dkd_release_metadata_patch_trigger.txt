@@ -1,1 +1,2 @@
 DraBornGo v0.0.16 release metadata patch trigger — 2026-08-10 03:14 +03:00
+retry: pull_request_target
