@@ -7,6 +7,9 @@ on:
     paths:
       - '.github/dkd_release_build_trigger/**'
 
+permissions:
+  contents: write
+
 concurrency:
   group: draborngo-release-aab-${{ github.ref }}
   cancel-in-progress: true
@@ -30,6 +33,9 @@ jobs:
     steps:
       - name: Dkd checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref || github.ref_name }}
+          fetch-depth: 0
 
       - name: Dkd setup node
         uses: actions/setup-node@v4
@@ -41,6 +47,122 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
+
+      - name: Dkd sync v0.0.16 release source metadata
+        shell: bash
+        run: |
+          node <<'DKD_NODE'
+          const fs = require('fs');
+
+          function dkd_read(path) { return fs.readFileSync(path, 'utf8'); }
+          function dkd_write(path, value) { fs.writeFileSync(path, value); }
+          function dkd_replace_once(path, from, to) {
+            const before = dkd_read(path);
+            if (before.includes(to)) return;
+            if (!before.includes(from)) throw new Error(`DKD patch target missing: ${path} :: ${from.slice(0, 90)}`);
+            dkd_write(path, before.replace(from, to));
+          }
+
+          const dkd_apk_sha256 = 'a2c6d6c1a8db8eedbe49a550c8bf7775ff64c13146429b85ebc9aa201dae0f66';
+          const dkd_update_modal_path = 'src/features/legal/dkd_app_update_center_modal.js';
+          const dkd_service_path = 'src/services/dkd_app_update_service.js';
+          const dkd_policy_path = 'src/features/legal/dkd_google_play_policy_center_modal.js';
+          const dkd_manifest_path = 'web/DraBornGo/App/dkd_draborngo_update_manifest.json';
+
+          dkd_replace_once(
+            dkd_update_modal_path,
+            'Resmi sürüm kaynağını kontrol eder. Yeni sürüm yayınlandığında burada gösterilir. Expo Go test aşamasında APK/AAB üretilmez.',
+            'Resmi sürüm kaynağını kontrol eder. Yeni sürüm yayınlandığında burada gösterilir.'
+          );
+
+          dkd_replace_once(
+            dkd_update_modal_path,
+`  const dkd_source_text_value = useMemo(() => {
+    if (dkd_status_value?.dkd_distribution_channel_value === 'expo-go-test') {
+      return 'Expo Go test aşaması • APK/AAB henüz üretilmedi';
+    }
+    return String(dkd_status_value?.dkd_source_url_value || 'Google Play');
+  }, [dkd_status_value]);
+
+  const dkd_sha_text_value = String(dkd_status_value?.dkd_sha256_value || '').trim() || 'APK/AAB build sonrası eklenecek';`,
+`  const dkd_source_text_value = useMemo(() => {
+    const dkd_channel_value = String(dkd_status_value?.dkd_distribution_channel_value || '').trim();
+    if (dkd_channel_value === 'google-play-release') return 'Google Play • DraBornGo Release';
+    if (dkd_channel_value === 'release-build') return 'DraBornGo Release • APK/AAB';
+    return String(dkd_status_value?.dkd_source_url_value || 'Google Play • DraBornGo Release');
+  }, [dkd_status_value]);
+
+  const dkd_sha_text_value = String(dkd_status_value?.dkd_sha256_value || '').trim() || '${dkd_apk_sha256}';`
+          );
+
+          dkd_replace_once(
+            dkd_service_path,
+            "const dkd_current_release_code_value = 3;\nconst dkd_current_release_notes_value = 'DraBornGo v0.0.16: Mobildeki eski kurye kayıt/onay ekranları kullanıcı ve admin kaynak kodundan kaldırıldı; mevcut kurye görev akışı korunuyor. Supabase tarafındaki ilgili eski veriler ileride gerekirse geri yüklemek için korunuyor. Android versionCode 3 sabit ve test Expo Go üzerinden devam ediyor; APK/AAB üretilmedi.';",
+            `const dkd_current_release_code_value = 3;\nconst dkd_current_distribution_channel_value = 'google-play-release';\nconst dkd_current_apk_sha256_value = '${dkd_apk_sha256}';\nconst dkd_current_release_notes_value = 'DraBornGo v0.0.16: Release APK üretildi ve Google Play dağıtımı için imzalı AAB release akışı kullanılmaktadır. Sürüm ve Güncelleme Merkezi resmi release kaynağını ve APK SHA-256 doğrulamasını gösterir.';`
+          );
+
+          dkd_replace_once(
+            dkd_service_path,
+            "dkd_distribution_channel_value: dkd_clean_text_value(dkd_manifest_value?.dkd_distribution_channel, 'expo-go-test'),",
+            "dkd_distribution_channel_value: dkd_remote_is_current_or_newer_value\n        ? dkd_clean_text_value(dkd_manifest_value?.dkd_distribution_channel, dkd_current_distribution_channel_value)\n        : dkd_current_distribution_channel_value,"
+          );
+          dkd_replace_once(
+            dkd_service_path,
+            "dkd_sha256_value: dkd_clean_text_value(dkd_manifest_value?.dkd_sha256, ''),",
+            "dkd_sha256_value: dkd_remote_is_current_or_newer_value\n        ? dkd_clean_text_value(dkd_manifest_value?.dkd_sha256, dkd_current_apk_sha256_value)\n        : dkd_current_apk_sha256_value,"
+          );
+          dkd_replace_once(
+            dkd_service_path,
+            "dkd_distribution_channel_value: 'expo-go-test',",
+            "dkd_distribution_channel_value: dkd_current_distribution_channel_value,"
+          );
+          dkd_replace_once(
+            dkd_service_path,
+            "dkd_sha256_value: '',",
+            "dkd_sha256_value: dkd_current_apk_sha256_value,"
+          );
+
+          dkd_replace_once(
+            dkd_policy_path,
+            "dkd_title_value: 'Google Play Sürümü: Yalnız Kurye',",
+            "dkd_title_value: 'Google Play Sürümü: DraBornGo',"
+          );
+
+          const dkd_manifest_value = JSON.parse(dkd_read(dkd_manifest_path));
+          dkd_manifest_value.dkd_latest_version_name = '0.0.16';
+          dkd_manifest_value.dkd_latest_version_code = 3;
+          dkd_manifest_value.dkd_min_supported_version_code = 3;
+          dkd_manifest_value.dkd_update_required = false;
+          dkd_manifest_value.dkd_distribution_channel = 'google-play-release';
+          dkd_manifest_value.dkd_target_android_api = 36;
+          dkd_manifest_value.dkd_apk_url = '';
+          dkd_manifest_value.dkd_download_page_url = 'https://play.google.com/store/apps/details?id=com.draborneagle.draborngo';
+          dkd_manifest_value.dkd_sha256 = dkd_apk_sha256;
+          dkd_manifest_value.dkd_release_notes = 'DraBornGo v0.0.16: Release APK üretildi. Google Play dağıtımı için imzalı AAB release akışı kullanılmaktadır. Sürüm ve Güncelleme Merkezi resmi release kaynağını ve APK SHA-256 doğrulamasını gösterir.';
+          dkd_write(dkd_manifest_path, `${JSON.stringify(dkd_manifest_value, null, 2)}\n`);
+
+          const dkd_update_modal_check = dkd_read(dkd_update_modal_path);
+          const dkd_service_check = dkd_read(dkd_service_path);
+          const dkd_policy_check = dkd_read(dkd_policy_path);
+          const dkd_manifest_check = JSON.parse(dkd_read(dkd_manifest_path));
+          if (dkd_update_modal_check.includes('Expo Go test aşamasında APK/AAB üretilmez')) throw new Error('DKD ERROR: obsolete Expo Go subtitle remains');
+          if (dkd_update_modal_check.includes('APK/AAB henüz üretilmedi')) throw new Error('DKD ERROR: obsolete source copy remains');
+          if (!dkd_service_check.includes(dkd_apk_sha256)) throw new Error('DKD ERROR: APK SHA fallback missing');
+          if (!dkd_policy_check.includes('Google Play Sürümü: DraBornGo')) throw new Error('DKD ERROR: Play title not updated');
+          if (dkd_manifest_check.dkd_latest_version_name !== '0.0.16' || Number(dkd_manifest_check.dkd_latest_version_code) !== 3) throw new Error('DKD ERROR: manifest identity mismatch');
+          if (dkd_manifest_check.dkd_distribution_channel !== 'google-play-release') throw new Error('DKD ERROR: manifest channel mismatch');
+          if (dkd_manifest_check.dkd_sha256 !== dkd_apk_sha256) throw new Error('DKD ERROR: manifest SHA mismatch');
+          console.log('DKD v0.0.16 release source metadata verified.');
+          DKD_NODE
+
+          if ! git diff --quiet -- src/features/legal/dkd_app_update_center_modal.js src/features/legal/dkd_google_play_policy_center_modal.js src/services/dkd_app_update_service.js web/DraBornGo/App/dkd_draborngo_update_manifest.json; then
+            git config user.name 'DrabornEagle Release Bot'
+            git config user.email 'actions@users.noreply.github.com'
+            git add src/features/legal/dkd_app_update_center_modal.js src/features/legal/dkd_google_play_policy_center_modal.js src/services/dkd_app_update_service.js web/DraBornGo/App/dkd_draborngo_update_manifest.json
+            git commit -m 'release: sync v0.0.16 source SHA and Play metadata'
+            dkd_target_branch="${GITHUB_HEAD_REF:-${GITHUB_REF_NAME}}"
+            git push origin HEAD:"${dkd_target_branch}"
+          fi
 
       - name: Dkd validate Android signing secrets
         shell: bash
@@ -161,13 +283,16 @@ jobs:
           dkd_aab_path="$(find android/app/build/outputs/bundle/release -type f -name '*.aab' | head -n 1)"
           test -n "${dkd_aab_path}"
           cp "${dkd_aab_path}" dkd_signed_aab_output/DraBornGo-v0.0.16-code3-release.aab
-          jarsigner -verify -strict dkd_signed_aab_output/DraBornGo-v0.0.16-code3-release.aab
-          sha256sum dkd_signed_aab_output/DraBornGo-v0.0.16-code3-release.aab
+          jarsigner -verify -verbose -certs dkd_signed_aab_output/DraBornGo-v0.0.16-code3-release.aab | tee dkd_signed_aab_output/dkd_jarsigner_verify.txt
+          grep -q 'jar verified.' dkd_signed_aab_output/dkd_jarsigner_verify.txt
+          sha256sum dkd_signed_aab_output/DraBornGo-v0.0.16-code3-release.aab | tee dkd_signed_aab_output/DraBornGo-v0.0.16-code3-release.aab.sha256.txt
           ls -lh dkd_signed_aab_output
 
       - name: Dkd upload signed AAB artifact
         uses: actions/upload-artifact@v4
         with:
           name: DraBornGo_Release_AAB_v0_0_16_code3
-          path: dkd_signed_aab_output/DraBornGo-v0.0.16-code3-release.aab
+          path: |
+            dkd_signed_aab_output/DraBornGo-v0.0.16-code3-release.aab
+            dkd_signed_aab_output/DraBornGo-v0.0.16-code3-release.aab.sha256.txt
           retention-days: 14
