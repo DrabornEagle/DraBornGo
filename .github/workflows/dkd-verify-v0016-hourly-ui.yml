@@ -1,0 +1,46 @@
+name: DKD Verify v0.0.16 Hourly UI
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  dkd-verify:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Validate and save report
+        shell: bash
+        run: |
+          set +e
+          npm ci > dkd-v0016-hourly-ui-report.txt 2>&1
+          dkd_npm=$?
+          echo "" >> dkd-v0016-hourly-ui-report.txt
+          echo "DKD_NPM_CI_EXIT_CODE=$dkd_npm" >> dkd-v0016-hourly-ui-report.txt
+          if [ "$dkd_npm" -eq 0 ]; then
+            npx expo-doctor@latest --verbose >> dkd-v0016-hourly-ui-report.txt 2>&1
+            dkd_doctor=$?
+            echo "" >> dkd-v0016-hourly-ui-report.txt
+            echo "DKD_EXPO_DOCTOR_EXIT_CODE=$dkd_doctor" >> dkd-v0016-hourly-ui-report.txt
+            npx expo export --platform android --output-dir /tmp/dkd-v0016-export >> dkd-v0016-hourly-ui-report.txt 2>&1
+            dkd_bundle=$?
+            echo "" >> dkd-v0016-hourly-ui-report.txt
+            echo "DKD_ANDROID_BUNDLE_EXIT_CODE=$dkd_bundle" >> dkd-v0016-hourly-ui-report.txt
+          else
+            echo "DKD_EXPO_DOCTOR_EXIT_CODE=SKIPPED" >> dkd-v0016-hourly-ui-report.txt
+            echo "DKD_ANDROID_BUNDLE_EXIT_CODE=SKIPPED" >> dkd-v0016-hourly-ui-report.txt
+          fi
+          cat dkd-v0016-hourly-ui-report.txt
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add dkd-v0016-hourly-ui-report.txt
+          git commit -m "chore: record v0.0.16 hourly UI validation" || exit 0
+          git push
+          exit 0
