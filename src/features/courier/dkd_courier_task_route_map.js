@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Linking, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 import MapView, { Marker, Polyline } from 'react-native-maps';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import {
@@ -9,221 +9,32 @@ import {
   dkd_point_from_lat_lng_value,
 } from '../../services/dkd_mapbox_route_service';
 
-function dkd_text_value(dkd_value) {
-  return String(dkd_value || '').trim();
+function dkd_text_value(dkd_value){return String(dkd_value||'').trim();}
+function dkd_job_pickup_point_value(dkd_job_value){return dkd_point_from_lat_lng_value(dkd_job_value?.pickup_lat,dkd_job_value?.pickup_lng);}
+function dkd_job_delivery_point_value(dkd_job_value){return dkd_point_from_lat_lng_value(dkd_job_value?.dropoff_lat,dkd_job_value?.dropoff_lng);}
+function dkd_map_region_value(dkd_points_value){const dkd_points_safe=(Array.isArray(dkd_points_value)?dkd_points_value:[]).filter(Boolean);if(!dkd_points_safe.length)return{latitude:39.92077,longitude:32.85411,latitudeDelta:.12,longitudeDelta:.12};const dkd_lats=dkd_points_safe.map((dkd_point)=>Number(dkd_point.latitude));const dkd_lngs=dkd_points_safe.map((dkd_point)=>Number(dkd_point.longitude));const dkd_min_lat=Math.min(...dkd_lats),dkd_max_lat=Math.max(...dkd_lats),dkd_min_lng=Math.min(...dkd_lngs),dkd_max_lng=Math.max(...dkd_lngs);return{latitude:(dkd_min_lat+dkd_max_lat)/2,longitude:(dkd_min_lng+dkd_max_lng)/2,latitudeDelta:Math.max(.018,(dkd_max_lat-dkd_min_lat)*1.55),longitudeDelta:Math.max(.018,(dkd_max_lng-dkd_min_lng)*1.55)};}
+function DkdRouteMarker({dkd_icon_name,dkd_label_value,dkd_tone_value='cyan'}){const dkd_delivery=dkd_tone_value==='green';return<View style={styles.markerWrap}><View style={[styles.markerIcon,dkd_delivery&&styles.markerIconDelivery]}><MaterialCommunityIcons name={dkd_icon_name} size={20} color={dkd_delivery?'#082018':'#06151E'}/></View><View style={styles.markerLabelWrap}><Text style={styles.markerLabel}>{dkd_label_value}</Text></View></View>;}
+
+function DkdMapSurface({dkd_map_ref_value,dkd_region_value,dkd_route_points_value,dkd_pickup_point_value,dkd_delivery_point_value,dkd_current_point_value,dkd_fullscreen_value=false}){
+  return <MapView ref={dkd_map_ref_value} style={dkd_fullscreen_value?styles.fullscreenMap:styles.map} initialRegion={dkd_region_value} toolbarEnabled={false}>
+    {dkd_route_points_value.length>=2?<Polyline coordinates={dkd_route_points_value} strokeWidth={6} strokeColor="#59D9FF"/>:null}
+    {dkd_pickup_point_value?<Marker coordinate={dkd_pickup_point_value.dkd_map_view_coordinate_value} tracksViewChanges={false}><DkdRouteMarker dkd_icon_name="storefront-outline" dkd_label_value="İşletme"/></Marker>:null}
+    {dkd_delivery_point_value?<Marker coordinate={dkd_delivery_point_value.dkd_map_view_coordinate_value} tracksViewChanges={false}><DkdRouteMarker dkd_icon_name="map-marker-check-outline" dkd_label_value="Teslimat" dkd_tone_value="green"/></Marker>:null}
+    {dkd_current_point_value?<Marker coordinate={dkd_current_point_value.dkd_map_view_coordinate_value} tracksViewChanges={false}><View style={styles.courierMarker}><MaterialCommunityIcons name="motorbike" size={18} color="#07121D"/></View></Marker>:null}
+  </MapView>;
 }
 
-function dkd_job_pickup_point_value(dkd_job_value) {
-  return dkd_point_from_lat_lng_value(dkd_job_value?.pickup_lat, dkd_job_value?.pickup_lng);
+export default function DkdCourierTaskRouteMap({dkd_job_value,dkd_current_location_value}){
+  const dkd_map_ref_value=useRef(null);const dkd_full_map_ref_value=useRef(null);const[dkd_open_value,dkd_set_open_value]=useState(false);const[dkd_fullscreen_value,dkd_set_fullscreen_value]=useState(false);const[dkd_loading_value,dkd_set_loading_value]=useState(false);const[dkd_error_value,dkd_set_error_value]=useState('');const[dkd_pickup_point_value,dkd_set_pickup_point_value]=useState(null);const[dkd_delivery_point_value,dkd_set_delivery_point_value]=useState(null);const[dkd_route_value,dkd_set_route_value]=useState(null);
+  const dkd_pickup_text_value=dkd_text_value(dkd_job_value?.pickup);const dkd_delivery_text_value=dkd_text_value(dkd_job_value?.delivery_address_text||dkd_job_value?.dropoff);const dkd_current_point_value=useMemo(()=>dkd_point_from_any_lat_lng_value(dkd_current_location_value),[dkd_current_location_value]);
+  const dkd_load_route_value=useCallback(async()=>{if(!dkd_job_value||!dkd_delivery_text_value){dkd_set_error_value('Teslimat adresi bulunamadı.');return;}dkd_set_loading_value(true);dkd_set_error_value('');try{let dkd_pickup_next=dkd_job_pickup_point_value(dkd_job_value);if(!dkd_pickup_next&&dkd_pickup_text_value){const dkd_geo=await dkd_fetch_mapbox_geocoding_place_value(dkd_pickup_text_value,{dkd_expected_place_text_value:dkd_pickup_text_value});dkd_pickup_next=dkd_geo?.dkd_point_value||null;}let dkd_delivery_next=dkd_job_delivery_point_value(dkd_job_value);if(!dkd_delivery_next){const dkd_geo=await dkd_fetch_mapbox_geocoding_place_value(dkd_delivery_text_value,{dkd_expected_place_text_value:dkd_delivery_text_value});dkd_delivery_next=dkd_geo?.dkd_point_value||null;}if(!dkd_delivery_next)throw new Error('Mapbox teslimat adresini konuma çeviremedi. Adresi kontrol et.');const dkd_start=dkd_current_point_value||dkd_pickup_next;if(!dkd_start)throw new Error('Rota başlangıç konumu alınamadı. GPS açık olmalı.');const dkd_route_next=await dkd_fetch_mapbox_directions_route_value(dkd_start,dkd_delivery_next);dkd_set_pickup_point_value(dkd_pickup_next);dkd_set_delivery_point_value(dkd_delivery_next);dkd_set_route_value(dkd_route_next);dkd_set_open_value(true);}catch(dkd_route_error_value){dkd_set_error_value(String(dkd_route_error_value?.message||dkd_route_error_value||'Rota alınamadı.'));dkd_set_open_value(true);}finally{dkd_set_loading_value(false);}},[dkd_current_point_value,dkd_delivery_text_value,dkd_job_value,dkd_pickup_text_value]);
+  const dkd_route_points_value=Array.isArray(dkd_route_value?.dkd_point_list_value)?dkd_route_value.dkd_point_list_value:[];const dkd_initial_region_value=dkd_map_region_value([dkd_current_point_value?.dkd_map_view_coordinate_value,dkd_pickup_point_value?.dkd_map_view_coordinate_value,dkd_delivery_point_value?.dkd_map_view_coordinate_value]);
+  const dkd_fit_value=useCallback((dkd_ref_value)=>{const dkd_points=[dkd_current_point_value?.dkd_map_view_coordinate_value,dkd_pickup_point_value?.dkd_map_view_coordinate_value,dkd_delivery_point_value?.dkd_map_view_coordinate_value,...dkd_route_points_value].filter(Boolean);if(dkd_points.length>=2)setTimeout(()=>{try{dkd_ref_value?.current?.fitToCoordinates(dkd_points,{edgePadding:{top:60,right:44,bottom:60,left:44},animated:true});}catch{}},180);},[dkd_current_point_value,dkd_pickup_point_value,dkd_delivery_point_value,dkd_route_points_value]);
+  useEffect(()=>{if(dkd_open_value)dkd_fit_value(dkd_map_ref_value);},[dkd_open_value,dkd_fit_value]);useEffect(()=>{if(dkd_fullscreen_value)dkd_fit_value(dkd_full_map_ref_value);},[dkd_fullscreen_value,dkd_fit_value]);
+  const dkd_open_google_maps_value=useCallback(async()=>{try{const dkd_destination_value=dkd_delivery_point_value?`${dkd_delivery_point_value.dkd_lat_value},${dkd_delivery_point_value.dkd_lng_value}`:encodeURIComponent(dkd_delivery_text_value);const dkd_origin_value=dkd_current_point_value?`&origin=${dkd_current_point_value.dkd_lat_value},${dkd_current_point_value.dkd_lng_value}`:'';await Linking.openURL(`https://www.google.com/maps/dir/?api=1${dkd_origin_value}&destination=${dkd_destination_value}&travelmode=driving`);}catch{}},[dkd_current_point_value,dkd_delivery_point_value,dkd_delivery_text_value]);
+  return <View style={styles.root}><Pressable onPress={dkd_load_route_value} disabled={dkd_loading_value} style={styles.routeButton}>{dkd_loading_value?<ActivityIndicator color="#06141E"/>:<MaterialCommunityIcons name="navigation-variant" size={21} color="#06141E"/>}<View style={{flex:1}}><Text style={styles.routeButtonTitle}>{dkd_loading_value?'MAPBOX ROTA HESAPLANIYOR':'KONUMA GİT'}</Text><Text style={styles.routeButtonSub}>Teslimat adresini Mapbox ile okuyup sürüş rotasını aç</Text></View>{!dkd_loading_value?<MaterialCommunityIcons name="chevron-right" size={22} color="#06141E"/>:null}</Pressable>
+  {dkd_open_value?<View style={styles.mapCard}>{dkd_delivery_point_value?<View><DkdMapSurface dkd_map_ref_value={dkd_map_ref_value} dkd_region_value={dkd_initial_region_value} dkd_route_points_value={dkd_route_points_value} dkd_pickup_point_value={dkd_pickup_point_value} dkd_delivery_point_value={dkd_delivery_point_value} dkd_current_point_value={dkd_current_point_value}/><Pressable onPress={()=>dkd_set_fullscreen_value(true)} style={styles.expandButton}><MaterialCommunityIcons name="arrow-expand-all" size={21} color="#FFF"/></Pressable></View>:<View style={styles.mapFallback}><MaterialCommunityIcons name="map-marker-alert-outline" size={30} color="#8FA5BE"/><Text style={styles.mapFallbackText}>{dkd_error_value||'Teslimat konumu bekleniyor.'}</Text></View>}<View style={styles.routeMetaRow}><View style={styles.routeMeta}><Text style={styles.routeMetaLabel}>MESAFE</Text><Text style={styles.routeMetaValue}>{Number.isFinite(Number(dkd_route_value?.dkd_distance_km_value))?`${Number(dkd_route_value.dkd_distance_km_value).toFixed(1)} km`:'—'}</Text></View><View style={styles.routeMeta}><Text style={styles.routeMetaLabel}>VARIŞ</Text><Text style={styles.routeMetaValue}>{Number.isFinite(Number(dkd_route_value?.dkd_duration_min_value))?`${Math.max(1,Math.round(Number(dkd_route_value.dkd_duration_min_value)))} dk`:'—'}</Text></View><View style={styles.routeMetaWide}><Text style={styles.routeMetaLabel}>HEDEF</Text><Text numberOfLines={2} style={styles.routeMetaValueSmall}>{dkd_delivery_text_value}</Text></View></View><Pressable onPress={dkd_open_google_maps_value} style={styles.googleButton}><MaterialCommunityIcons name="google-maps" size={21} color="#06111B"/><View style={{flex:1}}><Text style={styles.googleTitle}>GOOGLE MAPS İLE ROTA</Text><Text style={styles.googleSub}>Alternatif navigasyon uygulamasında sürüş rotasını aç</Text></View><MaterialCommunityIcons name="open-in-new" size={18} color="#06111B"/></Pressable>{!!dkd_error_value&&<Text style={styles.errorText}>{dkd_error_value}</Text>}{!!dkd_route_value?.dkd_warning_text_value&&!dkd_error_value?<Text style={styles.warningText}>{dkd_route_value.dkd_warning_text_value}</Text>:null}</View>:null}
+  <Modal visible={dkd_fullscreen_value} animationType="slide" onRequestClose={()=>dkd_set_fullscreen_value(false)}><View style={styles.fullscreenRoot}>{dkd_delivery_point_value?<DkdMapSurface dkd_map_ref_value={dkd_full_map_ref_value} dkd_region_value={dkd_initial_region_value} dkd_route_points_value={dkd_route_points_value} dkd_pickup_point_value={dkd_pickup_point_value} dkd_delivery_point_value={dkd_delivery_point_value} dkd_current_point_value={dkd_current_point_value} dkd_fullscreen_value/>:null}<View style={styles.fullscreenTop}><Pressable onPress={()=>dkd_set_fullscreen_value(false)} style={styles.fullClose}><MaterialCommunityIcons name="close" size={24} color="#FFF"/></Pressable><View style={styles.fullTitleBox}><Text style={styles.fullKicker}>MAPBOX CANLI ROTA</Text><Text numberOfLines={1} style={styles.fullTitle}>{dkd_delivery_text_value}</Text></View></View><View style={styles.fullBottom}><View style={styles.fullMetric}><Text style={styles.fullMetricLabel}>MESAFE</Text><Text style={styles.fullMetricValue}>{Number.isFinite(Number(dkd_route_value?.dkd_distance_km_value))?`${Number(dkd_route_value.dkd_distance_km_value).toFixed(1)} km`:'—'}</Text></View><View style={styles.fullMetric}><Text style={styles.fullMetricLabel}>VARIŞ</Text><Text style={styles.fullMetricValue}>{Number.isFinite(Number(dkd_route_value?.dkd_duration_min_value))?`${Math.max(1,Math.round(Number(dkd_route_value.dkd_duration_min_value)))} dk`:'—'}</Text></View><Pressable onPress={dkd_open_google_maps_value} style={styles.fullGoogle}><MaterialCommunityIcons name="google-maps" size={22} color="#06111B"/><Text style={styles.fullGoogleText}>Google Maps</Text></Pressable></View></View></Modal></View>;
 }
 
-function dkd_job_delivery_point_value(dkd_job_value) {
-  return dkd_point_from_lat_lng_value(dkd_job_value?.dropoff_lat, dkd_job_value?.dropoff_lng);
-}
-
-function dkd_map_region_value(dkd_points_value) {
-  const dkd_points_safe_value = (Array.isArray(dkd_points_value) ? dkd_points_value : []).filter(Boolean);
-  if (!dkd_points_safe_value.length) {
-    return { latitude: 39.92077, longitude: 32.85411, latitudeDelta: 0.12, longitudeDelta: 0.12 };
-  }
-  const dkd_latitudes_value = dkd_points_safe_value.map((dkd_point_value) => Number(dkd_point_value.latitude));
-  const dkd_longitudes_value = dkd_points_safe_value.map((dkd_point_value) => Number(dkd_point_value.longitude));
-  const dkd_min_lat_value = Math.min(...dkd_latitudes_value);
-  const dkd_max_lat_value = Math.max(...dkd_latitudes_value);
-  const dkd_min_lng_value = Math.min(...dkd_longitudes_value);
-  const dkd_max_lng_value = Math.max(...dkd_longitudes_value);
-  return {
-    latitude: (dkd_min_lat_value + dkd_max_lat_value) / 2,
-    longitude: (dkd_min_lng_value + dkd_max_lng_value) / 2,
-    latitudeDelta: Math.max(0.018, (dkd_max_lat_value - dkd_min_lat_value) * 1.55),
-    longitudeDelta: Math.max(0.018, (dkd_max_lng_value - dkd_min_lng_value) * 1.55),
-  };
-}
-
-function DkdRouteMarker({ dkd_icon_name, dkd_label_value, dkd_tone_value = 'cyan' }) {
-  const dkd_is_delivery_value = dkd_tone_value === 'green';
-  return (
-    <View style={styles.markerWrap}>
-      <View style={[styles.markerIcon, dkd_is_delivery_value && styles.markerIconDelivery]}>
-        <MaterialCommunityIcons name={dkd_icon_name} size={20} color={dkd_is_delivery_value ? '#082018' : '#06151E'} />
-      </View>
-      <View style={styles.markerLabelWrap}><Text style={styles.markerLabel}>{dkd_label_value}</Text></View>
-    </View>
-  );
-}
-
-export default function DkdCourierTaskRouteMap({ dkd_job_value, dkd_current_location_value }) {
-  const dkd_map_ref_value = useRef(null);
-  const [dkd_open_value, dkd_set_open_value] = useState(false);
-  const [dkd_loading_value, dkd_set_loading_value] = useState(false);
-  const [dkd_error_value, dkd_set_error_value] = useState('');
-  const [dkd_pickup_point_value, dkd_set_pickup_point_value] = useState(null);
-  const [dkd_delivery_point_value, dkd_set_delivery_point_value] = useState(null);
-  const [dkd_route_value, dkd_set_route_value] = useState(null);
-
-  const dkd_pickup_text_value = dkd_text_value(dkd_job_value?.pickup);
-  const dkd_delivery_text_value = dkd_text_value(dkd_job_value?.delivery_address_text || dkd_job_value?.dropoff);
-  const dkd_current_point_value = useMemo(
-    () => dkd_point_from_any_lat_lng_value(dkd_current_location_value),
-    [dkd_current_location_value],
-  );
-
-  const dkd_load_route_value = useCallback(async () => {
-    if (!dkd_job_value || !dkd_delivery_text_value) {
-      dkd_set_error_value('Teslimat adresi bulunamadı.');
-      return;
-    }
-    dkd_set_loading_value(true);
-    dkd_set_error_value('');
-    try {
-      let dkd_pickup_point_next_value = dkd_job_pickup_point_value(dkd_job_value);
-      if (!dkd_pickup_point_next_value && dkd_pickup_text_value) {
-        const dkd_pickup_geocode_value = await dkd_fetch_mapbox_geocoding_place_value(dkd_pickup_text_value, {
-          dkd_expected_place_text_value: dkd_pickup_text_value,
-        });
-        dkd_pickup_point_next_value = dkd_pickup_geocode_value?.dkd_point_value || null;
-      }
-
-      let dkd_delivery_point_next_value = dkd_job_delivery_point_value(dkd_job_value);
-      if (!dkd_delivery_point_next_value) {
-        const dkd_delivery_geocode_value = await dkd_fetch_mapbox_geocoding_place_value(dkd_delivery_text_value, {
-          dkd_expected_place_text_value: dkd_delivery_text_value,
-        });
-        dkd_delivery_point_next_value = dkd_delivery_geocode_value?.dkd_point_value || null;
-      }
-
-      if (!dkd_delivery_point_next_value) throw new Error('Mapbox teslimat adresini konuma çeviremedi. Adresi kontrol et.');
-
-      const dkd_start_point_value = dkd_current_point_value || dkd_pickup_point_next_value;
-      if (!dkd_start_point_value) throw new Error('Rota başlangıç konumu alınamadı. GPS açık olmalı.');
-
-      const dkd_route_next_value = await dkd_fetch_mapbox_directions_route_value(
-        dkd_start_point_value,
-        dkd_delivery_point_next_value,
-      );
-
-      dkd_set_pickup_point_value(dkd_pickup_point_next_value);
-      dkd_set_delivery_point_value(dkd_delivery_point_next_value);
-      dkd_set_route_value(dkd_route_next_value);
-      dkd_set_open_value(true);
-    } catch (dkd_route_error_value) {
-      dkd_set_error_value(String(dkd_route_error_value?.message || dkd_route_error_value || 'Rota alınamadı.'));
-      dkd_set_open_value(true);
-    } finally {
-      dkd_set_loading_value(false);
-    }
-  }, [dkd_current_point_value, dkd_delivery_text_value, dkd_job_value, dkd_pickup_text_value]);
-
-  useEffect(() => {
-    if (!dkd_open_value || !dkd_map_ref_value.current) return;
-    const dkd_fit_point_values = [
-      dkd_current_point_value?.dkd_map_view_coordinate_value,
-      dkd_pickup_point_value?.dkd_map_view_coordinate_value,
-      dkd_delivery_point_value?.dkd_map_view_coordinate_value,
-      ...(Array.isArray(dkd_route_value?.dkd_point_list_value) ? dkd_route_value.dkd_point_list_value : []),
-    ].filter(Boolean);
-    if (dkd_fit_point_values.length >= 2) {
-      setTimeout(() => {
-        try {
-          dkd_map_ref_value.current?.fitToCoordinates(dkd_fit_point_values, {
-            edgePadding: { top: 44, right: 44, bottom: 44, left: 44 },
-            animated: true,
-          });
-        } catch {}
-      }, 180);
-    }
-  }, [dkd_current_point_value, dkd_delivery_point_value, dkd_open_value, dkd_pickup_point_value, dkd_route_value]);
-
-  const dkd_route_points_value = Array.isArray(dkd_route_value?.dkd_point_list_value) ? dkd_route_value.dkd_point_list_value : [];
-  const dkd_initial_region_value = dkd_map_region_value([
-    dkd_current_point_value?.dkd_map_view_coordinate_value,
-    dkd_pickup_point_value?.dkd_map_view_coordinate_value,
-    dkd_delivery_point_value?.dkd_map_view_coordinate_value,
-  ]);
-
-  return (
-    <View style={styles.root}>
-      <Pressable onPress={dkd_load_route_value} disabled={dkd_loading_value} style={styles.routeButton}>
-        {dkd_loading_value
-          ? <ActivityIndicator color="#06141E" />
-          : <MaterialCommunityIcons name="navigation-variant" size={21} color="#06141E" />}
-        <View style={{ flex: 1 }}>
-          <Text style={styles.routeButtonTitle}>{dkd_loading_value ? 'MAPBOX ROTA HESAPLANIYOR' : 'KONUMA GİT'}</Text>
-          <Text style={styles.routeButtonSub}>Teslimat adresini Mapbox ile okuyup sürüş rotasını aç</Text>
-        </View>
-        {!dkd_loading_value ? <MaterialCommunityIcons name="chevron-right" size={22} color="#06141E" /> : null}
-      </Pressable>
-
-      {dkd_open_value ? (
-        <View style={styles.mapCard}>
-          {dkd_delivery_point_value ? (
-            <MapView ref={dkd_map_ref_value} style={styles.map} initialRegion={dkd_initial_region_value} toolbarEnabled={false}>
-              {dkd_route_points_value.length >= 2 ? (
-                <Polyline coordinates={dkd_route_points_value} strokeWidth={5} strokeColor="#59D9FF" />
-              ) : null}
-              {dkd_pickup_point_value ? (
-                <Marker coordinate={dkd_pickup_point_value.dkd_map_view_coordinate_value} tracksViewChanges={false}>
-                  <DkdRouteMarker dkd_icon_name="storefront-outline" dkd_label_value="İşletme" />
-                </Marker>
-              ) : null}
-              {dkd_delivery_point_value ? (
-                <Marker coordinate={dkd_delivery_point_value.dkd_map_view_coordinate_value} tracksViewChanges={false}>
-                  <DkdRouteMarker dkd_icon_name="map-marker-check-outline" dkd_label_value="Teslimat" dkd_tone_value="green" />
-                </Marker>
-              ) : null}
-              {dkd_current_point_value ? (
-                <Marker coordinate={dkd_current_point_value.dkd_map_view_coordinate_value} tracksViewChanges={false}>
-                  <View style={styles.courierMarker}><MaterialCommunityIcons name="motorbike" size={18} color="#07121D" /></View>
-                </Marker>
-              ) : null}
-            </MapView>
-          ) : (
-            <View style={styles.mapFallback}><MaterialCommunityIcons name="map-marker-alert-outline" size={30} color="#8FA5BE" /><Text style={styles.mapFallbackText}>{dkd_error_value || 'Teslimat konumu bekleniyor.'}</Text></View>
-          )}
-
-          <View style={styles.routeMetaRow}>
-            <View style={styles.routeMeta}>
-              <Text style={styles.routeMetaLabel}>MESAFE</Text>
-              <Text style={styles.routeMetaValue}>{Number.isFinite(Number(dkd_route_value?.dkd_distance_km_value)) ? `${Number(dkd_route_value.dkd_distance_km_value).toFixed(1)} km` : '—'}</Text>
-            </View>
-            <View style={styles.routeMeta}>
-              <Text style={styles.routeMetaLabel}>VARIŞ</Text>
-              <Text style={styles.routeMetaValue}>{Number.isFinite(Number(dkd_route_value?.dkd_duration_min_value)) ? `${Math.max(1, Math.round(Number(dkd_route_value.dkd_duration_min_value)))} dk` : '—'}</Text>
-            </View>
-            <View style={styles.routeMetaWide}>
-              <Text style={styles.routeMetaLabel}>HEDEF</Text>
-              <Text numberOfLines={2} style={styles.routeMetaValueSmall}>{dkd_delivery_text_value}</Text>
-            </View>
-          </View>
-          {!!dkd_error_value && <Text style={styles.errorText}>{dkd_error_value}</Text>}
-          {!!dkd_route_value?.dkd_warning_text_value && !dkd_error_value ? <Text style={styles.warningText}>{dkd_route_value.dkd_warning_text_value}</Text> : null}
-        </View>
-      ) : null}
-    </View>
-  );
-}
-
-const styles = StyleSheet.create({
-  root: { marginTop: 10 },
-  routeButton: { minHeight: 62, borderRadius: 19, backgroundColor: '#6EE9FF', paddingHorizontal: 13, flexDirection: 'row', alignItems: 'center', gap: 10 },
-  routeButtonTitle: { color: '#06141E', fontSize: 14, fontWeight: '900' },
-  routeButtonSub: { color: 'rgba(6,20,30,.70)', fontSize: 10.5, lineHeight: 14, fontWeight: '800', marginTop: 2 },
-  mapCard: { marginTop: 9, borderRadius: 21, overflow: 'hidden', backgroundColor: '#091728', borderWidth: 1, borderColor: 'rgba(119,229,255,.16)' },
-  map: { width: '100%', height: 250 },
-  mapFallback: { height: 190, alignItems: 'center', justifyContent: 'center', gap: 8, padding: 18 },
-  mapFallbackText: { color: '#91A6BE', fontSize: 12.5, lineHeight: 17, fontWeight: '800', textAlign: 'center' },
-  markerWrap: { alignItems: 'center' },
-  markerIcon: { width: 39, height: 39, borderRadius: 14, backgroundColor: '#70E8FF', alignItems: 'center', justifyContent: 'center', borderWidth: 3, borderColor: '#FFFFFF' },
-  markerIconDelivery: { backgroundColor: '#70EDB4' },
-  markerLabelWrap: { marginTop: 2, paddingHorizontal: 6, paddingVertical: 3, borderRadius: 8, backgroundColor: 'rgba(5,15,28,.90)' },
-  markerLabel: { color: '#FFF', fontSize: 9, fontWeight: '900' },
-  courierMarker: { width: 34, height: 34, borderRadius: 99, backgroundColor: '#FFD66D', borderWidth: 3, borderColor: '#FFF', alignItems: 'center', justifyContent: 'center' },
-  routeMetaRow: { padding: 10, flexDirection: 'row', flexWrap: 'wrap', gap: 7 },
-  routeMeta: { width: '30%', minHeight: 58, borderRadius: 14, backgroundColor: 'rgba(255,255,255,.045)', padding: 9 },
-  routeMetaWide: { flex: 1, minWidth: '34%', minHeight: 58, borderRadius: 14, backgroundColor: 'rgba(255,255,255,.045)', padding: 9 },
-  routeMetaLabel: { color: '#7188A1', fontSize: 8.5, fontWeight: '900' },
-  routeMetaValue: { color: '#F2FAFF', fontSize: 13.5, fontWeight: '900', marginTop: 5 },
-  routeMetaValueSmall: { color: '#F2FAFF', fontSize: 10.5, lineHeight: 13, fontWeight: '800', marginTop: 4 },
-  errorText: { color: '#FF9EAF', fontSize: 11, lineHeight: 15, fontWeight: '800', paddingHorizontal: 10, paddingBottom: 10 },
-  warningText: { color: '#FFD88A', fontSize: 10.5, lineHeight: 14, fontWeight: '800', paddingHorizontal: 10, paddingBottom: 10 },
-});
+const styles=StyleSheet.create({root:{marginTop:10},routeButton:{minHeight:62,borderRadius:19,backgroundColor:'#6EE9FF',paddingHorizontal:13,flexDirection:'row',alignItems:'center',gap:10},routeButtonTitle:{color:'#06141E',fontSize:14,fontWeight:'900'},routeButtonSub:{color:'rgba(6,20,30,.70)',fontSize:10.5,lineHeight:14,fontWeight:'800',marginTop:2},mapCard:{marginTop:9,borderRadius:21,overflow:'hidden',backgroundColor:'#091728',borderWidth:1,borderColor:'rgba(119,229,255,.16)'},map:{width:'100%',height:250},expandButton:{position:'absolute',right:12,top:12,width:44,height:44,borderRadius:15,backgroundColor:'rgba(5,15,28,.88)',alignItems:'center',justifyContent:'center',borderWidth:1,borderColor:'rgba(255,255,255,.18)'},mapFallback:{height:190,alignItems:'center',justifyContent:'center',gap:8,padding:18},mapFallbackText:{color:'#91A6BE',fontSize:12.5,lineHeight:17,fontWeight:'800',textAlign:'center'},markerWrap:{alignItems:'center'},markerIcon:{width:39,height:39,borderRadius:14,backgroundColor:'#70E8FF',alignItems:'center',justifyContent:'center',borderWidth:3,borderColor:'#FFF'},markerIconDelivery:{backgroundColor:'#70EDB4'},markerLabelWrap:{marginTop:2,paddingHorizontal:6,paddingVertical:3,borderRadius:8,backgroundColor:'rgba(5,15,28,.90)'},markerLabel:{color:'#FFF',fontSize:9,fontWeight:'900'},courierMarker:{width:34,height:34,borderRadius:99,backgroundColor:'#FFD66D',borderWidth:3,borderColor:'#FFF',alignItems:'center',justifyContent:'center'},routeMetaRow:{padding:10,flexDirection:'row',flexWrap:'wrap',gap:7},routeMeta:{width:'30%',minHeight:58,borderRadius:14,backgroundColor:'rgba(255,255,255,.045)',padding:9},routeMetaWide:{flex:1,minWidth:'34%',minHeight:58,borderRadius:14,backgroundColor:'rgba(255,255,255,.045)',padding:9},routeMetaLabel:{color:'#7188A1',fontSize:8.5,fontWeight:'900'},routeMetaValue:{color:'#F2FAFF',fontSize:13.5,fontWeight:'900',marginTop:5},routeMetaValueSmall:{color:'#F2FAFF',fontSize:10.5,lineHeight:13,fontWeight:'800',marginTop:4},googleButton:{minHeight:58,marginHorizontal:10,marginBottom:10,borderRadius:17,backgroundColor:'#F6F2E8',paddingHorizontal:13,flexDirection:'row',alignItems:'center',gap:10},googleTitle:{color:'#06111B',fontSize:12.5,fontWeight:'900'},googleSub:{color:'rgba(6,17,27,.65)',fontSize:9.5,fontWeight:'700',marginTop:2},errorText:{color:'#FF9EAF',fontSize:11,lineHeight:15,fontWeight:'800',paddingHorizontal:10,paddingBottom:10},warningText:{color:'#FFD88A',fontSize:10.5,lineHeight:14,fontWeight:'800',paddingHorizontal:10,paddingBottom:10},fullscreenRoot:{flex:1,backgroundColor:'#030812'},fullscreenMap:{...StyleSheet.absoluteFillObject},fullscreenTop:{position:'absolute',top:18,left:14,right:14,flexDirection:'row',alignItems:'center',gap:10},fullClose:{width:48,height:48,borderRadius:17,backgroundColor:'rgba(5,15,28,.90)',alignItems:'center',justifyContent:'center'},fullTitleBox:{flex:1,borderRadius:17,paddingHorizontal:13,paddingVertical:9,backgroundColor:'rgba(5,15,28,.90)'},fullKicker:{color:'#7DEAFF',fontSize:9.5,fontWeight:'900',letterSpacing:1},fullTitle:{color:'#FFF',fontSize:13.5,fontWeight:'900',marginTop:3},fullBottom:{position:'absolute',left:14,right:14,bottom:22,flexDirection:'row',gap:8,alignItems:'stretch'},fullMetric:{minWidth:84,borderRadius:17,padding:11,backgroundColor:'rgba(5,15,28,.92)'},fullMetricLabel:{color:'#7C92AA',fontSize:9,fontWeight:'900'},fullMetricValue:{color:'#FFF',fontSize:14,fontWeight:'900',marginTop:4},fullGoogle:{flex:1,borderRadius:17,backgroundColor:'#F6F2E8',flexDirection:'row',alignItems:'center',justifyContent:'center',gap:7,paddingHorizontal:12},fullGoogleText:{color:'#06111B',fontSize:13,fontWeight:'900'}});
