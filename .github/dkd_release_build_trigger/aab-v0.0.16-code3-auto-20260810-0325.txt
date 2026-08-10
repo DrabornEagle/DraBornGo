@@ -1,0 +1,4 @@
+DraBornGo signed AAB automatic build
+version=0.0.16
+versionCode=3
+requested=2026-08-10T03:25:00+03:00
