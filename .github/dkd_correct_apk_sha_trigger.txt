@@ -1,0 +1,2 @@
+correct actual DraBornGo v0.0.16 APK SHA
+actual_sha256=f6214c8a1e9d48b7e0cc5718a9172cce88dd2620a48c1debbbaffca1549accba
