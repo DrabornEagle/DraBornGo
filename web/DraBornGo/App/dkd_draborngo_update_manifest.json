@@ -7,6 +7,6 @@
   "dkd_target_android_api": 36,
   "dkd_apk_url": "",
   "dkd_download_page_url": "https://play.google.com/store/apps/details?id=com.draborneagle.draborngo",
-  "dkd_sha256": "a2c6d6c1a8db8eedbe49a550c8bf7775ff64c13146429b85ebc9aa201dae0f66",
+  "dkd_sha256": "f6214c8a1e9d48b7e0cc5718a9172cce88dd2620a48c1debbbaffca1549accba",
   "dkd_release_notes": "DraBornGo v0.0.16: Release APK üretildi. Google Play dağıtımı için imzalı AAB release akışı kullanılmaktadır. Sürüm ve Güncelleme Merkezi resmi release kaynağını ve APK SHA-256 doğrulamasını gösterir."
 }

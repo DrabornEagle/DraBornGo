@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 
-const dkd_apk_sha256_value = 'a2c6d6c1a8db8eedbe49a550c8bf7775ff64c13146429b85ebc9aa201dae0f66';
+const dkd_apk_sha256_value = 'f6214c8a1e9d48b7e0cc5718a9172cce88dd2620a48c1debbbaffca1549accba';
 const dkd_version_name_value = '0.0.16';
 const dkd_version_code_value = 3;
 const dkd_distribution_channel_value = 'google-play-release';

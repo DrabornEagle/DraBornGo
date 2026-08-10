@@ -7,7 +7,7 @@ const dkd_play_store_url_value = 'https://play.google.com/store/apps/details?id=
 const dkd_current_release_name_value = '0.0.16';
 const dkd_current_release_code_value = 3;
 const dkd_current_distribution_channel_value = 'google-play-release';
-const dkd_current_apk_sha256_value = 'a2c6d6c1a8db8eedbe49a550c8bf7775ff64c13146429b85ebc9aa201dae0f66';
+const dkd_current_apk_sha256_value = 'f6214c8a1e9d48b7e0cc5718a9172cce88dd2620a48c1debbbaffca1549accba';
 const dkd_current_release_notes_value = 'DraBornGo v0.0.16: Release APK üretildi ve Google Play dağıtımı için imzalı AAB release akışı kullanılmaktadır. Sürüm ve Güncelleme Merkezi resmi release kaynağını ve APK SHA-256 doğrulamasını gösterir.';
 
 function dkd_clean_text_value(dkd_value, dkd_fallback = '') {

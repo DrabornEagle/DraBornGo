@@ -62,7 +62,7 @@ export default function DkdAppUpdateCenterModal({ dkd_visible_value, dkd_on_clos
     return String(dkd_status_value?.dkd_source_url_value || 'Google Play • DraBornGo Release');
   }, [dkd_status_value]);
 
-  const dkd_sha_text_value = String(dkd_status_value?.dkd_sha256_value || '').trim() || 'a2c6d6c1a8db8eedbe49a550c8bf7775ff64c13146429b85ebc9aa201dae0f66';
+  const dkd_sha_text_value = String(dkd_status_value?.dkd_sha256_value || '').trim() || 'f6214c8a1e9d48b7e0cc5718a9172cce88dd2620a48c1debbbaffca1549accba';
 
   const dkd_save_release_note_value = useCallback(async () => {
     if (!dkd_is_admin_value || dkd_release_note_saving_value) return;
