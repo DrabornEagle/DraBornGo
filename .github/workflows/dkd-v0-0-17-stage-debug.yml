@@ -1,0 +1,50 @@
+name: DraBornGo v0.0.17 staged validation
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/dkd-v0-0-17-stage-debug.yml'
+permissions:
+  contents: write
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Configure validation commits
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+      - name: Sync lock identity
+        run: |
+          npm install --package-lock-only --ignore-scripts
+          printf 'v0.0.17 lock sync passed\n' > .github/dkd-v0.0.17-stage-lock.txt
+          git add package-lock.json .github/dkd-v0.0.17-stage-lock.txt
+          git commit -m 'ci: v0.0.17 lock stage passed'
+          git push
+      - name: Install exact dependencies
+        run: |
+          npm ci
+          printf 'v0.0.17 npm ci passed\n' > .github/dkd-v0.0.17-stage-install.txt
+          git add .github/dkd-v0.0.17-stage-install.txt
+          git commit -m 'ci: v0.0.17 install stage passed'
+          git push
+      - name: Expo Doctor
+        run: |
+          npx expo-doctor@latest
+          printf 'v0.0.17 Expo Doctor passed\n' > .github/dkd-v0.0.17-stage-doctor.txt
+          git add .github/dkd-v0.0.17-stage-doctor.txt
+          git commit -m 'ci: v0.0.17 doctor stage passed'
+          git push
+      - name: Android Metro export
+        run: |
+          npx expo export --platform android --output-dir dist-ci
+          printf 'v0.0.17 Android Metro export passed; no APK/AAB built\n' > .github/dkd-v0.0.17-stage-export.txt
+          git add .github/dkd-v0.0.17-stage-export.txt
+          git commit -m 'ci: v0.0.17 export stage passed'
+          git push
