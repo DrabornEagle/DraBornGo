@@ -4,8 +4,6 @@ on:
   push:
     branches:
       - 'release/aab-dispatch-*'
-    paths:
-      - '.github/dkd_aab_dispatch_trigger.txt'
 
 permissions:
   actions: write
