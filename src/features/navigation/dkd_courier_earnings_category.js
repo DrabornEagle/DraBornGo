@@ -92,8 +92,29 @@ function DkdCourierEarningsCategory({ dkd_visible_value = true }) {
     return dkd_base_seconds_value + Math.max(0, Math.floor((dkd_clock_value - dkd_generated_timestamp_value) / 1000));
   }, [dkd_clock_value, dkd_daily_value?.dkd_online_seconds, dkd_data_value?.dkd_generated_at, dkd_data_value?.dkd_is_online]);
 
-  const dkd_hourly_value = dkd_safe_number_value(dkd_daily_value?.dkd_hourly_tl);
-  const dkd_hourly_ready_value = dkd_safe_number_value(dkd_daily_value?.dkd_hourly_basis_seconds) >= 60;
+  const dkd_hourly_period_value = dkd_data_value?.hourly || {};
+  const dkd_fixed_hourly_rate_value = dkd_safe_number_value(
+    dkd_hourly_period_value?.dkd_fixed_hourly_rate_tl
+      ?? dkd_daily_value?.dkd_fixed_hourly_rate_tl
+      ?? dkd_daily_value?.dkd_hourly_tl,
+  );
+  const dkd_live_hourly_earnings_value = useMemo(() => {
+    const dkd_server_earned_value = dkd_safe_number_value(dkd_hourly_period_value?.dkd_hourly_earnings_tl);
+    if (dkd_data_value?.dkd_is_online !== true || dkd_fixed_hourly_rate_value <= 0) return dkd_server_earned_value;
+    const dkd_generated_timestamp_value = new Date(dkd_data_value?.dkd_generated_at || 0).getTime();
+    if (!Number.isFinite(dkd_generated_timestamp_value) || dkd_generated_timestamp_value <= 0) return dkd_server_earned_value;
+    const dkd_now_timestamp_value = dkd_clock_value;
+    const dkd_generated_hour_value = Math.floor(dkd_generated_timestamp_value / 3600000);
+    const dkd_now_hour_value = Math.floor(dkd_now_timestamp_value / 3600000);
+    if (dkd_generated_hour_value === dkd_now_hour_value) {
+      const dkd_elapsed_seconds_value = Math.max(0, (dkd_now_timestamp_value - dkd_generated_timestamp_value) / 1000);
+      return dkd_server_earned_value + ((dkd_elapsed_seconds_value / 3600) * dkd_fixed_hourly_rate_value);
+    }
+    const dkd_seconds_into_current_hour_value = Math.max(0, (dkd_now_timestamp_value % 3600000) / 1000);
+    return (dkd_seconds_into_current_hour_value / 3600) * dkd_fixed_hourly_rate_value;
+  }, [dkd_clock_value, dkd_data_value?.dkd_generated_at, dkd_data_value?.dkd_is_online, dkd_fixed_hourly_rate_value, dkd_hourly_period_value?.dkd_hourly_earnings_tl]);
+  const dkd_hourly_ready_value = dkd_fixed_hourly_rate_value > 0
+    && (dkd_safe_number_value(dkd_hourly_period_value?.dkd_online_seconds) > 0 || dkd_data_value?.dkd_is_online === true);
   const dkd_arrow_rotate_value = dkd_arrow_value.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '180deg'] });
 
   return (
@@ -128,9 +149,9 @@ function DkdCourierEarningsCategory({ dkd_visible_value = true }) {
               <Text style={dkd_styles_value.dkd_live_timer_sub}>{dkd_data_value?.dkd_is_online === true ? 'Sayaç canlı çalışıyor' : 'Kurye şu anda çevrimdışı'}</Text>
             </LinearGradient>
             <LinearGradient colors={['rgba(4,56,46,.52)', 'rgba(34,40,86,.56)']} style={dkd_styles_value.dkd_live_timer_card}>
-              <View style={dkd_styles_value.dkd_live_timer_top}><MaterialCommunityIcons name="speedometer" size={19} color="#89F0C0" /><Text style={dkd_styles_value.dkd_live_timer_label}>SAAT BAŞI</Text></View>
-              <Text style={dkd_styles_value.dkd_hourly_value}>{dkd_hourly_ready_value ? dkd_format_earnings_money_value(dkd_hourly_value) : 'Hesaplanıyor'}</Text>
-              <Text style={dkd_styles_value.dkd_live_timer_sub}>En az 1 dk gerçek çalışma verisiyle hesaplanır</Text>
+              <View style={dkd_styles_value.dkd_live_timer_top}><MaterialCommunityIcons name="speedometer" size={19} color="#89F0C0" /><Text style={dkd_styles_value.dkd_live_timer_label}>BU SAAT KAZANÇ</Text></View>
+              <Text style={dkd_styles_value.dkd_hourly_value}>{dkd_hourly_ready_value ? dkd_format_earnings_money_value(dkd_live_hourly_earnings_value) : dkd_format_earnings_money_value(0)}</Text>
+              <Text style={dkd_styles_value.dkd_live_timer_sub}>Saatlik sabit ücret, bu saat içindeki gerçek çalışma süresi kadar yansır</Text>
             </LinearGradient>
           </View>
 
@@ -155,30 +176,30 @@ const dkd_styles_value = StyleSheet.create({
   dkd_header: { minHeight: 92, padding: 13, flexDirection: 'row', alignItems: 'center', gap: 10 },
   dkd_header_icon: { width: 48, height: 48, borderRadius: 17, backgroundColor: '#87EAFF', alignItems: 'center', justifyContent: 'center' },
   dkd_header_copy: { flex: 1, minWidth: 0 },
-  dkd_kicker: { color: '#B8F4FF', fontSize: 8.5, fontWeight: '900', letterSpacing: 1.15 },
+  dkd_kicker: { color: '#B8F4FF', fontSize: 10.5, fontWeight: '900', letterSpacing: 1.15 },
   dkd_title: { color: '#FFFFFF', fontSize: 20, fontWeight: '900', marginTop: 2 },
-  dkd_subtitle: { color: 'rgba(238,247,255,.65)', fontSize: 10.5, fontWeight: '700', marginTop: 3 },
+  dkd_subtitle: { color: 'rgba(238,247,255,.65)', fontSize: 12, fontWeight: '700', marginTop: 3 },
   dkd_header_actions: { flexDirection: 'row', alignItems: 'center', gap: 7 },
   dkd_refresh_button: { width: 38, height: 38, borderRadius: 14, backgroundColor: 'rgba(255,255,255,.08)', alignItems: 'center', justifyContent: 'center' },
   dkd_body: { paddingHorizontal: 13, paddingBottom: 13, gap: 9 },
   dkd_live_row: { flexDirection: 'row', gap: 8 },
   dkd_live_timer_card: { flex: 1, minHeight: 111, borderRadius: 19, padding: 11, borderWidth: 1, borderColor: 'rgba(255,255,255,.09)' },
   dkd_live_timer_top: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  dkd_live_timer_label: { flex: 1, color: 'rgba(238,247,255,.66)', fontSize: 8, fontWeight: '900', letterSpacing: .7 },
+  dkd_live_timer_label: { flex: 1, color: 'rgba(238,247,255,.66)', fontSize: 10.5, fontWeight: '900', letterSpacing: .7 },
   dkd_live_dot: { width: 7, height: 7, borderRadius: 99, backgroundColor: '#728098' },
   dkd_live_dot_active: { backgroundColor: '#59E8AD' },
   dkd_live_timer_value: { color: '#FFFFFF', fontSize: 22, fontWeight: '900', marginTop: 9, fontVariant: ['tabular-nums'] },
   dkd_hourly_value: { color: '#DFFFF2', fontSize: 18, fontWeight: '900', marginTop: 9 },
-  dkd_live_timer_sub: { color: 'rgba(235,245,255,.52)', fontSize: 8.5, lineHeight: 12, fontWeight: '700', marginTop: 4 },
+  dkd_live_timer_sub: { color: 'rgba(235,245,255,.52)', fontSize: 10.5, lineHeight: 12, fontWeight: '700', marginTop: 4 },
   dkd_period_card: { minHeight: 110, borderRadius: 20, padding: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,.10)' },
   dkd_period_top: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   dkd_period_icon: { width: 34, height: 34, borderRadius: 12, backgroundColor: 'rgba(255,255,255,.10)', alignItems: 'center', justifyContent: 'center' },
-  dkd_period_title: { color: '#FFFFFF', fontSize: 10, fontWeight: '900', letterSpacing: 1 },
+  dkd_period_title: { color: '#FFFFFF', fontSize: 12, fontWeight: '900', letterSpacing: 1 },
   dkd_period_money: { color: '#FFFFFF', fontSize: 22, fontWeight: '900', marginTop: 9 },
   dkd_period_bottom: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 6 },
-  dkd_period_meta: { color: 'rgba(238,247,255,.66)', fontSize: 9.5, fontWeight: '800', fontVariant: ['tabular-nums'] },
+  dkd_period_meta: { color: 'rgba(238,247,255,.66)', fontSize: 11.5, fontWeight: '800', fontVariant: ['tabular-nums'] },
   dkd_lifetime_row: { minHeight: 48, borderRadius: 17, paddingHorizontal: 12, flexDirection: 'row', alignItems: 'center', gap: 8, borderWidth: 1, borderColor: 'rgba(255,214,122,.16)', backgroundColor: 'rgba(91,55,64,.30)' },
-  dkd_lifetime_text: { flex: 1, color: '#FFE7AA', fontSize: 10.5, fontWeight: '900' },
+  dkd_lifetime_text: { flex: 1, color: '#FFE7AA', fontSize: 12, fontWeight: '900' },
 });
 
 export default memo(DkdCourierEarningsCategory);
