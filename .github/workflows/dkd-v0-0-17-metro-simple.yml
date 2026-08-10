@@ -1,0 +1,28 @@
+name: DraBornGo v0.0.17 simple Metro validation
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/dkd-v0-0-17-metro-simple.yml'
+permissions:
+  contents: write
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npx expo export --platform android --output-dir dist-ci
+      - run: |
+          echo 'DraBornGo v0.0.17 Android Metro export passed. No APK/AAB built.' > .github/dkd-v0.0.17-metro-simple-success.txt
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add .github/dkd-v0.0.17-metro-simple-success.txt
+          git commit -m 'ci: confirm v0.0.17 Metro validation'
+          git push
