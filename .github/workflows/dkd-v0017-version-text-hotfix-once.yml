@@ -1,0 +1,45 @@
+name: DraBornGo v0.0.17 visible text hotfix once
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/dkd-v0017-version-text-hotfix-once.yml'
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Update current visible release text
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          roots = [Path('src'), Path('web/DraBornGo/App')]
+          files = []
+          for root in roots:
+              if root.exists():
+                  files.extend([p for p in root.rglob('*') if p.is_file() and p.suffix.lower() in {'.js','.json','.html','.css','.md'}])
+          for extra in [Path('README.md'), Path('README_TR.md'), Path('scripts/dkd_verify_release_identity.mjs'), Path('scripts/dkd_release_metadata_patch.mjs')]:
+              if extra.exists(): files.append(extra)
+
+          for path in files:
+              value = path.read_text(errors='ignore')
+              value = value.replace('v0.0.16', 'v0.0.17')
+              if path.suffix.lower() == '.js':
+                  value = re.sub(r"(['\"])ETA\1", lambda m: m.group(1) + 'VARIŞ' + m.group(1), value)
+              path.write_text(value)
+          PY
+      - name: Commit and remove one-shot workflow
+        run: |
+          rm -f .github/workflows/dkd-v0017-version-text-hotfix-once.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'fix: update visible DraBornGo texts to v0.0.17'
+          git push
