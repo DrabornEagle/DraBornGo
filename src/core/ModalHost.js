@@ -1,7 +1,7 @@
 import React, { memo, useCallback, useState } from 'react';
 import ActionMenuModal from '../features/navigation/ActionMenuModal';
 import ProfileModal from '../features/profile/ProfileModal';
-import CourierBoardModal from '../features/courier/dkd_courier_board_modal_v2';
+import CourierBoardModal from '../features/courier/dkd_courier_board_modal_v3';
 import DkdCourierLiveSyncBridge from '../features/courier/dkd_courier_live_sync_bridge';
 import DkdLiveSupportModal from '../features/support/dkd_live_support_modal_v2';
 import AdminMenuModal from '../features/admin/AdminMenuModal';
@@ -13,19 +13,17 @@ function ModalHost(props) {
     actionMenuOpen, setActionMenuOpen, isAdmin, courierBoardOpen, setCourierBoardOpen,
     setProfile, setProfileOpen, logout, profileOpen, profile, refreshProfile, saveProfileNick,
     activeTab, setActiveTab, sessionUserId, loc, adminMenuOpen, setAdminMenuOpen,
-    dkd_courier_initial_panel_value,
-    dkd_set_courier_initial_panel_value,
+    dkd_courier_initial_panel_value, dkd_set_courier_initial_panel_value,
   } = props;
+  void refreshProfile;
   const [dkd_policy_center_visible_value, dkd_set_policy_center_visible_value] = useState(false);
   const [dkd_app_update_center_visible_value, dkd_set_app_update_center_visible_value] = useState(false);
-
   const dkd_close_action_menu_value = useCallback(() => setActionMenuOpen(false), [setActionMenuOpen]);
   const dkd_open_profile_value = useCallback(() => { setActionMenuOpen(false); setProfileOpen(true); }, [setActionMenuOpen, setProfileOpen]);
   const dkd_open_courier_value = useCallback(() => { setActionMenuOpen(false); dkd_set_courier_initial_panel_value?.('default'); setCourierBoardOpen(true); }, [setActionMenuOpen, setCourierBoardOpen, dkd_set_courier_initial_panel_value]);
   const dkd_open_admin_value = useCallback(() => { setActionMenuOpen(false); setAdminMenuOpen(true); }, [setActionMenuOpen, setAdminMenuOpen]);
   const dkd_open_legal_value = useCallback(() => { setActionMenuOpen(false); dkd_set_policy_center_visible_value(true); setActiveTab('dkd_legal_center'); }, [setActionMenuOpen, setActiveTab]);
   const dkd_open_app_update_center_value = useCallback(() => { setActionMenuOpen(false); dkd_set_app_update_center_visible_value(true); setActiveTab('dkd_app_update_center'); }, [setActionMenuOpen, setActiveTab]);
-
   return <>
     {actionMenuOpen ? <ActionMenuModal visible onClose={dkd_close_action_menu_value} isAdmin={isAdmin} canCourier={String(profile?.courier_status || '').toLowerCase() === 'approved'} onCourier={dkd_open_courier_value} onProfile={dkd_open_profile_value} onSupport={() => { setActionMenuOpen(false); setActiveTab('support'); }} onLegalCenter={dkd_open_legal_value} dkd_on_app_update_center_value={dkd_open_app_update_center_value} onAdmin={dkd_open_admin_value} onLogout={logout} /> : null}
     {profileOpen ? <ProfileModal visible onClose={() => setProfileOpen(false)} profile={profile} onSave={saveProfileNick} /> : null}
