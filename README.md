@@ -1,6 +1,6 @@
 # DraBornGo
 
-Current release: **v0.0.16** • Android versionCode **3** • Expo SDK **57**.
+Current release: **v0.0.17** • Android versionCode **3** • Expo SDK **57**.
 
 DraBornGo's Google Play client is a courier-operations app for already authorized courier accounts: task discovery, accept/pickup/deliver flow, foreground route/location use, support, and work/earnings summaries.
 

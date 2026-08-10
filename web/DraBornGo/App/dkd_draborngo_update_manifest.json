@@ -8,5 +8,5 @@
   "dkd_apk_url": "",
   "dkd_download_page_url": "https://play.google.com/store/apps/details?id=com.draborneagle.draborngo",
   "dkd_sha256": "28e8579d7a7f07f7ea82583960ea9aedfae70b76589993eb003edc5ad8aba20e",
-  "dkd_release_notes": "DraBornGo v0.0.16: İmzalı Android App Bundle (AAB) üretildi ve Google Play dağıtımına hazırlandı. Mobil istemcide eski kurye kayıt/onay ekranları ve admin onay kuyruğu kaldırıldı; mevcut yetkili kuryelerin görev, rota, teslimat ve kazanç akışı korundu. Gizlilik, şartlar ve web ürün kapsamı v0.0.16 / Android versionCode 3 ile eşitlendi. Resmi Android dağıtım kanalı Google Play'dir."
+  "dkd_release_notes": "DraBornGo v0.0.17: İmzalı Android App Bundle (AAB) üretildi ve Google Play dağıtımına hazırlandı. Mobil istemcide eski kurye kayıt/onay ekranları ve admin onay kuyruğu kaldırıldı; mevcut yetkili kuryelerin görev, rota, teslimat ve kazanç akışı korundu. Gizlilik, şartlar ve web ürün kapsamı v0.0.17 / Android versionCode 3 ile eşitlendi. Resmi Android dağıtım kanalı Google Play'dir."
 }

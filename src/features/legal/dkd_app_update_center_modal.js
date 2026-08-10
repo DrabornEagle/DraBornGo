@@ -158,7 +158,7 @@ export default function DkdAppUpdateCenterModal({ dkd_visible_value, dkd_on_clos
                     </Pressable>
                   </>
                 ) : (
-                  <Text {...dkd_text_scaling_props_value} style={dkd_styles_value.dkd_release_text}>{dkd_status_value?.dkd_release_notes_value || 'DraBornGo v0.0.16 güncel sürüm bilgisi yükleniyor.'}</Text>
+                  <Text {...dkd_text_scaling_props_value} style={dkd_styles_value.dkd_release_text}>{dkd_status_value?.dkd_release_notes_value || 'DraBornGo v0.0.17 güncel sürüm bilgisi yükleniyor.'}</Text>
                 )}
               </View>
 

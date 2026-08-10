@@ -1,10 +1,10 @@
 # DraBornGo
 
-> Aktif sürüm: **v0.0.16** • Android versionCode **3** • Expo SDK **57** • Aktif lokal repo: `~/projects/DraBornGo`
+> Aktif sürüm: **v0.0.17** • Android versionCode **3** • Expo SDK **57** • Aktif lokal repo: `~/projects/DraBornGo`
 
 DraBornGo Google Play sürümü, mevcut yetkili kuryelerin teslimat görevlerini görmesi, görevi kabul etmesi, alım/teslim adımlarını ve rotayı yönetmesi, çalışma-kazanç özetlerini takip etmesi için kullanılan kurye operasyon uygulamasıdır.
 
-## v0.0.16 test düzeni
+## v0.0.17 test düzeni
 
 - Android versionCode **3** olarak sabittir ve üretim AAB oluşturulana kadar artırılmaz.
 - Test Expo Go üzerinden yapılır; bu sürüm geçişinde APK veya AAB üretilmez.
@@ -31,4 +31,4 @@ Service-role anahtarları, veritabanı parolaları, Android signing bilgileri ve
 
 ## Web
 
-Canlı şirket sitesi ayrı repodan yayınlanır: `DrabornEagle/DrabornEagle_Web`. DraBornGo ürün, gizlilik, şartlar ve hesap silme sayfaları v0.0.16 ile eşit tutulur.
+Canlı şirket sitesi ayrı repodan yayınlanır: `DrabornEagle/DrabornEagle_Web`. DraBornGo ürün, gizlilik, şartlar ve hesap silme sayfaları v0.0.17 ile eşit tutulur.

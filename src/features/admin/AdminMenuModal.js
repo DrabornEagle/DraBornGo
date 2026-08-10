@@ -34,7 +34,7 @@ export default function AdminMenuModal({ visible, onClose, onCourier }) {
               <SecondaryButton label="Kapat" onPress={onClose} size="compact" fullWidth={false} />
             </View>
 
-            <View style={styles.statusStrip}><View style={styles.statusDot} /><Text style={styles.statusText}>Admin oturumu aktif • DraBornGo v0.0.16</Text></View>
+            <View style={styles.statusStrip}><View style={styles.statusDot} /><Text style={styles.statusText}>Admin oturumu aktif • DraBornGo v0.0.17</Text></View>
 
             <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
               <Text style={styles.section}>KULLANICI & DESTEK</Text>

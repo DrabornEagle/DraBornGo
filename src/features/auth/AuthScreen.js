@@ -24,9 +24,9 @@ const dkd_login_secure_mockup_image_value = require('../../../assets/dkd_login/d
 const dkd_terms_public_url_value = 'https://www.draborneagle.com/draborngo/terms/';
 const dkd_privacy_public_url_value = 'https://www.draborneagle.com/draborngo/privacy/';
 const dkd_community_public_url_value = 'https://www.draborneagle.com/draborngo/community/';
-const dkd_terms_version_value = '2026-08-10-v0.0.16';
-const dkd_privacy_version_value = '2026-08-10-v0.0.16';
-const dkd_community_policy_version_value = '2026-08-10-v0.0.16';
+const dkd_terms_version_value = '2026-08-10-v0.0.17';
+const dkd_privacy_version_value = '2026-08-10-v0.0.17';
+const dkd_community_policy_version_value = '2026-08-10-v0.0.17';
 
 const dkd_region_presets_value = {
   Türkiye: {

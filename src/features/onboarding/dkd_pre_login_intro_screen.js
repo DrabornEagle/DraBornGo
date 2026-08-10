@@ -19,7 +19,7 @@ const dkd_pre_login_role_storage_key_value = 'dkd_dkd_draborngo_pre_login_role_h
 
 const dkd_intro_step_list_value = [
   {
-    dkd_badge_text: 'DraBornGo v0.0.16 • KURYE GİRİŞİ',
+    dkd_badge_text: 'DraBornGo v0.0.17 • KURYE GİRİŞİ',
     dkd_title_text: "DraBornGo'ya hoş geldin — kurye operasyonun tek ekranda",
     dkd_body_text: 'Gelen teslimat görevlerini gör, uygun görevi kabul et, rotanı takip et ve kazancını tek merkezden izle.',
     dkd_art_mode_value: 'welcome',

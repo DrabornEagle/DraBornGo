@@ -9,7 +9,7 @@ const dkd_text_scaling_props_value = { allowFontScaling: false, maxFontSizeMulti
 
 const dkd_default_config_value = {
   dkd_package_name_value: 'com.draborneagle.draborngo',
-  dkd_version_name_value: 'v0.0.16',
+  dkd_version_name_value: 'v0.0.17',
   dkd_version_code_value: 3,
   dkd_privacy_policy_doc_url_value: 'https://www.draborneagle.com/draborngo/privacy/',
   dkd_account_deletion_form_url_value: 'https://www.draborneagle.com/draborngo/account-deletion/',
@@ -95,7 +95,7 @@ export default function DkdGooglePlayPolicyCenterModal({ dkd_visible_value, dkd_
     dkd_set_config_value({
       ...dkd_default_config_value,
       ...dkd_remote_value,
-      dkd_version_name_value: 'v0.0.16',
+      dkd_version_name_value: 'v0.0.17',
       dkd_version_code_value: 3,
     });
   }, []);
@@ -105,7 +105,7 @@ export default function DkdGooglePlayPolicyCenterModal({ dkd_visible_value, dkd_
   }, [dkd_visible_value, dkd_load_value]);
 
   const dkd_version_text_value = useMemo(() => {
-    const dkd_name_value = 'v0.0.16';
+    const dkd_name_value = 'v0.0.17';
     const dkd_normalized_name_value = dkd_name_value.startsWith('v') ? dkd_name_value : `v${dkd_name_value}`;
     return `${dkd_normalized_name_value} • Kod: 3`;
   }, []);

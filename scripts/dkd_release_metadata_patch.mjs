@@ -73,7 +73,7 @@ if (!dkd_service_content_value.includes('const dkd_current_distribution_channel_
   dkd_write_value(dkd_update_service_path_value, dkd_service_content_value);
 }
 
-const dkd_release_notes_value = "const dkd_current_release_notes_value = 'DraBornGo v0.0.16: Release APK üretildi ve Google Play dağıtımı için imzalı AAB release akışı kullanılmaktadır. Sürüm ve Güncelleme Merkezi resmi release kaynağını ve APK SHA-256 doğrulamasını gösterir.';";
+const dkd_release_notes_value = "const dkd_current_release_notes_value = 'DraBornGo v0.0.17: Release APK üretildi ve Google Play dağıtımı için imzalı AAB release akışı kullanılmaktadır. Sürüm ve Güncelleme Merkezi resmi release kaynağını ve APK SHA-256 doğrulamasını gösterir.';";
 dkd_replace_regex_required_value(
   dkd_update_service_path_value,
   /const dkd_current_release_notes_value = '[^']*';/,
@@ -121,7 +121,7 @@ dkd_manifest_value.dkd_target_android_api = 36;
 dkd_manifest_value.dkd_apk_url = '';
 dkd_manifest_value.dkd_download_page_url = 'https://play.google.com/store/apps/details?id=com.draborneagle.draborngo';
 dkd_manifest_value.dkd_sha256 = dkd_apk_sha256_value;
-dkd_manifest_value.dkd_release_notes = 'DraBornGo v0.0.16: Release APK üretildi. Google Play dağıtımı için imzalı AAB release akışı kullanılmaktadır. Sürüm ve Güncelleme Merkezi resmi release kaynağını ve APK SHA-256 doğrulamasını gösterir.';
+dkd_manifest_value.dkd_release_notes = 'DraBornGo v0.0.17: Release APK üretildi. Google Play dağıtımı için imzalı AAB release akışı kullanılmaktadır. Sürüm ve Güncelleme Merkezi resmi release kaynağını ve APK SHA-256 doğrulamasını gösterir.';
 dkd_write_value(dkd_manifest_path_value, `${JSON.stringify(dkd_manifest_value, null, 2)}\n`);
 
 const dkd_update_modal_check_value = dkd_read_value(dkd_update_modal_path_value);

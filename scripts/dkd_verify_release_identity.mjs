@@ -9,4 +9,4 @@ if (Number(dkd_app_value?.expo?.android?.versionCode) !== 3) dkd_fail_value('And
 if (dkd_package_value?.version !== '0.0.16') dkd_fail_value('package.json version must be 0.0.16');
 if (dkd_app_value?.expo?.android?.package !== 'com.draborneagle.draborngo') dkd_fail_value('Android package changed unexpectedly');
 
-console.log('DraBornGo v0.0.16 / Android versionCode 3 identity: PASS');
+console.log('DraBornGo v0.0.17 / Android versionCode 3 identity: PASS');
