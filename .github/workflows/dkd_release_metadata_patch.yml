@@ -1,7 +1,7 @@
 name: Dkd Release Metadata Patch
 
 on:
-  pull_request:
+  pull_request_target:
     branches: [main]
     paths:
       - 'scripts/dkd_release_metadata_patch_trigger.txt'
@@ -17,7 +17,7 @@ jobs:
       - name: Dkd checkout PR branch
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.head_ref }}
+          ref: ${{ github.event.pull_request.head.ref }}
           token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 0
 
@@ -134,4 +134,4 @@ jobs:
             exit 0
           fi
           git commit -m 'release: sync v0.0.16 source SHA and Play metadata'
-          git push origin HEAD:${{ github.head_ref }}
+          git push origin HEAD:${{ github.event.pull_request.head.ref }}
