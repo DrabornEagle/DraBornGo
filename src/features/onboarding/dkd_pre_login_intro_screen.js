@@ -608,7 +608,7 @@ const dkd_styles_value = StyleSheet.create({
   },
   dkd_role_chip_cue_text: {
     color: '#BAE6FD',
-    fontSize: 10,
+    fontSize: 12,
     fontWeight: '900',
   },
   dkd_role_chip_active: {

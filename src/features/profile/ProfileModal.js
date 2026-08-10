@@ -152,7 +152,7 @@ export default function ProfileModal({ visible, onClose, profile, onSave }) {
 const dkd_styles_value = StyleSheet.create({
   screen: { flex: 1, backgroundColor: '#050B18' },
   header: { padding: 18, flexDirection: 'row', gap: 12, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,.1)' },
-  kicker: { color: '#7EEBFF', fontSize: 10, fontWeight: '900', letterSpacing: 1.1 },
+  kicker: { color: '#7EEBFF', fontSize: 12, fontWeight: '900', letterSpacing: 1.1 },
   title: { color: '#FFF', fontSize: 28, fontWeight: '900', marginTop: 4 },
   sub: { color: 'rgba(240,248,255,.62)', fontSize: 12, lineHeight: 18, marginTop: 4 },
   close: { width: 44, height: 44, borderRadius: 16, backgroundColor: 'rgba(255,255,255,.08)', alignItems: 'center', justifyContent: 'center' },

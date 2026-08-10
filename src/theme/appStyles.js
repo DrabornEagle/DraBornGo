@@ -78,7 +78,7 @@ const styles = StyleSheet.create({
   statChipRow: { flexDirection: 'row', alignItems: 'center', gap: 9, paddingHorizontal: 11, paddingVertical: 9 },
   statChipIconWrap: { width: 32, height: 32, borderRadius: 12, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(255,255,255,0.06)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.07)' },
   statChipIcon: { color: '#fff', fontSize: 15, fontWeight: '900' },
-  statChipLabel: { color: 'rgba(255,255,255,0.56)', fontSize: 10, fontWeight: '900', letterSpacing: 0.6 },
+  statChipLabel: { color: 'rgba(255,255,255,0.56)', fontSize: 12, fontWeight: '900', letterSpacing: 0.6 },
   statChipValue: { color: '#fff', fontSize: 18, fontWeight: '1000', marginTop: 1 },
 
   locBanner: {
@@ -116,7 +116,7 @@ const styles = StyleSheet.create({
   flowLeadCard: { minHeight: 86, borderRadius: 26, borderWidth: 1, borderColor: 'rgba(255,255,255,0.10)', backgroundColor: 'rgba(255,255,255,0.05)', paddingHorizontal: 14, paddingVertical: 12, flexDirection: 'row', alignItems: 'center', gap: 12 },
   flowLeadIconWrap: { width: 58, height: 58, borderRadius: 18, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(255,255,255,0.05)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
   flowLeadIcon: { fontSize: 30, fontWeight: '900' },
-  flowLeadKicker: { color: 'rgba(255,255,255,0.58)', fontWeight: '900', fontSize: 10, letterSpacing: 0.9, marginBottom: 2 },
+  flowLeadKicker: { color: 'rgba(255,255,255,0.58)', fontWeight: '900', fontSize: 12, letterSpacing: 0.9, marginBottom: 2 },
   flowLeadTitle: { color: '#fff', fontWeight: '1000', fontSize: 17 },
   flowLeadSub: { color: 'rgba(255,255,255,0.72)', fontWeight: '700', marginTop: 3 },
   flowLeadBtn: { minWidth: 60, height: 42, paddingHorizontal: 16, borderRadius: 16, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(255,255,255,0.08)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.10)' },
@@ -169,7 +169,7 @@ const styles = StyleSheet.create({
   dropDockHero: { marginTop: 12, minHeight: 74, borderRadius: 22, paddingHorizontal: 12, paddingVertical: 10, backgroundColor: 'rgba(255,255,255,0.045)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.07)', flexDirection: 'row', alignItems: 'center', gap: 12 },
   dropDockHeroIconWrap: { width: 46, height: 46, borderRadius: 18, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(255,255,255,0.035)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)' },
   dropDockHeroIcon: { fontSize: 25, lineHeight: 30, fontWeight: '900' },
-  dropDockQuickLabel: { color: 'rgba(255,255,255,0.58)', fontSize: 10, fontWeight: '900', letterSpacing: 1.0, marginBottom: 2 },
+  dropDockQuickLabel: { color: 'rgba(255,255,255,0.58)', fontSize: 12, fontWeight: '900', letterSpacing: 1.0, marginBottom: 2 },
   dropDockHeroTitle: { color: '#fff', fontWeight: '1000', fontSize: 14 },
   dropDockHeroSub: { color: 'rgba(255,255,255,0.70)', fontWeight: '700', fontSize: 12, marginTop: 2 },
   dropDockGoBtn: { minWidth: 54, height: 42, paddingHorizontal: 14, borderRadius: 15, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(255,255,255,0.08)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.10)' },

@@ -135,7 +135,7 @@ const dkd_styles = StyleSheet.create({
   dkd_status_row: { marginTop: 22, flexDirection: 'row', gap: 10 },
   dkd_status_card: { flex: 1, minHeight: 82, borderRadius: 20, padding: 10, borderWidth: 1, borderColor: 'rgba(255,255,255,0.12)', backgroundColor: 'rgba(255,255,255,0.08)', justifyContent: 'center' },
   dkd_status_title: { marginTop: 6, color: '#F8FAFC', fontSize: 11, fontWeight: '900' },
-  dkd_status_detail: { marginTop: 2, color: 'rgba(226,232,240,0.62)', fontSize: 10, fontWeight: '800' },
+  dkd_status_detail: { marginTop: 2, color: 'rgba(226,232,240,0.62)', fontSize: 12, fontWeight: '800' },
   dkd_progress_shell: { height: 10, marginTop: 22, borderRadius: 999, overflow: 'hidden', backgroundColor: 'rgba(255,255,255,0.10)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.12)' },
   dkd_progress_fill: { height: '100%', borderRadius: 999, backgroundColor: '#67E8F9' },
 });

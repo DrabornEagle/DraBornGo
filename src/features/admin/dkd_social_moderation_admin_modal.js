@@ -360,7 +360,7 @@ const dkd_styles = StyleSheet.create({
     borderColor: 'rgba(255,255,255,0.10)',
     backgroundColor: 'rgba(255,255,255,0.05)',
   },
-  dkd_stat_label: { color: cityLootTheme.colors.textMuted, fontSize: 10, fontWeight: '900' },
+  dkd_stat_label: { color: cityLootTheme.colors.textMuted, fontSize: 12, fontWeight: '900' },
   dkd_stat_value: { color: cityLootTheme.colors.text, fontSize: 18, fontWeight: '900', marginTop: 5 },
   dkd_filter_row: { gap: 8, paddingTop: 14, paddingBottom: 6 },
   dkd_status_chip: {

@@ -1274,7 +1274,7 @@ const dkd_styles = StyleSheet.create({
   },
   dkd_kicker: {
     color: '#67E8F9',
-    fontSize: 10,
+    fontSize: 12,
     fontWeight: '900',
     letterSpacing: 1.5,
   },
@@ -1517,7 +1517,7 @@ const dkd_styles = StyleSheet.create({
   },
   dkd_filter_text: {
     color: 'rgba(255,255,255,0.72)',
-    fontSize: 10,
+    fontSize: 12,
     fontWeight: '900',
   },
   dkd_filter_text_active: {
@@ -1549,7 +1549,7 @@ const dkd_styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.04)',
   },
   dkd_priority_pill_text: {
-    fontSize: 10,
+    fontSize: 12,
     fontWeight: '900',
   },
   dkd_thread_meta_row: {
@@ -1580,7 +1580,7 @@ const dkd_styles = StyleSheet.create({
   },
   dkd_load_more_threads_count: {
     color: 'rgba(255,255,255,0.58)',
-    fontSize: 10,
+    fontSize: 12,
     fontWeight: '900',
   },
   dkd_thread_detail_card: {
@@ -1629,7 +1629,7 @@ const dkd_styles = StyleSheet.create({
   },
   dkd_delete_thread_text: {
     color: '#FECACA',
-    fontSize: 10,
+    fontSize: 12,
     fontWeight: '900',
   },
   dkd_close_thread_button: {
@@ -1640,7 +1640,7 @@ const dkd_styles = StyleSheet.create({
   },
   dkd_close_thread_text: {
     color: '#111827',
-    fontSize: 10,
+    fontSize: 12,
     fontWeight: '900',
   },
   dkd_loading_messages_box: {
@@ -1683,7 +1683,7 @@ const dkd_styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(251,191,36,0.26)',
     color: '#FDE68A',
-    fontSize: 10,
+    fontSize: 12,
     fontWeight: '900',
   },
   dkd_ai_issue_box: {
@@ -1733,12 +1733,12 @@ const dkd_styles = StyleSheet.create({
   },
   dkd_delete_message_text: {
     color: '#FCA5A5',
-    fontSize: 10,
+    fontSize: 12,
     fontWeight: '900',
   },
   dkd_message_time: {
     color: 'rgba(255,255,255,0.46)',
-    fontSize: 10,
+    fontSize: 12,
     fontWeight: '800',
     marginTop: 6,
   },
@@ -1821,13 +1821,13 @@ const dkd_styles = StyleSheet.create({
   },
   dkd_history_status: {
     color: '#FDE68A',
-    fontSize: 10,
+    fontSize: 12,
     fontWeight: '900',
     flex: 1,
   },
   dkd_history_time: {
     color: 'rgba(255,255,255,0.46)',
-    fontSize: 10,
+    fontSize: 12,
     fontWeight: '800',
   },
   dkd_history_topic: {

@@ -224,7 +224,7 @@ const dkd_styles = StyleSheet.create({
   heroSub: { color: cityLootTheme.colors.textSoft, lineHeight: 18, marginTop: 6 },
   statsRow: { flexDirection: 'row', gap: 8, marginTop: 14, flexWrap: 'wrap' },
   statCard: { flex: 1, borderRadius: 18, borderWidth: 1, borderColor: 'rgba(255,255,255,0.10)', backgroundColor: 'rgba(7,12,22,0.64)', padding: 12 },
-  statLabel: { color: cityLootTheme.colors.textMuted, fontSize: 10, fontWeight: '800', letterSpacing: 0.8 },
+  statLabel: { color: cityLootTheme.colors.textMuted, fontSize: 12, fontWeight: '800', letterSpacing: 0.8 },
   statValue: { color: cityLootTheme.colors.text, fontSize: 16, fontWeight: '900', marginTop: 6 },
   panel: { borderRadius: 24, borderWidth: 1, borderColor: 'rgba(255,255,255,0.10)', backgroundColor: 'rgba(255,255,255,0.05)', padding: 14 },
   sectionTitle: { color: cityLootTheme.colors.text, fontSize: 18, fontWeight: '900' },

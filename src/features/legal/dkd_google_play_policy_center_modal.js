@@ -171,7 +171,7 @@ const dkd_styles_value = StyleSheet.create({
   dkd_header: { minHeight: 162, paddingHorizontal: 16, paddingTop: 16, paddingBottom: 15, flexDirection: 'row', alignItems: 'center', gap: 12, borderBottomWidth: 1, borderBottomColor: 'rgba(126,235,255,0.23)' },
   dkd_play_icon_shell: { width: 58, height: 58, borderRadius: 17, overflow: 'hidden', alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
   dkd_header_copy: { flex: 1, minWidth: 0 },
-  dkd_kicker: { color: 'rgba(229,248,255,0.88)', fontSize: 10.5, lineHeight: 13, fontWeight: '900', letterSpacing: 1.2 },
+  dkd_kicker: { color: 'rgba(229,248,255,0.88)', fontSize: 12.5, lineHeight: 13, fontWeight: '900', letterSpacing: 1.2 },
   dkd_title: { color: '#FFFFFF', fontSize: 20, lineHeight: 24, fontWeight: '900', marginTop: 6 },
   dkd_package_text: { color: 'rgba(235,241,255,0.72)', fontSize: 11.5, lineHeight: 16, fontWeight: '800', marginTop: 7 },
   dkd_close_button: { width: 43, height: 43, borderRadius: 15, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(9,20,47,0.66)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.15)', flexShrink: 0 },
