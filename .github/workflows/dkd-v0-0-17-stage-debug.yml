@@ -23,28 +23,62 @@ jobs:
       - name: Sync lock identity
         run: |
           npm install --package-lock-only --ignore-scripts
-          printf 'v0.0.17 lock sync passed\n' > .github/dkd-v0.0.17-stage-lock.txt
-          git add package-lock.json .github/dkd-v0.0.17-stage-lock.txt
-          git commit -m 'ci: v0.0.17 lock stage passed'
-          git push
+          git add package-lock.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'ci: sync v0.0.17 lock identity'
+            git push
+          fi
       - name: Install exact dependencies
+        shell: bash
         run: |
-          npm ci
+          set +e
+          npm ci > /tmp/dkd-npm-ci.log 2>&1
+          dkd_code=$?
+          set -e
+          if [ "$dkd_code" -ne 0 ]; then
+            tail -n 220 /tmp/dkd-npm-ci.log > .github/dkd-v0.0.17-npm-ci-failure.log
+            git add .github/dkd-v0.0.17-npm-ci-failure.log
+            git commit -m 'ci: record v0.0.17 npm ci failure'
+            git push
+            exit "$dkd_code"
+          fi
+          rm -f .github/dkd-v0.0.17-npm-ci-failure.log
           printf 'v0.0.17 npm ci passed\n' > .github/dkd-v0.0.17-stage-install.txt
-          git add .github/dkd-v0.0.17-stage-install.txt
-          git commit -m 'ci: v0.0.17 install stage passed'
-          git push
+          git add -A .github/dkd-v0.0.17-npm-ci-failure.log .github/dkd-v0.0.17-stage-install.txt
+          if ! git diff --cached --quiet; then git commit -m 'ci: v0.0.17 install stage passed'; git push; fi
       - name: Expo Doctor
+        shell: bash
         run: |
-          npx expo-doctor@latest
+          set +e
+          npx expo-doctor@latest > /tmp/dkd-doctor.log 2>&1
+          dkd_code=$?
+          set -e
+          if [ "$dkd_code" -ne 0 ]; then
+            tail -n 220 /tmp/dkd-doctor.log > .github/dkd-v0.0.17-doctor-failure.log
+            git add .github/dkd-v0.0.17-doctor-failure.log
+            git commit -m 'ci: record v0.0.17 Expo Doctor failure'
+            git push
+            exit "$dkd_code"
+          fi
+          rm -f .github/dkd-v0.0.17-doctor-failure.log
           printf 'v0.0.17 Expo Doctor passed\n' > .github/dkd-v0.0.17-stage-doctor.txt
-          git add .github/dkd-v0.0.17-stage-doctor.txt
-          git commit -m 'ci: v0.0.17 doctor stage passed'
-          git push
+          git add -A .github/dkd-v0.0.17-doctor-failure.log .github/dkd-v0.0.17-stage-doctor.txt
+          if ! git diff --cached --quiet; then git commit -m 'ci: v0.0.17 doctor stage passed'; git push; fi
       - name: Android Metro export
+        shell: bash
         run: |
-          npx expo export --platform android --output-dir dist-ci
+          set +e
+          npx expo export --platform android --output-dir dist-ci > /tmp/dkd-export.log 2>&1
+          dkd_code=$?
+          set -e
+          if [ "$dkd_code" -ne 0 ]; then
+            tail -n 260 /tmp/dkd-export.log > .github/dkd-v0.0.17-export-failure.log
+            git add .github/dkd-v0.0.17-export-failure.log
+            git commit -m 'ci: record v0.0.17 Android Metro export failure'
+            git push
+            exit "$dkd_code"
+          fi
+          rm -f .github/dkd-v0.0.17-export-failure.log
           printf 'v0.0.17 Android Metro export passed; no APK/AAB built\n' > .github/dkd-v0.0.17-stage-export.txt
-          git add .github/dkd-v0.0.17-stage-export.txt
-          git commit -m 'ci: v0.0.17 export stage passed'
-          git push
+          git add -A .github/dkd-v0.0.17-export-failure.log .github/dkd-v0.0.17-stage-export.txt
+          if ! git diff --cached --quiet; then git commit -m 'ci: v0.0.17 export stage passed'; git push; fi
