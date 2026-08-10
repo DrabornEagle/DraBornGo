@@ -1,0 +1,3 @@
+DraBornGo Release AAB direct push build
+version=0.0.16
+versionCode=3
