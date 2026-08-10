@@ -2,15 +2,13 @@
   "expo": {
     "name": "DraBornGo",
     "slug": "draborngo",
-    "version": "0.0.16",
+    "version": "0.0.17",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "draborngo",
     "userInterfaceStyle": "automatic",
     "backgroundColor": "#02050B",
-    "ios": {
-      "supportsTablet": true
-    },
+    "ios": { "supportsTablet": true },
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
@@ -22,90 +20,25 @@
       "softwareKeyboardLayoutMode": "resize",
       "package": "com.draborneagle.draborngo",
       "googleServicesFile": "./google-services.json",
-      "config": {
-        "googleMaps": {
-          "apiKey": "AIzaSyDznPFvHQMVOqdJhPPyJ4jkqQINUUymcpY"
-        }
-      },
+      "config": { "googleMaps": { "apiKey": "AIzaSyDznPFvHQMVOqdJhPPyJ4jkqQINUUymcpY" } },
       "versionCode": 3,
-      "permissions": [
-        "android.permission.ACCESS_COARSE_LOCATION",
-        "android.permission.ACCESS_FINE_LOCATION",
-        "android.permission.CAMERA"
-      ],
+      "permissions": ["android.permission.ACCESS_COARSE_LOCATION", "android.permission.ACCESS_FINE_LOCATION", "android.permission.CAMERA"],
       "blockedPermissions": [
-        "android.permission.ACCESS_BACKGROUND_LOCATION",
-        "android.permission.READ_EXTERNAL_STORAGE",
-        "android.permission.WRITE_EXTERNAL_STORAGE",
-        "android.permission.READ_MEDIA_IMAGES",
-        "android.permission.READ_MEDIA_VIDEO",
-        "android.permission.RECORD_AUDIO"
+        "android.permission.ACCESS_BACKGROUND_LOCATION", "android.permission.READ_EXTERNAL_STORAGE", "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.READ_MEDIA_IMAGES", "android.permission.READ_MEDIA_VIDEO", "android.permission.RECORD_AUDIO"
       ]
     },
     "plugins": [
-      [
-        "expo-splash-screen",
-        {
-          "image": "./assets/images/splash-icon.png",
-          "imageWidth": 260,
-          "resizeMode": "contain",
-          "backgroundColor": "#000000",
-          "dark": {
-            "backgroundColor": "#000000"
-          }
-        }
-      ],
-      [
-        "expo-notifications",
-        {
-          "defaultChannel": "draborngo-core",
-          "color": "#0EA5E9"
-        }
-      ],
-      [
-        "@rnmapbox/maps",
-        {
-          "RNMapboxMapsVersion": "11.20.1"
-        }
-      ],
-      [
-        "expo-location",
-        {
-          "locationWhenInUsePermission": "DraBornGo; kurye görevi, rota ve aktif teslimat takibi için yalnızca uygulama açıkken konumunu kullanır.",
-          "isAndroidBackgroundLocationEnabled": false,
-          "isAndroidForegroundServiceEnabled": false,
-          "isIosBackgroundLocationEnabled": false
-        }
-      ],
-      [
-        "expo-image-picker",
-        {
-          "photosPermission": "DraBornGo; yalnızca senin seçtiğin profil görselini eklemek için sistem görsel seçicisini kullanır.",
-          "cameraPermission": "DraBornGo; yalnızca sen başlattığında profil görseli çekmek için kameranı kullanır.",
-          "microphonePermission": false
-        }
-      ],
-      [
-        "expo-navigation-bar",
-        {
-          "enforceContrast": false,
-          "style": "dark"
-        }
-      ]
+      ["expo-splash-screen", { "image": "./assets/images/splash-icon.png", "imageWidth": 260, "resizeMode": "contain", "backgroundColor": "#000000", "dark": { "backgroundColor": "#000000" } }],
+      ["expo-notifications", { "defaultChannel": "draborngo-core", "color": "#0EA5E9" }],
+      ["@rnmapbox/maps", { "RNMapboxMapsVersion": "11.20.1" }],
+      ["expo-location", { "locationWhenInUsePermission": "DraBornGo; kurye görevi, rota ve aktif teslimat takibi için yalnızca uygulama açıkken konumunu kullanır.", "isAndroidBackgroundLocationEnabled": false, "isAndroidForegroundServiceEnabled": false, "isIosBackgroundLocationEnabled": false }],
+      ["expo-image-picker", { "photosPermission": "DraBornGo; yalnızca senin seçtiğin profil görselini eklemek için sistem görsel seçicisini kullanır.", "cameraPermission": "DraBornGo; yalnızca sen başlattığında profil görseli çekmek için kameranı kullanır.", "microphonePermission": false }],
+      ["expo-navigation-bar", { "enforceContrast": false, "style": "dark" }]
     ],
-    "experiments": {
-      "reactCompiler": true
-    },
-    "extra": {
-      "eas": {
-        "projectId": "a597c3fc-0708-4e3f-a1fc-faa0b86d30ee"
-      }
-    },
+    "experiments": { "reactCompiler": true },
+    "extra": { "eas": { "projectId": "a597c3fc-0708-4e3f-a1fc-faa0b86d30ee" } },
     "owner": "draborneagle",
-    "androidStatusBar": {
-      "backgroundColor": "#02050B",
-      "barStyle": "light-content",
-      "translucent": false
-    }
+    "androidStatusBar": { "backgroundColor": "#02050B", "barStyle": "light-content", "translucent": false }
   }
 }
