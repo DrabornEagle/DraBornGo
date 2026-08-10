@@ -1,0 +1,41 @@
+name: DraBornGo v0.0.17 hotfix validation once
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/dkd-v0017-hotfix-validate-once.yml'
+permissions:
+  contents: write
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Validate Android Metro bundle
+        shell: bash
+        run: |
+          set +e
+          npx expo export --platform android --output-dir dist-hotfix > /tmp/dkd-hotfix.log 2>&1
+          dkd_code=$?
+          set -e
+          if [ "$dkd_code" -eq 0 ]; then
+            printf 'DraBornGo v0.0.17 hotfix validated: npm ci + Android Metro export. Mapbox route UI bundled. No APK/AAB built.\n' > .github/dkd-v0.0.17-hotfix-validation.txt
+            rm -f .github/dkd-v0.0.17-hotfix-failure.log
+          else
+            tail -n 300 /tmp/dkd-hotfix.log > .github/dkd-v0.0.17-hotfix-failure.log
+            rm -f .github/dkd-v0.0.17-hotfix-validation.txt
+          fi
+          rm -f .github/workflows/dkd-v0017-hotfix-validate-once.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A .github
+          git commit -m "ci: record v0.0.17 hotfix validation result"
+          git push
+          exit "$dkd_code"
