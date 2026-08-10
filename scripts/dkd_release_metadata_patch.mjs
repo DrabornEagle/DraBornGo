@@ -15,20 +15,22 @@ function dkd_write_value(dkd_path_value, dkd_content_value) {
 
 function dkd_replace_required_value(dkd_path_value, dkd_from_value, dkd_to_value) {
   const dkd_before_value = dkd_read_value(dkd_path_value);
-  if (dkd_before_value.includes(dkd_to_value)) return;
-  if (!dkd_before_value.includes(dkd_from_value)) {
-    throw new Error(`DKD patch target missing: ${dkd_path_value} :: ${String(dkd_from_value).slice(0, 100)}`);
+  if (dkd_before_value.includes(dkd_from_value)) {
+    dkd_write_value(dkd_path_value, dkd_before_value.replace(dkd_from_value, dkd_to_value));
+    return;
   }
-  dkd_write_value(dkd_path_value, dkd_before_value.replace(dkd_from_value, dkd_to_value));
+  if (dkd_before_value.includes(dkd_to_value)) return;
+  throw new Error(`DKD patch target missing: ${dkd_path_value} :: ${String(dkd_from_value).slice(0, 100)}`);
 }
 
 function dkd_replace_regex_required_value(dkd_path_value, dkd_pattern_value, dkd_to_value, dkd_accept_value = '') {
   const dkd_before_value = dkd_read_value(dkd_path_value);
-  if (dkd_accept_value && dkd_before_value.includes(dkd_accept_value)) return;
-  if (!dkd_pattern_value.test(dkd_before_value)) {
-    throw new Error(`DKD regex patch target missing: ${dkd_path_value}`);
+  if (dkd_pattern_value.test(dkd_before_value)) {
+    dkd_write_value(dkd_path_value, dkd_before_value.replace(dkd_pattern_value, dkd_to_value));
+    return;
   }
-  dkd_write_value(dkd_path_value, dkd_before_value.replace(dkd_pattern_value, dkd_to_value));
+  if (dkd_accept_value && dkd_before_value.includes(dkd_accept_value)) return;
+  throw new Error(`DKD regex patch target missing: ${dkd_path_value}`);
 }
 
 const dkd_update_modal_path_value = 'src/features/legal/dkd_app_update_center_modal.js';
@@ -55,7 +57,7 @@ dkd_replace_regex_required_value(
   dkd_update_modal_path_value,
   /  const dkd_source_text_value = useMemo\(\(\) => \{[\s\S]*?  const dkd_sha_text_value = String\(dkd_status_value\?\.dkd_sha256_value \|\| ''\)\.trim\(\) \|\| 'APK\/AAB build sonrası eklenecek';/,
   dkd_source_block_value,
-  "Google Play • DraBornGo Release",
+  'Google Play • DraBornGo Release',
 );
 
 let dkd_service_content_value = dkd_read_value(dkd_update_service_path_value);
