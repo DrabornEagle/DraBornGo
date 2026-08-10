@@ -1,7 +1,7 @@
 import React, { memo, useCallback, useState } from 'react';
 import ActionMenuModal from '../features/navigation/ActionMenuModal';
 import ProfileModal from '../features/profile/ProfileModal';
-import CourierBoardModal from '../features/courier/dkd_courier_board_modal_v3';
+import CourierBoardModal from '../features/courier/dkd_courier_board_modal_v4';
 import DkdCourierLiveSyncBridge from '../features/courier/dkd_courier_live_sync_bridge';
 import DkdLiveSupportModal from '../features/support/dkd_live_support_modal_v2';
 import AdminMenuModal from '../features/admin/AdminMenuModal';
