@@ -1,44 +1,15 @@
 <!doctype html>
 <html lang="tr">
-<head><meta charset="utf-8" /><meta name="viewport" content="width=device-width,initial-scale=1" /><meta name="color-scheme" content="dark" /><title>DraBornGo v0.0.13 Sürüm Notları</title><style>:root{color-scheme:dark}body{margin:0;font-family:Inter,system-ui,sans-serif;background:#050b18;color:#fff}main{width:min(900px,calc(100% - 28px));margin:auto;padding:30px 0}.card{border:1px solid rgba(126,235,255,.18);border-radius:28px;background:#09192d;padding:clamp(20px,4vw,34px)}.badge,a{color:#7eebff;font-weight:900}h1{font-size:clamp(34px,7vw,56px)}h2{margin-top:26px}p,li{color:rgba(240,248,255,.75);line-height:1.7;font-weight:700}li{margin:7px 0}.callout{padding:14px;border-radius:18px;border:1px solid rgba(108,231,183,.25);background:rgba(108,231,183,.08);color:#eafff6;font-weight:800}</style></head>
+<head><meta charset="utf-8" /><meta name="viewport" content="width=device-width,initial-scale=1" /><meta name="color-scheme" content="dark" /><title>DraBornGo v0.0.16 Sürüm Notları</title><style>:root{color-scheme:dark}body{margin:0;font-family:Inter,system-ui,sans-serif;background:#050b18;color:#fff}main{width:min(900px,calc(100% - 28px));margin:auto;padding:30px 0}.card{border:1px solid rgba(126,235,255,.18);border-radius:28px;background:#09192d;padding:clamp(20px,4vw,34px)}.badge,a{color:#7eebff;font-weight:900}h1{font-size:clamp(34px,7vw,56px)}h2{margin-top:26px}p,li{color:rgba(240,248,255,.75);line-height:1.7;font-weight:700}li{margin:7px 0}.callout{padding:14px;border-radius:18px;border:1px solid rgba(108,231,183,.25);background:rgba(108,231,183,.08);color:#eafff6;font-weight:800}</style></head>
 <body><main><section class="card">
-<span class="badge">DraBornGo v0.0.13 • Android versionCode 13</span>
+<span class="badge">DraBornGo v0.0.16 • Android versionCode 3 • Google Play Release</span>
 <h1>Sürüm Notları</h1>
-<p><strong>9 Ağustos 2026</strong> tarihli v0.0.13 bakım güncellemesi; kurye veri modelini sadeleştirir, admin kazanç görünümünü tamamlar ve Google Play hazırlık ekranlarını v0.0.5 dönemindeki daha kompakt telefon düzenine geri yaklaştırır.</p>
-<div class="callout">Bu aşamada Expo Go ile test edilir; APK veya AAB üretilmez.</div>
-<h2>Arayüz düzeltmeleri</h2><ul>
-<li>Gizlilik ve Veri Merkezi başlık, ikon, kapatma düğmesi, kart ve metin ölçüleri küçültülerek v0.0.5 dönemindeki kompakt görünüme göre yeniden düzenlendi.</li>
-<li>Sürüm ve Güncelleme Merkezi aynı şekilde daha kompakt boyutlara getirildi; büyük başlık ve kart taşmaları giderildi.</li>
-<li>Android sistem yazı ölçeğinin bu iki merkezi gereksiz büyütmemesi için modal metin ölçekleri sabitlendi.</li>
-<li>Geçersiz <strong>file-document-lock-outline</strong> Material Community icon kullanımı kaldırıldı.</li>
-<li>Sürüm ve Güncelleme Merkezi artık menüden ilk dokunuşta açılır.</li>
-</ul>
-<h2>Kurye sistemi</h2><ul>
-<li>Kurye skor sistemi tamamen kaldırıldı; courier_score, puan ortalaması ve puan sayısı artık kullanılmaz.</li>
-<li>Görevlerdeki reward_score alanı ve görev tamamlandığında skor artırma davranışı kaldırıldı.</li>
-<li>Teslimat tamamlandığında yalnız operasyon durumu, tamamlanan teslimat sayısı ve ilgili zaman kayıtları güncellenir.</li>
-</ul>
-<h2>Admin Kullanıcı Yönetimi</h2><ul>
-<li>Kurye skor ve puan alanları Admin Kullanıcı Yönetiminden kaldırılmış olarak kalır.</li>
-<li>Günlük, haftalık ve aylık kazançlara ek olarak <strong>Saatlik Kazanç</strong> kartı yeniden eklendi.</li>
-<li>Kullanıcı listesi beşer kullanıcı halinde açılır; Daha Fazla ile sonraki kayıtlar görüntülenir.</li>
-</ul>
-<h2>Gizlilik ve Veri Merkezi</h2><ul>
-<li>Google Play hazırlık başlığı, paket/sürüm kimliği ve Data Safety kartları telefon ekranına uygun kompakt ölçülerde gösterilir.</li>
-<li>Metinler v0.0.13 kapsamına göre günceldir: gönderi/teslimat, konum, destek, kurye çalışma ve kazanç kayıtları açık biçimde belirtilir.</li>
-<li>Eski kullanıcılar arası DM/sohbet ve kurye skor/puan sistemi mevcut veri kapsamı olarak gösterilmez.</li>
-</ul>
-<h2>Sürüm ve Güncelleme Merkezi</h2><ul>
-<li>Cihaz sürümü, webdeki son sürüm, dağıtım kaynağı, SHA-256 alanı ve sürüm notu aynı merkezde gösterilir.</li>
-<li>Web tarafında son sürüm <strong>v0.0.13 • Kod 13</strong> olarak tanımlandı ve v0.0.13 sürüm notu yenilendi.</li>
-<li>Canlı web manifesti geçici olarak eski bir sürüm döndürürse uygulama v0.0.13'ten daha eski manifest bilgisini ekranda son sürüm olarak göstermeyecek şekilde korumaya alındı.</li>
-<li>Expo Go test aşamasında APK/AAB olmadığı açıkça belirtilir.</li>
-</ul>
-<h2>Android & sürüm kimliği</h2><ul>
-<li>Sürüm kimliği <strong>0.0.13 / versionCode 13</strong> olarak korunur.</li>
-<li>Android paket adı <strong>com.draborneagle.draborngo</strong> olarak korunur.</li>
-<li>Arka plan konumu, mikrofon ve geniş medya/depolama izinleri engelli kalır.</li>
-</ul>
-<h2>Dağıtım</h2><p>v0.0.13 şu anda kaynak kodu + Expo Go test sürümüdür. Üretim paketi hazır olduğunda resmi dağıtım kanalı Google Play olacaktır.</p>
-<p><a href="./">v0.0.13 sürüm merkezine dön</a></p>
+<p><strong>10 Ağustos 2026</strong> tarihli v0.0.16; Google Play mobil istemcisini mevcut yetkili kuryelerin operasyon akışına odaklar ve işletme/yönetim tarafındaki ayrı panel işlevlerini mobil istemciden ayırır.</p>
+<div class="callout">DraBornGo v0.0.16 için imzalı Android App Bundle (AAB) başarıyla üretildi ve Google Play'e gönderime hazırlandı. Android versionCode 3 bu release paketinin sürüm kodudur.</div>
+<h2>Mobil kaynak kapsamı</h2><ul><li>Eski kurye kayıt/onay formu, kullanıcı onay merkezi ve admin onay kuyruğu aktif mobil kaynak kodundan kaldırıldı.</li><li>Mevcut yetkili kuryelerin görev havuzu, görevi kabul etme, teslim alma, teslim etme, rota, çevrimiçi durum ve kazanç akışı korunur.</li><li>Admin Kullanıcı Yönetimindeki eski kurye kayıt formu alanları kaldırıldı; kullanıcı, destek ve kurye operasyon araçları korunur.</li><li>Supabase'deki geçmiş şema ve kayıtlar geri yükleme ihtiyacı için korunur; bu sürüm veri silme migration'ı çalıştırmaz.</li></ul>
+<h2>Gizlilik ve Google Play</h2><ul><li>Gizlilik ve Veri Merkezi yalnız mevcut mobil işlevlerin veri kapsamını gösterir: hesap/profil, görev ve teslimat, ön plan konum, profil görseli, destek, bildirim/teknik kimlikler ve çalışma-kazanç kayıtları.</li><li>Kamera ve sistem görsel seçicisi yalnız kullanıcı tarafından başlatılan profil görseli işlemine göre açıklanır.</li><li>Arka plan konum, mikrofon ve geniş medya/depolama izinleri engelli kalır.</li><li>Hesap silme yolu uygulama içinde ve resmi web sayfasında korunur.</li></ul>
+<h2>Web ve release manifesti</h2><ul><li>Ürün merkezi, Gizlilik Politikası, Kullanım Şartları, Güvenlik ve Davranış Kuralları, Hesap ve Veri Silme sayfası ve sürüm manifesti v0.0.16 / code 3 ile eşitlendi.</li><li>Manifest dağıtım kanalı <strong>google-play-release</strong>, hedef Android API <strong>36</strong> ve release artifact SHA-256 bilgisi production durumuna geçirildi.</li><li>Expo Go test ve “APK/AAB üretilmedi” ifadeleri production web kaynaklarından kaldırıldı.</li></ul>
+<h2>Release paketi</h2><ul><li>Android paket adı: <strong>com.draborneagle.draborngo</strong></li><li>Sürüm: <strong>0.0.16</strong></li><li>Android versionCode: <strong>3</strong></li><li>Dağıtım kanalı: <strong>Google Play</strong></li><li>AAB SHA-256: <strong>28e8579d7a7f07f7ea82583960ea9aedfae70b76589993eb003edc5ad8aba20e</strong></li></ul>
+<h2>Dağıtım</h2><p>v0.0.16 için imzalı AAB üretildi. Resmi Android dağıtım kanalı Google Play'dir; paket Google Play Console inceleme/yayın sürecine gönderilmeye hazırdır.</p>
+<p><a href="./">DraBornGo v0.0.16 sürüm merkezine dön</a></p>
 </section></main></body></html>
