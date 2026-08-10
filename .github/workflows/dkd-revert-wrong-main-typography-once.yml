@@ -1,0 +1,76 @@
+name: DKD Revert Wrong Main Typography Once
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+jobs:
+  dkd-revert-typography:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Restore DraBornGo typography only
+        shell: bash
+        run: |
+          set -e
+          BASE=c6f829d73587d5a7530b4f7e2d53695ad18c4664
+          TYPO=c1cab1c81df104a678c31fd57c517fb10bf1c696
+          for path in \
+            src/components/ui/dkd_modern_alert_provider.js \
+            src/features/admin/AdminBroadcastModal.js \
+            src/features/admin/AdminMenuModal.js \
+            src/features/admin/dkd_admin_user_manager_modal.js \
+            src/features/admin/dkd_social_moderation_admin_modal.js \
+            src/features/auth/AuthScreen.js \
+            src/features/courier/CourierProfileModal.js \
+            src/features/courier/dkd_courier_board_modal_v2.js \
+            src/features/legal/dkd_app_update_center_modal.js \
+            src/features/legal/dkd_google_play_policy_center_modal.js \
+            src/features/navigation/ActionMenuModal.js \
+            src/features/onboarding/dkd_city_gate_transition_screen.js \
+            src/features/onboarding/dkd_pre_login_intro_screen.js \
+            src/features/profile/ProfileModal.js \
+            src/features/support/dkd_live_support_modal.js \
+            src/features/support/dkd_live_support_modal_v2.js \
+            src/features/support/dkd_support_panel_conversation.js \
+            src/theme/appStyles.js
+          do
+            git checkout "$BASE" -- "$path"
+          done
+          python3 - <<'PY'
+          from pathlib import Path
+          import subprocess
+          path = Path('src/features/courier/dkd_courier_online_global_watcher.js')
+          current = path.read_text()
+          diff = subprocess.check_output([
+              'git','diff','--unified=0',
+              'c6f829d73587d5a7530b4f7e2d53695ad18c4664',
+              'c1cab1c81df104a678c31fd57c517fb10bf1c696',
+              '--', str(path)
+          ], text=True)
+          removed = []
+          added = []
+          for line in diff.splitlines():
+              if line.startswith('-') and not line.startswith('---') and 'fontSize:' in line:
+                  removed.append(line[1:])
+              elif line.startswith('+') and not line.startswith('+++') and 'fontSize:' in line:
+                  added.append(line[1:])
+          if len(removed) != len(added):
+              raise SystemExit(f'font diff mismatch: {len(removed)} != {len(added)}')
+          for old, new in zip(removed, added):
+              if new in current:
+                  current = current.replace(new, old, 1)
+          path.write_text(current)
+          PY
+      - name: Commit correction and self-clean
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src
+          git rm .github/workflows/dkd-revert-wrong-main-typography-once.yml
+          git commit -m "fix: restore DraBornGo typography while keeping courier logic"
+          git push
