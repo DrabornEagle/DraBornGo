@@ -19,7 +19,7 @@ const dkd_policy_card_values = [
   {
     dkd_key_value: 'play-scope',
     dkd_icon_value: 'motorbike',
-    dkd_title_value: 'Google Play Sürümü: Yalnız Kurye',
+    dkd_title_value: 'Google Play Sürümü: DraBornGo',
     dkd_body_value: 'DraBornGo Google Play sürümü, onaylı kuryelerin kendilerine veya kurye görev havuzuna sunulan teslimat görevlerini görmesi, uygun görevi kabul etmesi, teslim alma/teslim etme adımlarını yönetmesi, aktif görev rotasını kullanması ve çalışma-kazanç özetlerini takip etmesi için tasarlanmıştır. Bu uygulamada müşteriye sipariş oluşturma, işletme paneli, mağaza/marketplace, ödeme alma, cüzdan, banka, kredi veya yatırım hizmeti sunulmaz.',
   },
   {

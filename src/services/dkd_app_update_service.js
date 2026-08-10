@@ -6,7 +6,9 @@ const dkd_update_manifest_url_value = 'https://www.draborneagle.com/DraBornGo/Ap
 const dkd_play_store_url_value = 'https://play.google.com/store/apps/details?id=com.draborneagle.draborngo';
 const dkd_current_release_name_value = '0.0.16';
 const dkd_current_release_code_value = 3;
-const dkd_current_release_notes_value = 'DraBornGo v0.0.16: Mobildeki eski kurye kayıt/onay ekranları kullanıcı ve admin kaynak kodundan kaldırıldı; mevcut kurye görev akışı korunuyor. Supabase tarafındaki ilgili eski veriler ileride gerekirse geri yüklemek için korunuyor. Android versionCode 3 sabit ve test Expo Go üzerinden devam ediyor; APK/AAB üretilmedi.';
+const dkd_current_distribution_channel_value = 'google-play-release';
+const dkd_current_apk_sha256_value = 'a2c6d6c1a8db8eedbe49a550c8bf7775ff64c13146429b85ebc9aa201dae0f66';
+const dkd_current_release_notes_value = 'DraBornGo v0.0.16: Release APK üretildi ve Google Play dağıtımı için imzalı AAB release akışı kullanılmaktadır. Sürüm ve Güncelleme Merkezi resmi release kaynağını ve APK SHA-256 doğrulamasını gösterir.';
 
 function dkd_clean_text_value(dkd_value, dkd_fallback = '') {
   const dkd_text_value = String(dkd_value ?? '').trim();
@@ -126,10 +128,14 @@ export async function dkd_fetch_app_update_status_value() {
       dkd_latest_version_name_value: dkd_latest_name_value,
       dkd_latest_version_code_value: dkd_latest_code_value,
       dkd_update_required_value,
-      dkd_distribution_channel_value: dkd_clean_text_value(dkd_manifest_value?.dkd_distribution_channel, 'expo-go-test'),
+      dkd_distribution_channel_value: dkd_remote_is_current_or_newer_value
+        ? dkd_clean_text_value(dkd_manifest_value?.dkd_distribution_channel, dkd_current_distribution_channel_value)
+        : dkd_current_distribution_channel_value,
       dkd_download_url_value: dkd_apk_url_value,
       dkd_source_url_value: dkd_apk_url_value || dkd_download_page_url_value,
-      dkd_sha256_value: dkd_clean_text_value(dkd_manifest_value?.dkd_sha256, ''),
+      dkd_sha256_value: dkd_remote_is_current_or_newer_value
+        ? dkd_clean_text_value(dkd_manifest_value?.dkd_sha256, dkd_current_apk_sha256_value)
+        : dkd_current_apk_sha256_value,
       dkd_release_notes_value: dkd_dynamic_release_note_value || (dkd_remote_is_current_or_newer_value && dkd_remote_release_notes_value
         ? dkd_remote_release_notes_value
         : dkd_current_release_notes_value),
@@ -144,10 +150,10 @@ export async function dkd_fetch_app_update_status_value() {
       dkd_latest_version_code_value: dkd_current_release_code_value,
       dkd_update_required_value: dkd_installed_name_compare_value > 0
         || (dkd_installed_name_compare_value === 0 && dkd_current_release_code_value > dkd_installed_value.dkd_version_code_value),
-      dkd_distribution_channel_value: 'expo-go-test',
+      dkd_distribution_channel_value: dkd_current_distribution_channel_value,
       dkd_download_url_value: '',
       dkd_source_url_value: dkd_play_store_url_value,
-      dkd_sha256_value: '',
+      dkd_sha256_value: dkd_current_apk_sha256_value,
       dkd_release_notes_value: dkd_dynamic_release_note_value || dkd_current_release_notes_value,
       dkd_error_value,
       dkd_remote_manifest_stale_value: true,

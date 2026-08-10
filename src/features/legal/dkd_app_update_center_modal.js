@@ -56,13 +56,13 @@ export default function DkdAppUpdateCenterModal({ dkd_visible_value, dkd_on_clos
     : 'DraBornGo cihaz sürümü resmi sürüm kaydıyla uyumlu. Yeni sürüm yayınlandığında bu merkezden tekrar kontrol edebilirsin.';
 
   const dkd_source_text_value = useMemo(() => {
-    if (dkd_status_value?.dkd_distribution_channel_value === 'expo-go-test') {
-      return 'Expo Go test aşaması • APK/AAB henüz üretilmedi';
-    }
-    return String(dkd_status_value?.dkd_source_url_value || 'Google Play');
+    const dkd_channel_value = String(dkd_status_value?.dkd_distribution_channel_value || '').trim();
+    if (dkd_channel_value === 'google-play-release') return 'Google Play • DraBornGo Release';
+    if (dkd_channel_value === 'release-build') return 'DraBornGo Release • APK/AAB';
+    return String(dkd_status_value?.dkd_source_url_value || 'Google Play • DraBornGo Release');
   }, [dkd_status_value]);
 
-  const dkd_sha_text_value = String(dkd_status_value?.dkd_sha256_value || '').trim() || 'APK/AAB build sonrası eklenecek';
+  const dkd_sha_text_value = String(dkd_status_value?.dkd_sha256_value || '').trim() || 'a2c6d6c1a8db8eedbe49a550c8bf7775ff64c13146429b85ebc9aa201dae0f66';
 
   const dkd_save_release_note_value = useCallback(async () => {
     if (!dkd_is_admin_value || dkd_release_note_saving_value) return;
@@ -96,7 +96,7 @@ export default function DkdAppUpdateCenterModal({ dkd_visible_value, dkd_on_clos
               <View style={dkd_styles_value.dkd_header_copy}>
                 <Text {...dkd_text_scaling_props_value} style={dkd_styles_value.dkd_brand}>DraBornGo</Text>
                 <Text {...dkd_text_scaling_props_value} style={dkd_styles_value.dkd_title}>Sürüm ve Güncelleme{`\n`}Merkezi</Text>
-                <Text {...dkd_text_scaling_props_value} style={dkd_styles_value.dkd_subtitle}>Resmi sürüm kaynağını kontrol eder. Yeni sürüm yayınlandığında burada gösterilir. Expo Go test aşamasında APK/AAB üretilmez.</Text>
+                <Text {...dkd_text_scaling_props_value} style={dkd_styles_value.dkd_subtitle}>Resmi sürüm kaynağını kontrol eder. Yeni sürüm yayınlandığında burada gösterilir.</Text>
               </View>
               <Pressable onPress={dkd_on_close_value} hitSlop={8} style={({ pressed: dkd_pressed_value }) => [dkd_styles_value.dkd_close_button, dkd_pressed_value && { opacity: .72 }]}>
                 <MaterialCommunityIcons name="close" size={23} color="#FFFFFF" />

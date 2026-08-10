@@ -1,12 +1,12 @@
 {
-  "dkd_latest_version_name": "0.0.13",
-  "dkd_latest_version_code": 13,
-  "dkd_min_supported_version_code": 12,
+  "dkd_latest_version_name": "0.0.16",
+  "dkd_latest_version_code": 3,
+  "dkd_min_supported_version_code": 3,
   "dkd_update_required": false,
-  "dkd_distribution_channel": "expo-go-test",
+  "dkd_distribution_channel": "google-play-release",
   "dkd_target_android_api": 36,
   "dkd_apk_url": "",
   "dkd_download_page_url": "https://play.google.com/store/apps/details?id=com.draborneagle.draborngo",
-  "dkd_sha256": "",
-  "dkd_release_notes": "DraBornGo v0.0.13: Gizlilik ve Veri Merkezi ile Sürüm ve Güncelleme Merkezi v0.0.5 dönemindeki kompakt kart ölçülerine göre yeniden düzenlendi. Sürüm ve Güncelleme Merkezi artık ilk dokunuşta açılır. Geçersiz Material Community icon uyarısı giderildi. Admin Kullanıcı Yönetimindeki Saatlik Kazanç kartı korunur; kurye skor, puan ortalaması, puan sayısı ve reward_score sistemi kaldırılmış olarak kalır. Expo Go test aşamasında APK/AAB üretilmez."
+  "dkd_sha256": "a2c6d6c1a8db8eedbe49a550c8bf7775ff64c13146429b85ebc9aa201dae0f66",
+  "dkd_release_notes": "DraBornGo v0.0.16: Release APK üretildi. Google Play dağıtımı için imzalı AAB release akışı kullanılmaktadır. Sürüm ve Güncelleme Merkezi resmi release kaynağını ve APK SHA-256 doğrulamasını gösterir."
 }
