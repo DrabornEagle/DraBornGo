@@ -1,0 +1,54 @@
+name: DKD Apply v0.0.16 Hourly UI
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  dkd-apply:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply changes and commit
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          earnings = Path('src/features/navigation/dkd_courier_earnings_category.js')
+          text = earnings.read_text()
+          old = """  const dkd_hourly_value = dkd_safe_number_value(dkd_daily_value?.dkd_hourly_tl);\n  const dkd_hourly_ready_value = dkd_safe_number_value(dkd_daily_value?.dkd_hourly_basis_seconds) >= 60;\n"""
+          new = """  const dkd_hourly_period_value = dkd_data_value?.hourly || {};\n  const dkd_fixed_hourly_rate_value = dkd_safe_number_value(\n    dkd_hourly_period_value?.dkd_fixed_hourly_rate_tl\n      ?? dkd_daily_value?.dkd_fixed_hourly_rate_tl\n      ?? dkd_daily_value?.dkd_hourly_tl,\n  );\n  const dkd_live_hourly_earnings_value = useMemo(() => {\n    const dkd_server_earned_value = dkd_safe_number_value(dkd_hourly_period_value?.dkd_hourly_earnings_tl);\n    if (dkd_data_value?.dkd_is_online !== true || dkd_fixed_hourly_rate_value <= 0) return dkd_server_earned_value;\n    const dkd_generated_timestamp_value = new Date(dkd_data_value?.dkd_generated_at || 0).getTime();\n    if (!Number.isFinite(dkd_generated_timestamp_value) || dkd_generated_timestamp_value <= 0) return dkd_server_earned_value;\n    const dkd_now_timestamp_value = dkd_clock_value;\n    const dkd_generated_hour_value = Math.floor(dkd_generated_timestamp_value / 3600000);\n    const dkd_now_hour_value = Math.floor(dkd_now_timestamp_value / 3600000);\n    if (dkd_generated_hour_value === dkd_now_hour_value) {\n      const dkd_elapsed_seconds_value = Math.max(0, (dkd_now_timestamp_value - dkd_generated_timestamp_value) / 1000);\n      return dkd_server_earned_value + ((dkd_elapsed_seconds_value / 3600) * dkd_fixed_hourly_rate_value);\n    }\n    const dkd_seconds_into_current_hour_value = Math.max(0, (dkd_now_timestamp_value % 3600000) / 1000);\n    return (dkd_seconds_into_current_hour_value / 3600) * dkd_fixed_hourly_rate_value;\n  }, [dkd_clock_value, dkd_data_value?.dkd_generated_at, dkd_data_value?.dkd_is_online, dkd_fixed_hourly_rate_value, dkd_hourly_period_value?.dkd_hourly_earnings_tl]);\n  const dkd_hourly_ready_value = dkd_fixed_hourly_rate_value > 0\n    && (dkd_safe_number_value(dkd_hourly_period_value?.dkd_online_seconds) > 0 || dkd_data_value?.dkd_is_online === true);\n"""
+          if 'dkd_live_hourly_earnings_value' not in text:
+              if old not in text:
+                  raise SystemExit('hourly marker missing')
+              text = text.replace(old, new)
+          text = text.replace('>SAAT BAŞI</Text>', '>BU SAAT KAZANÇ</Text>')
+          text = text.replace("{dkd_hourly_ready_value ? dkd_format_earnings_money_value(dkd_hourly_value) : 'Hesaplanıyor'}", "{dkd_hourly_ready_value ? dkd_format_earnings_money_value(dkd_live_hourly_earnings_value) : dkd_format_earnings_money_value(0)}")
+          text = text.replace('En az 1 dk gerçek çalışma verisiyle hesaplanır', 'Saatlik sabit ücret, bu saat içindeki gerçek çalışma süresi kadar yansır')
+          earnings.write_text(text)
+
+          targets = [Path('src/features/map/MapHomeScreen.js'), earnings]
+          def raise_fonts(content):
+              def repl(m):
+                  v=float(m.group(1))
+                  if v<=8: n=v+2.5
+                  elif v<=10: n=v+2
+                  elif v<=12: n=v+1.5
+                  elif v<=13: n=v+1
+                  else: return m.group(0)
+                  return 'fontSize: '+f'{n:.1f}'.rstrip('0').rstrip('.')
+              return re.sub(r'fontSize:\s*(\d+(?:\.\d+)?)', repl, content)
+          for p in targets:
+              p.write_text(raise_fonts(p.read_text()))
+          PY
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/features/map/MapHomeScreen.js src/features/navigation/dkd_courier_earnings_category.js
+          git commit -m "feat: prorate current-hour earnings and enlarge courier UI text"
+          git push
