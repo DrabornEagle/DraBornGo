@@ -1,0 +1,1 @@
+DraBornGo v0.0.17 hotfix validated: npm ci + Android Metro export. Mapbox route UI bundled. No APK/AAB built.
