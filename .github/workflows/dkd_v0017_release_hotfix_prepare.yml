@@ -1,0 +1,66 @@
+name: DraBornGo v0.0.17 release hotfix prepare
+on:
+  push:
+    branches: [work/v0.0.17-release-hotfix-2026-08-11]
+    paths:
+      - '.github/workflows/dkd_v0017_release_hotfix_prepare.yml'
+permissions:
+  contents: write
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: work/v0.0.17-release-hotfix-2026-08-11
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Configure git
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+      - name: Synchronize release identity and APK workflow
+        shell: bash
+        run: |
+          node <<'DKD_NODE'
+          const fs=require('fs');
+          const service='src/services/dkd_app_update_service.js';
+          let s=fs.readFileSync(service,'utf8');
+          s=s.replace("const dkd_current_release_name_value = '0.0.16';","const dkd_current_release_name_value = '0.0.17';");
+          fs.writeFileSync(service,s);
+          const workflow='.github/workflows/dkd_build_signed_apk.yml';
+          let w=fs.readFileSync(workflow,'utf8');
+          w=w.replaceAll('v0.0.16','v0.0.17').replaceAll("'0.0.16'","'0.0.17'").replaceAll('0_0_16','0_0_17');
+          fs.writeFileSync(workflow,w);
+          DKD_NODE
+      - name: Validate source identities
+        shell: bash
+        run: |
+          node <<'DKD_NODE'
+          const a=require('./app.json').expo; const p=require('./package.json');
+          if(a.version!=='0.0.17'||p.version!=='0.0.17') throw new Error('DraBornGo source identity mismatch');
+          if(Number(a.android.versionCode)!==3) throw new Error('DraBornGo versionCode must remain 3');
+          const fs=require('fs');
+          const svc=fs.readFileSync('src/services/dkd_app_update_service.js','utf8');
+          if(!svc.includes("dkd_current_release_name_value = '0.0.17'")) throw new Error('Update center release identity stale');
+          const manifest=JSON.parse(fs.readFileSync('web/DraBornGo/App/dkd_draborngo_update_manifest.json','utf8'));
+          if(manifest.dkd_latest_version_name!=='0.0.17'||Number(manifest.dkd_latest_version_code)!==3) throw new Error('Web manifest identity stale');
+          const page=fs.readFileSync('web/DraBornGo/App/dkd_draborngo_release_notes.html','utf8');
+          if(!page.includes('dkd_app_release_notes')) throw new Error('Web release notes are not dynamically synchronized');
+          DKD_NODE
+      - name: Install exact dependencies
+        run: npm ci
+      - name: Android Metro export
+        run: npx expo export --platform android --output-dir dist-ci
+      - name: Record validation and push prepared files
+        shell: bash
+        run: |
+          printf 'DraBornGo v0.0.17 release hotfix: update-center/web sync + route UI + Android Metro export passed.\n' > .github/dkd-v0.0.17-release-hotfix-validation.txt
+          git add src/services/dkd_app_update_service.js .github/workflows/dkd_build_signed_apk.yml .github/dkd-v0.0.17-release-hotfix-validation.txt
+          if ! git diff --cached --quiet; then
+            git commit -m 'chore: prepare DraBornGo v0.0.17 release hotfix'
+            git push origin HEAD:work/v0.0.17-release-hotfix-2026-08-11
+          fi
