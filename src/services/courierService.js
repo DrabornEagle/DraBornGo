@@ -50,9 +50,9 @@ export function dkd_subscribe_courier_jobs_live_updates_value(dkd_on_change_valu
   const dkd_channel_name_value = `dkd_courier_jobs_live_${Date.now()}_${Math.random().toString(36).slice(2)}`;
   let dkd_channel_value = supabase.channel(dkd_channel_name_value);
   for (const dkd_table_name_value of ['dkd_courier_jobs', 'dkd_cargo_shipments']) {
-    dkd_channel_value = dkd_channel_value.on('postgres_changes', { event: '*', schema: 'public', table: dkd_table_name_value }, () => {
+    dkd_channel_value = dkd_channel_value.on('postgres_changes', { event: '*', schema: 'public', table: dkd_table_name_value }, (dkd_payload_value) => {
       dkd_clear_courier_jobs_cache_value();
-      dkd_on_change_value({ dkd_table_name: dkd_table_name_value });
+      dkd_on_change_value({ dkd_table_name: dkd_table_name_value, dkd_payload_value });
     });
   }
   dkd_channel_value.subscribe((dkd_status_value) => {

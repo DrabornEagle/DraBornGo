@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, Alert, Modal, Pressable, RefreshControl, ScrollView, StatusBar, StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -13,6 +13,7 @@ import {
   fetchCourierJobs,
   markCourierJobPickedUp,
 } from '../../services/courierService';
+import { dkd_notify_new_courier_job_local_value, dkd_seed_courier_job_notification_values } from '../../services/dkd_courier_local_notification_service';
 
 function dkd_text_value(dkd_value){return String(dkd_value||'').trim();}
 function dkd_status_value(dkd_job_value){return dkd_text_value(dkd_job_value?.status).toLowerCase();}
@@ -44,7 +45,8 @@ function DkdTaskCard({job,userId,onOpen}){const owned=dkd_owned_value(job,userId
 
 export default function DkdCourierBoardModalV5({visible,onClose,profile,currentLocation,sessionUserId,setProfile}){
   const[jobs,setJobs]=useState([]);const[loading,setLoading]=useState(false);const[refreshing,setRefreshing]=useState(false);const[busyId,setBusyId]=useState(null);const[onlineBusy,setOnlineBusy]=useState(false);const[selected,setSelected]=useState(null);const[info,setInfo]=useState(null);const userId=sessionUserId||profile?.user_id||profile?.id;const online=profile?.dkd_courier_online===true;const approved=String(profile?.courier_status||'').toLowerCase()==='approved';
-  const load=useCallback(async(force=false)=>{force?setRefreshing(true):setLoading(true);try{const result=await fetchCourierJobs({dkd_force_refresh:force,dkd_cache_ttl_ms:force?0:3500});if(result?.error)throw result.error;const rows=(Array.isArray(result?.data)?result.data:[]).filter((job)=>!dkd_done_value(job));setJobs(rows);}catch(error){Alert.alert('Kurye',error?.message||'Görevler alınamadı.');}finally{setLoading(false);setRefreshing(false);}},[]);
+  const dkd_notification_seeded_ref_value=useRef(false);
+  const load=useCallback(async(force=false)=>{force?setRefreshing(true):setLoading(true);try{const result=await fetchCourierJobs({dkd_force_refresh:force,dkd_cache_ttl_ms:force?0:3500});if(result?.error)throw result.error;const rows=(Array.isArray(result?.data)?result.data:[]).filter((job)=>!dkd_done_value(job));if(!dkd_notification_seeded_ref_value.current){dkd_seed_courier_job_notification_values(rows);dkd_notification_seeded_ref_value.current=true;}setJobs(rows);}catch(error){Alert.alert('Kurye',error?.message||'Görevler alınamadı.');}finally{setLoading(false);setRefreshing(false);}},[]);
   useEffect(()=>{
     if(!selected?.id)return;
     const dkd_fresh_selected_value=jobs.find((dkd_job_value)=>Number(dkd_job_value?.id)===Number(selected.id));
@@ -52,7 +54,7 @@ export default function DkdCourierBoardModalV5({visible,onClose,profile,currentL
     const dkd_changed_value=String(dkd_fresh_selected_value?.status||'')!==String(selected?.status||'')||String(dkd_fresh_selected_value?.pickup_status||'')!==String(selected?.pickup_status||'')||String(dkd_fresh_selected_value?.updated_at||'')!==String(selected?.updated_at||'')||String(dkd_fresh_selected_value?.assigned_user_id||'')!==String(selected?.assigned_user_id||'');
     if(dkd_changed_value)setSelected(dkd_fresh_selected_value);
   },[jobs,selected?.id,selected?.status,selected?.pickup_status,selected?.updated_at,selected?.assigned_user_id]);
-  useEffect(()=>{if(!visible)return undefined;load(false);const sub=dkd_subscribe_courier_jobs_live_updates_value(()=>load(true));const timer=setInterval(()=>load(true),6000);return()=>{sub?.dkd_unsubscribe?.();clearInterval(timer);};},[visible,load]);
+  useEffect(()=>{if(!visible)return undefined;load(false);const sub=dkd_subscribe_courier_jobs_live_updates_value((dkd_change_value)=>{const dkd_payload_value=dkd_change_value?.dkd_payload_value;const dkd_record_value=dkd_payload_value?.new;if(dkd_change_value?.dkd_table_name==='dkd_courier_jobs'&&String(dkd_payload_value?.eventType||'').toUpperCase()==='INSERT'&&dkd_open_value(dkd_record_value)){dkd_notify_new_courier_job_local_value(dkd_record_value).catch(()=>null);}load(true);});const timer=setInterval(()=>load(true),6000);return()=>{sub?.dkd_unsubscribe?.();clearInterval(timer);};},[visible,load]);
   const visibleJobs=useMemo(()=>jobs.filter((job)=>{if(dkd_owned_value(job,userId)&&dkd_active_delivery_value(job))return true;if(!online)return false;return dkd_open_value(job)||dkd_offer_value(job)||dkd_owned_value(job,userId);}),[jobs,userId,online]);
   const activeOwned=useMemo(()=>visibleJobs.find((job)=>dkd_owned_value(job,userId)&&dkd_active_delivery_value(job))||null,[visibleJobs,userId]);
   const showLimit=useCallback((payload={})=>setInfo({tone:'warning',icon:'timer-alert-outline',kicker:'GÜNLÜK MESAİ SINIRI',title:'Bugünkü çevrimiçi süren doldu',body:'Yeni görev arayamaz veya yeni sipariş kabul edemezsin. Üzerindeki aktif teslimat varsa tamamlamaya devam edebilirsin.',used:dkd_duration_value(payload?.dkd_today_online_seconds),limit:payload?.dkd_max_online_hours?`${Number(payload.dkd_max_online_hours).toLocaleString('tr-TR')} saat`:'Belirlenen süre',notice:'Günlük süre yenilendiğinde veya yetkili yeni bir mesai düzeni belirlediğinde tekrar görev arayabilirsin.'}),[]);
