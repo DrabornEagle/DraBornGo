@@ -1,10 +1,11 @@
 name: DraBornGo notification sound hotfix
 
 on:
-  push:
+  workflow_dispatch:
+  pull_request:
     branches: [main]
     paths:
-      - '.github/workflows/dkd_notification_sound_hotfix.yml'
+      - '.github/dkd_notification_sound_trigger/**'
 
 permissions:
   contents: write
