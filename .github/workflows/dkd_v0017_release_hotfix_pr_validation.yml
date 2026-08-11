@@ -1,0 +1,33 @@
+name: DraBornGo v0.0.17 release hotfix validation
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'web/DraBornGo/App/**'
+      - '.github/workflows/dkd_build_signed_apk.yml'
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Validate Android Metro export
+        run: npx expo export --platform android --output-dir dist-ci
+      - name: Validate web/update identity
+        shell: bash
+        run: |
+          node <<'DKD_NODE'
+          const fs=require('fs'); const a=require('./app.json').expo;
+          if(a.version!=='0.0.17'||Number(a.android.versionCode)!==3) throw new Error('identity mismatch');
+          const m=JSON.parse(fs.readFileSync('web/DraBornGo/App/dkd_draborngo_update_manifest.json','utf8'));
+          if(m.dkd_latest_version_name!=='0.0.17') throw new Error('manifest stale');
+          if(!fs.readFileSync('web/DraBornGo/App/dkd_draborngo_release_notes.html','utf8').includes('dkd_app_release_notes')) throw new Error('web note not synced');
+          DKD_NODE
