@@ -13,7 +13,7 @@ concurrency:
 
 jobs:
   dkd_build_signed_apk:
-    name: DraBornGo v0.0.16 code 3 signed APK
+    name: DraBornGo v0.0.17 code 3 signed APK
     runs-on: ubuntu-latest
     timeout-minutes: 70
     env:
@@ -30,18 +30,15 @@ jobs:
     steps:
       - name: Dkd checkout
         uses: actions/checkout@v4
-
       - name: Dkd setup node
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-
       - name: Dkd setup java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
-
       - name: Dkd validate Android signing secrets
         shell: bash
         run: |
@@ -57,7 +54,6 @@ jobs:
           popd >/dev/null
           rm -rf dkd_keystore_precheck
           echo 'DKD signing secrets verified.'
-
       - name: Dkd write embedded public env module
         shell: bash
         run: |
@@ -83,28 +79,25 @@ jobs:
           const out={}; for(const k of keys){const v=String(process.env[k]||'').trim(); if(!v) throw new Error(`DKD ERROR: ${k} missing`); out[k]=v;}
           fs.writeFileSync('src/lib/dkd_public_env.generated.js',`export const dkd_generated_public_env_value = ${JSON.stringify(out,null,2)};\n`);
           DKD_NODE
-
       - name: Dkd install packages
         run: npm install --no-package-lock
-
-      - name: Dkd verify v0.0.16 code 3 release identity
+      - name: Dkd verify v0.0.17 code 3 release identity
         shell: bash
         run: |
           node <<'DKD_NODE'
           const a=require('./app.json').expo; const p=require('./package.json');
-          if(a.version!=='0.0.16'||p.version!=='0.0.16') throw new Error('DKD ERROR: version must be 0.0.16');
+          if(a.version!=='0.0.17'||p.version!=='0.0.17') throw new Error('DKD ERROR: version must be 0.0.17');
           if(Number(a.android.versionCode)!==3) throw new Error('DKD ERROR: versionCode must be 3');
           if(a.android.package!=='com.draborneagle.draborngo') throw new Error('DKD ERROR: Android package mismatch');
-          console.log('DKD identity OK: DraBornGo v0.0.16 / code 3');
+          console.log('DKD identity OK: DraBornGo v0.0.17 / code 3');
           DKD_NODE
-
       - name: Dkd verify Expo runtime and Play permissions
         shell: bash
         run: |
           npx expo config --json > dkd_expo_config.json
           node <<'DKD_NODE'
           const fs=require('fs'); const c=JSON.parse(fs.readFileSync('dkd_expo_config.json','utf8'));
-          if(c.version!=='0.0.16'||Number(c.android.versionCode)!==3) throw new Error('DKD ERROR: resolved Expo identity mismatch');
+          if(c.version!=='0.0.17'||Number(c.android.versionCode)!==3) throw new Error('DKD ERROR: resolved Expo identity mismatch');
           const permissions=Array.isArray(c?.android?.permissions)?c.android.permissions:[];
           const forbidden=['android.permission.ACCESS_BACKGROUND_LOCATION','android.permission.READ_EXTERNAL_STORAGE','android.permission.WRITE_EXTERNAL_STORAGE','android.permission.READ_MEDIA_IMAGES','android.permission.READ_MEDIA_VIDEO','android.permission.RECORD_AUDIO','android.permission.FOREGROUND_SERVICE_LOCATION'];
           for(const value of forbidden){if(permissions.includes(value)) throw new Error(`DKD ERROR: forbidden permission ${value}`);}
@@ -112,22 +105,18 @@ jobs:
           for(const key of ['EXPO_PUBLIC_SUPABASE_URL','EXPO_PUBLIC_SUPABASE_ANON_KEY','EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY','EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN']) if(!generated.includes(key)) throw new Error(`DKD ERROR: generated env missing ${key}`);
           console.log('DKD Expo runtime and permission audit OK.');
           DKD_NODE
-
       - name: Dkd prepare Android SDK
         shell: bash
         run: |
           export PATH="$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$ANDROID_SDK_ROOT/platform-tools:$PATH"
           yes | sdkmanager --licenses || true
           sdkmanager --install 'platform-tools' 'platforms;android-36' 'build-tools;36.0.0'
-
       - name: Dkd generate Android project
         run: npx expo prebuild --platform android --clean --non-interactive
-
       - name: Dkd tune Gradle release memory
         shell: bash
         run: |
           printf '\norg.gradle.jvmargs=-Xmx4g -XX:MaxMetaspaceSize=1g -Dfile.encoding=UTF-8\norg.gradle.daemon=false\norg.gradle.parallel=false\n' >> android/gradle.properties
-
       - name: Dkd inject release signing config
         shell: bash
         run: |
@@ -147,27 +136,24 @@ jobs:
           }
           DKD_GRADLE
           printf '\napply from: "dkd_release_signing.gradle"\n' >> android/app/build.gradle
-
       - name: Dkd build signed APK
         shell: bash
         run: |
           cd android
           ./gradlew :app:assembleRelease --no-daemon
-
       - name: Dkd collect and verify signed APK
         shell: bash
         run: |
           mkdir -p dkd_signed_apk_output
           dkd_apk_path="$(find android/app/build/outputs/apk/release -type f -name '*.apk' | head -n 1)"
           test -n "${dkd_apk_path}"
-          cp "${dkd_apk_path}" dkd_signed_apk_output/DraBornGo-v0.0.16-code3-release.apk
-          "$ANDROID_SDK_ROOT/build-tools/36.0.0/apksigner" verify --verbose dkd_signed_apk_output/DraBornGo-v0.0.16-code3-release.apk
-          sha256sum dkd_signed_apk_output/DraBornGo-v0.0.16-code3-release.apk
+          cp "${dkd_apk_path}" dkd_signed_apk_output/DraBornGo-v0.0.17-code3-release.apk
+          "$ANDROID_SDK_ROOT/build-tools/36.0.0/apksigner" verify --verbose dkd_signed_apk_output/DraBornGo-v0.0.17-code3-release.apk
+          sha256sum dkd_signed_apk_output/DraBornGo-v0.0.17-code3-release.apk | tee dkd_signed_apk_output/SHA256.txt
           ls -lh dkd_signed_apk_output
-
       - name: Dkd upload signed APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: DraBornGo_Release_APK_v0_0_16_code3
-          path: dkd_signed_apk_output/DraBornGo-v0.0.16-code3-release.apk
+          name: DraBornGo_Release_APK_v0_0_17_code3
+          path: dkd_signed_apk_output/
           retention-days: 14
