@@ -1,0 +1,26 @@
+name: Fix DraBornGo update service v0.0.17 identity once
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/dkd_fix_update_service_v0017_once.yml']
+permissions:
+  contents: write
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch and commit
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          node <<'DKD_NODE'
+          const fs=require('fs'); const p='src/services/dkd_app_update_service.js'; let s=fs.readFileSync(p,'utf8');
+          s=s.replace("const dkd_current_release_name_value = '0.0.16';","const dkd_current_release_name_value = '0.0.17';");
+          fs.writeFileSync(p,s);
+          DKD_NODE
+          grep -q "dkd_current_release_name_value = '0.0.17'" src/services/dkd_app_update_service.js
+          git add src/services/dkd_app_update_service.js
+          if ! git diff --cached --quiet; then git commit -m 'fix: align update center fallback with v0.0.17'; git push; fi
