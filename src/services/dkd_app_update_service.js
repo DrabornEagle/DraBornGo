@@ -4,7 +4,7 @@ import { supabase } from '../lib/supabase';
 
 const dkd_update_manifest_url_value = 'https://www.draborneagle.com/DraBornGo/App/dkd_draborngo_update_manifest.json';
 const dkd_play_store_url_value = 'https://play.google.com/store/apps/details?id=com.draborneagle.draborngo';
-const dkd_current_release_name_value = '0.0.16';
+const dkd_current_release_name_value = '0.0.17';
 const dkd_current_release_code_value = 3;
 const dkd_current_distribution_channel_value = 'google-play-release';
 const dkd_current_apk_sha256_value = 'f6214c8a1e9d48b7e0cc5718a9172cce88dd2620a48c1debbbaffca1549accba';
