@@ -1,4 +1,4 @@
-name: DraBornGo courier modal lifecycle hotfix
+name: DraBornGo final courier live hotfix validation
 
 on:
   push:
@@ -7,10 +7,10 @@ on:
       - '.github/workflows/dkd_courier_modal_state_hotfix.yml'
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  patch-and-validate:
+  validate:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -21,44 +21,7 @@ jobs:
         with:
           node-version: '22'
           cache: npm
-      - name: Configure git
-        run: |
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-      - name: Patch courier lifecycle modal
-        shell: bash
-        run: |
-          node <<'DKD_NODE'
-          const fs = require('fs');
-          const path = 'src/features/courier/dkd_courier_board_modal_v5.js';
-          let source = fs.readFileSync(path, 'utf8');
-
-          const loadNeedle = "  const load=useCallback(async(force=false)=>{force?setRefreshing(true):setLoading(true);try{const result=await fetchCourierJobs({dkd_force_refresh:force,dkd_cache_ttl_ms:force?0:3500});if(result?.error)throw result.error;const rows=(Array.isArray(result?.data)?result.data:[]).filter((job)=>!dkd_done_value(job));setJobs(rows);}catch(error){Alert.alert('Kurye',error?.message||'Görevler alınamadı.');}finally{setLoading(false);setRefreshing(false);}},[]);";
-          if (!source.includes(loadNeedle)) throw new Error('load anchor not found');
-          const syncBlock = `${loadNeedle}\n  useEffect(()=>{\n    if(!selected?.id)return;\n    const dkd_fresh_selected_value=jobs.find((dkd_job_value)=>Number(dkd_job_value?.id)===Number(selected.id));\n    if(!dkd_fresh_selected_value)return;\n    const dkd_changed_value=String(dkd_fresh_selected_value?.status||'')!==String(selected?.status||'')||String(dkd_fresh_selected_value?.pickup_status||'')!==String(selected?.pickup_status||'')||String(dkd_fresh_selected_value?.updated_at||'')!==String(selected?.updated_at||'')||String(dkd_fresh_selected_value?.assigned_user_id||'')!==String(selected?.assigned_user_id||'');\n    if(dkd_changed_value)setSelected(dkd_fresh_selected_value);\n  },[jobs,selected?.id,selected?.status,selected?.pickup_status,selected?.updated_at,selected?.assigned_user_id]);`;
-          source = source.replace(loadNeedle, syncBlock);
-
-          const actionNeedle = "    if(action==='reject'){setJobs((prev)=>prev.filter((job)=>Number(job.id)!==Number(jobId)));setSelected(null);}await load(true);";
-          if (!source.includes(actionNeedle)) throw new Error('action anchor not found');
-          const optimisticBlock = `    if(action==='accept'||action==='pickup'){\n      const dkd_now_value=new Date().toISOString();\n      const dkd_patch_job_value=(dkd_job_value)=>{\n        if(Number(dkd_job_value?.id)!==Number(jobId))return dkd_job_value;\n        if(action==='accept')return{...dkd_job_value,assigned_user_id:userId,status:'accepted',accepted_at:dkd_job_value?.accepted_at||dkd_now_value,updated_at:dkd_now_value};\n        return{...dkd_job_value,assigned_user_id:userId,status:'picked_up',pickup_status:'picked_up',picked_up_at:dkd_job_value?.picked_up_at||dkd_now_value,updated_at:dkd_now_value};\n      };\n      setJobs((dkd_previous_value)=>dkd_previous_value.map(dkd_patch_job_value));\n      setSelected((dkd_previous_value)=>dkd_previous_value?dkd_patch_job_value(dkd_previous_value):dkd_previous_value);\n    }\n    if(action==='reject'){setJobs((prev)=>prev.filter((job)=>Number(job.id)!==Number(jobId)));setSelected(null);}await load(true);`;
-          source = source.replace(actionNeedle, optimisticBlock);
-
-          const depsNeedle = "[busyId,currentLocation,load,online,setProfile,showLimit,showLocked,showOffline]";
-          if (!source.includes(depsNeedle)) throw new Error('dependency anchor not found');
-          source = source.replace(depsNeedle, "[busyId,currentLocation,load,online,setProfile,showLimit,showLocked,showOffline,userId]");
-
-          if (!source.includes("dkd_patch_job_value")) throw new Error('optimistic patch not written');
-          fs.writeFileSync(path, source);
-          DKD_NODE
-      - name: Install dependencies
+      - name: Install exact dependencies
         run: npm ci
-      - name: Validate Android Metro export
-        run: npx expo export --platform android --output-dir dist-courier-state-hotfix
-      - name: Commit hotfix
-        shell: bash
-        run: |
-          git add src/features/courier/dkd_courier_board_modal_v5.js
-          if ! git diff --cached --quiet; then
-            git commit -m 'fix: advance courier task modal immediately after actions'
-            git push origin HEAD:main
-          fi
+      - name: Validate Android Metro export only
+        run: npx expo export --platform android --output-dir dist-final-courier-live-hotfix
