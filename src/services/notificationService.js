@@ -43,7 +43,7 @@ export async function ensureNotificationChannel() {
   await Notifications.setNotificationChannelAsync('draborngo-core', {
     name: 'DraBornGo Core',
     importance: Notifications.AndroidImportance.HIGH,
-    sound: 'default',
+
     vibrationPattern: [0, 180, 120, 220],
     lightColor: '#0EA5E9',
     lockscreenVisibility: Notifications.AndroidNotificationVisibility.PUBLIC,
@@ -300,7 +300,7 @@ export async function dkd_sync_boss_ready_notification(dkd_boss_state_value) {
       content: {
         title: 'Özel Hedef Hazır',
         body: 'Yeni özel hedef hazır. Harita çekirdeğini aç ve hedef akışına başla.',
-        sound: 'default',
+
         priority: Notifications.AndroidNotificationPriority?.MAX,
         channelId: 'draborngo-core',
         data: {
