@@ -49,12 +49,12 @@ jobs:
           config=config.replace(/const dkd_android_version_code_value = \d+;/,'const dkd_android_version_code_value = 4;');
           fs.writeFileSync('app.config.js',config);
           NODE
+      - name: Install current project dependencies
+        run: npm ci
       - name: Add Expo-compatible SVG runtime
         env:
           CI: true
         run: npx expo install react-native-svg
-      - name: Install exact dependencies
-        run: npm ci
       - name: Validate Android JS bundle only
         run: npx expo export --platform android --output-dir /tmp/dkd-main-v0017-code4-export
       - name: Commit release and remove helper workflow
