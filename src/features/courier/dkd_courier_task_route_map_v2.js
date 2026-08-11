@@ -3,6 +3,7 @@ import { ActivityIndicator, Linking, Modal, Pressable, StyleSheet, Text, View } 
 import MapboxGL from '@rnmapbox/maps';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+import DkdRacingMotorcycle from '../../components/DkdRacingMotorcycle';
 import { supabase } from '../../lib/supabase';
 import { dkd_generated_public_env_value } from '../../lib/dkd_public_env.generated';
 import {
@@ -130,7 +131,7 @@ function DkdMapSurface({
             id={`dkd-main-courier-${dkd_courier_user_id_value || 'self'}-${dkd_fullscreen_value ? 'full' : 'card'}`}
             coordinate={dkd_courier_point_value.dkd_coordinate_value}
           >
-            <DkdMarker icon="motorbike" />
+            <View style={styles.courierMotorcycleMarker}><DkdRacingMotorcycle size={42} /></View>
           </MapboxGL.PointAnnotation>
         ) : null}
         {dkd_drop_point_value ? (
@@ -503,6 +504,7 @@ const styles = StyleSheet.create({
   },
   mapFill: { flex: 1 },
   map: { flex: 1 },
+  courierMotorcycleMarker: { width: 48, height: 38, alignItems: 'center', justifyContent: 'center' },
   marker: {
     width: 46,
     height: 46,
