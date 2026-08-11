@@ -1,4 +1,4 @@
-name: Prepare DraBornGo v0.0.17 release hotfix branch once
+name: Prepare DraBornGo v0.0.17 release hotfix branch once retry
 on:
   push:
     branches: [main]
