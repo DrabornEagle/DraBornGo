@@ -1,7 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Linking, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 import MapboxGL from '@rnmapbox/maps';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { supabase } from '../../lib/supabase';
 import { dkd_generated_public_env_value } from '../../lib/dkd_public_env.generated';
 import {
@@ -359,6 +360,21 @@ export default function DkdCourierTaskRouteMapV2({ dkd_job_value, dkd_current_lo
   const dkd_distance_text_value = dkd_distance_value == null ? (dkd_loading_value ? '...' : '—') : `${dkd_distance_value.toFixed(1)} km`;
   const dkd_eta_text_value = dkd_eta_value == null ? (dkd_loading_value ? '...' : '—') : `${Math.max(1, Math.round(dkd_eta_value))} dk`;
 
+  const dkd_open_google_maps_value = useCallback(async () => {
+    if (!dkd_drop_point_value) return;
+    const dkd_destination_text_value = `${dkd_drop_point_value.dkd_lat_value},${dkd_drop_point_value.dkd_lng_value}`;
+    const dkd_google_navigation_url_value = `google.navigation:q=${encodeURIComponent(dkd_destination_text_value)}&mode=d`;
+    const dkd_google_web_url_value = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(dkd_destination_text_value)}&travelmode=driving`;
+    try {
+      const dkd_can_open_navigation_value = await Linking.canOpenURL(dkd_google_navigation_url_value);
+      if (dkd_can_open_navigation_value) {
+        await Linking.openURL(dkd_google_navigation_url_value);
+        return;
+      }
+    } catch {}
+    try { await Linking.openURL(dkd_google_web_url_value); } catch {}
+  }, [dkd_drop_point_value]);
+
   return (
     <>
       <View style={styles.mapWrap}>
@@ -391,6 +407,31 @@ export default function DkdCourierTaskRouteMapV2({ dkd_job_value, dkd_current_lo
           <MaterialCommunityIcons name="arrow-expand-all" size={22} color="#FFF" />
         </Pressable>
       </View>
+
+      {dkd_drop_point_value ? (
+        <Pressable
+          onPress={dkd_open_google_maps_value}
+          style={({ pressed: dkd_pressed_value }) => [styles.googleMapsButtonPressable, dkd_pressed_value && styles.googleMapsButtonPressed]}
+        >
+          <LinearGradient
+            colors={['#4285F4', '#34A853', '#FBBC05', '#EA4335']}
+            start={{ x: 0, y: 0.5 }}
+            end={{ x: 1, y: 0.5 }}
+            style={styles.googleMapsButtonGradient}
+          >
+            <View style={styles.googleMapsIconShell}>
+              <MaterialCommunityIcons name="google-maps" size={27} color="#202124" />
+            </View>
+            <View style={styles.googleMapsButtonCopy}>
+              <Text style={styles.googleMapsButtonTitle}>GOOGLE MAPS İLE ROTA</Text>
+              <Text style={styles.googleMapsButtonSubtitle}>Doğru teslimat konumuna navigasyonu aç</Text>
+            </View>
+            <View style={styles.googleMapsArrowShell}>
+              <MaterialCommunityIcons name="navigation-variant" size={24} color="#FFF" />
+            </View>
+          </LinearGradient>
+        </Pressable>
+      ) : null}
 
       {!dkd_location_fresh_value && dkd_courier_point_value ? (
         <View style={styles.staleNotice}>
@@ -449,9 +490,11 @@ export default function DkdCourierTaskRouteMapV2({ dkd_job_value, dkd_current_lo
 
 const styles = StyleSheet.create({
   mapWrap: {
-    height: 300,
+    height: 365,
     marginTop: 16,
-    marginHorizontal: 18,
+    marginHorizontal: 0,
+    width: '100%',
+    alignSelf: 'stretch',
     borderRadius: 24,
     overflow: 'hidden',
     backgroundColor: '#0B1728',
@@ -514,6 +557,45 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: 'rgba(7,15,27,.94)',
+  },
+  googleMapsButtonPressable: {
+    marginTop: 14,
+    marginHorizontal: 0,
+    width: '100%',
+    alignSelf: 'stretch',
+    borderRadius: 22,
+    overflow: 'hidden',
+  },
+  googleMapsButtonPressed: { opacity: 0.82, transform: [{ scale: 0.992 }] },
+  googleMapsButtonGradient: {
+    minHeight: 82,
+    borderRadius: 22,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,.34)',
+  },
+  googleMapsIconShell: {
+    width: 52,
+    height: 52,
+    borderRadius: 17,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#FFF',
+  },
+  googleMapsButtonCopy: { flex: 1 },
+  googleMapsButtonTitle: { color: '#FFF', fontSize: 17, fontWeight: '900', letterSpacing: .25 },
+  googleMapsButtonSubtitle: { color: 'rgba(255,255,255,.92)', fontSize: 12.5, lineHeight: 17, fontWeight: '800', marginTop: 3 },
+  googleMapsArrowShell: {
+    width: 42,
+    height: 42,
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(0,0,0,.20)',
   },
   noLocation: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 28, gap: 8 },
   noLocationTitle: { color: '#F4F8FF', fontSize: 17, fontWeight: '900' },
