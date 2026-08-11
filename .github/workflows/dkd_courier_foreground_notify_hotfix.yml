@@ -1,0 +1,74 @@
+name: DraBornGo courier foreground notification hotfix
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/dkd_courier_foreground_notify_hotfix.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch-validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Patch Realtime payload and local notification bridge
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          service=Path('src/services/courierService.js')
+          s=service.read_text()
+          old="""    dkd_channel_value = dkd_channel_value.on('postgres_changes', { event: '*', schema: 'public', table: dkd_table_name_value }, () => {\n      dkd_clear_courier_jobs_cache_value();\n      dkd_on_change_value({ dkd_table_name: dkd_table_name_value });\n    });"""
+          new="""    dkd_channel_value = dkd_channel_value.on('postgres_changes', { event: '*', schema: 'public', table: dkd_table_name_value }, (dkd_payload_value) => {\n      dkd_clear_courier_jobs_cache_value();\n      dkd_on_change_value({ dkd_table_name: dkd_table_name_value, dkd_payload_value });\n    });"""
+          if old not in s:
+              raise SystemExit('courierService realtime anchor missing')
+          service.write_text(s.replace(old,new))
+
+          board=Path('src/features/courier/dkd_courier_board_modal_v5.js')
+          b=board.read_text()
+          b=b.replace("import React, { useCallback, useEffect, useMemo, useState } from 'react';", "import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';")
+          import_anchor="""} from '../../services/courierService';"""
+          import_insert="""} from '../../services/courierService';\nimport { dkd_notify_new_courier_job_local_value, dkd_seed_courier_job_notification_values } from '../../services/dkd_courier_local_notification_service';"""
+          if import_anchor not in b:
+              raise SystemExit('board import anchor missing')
+          b=b.replace(import_anchor,import_insert,1)
+
+          state_anchor="""  const[jobs,setJobs]=useState([]);const[loading,setLoading]=useState(false);const[refreshing,setRefreshing]=useState(false);const[busyId,setBusyId]=useState(null);const[onlineBusy,setOnlineBusy]=useState(false);const[selected,setSelected]=useState(null);const[info,setInfo]=useState(null);const userId=sessionUserId||profile?.user_id||profile?.id;const online=profile?.dkd_courier_online===true;const approved=String(profile?.courier_status||'').toLowerCase()==='approved';"""
+          state_new=state_anchor+"\n  const dkd_notification_seeded_ref_value=useRef(false);"
+          if state_anchor not in b:
+              raise SystemExit('board state anchor missing')
+          b=b.replace(state_anchor,state_new,1)
+
+          load_old="""const rows=(Array.isArray(result?.data)?result.data:[]).filter((job)=>!dkd_done_value(job));setJobs(rows);"""
+          load_new="""const rows=(Array.isArray(result?.data)?result.data:[]).filter((job)=>!dkd_done_value(job));if(!dkd_notification_seeded_ref_value.current){dkd_seed_courier_job_notification_values(rows);dkd_notification_seeded_ref_value.current=true;}setJobs(rows);"""
+          if load_old not in b:
+              raise SystemExit('board load anchor missing')
+          b=b.replace(load_old,load_new,1)
+
+          sub_old="""  useEffect(()=>{if(!visible)return undefined;load(false);const sub=dkd_subscribe_courier_jobs_live_updates_value(()=>load(true));const timer=setInterval(()=>load(true),6000);return()=>{sub?.dkd_unsubscribe?.();clearInterval(timer);};},[visible,load]);"""
+          sub_new="""  useEffect(()=>{if(!visible)return undefined;load(false);const sub=dkd_subscribe_courier_jobs_live_updates_value((dkd_change_value)=>{const dkd_payload_value=dkd_change_value?.dkd_payload_value;const dkd_record_value=dkd_payload_value?.new;if(dkd_change_value?.dkd_table_name==='dkd_courier_jobs'&&String(dkd_payload_value?.eventType||'').toUpperCase()==='INSERT'&&dkd_open_value(dkd_record_value)){dkd_notify_new_courier_job_local_value(dkd_record_value).catch(()=>null);}load(true);});const timer=setInterval(()=>load(true),6000);return()=>{sub?.dkd_unsubscribe?.();clearInterval(timer);};},[visible,load]);"""
+          if sub_old not in b:
+              raise SystemExit('board subscription anchor missing')
+          b=b.replace(sub_old,sub_new,1)
+          board.write_text(b)
+          PY
+      - name: Install exact dependencies
+        run: npm ci
+      - name: Validate Android Metro export
+        run: npx expo export --platform android --output-dir dist-courier-foreground-notify
+      - name: Commit hotfix
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add src/services/courierService.js src/features/courier/dkd_courier_board_modal_v5.js
+          git diff --cached --quiet || (git commit -m 'fix: show local new-order notification while courier app is active' && git push origin HEAD:main)
