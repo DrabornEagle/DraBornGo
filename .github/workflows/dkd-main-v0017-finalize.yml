@@ -1,0 +1,63 @@
+name: DraBornGo v0.0.17 code4 finalize
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/dkd-main-v0017-finalize.yml']
+permissions:
+  contents: write
+jobs:
+  finalize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Apply v0.0.17 code4 UI changes
+        run: |
+          node <<'NODE'
+          const fs=require('fs');
+          function replaceRequired(s,a,b,label){ if(!s.includes(a)) throw new Error(`Missing ${label}`); return s.replace(a,b); }
+          const route='src/features/courier/dkd_courier_task_route_map_v2.js';
+          let r=fs.readFileSync(route,'utf8');
+          r=replaceRequired(r,"import { LinearGradient } from 'expo-linear-gradient';","import { LinearGradient } from 'expo-linear-gradient';\nimport DkdRacingMotorcycle from '../../components/DkdRacingMotorcycle';",'route import');
+          r=replaceRequired(r,'<DkdMarker icon="motorbike" />','<View style={styles.courierMotorcycleMarker}><DkdRacingMotorcycle size={42} /></View>','courier marker');
+          r=replaceRequired(r,"  map: { flex: 1 },\n  marker: {","  map: { flex: 1 },\n  courierMotorcycleMarker: { width: 48, height: 38, alignItems: 'center', justifyContent: 'center' },\n  marker: {",'marker style');
+          fs.writeFileSync(route,r);
+
+          const board='src/features/courier/dkd_courier_board_modal_v5.js';
+          let b=fs.readFileSync(board,'utf8');
+          b=replaceRequired(b,"infoCard:{minHeight:61,borderRadius:18,padding:11,marginTop:8","infoCard:{minHeight:68,borderRadius:18,padding:13,marginTop:8",'infoCard');
+          b=replaceRequired(b,"infoLabel:{color:'#6C849D',fontSize:9.5","infoLabel:{color:'#6C849D',fontSize:10.5",'infoLabel');
+          b=replaceRequired(b,"infoValue:{color:'#F4F8FF',fontSize:13","infoValue:{color:'#F4F8FF',fontSize:14.5",'infoValue');
+          b=replaceRequired(b,"metric:{flex:1,minHeight:83,borderRadius:17,padding:10","metric:{flex:1,minHeight:92,borderRadius:17,padding:12",'metric');
+          b=replaceRequired(b,"metricLabel:{color:'#6C849D',fontSize:8.5","metricLabel:{color:'#6C849D',fontSize:9.5",'metricLabel');
+          b=replaceRequired(b,"metricValue:{color:'#F4F8FF',fontSize:13.5","metricValue:{color:'#F4F8FF',fontSize:15",'metricValue');
+          fs.writeFileSync(board,b);
+
+          const app=JSON.parse(fs.readFileSync('app.json','utf8'));
+          app.expo.version='0.0.17'; app.expo.android=app.expo.android||{}; app.expo.android.versionCode=4;
+          fs.writeFileSync('app.json',JSON.stringify(app,null,2)+'\n');
+          let config=fs.readFileSync('app.config.js','utf8');
+          config=replaceRequired(config,'const dkd_android_version_code_value = 9;','const dkd_android_version_code_value = 4;','config versionCode');
+          fs.writeFileSync('app.config.js',config);
+          NODE
+      - name: Add Expo-compatible SVG runtime
+        env:
+          CI: true
+        run: npx expo install react-native-svg
+      - name: Install exact dependencies
+        run: npm ci
+      - name: Validate Android JS bundle only
+        run: npx expo export --platform android --output-dir /tmp/dkd-main-v0017-code4-export
+      - name: Commit release and remove helper workflow
+        run: |
+          rm -f .github/workflows/dkd-main-v0017-finalize.yml
+          git config user.name 'DraBornGo Release Bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add -A
+          git commit -m 'release: DraBornGo v0.0.17 code4' || exit 0
+          git push origin HEAD:main
