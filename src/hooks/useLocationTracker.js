@@ -3,11 +3,11 @@ import * as Location from 'expo-location';
 import { haversineMeters } from '../utils/geo';
 
 const FALLBACK_LOCATION = { lat: 39.92077, lng: 32.85411 };
-const WATCH_TIME_INTERVAL_MS = 2200;
-const WATCH_DISTANCE_INTERVAL_M = 4;
-const MIN_STATE_UPDATE_DISTANCE_M = 2;
-const MIN_HEADING_STEP_DEG = 14;
-const HEADING_SNAP_DEG = 10;
+const WATCH_TIME_INTERVAL_MS = 1000;
+const WATCH_DISTANCE_INTERVAL_M = 1;
+const MIN_STATE_UPDATE_DISTANCE_M = 0.75;
+const MIN_HEADING_STEP_DEG = 10;
+const HEADING_SNAP_DEG = 5;
 
 export function useLocationTracker(enabled = false) {
   const [loc, setLoc] = useState(null);
@@ -29,11 +29,11 @@ export function useLocationTracker(enabled = false) {
   }, []);
 
   const commitLocation = useCallback((next) => {
-    if (!next?.lat || !next?.lng) return;
+    if (!Number.isFinite(Number(next?.lat)) || !Number.isFinite(Number(next?.lng))) return;
     const nextHeading = normalizeHeading(next.heading);
 
     setLoc((prev) => {
-      if (!prev?.lat || !prev?.lng) return { ...next, heading: nextHeading };
+      if (!Number.isFinite(Number(prev?.lat)) || !Number.isFinite(Number(prev?.lng))) return { ...next, heading: nextHeading };
       const movedMeters = haversineMeters(prev.lat, prev.lng, next.lat, next.lng);
       const headingDelta = Math.abs((((nextHeading - Number(prev.heading || 0)) + 540) % 360) - 180);
       if (movedMeters < MIN_STATE_UPDATE_DISTANCE_M && headingDelta < MIN_HEADING_STEP_DEG) return prev;
@@ -46,7 +46,7 @@ export function useLocationTracker(enabled = false) {
   }, [normalizeHeading]);
 
   useEffect(() => {
-    if (!enabled) return;
+    if (!enabled) return undefined;
 
     let cancelled = false;
     let watcher = null;
@@ -105,7 +105,7 @@ export function useLocationTracker(enabled = false) {
             if (!Number.isFinite(nextHeading) || nextHeading < 0) return;
             headingRef.current = normalizeHeading(nextHeading);
             setLoc((prev) => {
-              if (!prev?.lat || !prev?.lng) return prev;
+              if (!Number.isFinite(Number(prev?.lat)) || !Number.isFinite(Number(prev?.lng))) return prev;
               const currentHeading = Number(prev.heading || 0);
               const snappedHeading = normalizeHeading(nextHeading);
               const delta = Math.abs((((snappedHeading - currentHeading) + 540) % 360) - 180);
@@ -113,9 +113,7 @@ export function useLocationTracker(enabled = false) {
               return { ...prev, heading: snappedHeading };
             });
           });
-        } catch (_headingError) {
-          // ignore heading watcher errors on unsupported devices
-        }
+        } catch (_headingError) {}
 
         if (cancelled) {
           watcher?.remove?.();
