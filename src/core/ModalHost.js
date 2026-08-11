@@ -3,6 +3,7 @@ import ActionMenuModal from '../features/navigation/ActionMenuModal';
 import ProfileModal from '../features/profile/ProfileModal';
 import CourierBoardModal from '../features/courier/dkd_courier_board_modal_v4';
 import DkdCourierLiveSyncBridge from '../features/courier/dkd_courier_live_sync_bridge';
+import DkdCourierPushBootstrap from '../features/courier/dkd_courier_push_bootstrap';
 import DkdLiveSupportModal from '../features/support/dkd_live_support_modal_v2';
 import AdminMenuModal from '../features/admin/AdminMenuModal';
 import DkdGooglePlayPolicyCenterModal from '../features/legal/dkd_google_play_policy_center_modal';
@@ -25,6 +26,7 @@ function ModalHost(props) {
   const dkd_open_legal_value = useCallback(() => { setActionMenuOpen(false); dkd_set_policy_center_visible_value(true); setActiveTab('dkd_legal_center'); }, [setActionMenuOpen, setActiveTab]);
   const dkd_open_app_update_center_value = useCallback(() => { setActionMenuOpen(false); dkd_set_app_update_center_visible_value(true); setActiveTab('dkd_app_update_center'); }, [setActionMenuOpen, setActiveTab]);
   return <>
+    <DkdCourierPushBootstrap dkd_enabled_value={String(profile?.courier_status || '').toLowerCase() === 'approved'} />
     {actionMenuOpen ? <ActionMenuModal visible onClose={dkd_close_action_menu_value} isAdmin={isAdmin} canCourier={String(profile?.courier_status || '').toLowerCase() === 'approved'} onCourier={dkd_open_courier_value} onProfile={dkd_open_profile_value} onSupport={() => { setActionMenuOpen(false); setActiveTab('support'); }} onLegalCenter={dkd_open_legal_value} dkd_on_app_update_center_value={dkd_open_app_update_center_value} onAdmin={dkd_open_admin_value} onLogout={logout} /> : null}
     {profileOpen ? <ProfileModal visible onClose={() => setProfileOpen(false)} profile={profile} onSave={saveProfileNick} /> : null}
     <DkdCourierLiveSyncBridge dkd_profile_value={profile} dkd_current_location_value={loc} dkd_session_user_id_value={sessionUserId} />
