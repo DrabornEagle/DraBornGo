@@ -45,6 +45,13 @@ function DkdTaskCard({job,userId,onOpen}){const owned=dkd_owned_value(job,userId
 export default function DkdCourierBoardModalV5({visible,onClose,profile,currentLocation,sessionUserId,setProfile}){
   const[jobs,setJobs]=useState([]);const[loading,setLoading]=useState(false);const[refreshing,setRefreshing]=useState(false);const[busyId,setBusyId]=useState(null);const[onlineBusy,setOnlineBusy]=useState(false);const[selected,setSelected]=useState(null);const[info,setInfo]=useState(null);const userId=sessionUserId||profile?.user_id||profile?.id;const online=profile?.dkd_courier_online===true;const approved=String(profile?.courier_status||'').toLowerCase()==='approved';
   const load=useCallback(async(force=false)=>{force?setRefreshing(true):setLoading(true);try{const result=await fetchCourierJobs({dkd_force_refresh:force,dkd_cache_ttl_ms:force?0:3500});if(result?.error)throw result.error;const rows=(Array.isArray(result?.data)?result.data:[]).filter((job)=>!dkd_done_value(job));setJobs(rows);}catch(error){Alert.alert('Kurye',error?.message||'Görevler alınamadı.');}finally{setLoading(false);setRefreshing(false);}},[]);
+  useEffect(()=>{
+    if(!selected?.id)return;
+    const dkd_fresh_selected_value=jobs.find((dkd_job_value)=>Number(dkd_job_value?.id)===Number(selected.id));
+    if(!dkd_fresh_selected_value)return;
+    const dkd_changed_value=String(dkd_fresh_selected_value?.status||'')!==String(selected?.status||'')||String(dkd_fresh_selected_value?.pickup_status||'')!==String(selected?.pickup_status||'')||String(dkd_fresh_selected_value?.updated_at||'')!==String(selected?.updated_at||'')||String(dkd_fresh_selected_value?.assigned_user_id||'')!==String(selected?.assigned_user_id||'');
+    if(dkd_changed_value)setSelected(dkd_fresh_selected_value);
+  },[jobs,selected?.id,selected?.status,selected?.pickup_status,selected?.updated_at,selected?.assigned_user_id]);
   useEffect(()=>{if(!visible)return undefined;load(false);const sub=dkd_subscribe_courier_jobs_live_updates_value(()=>load(true));const timer=setInterval(()=>load(true),6000);return()=>{sub?.dkd_unsubscribe?.();clearInterval(timer);};},[visible,load]);
   const visibleJobs=useMemo(()=>jobs.filter((job)=>{if(dkd_owned_value(job,userId)&&dkd_active_delivery_value(job))return true;if(!online)return false;return dkd_open_value(job)||dkd_offer_value(job)||dkd_owned_value(job,userId);}),[jobs,userId,online]);
   const activeOwned=useMemo(()=>visibleJobs.find((job)=>dkd_owned_value(job,userId)&&dkd_active_delivery_value(job))||null,[visibleJobs,userId]);
@@ -59,8 +66,18 @@ export default function DkdCourierBoardModalV5({visible,onClose,profile,currentL
       if(!restored&&restoreReason==='max_online_hours_reached')showLimit(payload?.dkd_online_restore||payload);else if(!restored&&restoreReason==='online_status_locked')showLocked();
       await load(true);return;
     }
+    if(action==='accept'||action==='pickup'){
+      const dkd_now_value=new Date().toISOString();
+      const dkd_patch_job_value=(dkd_job_value)=>{
+        if(Number(dkd_job_value?.id)!==Number(jobId))return dkd_job_value;
+        if(action==='accept')return{...dkd_job_value,assigned_user_id:userId,status:'accepted',accepted_at:dkd_job_value?.accepted_at||dkd_now_value,updated_at:dkd_now_value};
+        return{...dkd_job_value,assigned_user_id:userId,status:'picked_up',pickup_status:'picked_up',picked_up_at:dkd_job_value?.picked_up_at||dkd_now_value,updated_at:dkd_now_value};
+      };
+      setJobs((dkd_previous_value)=>dkd_previous_value.map(dkd_patch_job_value));
+      setSelected((dkd_previous_value)=>dkd_previous_value?dkd_patch_job_value(dkd_previous_value):dkd_previous_value);
+    }
     if(action==='reject'){setJobs((prev)=>prev.filter((job)=>Number(job.id)!==Number(jobId)));setSelected(null);}await load(true);
-  }catch(error){Alert.alert('Kurye',error?.message||'Görev güncellenemedi.');}finally{setBusyId(null);}},[busyId,currentLocation,load,online,setProfile,showLimit,showLocked,showOffline]);
+  }catch(error){Alert.alert('Kurye',error?.message||'Görev güncellenemedi.');}finally{setBusyId(null);}},[busyId,currentLocation,load,online,setProfile,showLimit,showLocked,showOffline,userId]);
 
   const toggleOnline=useCallback(async()=>{if(onlineBusy||activeOwned||!approved)return;setOnlineBusy(true);try{const result=await dkd_set_courier_online_status({dkd_online:!online,dkd_country:profile?.dkd_country||'Türkiye',dkd_city:profile?.dkd_city||profile?.courier_city||'Ankara',dkd_region:profile?.dkd_region||profile?.courier_zone||'',dkd_live_lat:currentLocation?.lat??currentLocation?.latitude,dkd_live_lng:currentLocation?.lng??currentLocation?.longitude});if(result?.error)throw result.error;const payload=result?.data||{};setProfile?.((p)=>p?{...p,dkd_courier_online:payload?.dkd_online_value===true,dkd_courier_auto_assigned_job_id:payload?.dkd_assigned_job_id??null}:p);if(payload?.dkd_ok_value===false){const reason=String(payload?.dkd_reason_value||'');if(reason==='max_online_hours_reached')showLimit(payload);else if(reason==='online_status_locked')showLocked();}await load(true);}catch(error){Alert.alert('Kurye',error?.message||'Kurye durumu değiştirilemedi.');}finally{setOnlineBusy(false);}},[activeOwned,approved,currentLocation,load,online,onlineBusy,profile,setProfile,showLimit,showLocked]);
 
