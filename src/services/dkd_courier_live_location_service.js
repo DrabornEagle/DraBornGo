@@ -1,8 +1,17 @@
 import { supabase } from '../lib/supabase';
 
 function dkd_to_number_or_null(dkd_value) {
+  if (dkd_value === null || dkd_value === undefined || dkd_value === '') return null;
   const dkd_numeric_value = Number(dkd_value);
   return Number.isFinite(dkd_numeric_value) ? dkd_numeric_value : null;
+}
+
+function dkd_valid_lat_lng_value(dkd_lat_value, dkd_lng_value) {
+  return dkd_lat_value != null
+    && dkd_lng_value != null
+    && Math.abs(dkd_lat_value) <= 90
+    && Math.abs(dkd_lng_value) <= 180
+    && !(Math.abs(dkd_lat_value) < 0.0001 && Math.abs(dkd_lng_value) < 0.0001);
 }
 
 export async function dkd_upsert_courier_live_location(dkd_input_value) {
@@ -14,6 +23,13 @@ export async function dkd_upsert_courier_live_location(dkd_input_value) {
     dkd_param_plate_no: String(dkd_input_value?.dkd_plate_no || '').trim().toUpperCase() || null,
     dkd_param_vehicle_type: String(dkd_input_value?.dkd_vehicle_type || '').trim().toLowerCase() || null,
   };
+
+  if (!dkd_valid_lat_lng_value(dkd_payload_value.dkd_param_lat, dkd_payload_value.dkd_param_lng)) {
+    return { data: null, error: new Error('dkd_live_location_coordinate_invalid') };
+  }
+  if (dkd_payload_value.dkd_param_eta_min != null && (dkd_payload_value.dkd_param_eta_min < 0 || dkd_payload_value.dkd_param_eta_min > 720)) {
+    dkd_payload_value.dkd_param_eta_min = null;
+  }
 
   const dkd_rpc_result_value = await supabase.rpc('dkd_courier_location_ping', dkd_payload_value);
   if (!dkd_rpc_result_value?.error) return dkd_rpc_result_value;
