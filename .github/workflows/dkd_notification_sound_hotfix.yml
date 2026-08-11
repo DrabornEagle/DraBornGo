@@ -1,0 +1,50 @@
+name: DraBornGo notification sound hotfix
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/dkd_notification_sound_hotfix.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Configure git
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+      - name: Remove invalid explicit default custom sound
+        shell: bash
+        run: |
+          node <<'DKD_NODE'
+          const fs=require('fs');
+          const path='src/services/notificationService.js';
+          let source=fs.readFileSync(path,'utf8');
+          source=source.replace(/^\s*sound:\s*['"]default['"],\s*$/gm,'');
+          if (/sound:\s*['"]default['"]/.test(source)) throw new Error('Explicit default sound still exists');
+          fs.writeFileSync(path,source);
+          DKD_NODE
+      - name: Install exact dependencies
+        run: npm ci
+      - name: Validate Android Metro export
+        run: npx expo export --platform android --output-dir dist-notification-hotfix
+      - name: Commit source hotfix
+        shell: bash
+        run: |
+          git add src/services/notificationService.js
+          if ! git diff --cached --quiet; then
+            git commit -m 'fix: remove invalid expo default custom sound'
+            git push origin HEAD:main
+          fi
