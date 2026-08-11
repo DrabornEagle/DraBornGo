@@ -340,7 +340,7 @@ export default function DkdCourierTaskRouteMapV2({ dkd_job_value, dkd_current_lo
       </View>
 
       <View style={styles.targetCard}>
-        <MaterialCommunityIcons name="shield-map-outline" size={20} color="#70EAB7" />
+        <MaterialCommunityIcons name="map-marker-check-outline" size={20} color="#70EAB7" />
         <View style={{ flex: 1 }}>
           <Text style={styles.targetLabel}>DOĞRULANAN TESLİMAT HEDEFİ</Text>
           <Text style={styles.targetName}>{dkd_verified_name_value || dkd_delivery_address_value || '—'}</Text>
