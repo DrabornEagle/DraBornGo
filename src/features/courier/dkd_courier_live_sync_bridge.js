@@ -36,7 +36,7 @@ function dkd_estimated_eta_min_value(dkd_distance_km_value, dkd_phase_value) {
   const dkd_numeric_distance_value = dkd_safe_number_value(dkd_distance_km_value);
   if (dkd_numeric_distance_value == null) return null;
   const dkd_average_speed_kmh_value = dkd_phase_value === 'to_customer' ? 30 : 26;
-  const dkd_buffer_min_value = dkd_phase_value === 'to_customer' ? 3 : 4;
+  const dkd_buffer_min_value = dkd_phase_value === 'to_customer' ? 2 : 3;
   return Math.max(1, Math.round((dkd_numeric_distance_value / dkd_average_speed_kmh_value) * 60) + dkd_buffer_min_value);
 }
 
@@ -61,7 +61,7 @@ export default function DkdCourierLiveSyncBridge({ dkd_profile_value, dkd_curren
   const dkd_last_sync_fingerprint_ref_value = useRef('');
   const dkd_last_task_list_fingerprint_ref_value = useRef('');
   const dkd_app_state_ref_value = useRef(AppState.currentState || 'active');
-  const dkd_throttled_location_value = useThrottledLocation(dkd_current_location_value, 2200);
+  const dkd_throttled_location_value = useThrottledLocation(dkd_current_location_value, 700);
 
   const dkd_is_courier_approved_value = useMemo(() => String(dkd_profile_value?.courier_status || dkd_profile_value?.status || '').toLowerCase() === 'approved', [dkd_profile_value?.courier_status, dkd_profile_value?.status]);
   const dkd_active_task_value = useMemo(() => {
@@ -84,7 +84,7 @@ export default function DkdCourierLiveSyncBridge({ dkd_profile_value, dkd_curren
     async function dkd_refresh_task_list_value() {
       if (dkd_app_state_ref_value.current !== 'active') return;
       try {
-        const dkd_result_value = await fetchCourierJobs({ dkd_cache_ttl_ms: dkd_active_task_value ? 8000 : 18000 });
+        const dkd_result_value = await fetchCourierJobs({ dkd_force_refresh: Boolean(dkd_active_task_value), dkd_cache_ttl_ms: dkd_active_task_value ? 0 : 12000 });
         if (dkd_cancelled_value) return;
         const dkd_next_rows_value = Array.isArray(dkd_result_value?.data) ? dkd_result_value.data : [];
         const dkd_next_fingerprint_value = dkd_task_list_fingerprint_value(dkd_next_rows_value);
@@ -94,7 +94,7 @@ export default function DkdCourierLiveSyncBridge({ dkd_profile_value, dkd_curren
       } catch (_dkd_unused_error_value) {}
     }
     dkd_refresh_task_list_value();
-    const dkd_interval_value = setInterval(dkd_refresh_task_list_value, dkd_active_task_value ? 12000 : 30000);
+    const dkd_interval_value = setInterval(dkd_refresh_task_list_value, dkd_active_task_value ? 2500 : 15000);
     const dkd_app_state_subscription_value = AppState.addEventListener('change', (dkd_state_value) => {
       dkd_app_state_ref_value.current = dkd_state_value;
       if (dkd_state_value === 'active') dkd_refresh_task_list_value();
@@ -116,14 +116,15 @@ export default function DkdCourierLiveSyncBridge({ dkd_profile_value, dkd_curren
         const dkd_plate_value = String(dkd_profile_value?.courier_profile_meta?.plate_no || dkd_profile_value?.courier_profile_meta?.plateNo || '').trim().toUpperCase();
         const dkd_vehicle_type_value = String(dkd_profile_value?.courier_vehicle_type || dkd_profile_value?.courier_profile_meta?.vehicle_type || 'moto').trim().toLowerCase();
         const dkd_heading_deg_value = dkd_safe_number_value(dkd_throttled_location_value?.heading);
-        const dkd_sync_fingerprint_value = [dkd_current_lat_value.toFixed(5), dkd_current_lng_value.toFixed(5), dkd_eta_min_value == null ? 'na' : String(dkd_eta_min_value), dkd_heading_deg_value == null ? 'na' : String(Math.round(dkd_heading_deg_value)), String(dkd_active_task_value?.id || ''), String(dkd_active_task_value?.dkd_phase_value || '')].join('|');
+        const dkd_second_bucket_value = Math.floor(Date.now() / 1000);
+        const dkd_sync_fingerprint_value = [dkd_current_lat_value.toFixed(6), dkd_current_lng_value.toFixed(6), dkd_eta_min_value == null ? 'na' : String(dkd_eta_min_value), dkd_heading_deg_value == null ? 'na' : String(Math.round(dkd_heading_deg_value)), String(dkd_active_task_value?.id || ''), String(dkd_active_task_value?.dkd_phase_value || ''), String(dkd_second_bucket_value)].join('|');
         if (dkd_last_sync_fingerprint_ref_value.current === dkd_sync_fingerprint_value) return;
         await dkd_upsert_courier_live_location({ dkd_lat: dkd_current_lat_value, dkd_lng: dkd_current_lng_value, dkd_eta_min: dkd_eta_min_value, dkd_heading_deg: dkd_heading_deg_value, dkd_plate_no: dkd_plate_value, dkd_vehicle_type: dkd_vehicle_type_value });
         if (!dkd_cancelled_value) dkd_last_sync_fingerprint_ref_value.current = dkd_sync_fingerprint_value;
       } catch (_dkd_unused_error_value) {}
     }
     dkd_push_live_location_value();
-    const dkd_interval_value = setInterval(dkd_push_live_location_value, 10000);
+    const dkd_interval_value = setInterval(dkd_push_live_location_value, 1000);
     return () => { dkd_cancelled_value = true; clearInterval(dkd_interval_value); };
   }, [dkd_active_task_value, dkd_throttled_location_value?.heading, dkd_throttled_location_value?.lat, dkd_throttled_location_value?.lng, dkd_is_courier_approved_value, dkd_profile_value?.courier_profile_meta, dkd_profile_value?.courier_vehicle_type]);
 
