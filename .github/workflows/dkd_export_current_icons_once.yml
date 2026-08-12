@@ -1,0 +1,28 @@
+name: Export DraBornGo icon assets
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/dkd_export_current_icons_once.yml']
+permissions:
+  contents: write
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/upload-artifact@v4
+        with:
+          name: DraBornGo_Current_Icon_Assets
+          path: |
+            assets/images/icon.png
+            assets/images/splash-icon.png
+            assets/images/android-icon-foreground.png
+          retention-days: 1
+      - name: Remove helper workflow
+        run: |
+          rm -f .github/workflows/dkd_export_current_icons_once.yml
+          git config user.name 'DraBornGo Release Bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add .github/workflows/dkd_export_current_icons_once.yml
+          git commit -m 'ci: cleanup icon export helper' || true
+          git push origin HEAD:main
