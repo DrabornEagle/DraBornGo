@@ -1,4 +1,4 @@
-name: DraBornPortal v0.4 Signed APK
+name: DraBornPortal v0.4 Signed APK\n# DraBornPortal source refresh 2
 
 on:
   workflow_dispatch:
