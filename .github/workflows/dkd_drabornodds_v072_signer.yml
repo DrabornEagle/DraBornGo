@@ -150,3 +150,5 @@ jobs:
             dkd_drabornodds_release/CERTIFICATE.txt \
             dkd_drabornodds_release/SOURCE_COMMIT.txt \
             --clobber
+
+# Rerun after canonical code1 metadata/test alignment.
