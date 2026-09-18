@@ -1,4 +1,4 @@
-# DraBornOdds protected release signer; final v0.7.4 profile-correct source synchronization.
+# DraBornOdds protected release signer; v0.7.4 final source with stale-build cancellation.
 name: DraBornOdds synchronized APK signer
 
 on:
@@ -15,7 +15,7 @@ permissions:
 
 concurrency:
   group: dkd-drabornodds-auto-signer
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   dkd_sync_signed_apk:
