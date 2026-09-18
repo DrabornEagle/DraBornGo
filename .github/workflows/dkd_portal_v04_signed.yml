@@ -88,8 +88,8 @@ jobs:
         run: |
           tag="drabornportal-v0.4.2-code1"
           apk="signed_output/DraBornPortal-v0.4.2-code1-signed.apk"
-          if gh release view "$tag" >/dev/null 2>&1; then
-            gh release upload "$tag" "$apk" --clobber
+          if gh release view "$tag" -R DrabornEagle/DraBornGo >/dev/null 2>&1; then
+            gh release upload "$tag" "$apk" --clobber -R DrabornEagle/DraBornGo
           else
             gh release create "$tag" "$apk"               --title "DraBornPortal v0.4.2 • Android code 1"               --notes "DrabornEagle Oyun Çevirisi. Signed Release APK • versionName 0.4.2 • versionCode 1."
           fi
