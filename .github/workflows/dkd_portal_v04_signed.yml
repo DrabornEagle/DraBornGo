@@ -50,7 +50,7 @@ jobs:
         shell: bash
         run: |
           grep -q 'versionCode = 3' portal/app/build.gradle.kts
-          grep -q 'versionName = "0.4.1"' portal/app/build.gradle.kts
+          grep -q 'versionName = "0.4.2"' portal/app/build.gradle.kts
 
       - name: Test and build signed release APK
         working-directory: portal
