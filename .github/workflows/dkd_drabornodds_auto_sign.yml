@@ -1,6 +1,10 @@
 name: DraBornOdds synchronized APK signer
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/dkd_drabornodds_auto_sign.yml'
   workflow_dispatch:
   schedule:
     - cron: '17,47 * * * *'
