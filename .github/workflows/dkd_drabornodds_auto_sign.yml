@@ -114,7 +114,7 @@ jobs:
       - name: DKD prebuild Android
         if: env.DKD_NEEDS_BUILD == '1'
         working-directory: ${{ runner.temp }}/DraBornOdds
-        run: npx expo prebuild --platform android --clean --non-interactive
+        run: npx expo prebuild --platform android --clean
 
       - name: DKD inject protected release signing
         if: env.DKD_NEEDS_BUILD == '1'
