@@ -1,5 +1,8 @@
 name: DraBornPortal v0.4.2 Signed APK\n# DraBornPortal v0.4.2 code1 signed release
 
+permissions:
+  contents: write
+
 on:
   workflow_dispatch:
   push:
@@ -77,3 +80,16 @@ jobs:
           name: DraBornPortal-v0.4.2-code1-signed
           path: signed_output/
           retention-days: 14
+
+      - name: Publish stable DraBornPortal APK download
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          tag="drabornportal-v0.4.2-code1"
+          apk="signed_output/DraBornPortal-v0.4.2-code1-signed.apk"
+          if gh release view "$tag" >/dev/null 2>&1; then
+            gh release upload "$tag" "$apk" --clobber
+          else
+            gh release create "$tag" "$apk"               --title "DraBornPortal v0.4.2 • Android code 1"               --notes "DrabornEagle Oyun Çevirisi. Signed Release APK • versionName 0.4.2 • versionCode 1."
+          fi
