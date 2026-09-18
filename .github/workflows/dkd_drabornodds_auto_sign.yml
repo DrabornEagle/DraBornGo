@@ -1,4 +1,4 @@
-# DraBornOdds protected release signer; push trigger enables immediate verified rebuilds.
+# DraBornOdds protected release signer; push trigger enables immediate verified rebuilds. v0.7.3
 name: DraBornOdds synchronized APK signer
 
 on:
