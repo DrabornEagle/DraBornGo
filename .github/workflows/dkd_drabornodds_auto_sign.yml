@@ -1,4 +1,4 @@
-# DraBornOdds protected release signer; v0.7.4 final source with stale-build cancellation.
+# DraBornOdds protected release signer; release-driven only, no periodic polling.
 name: DraBornOdds synchronized APK signer
 
 on:
@@ -7,8 +7,6 @@ on:
     paths:
       - '.github/workflows/dkd_drabornodds_auto_sign.yml'
   workflow_dispatch:
-  schedule:
-    - cron: '17,47 * * * *'
 
 permissions:
   contents: write
@@ -54,7 +52,7 @@ jobs:
             if ! git cat-file -e "$dkd_signed_source^{commit}" 2>/dev/null; then
               git fetch origin "$dkd_signed_source" --depth=1 || true
             fi
-            if git cat-file -e "$dkd_signed_source^{commit}" 2>/dev/null && git diff --quiet "$dkd_signed_source" HEAD -- . ':(exclude).github/**'; then
+            if git cat-file -e "$dkd_signed_source^{commit}" 2>/dev/null && git diff --quiet "$dkd_signed_source" HEAD -- app src app.json package.json package-lock.json plugins metro.config.js tsconfig.json assets/dkd-icon.png assets/dkd-adaptive-icon.png; then
               dkd_needs_build=0
             fi
           fi
